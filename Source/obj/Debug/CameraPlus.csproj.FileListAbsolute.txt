@@ -1,0 +1,4 @@
+D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus\Source\obj\Debug\CameraPlus.dll
+D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus\Source\obj\Debug\CameraPlus.csprojResolveAssemblyReference.cache
+D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus2\Source\obj\Debug\CameraPlus.csprojResolveAssemblyReference.cache
+D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus2\Source\obj\Debug\CameraPlus2.dll
