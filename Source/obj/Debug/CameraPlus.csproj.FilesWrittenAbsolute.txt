@@ -1,2 +1,0 @@
-/Users/ap/Library/Application Support/Steam/steamapps/common/RimWorld/RimWorldMac.app/Mods/CameraPlus/Assemblies/CameraPlus2.dll
-/Users/ap/Library/Application Support/Steam/steamapps/common/RimWorld/RimWorldMac.app/Mods/CameraPlus/Source/obj/Debug/CameraPlus2.dll

@@ -1,7 +1,6 @@
 ﻿using Verse;
 using Harmony;
 using UnityEngine;
-using System;
 
 namespace CameraPlus
 {

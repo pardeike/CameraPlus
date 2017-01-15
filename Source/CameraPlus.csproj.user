@@ -2,4 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
   </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus\Harmony\;D:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin_Data\Managed\</ReferencePath>
+  </PropertyGroup>
 </Project>
