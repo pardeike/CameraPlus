@@ -3,6 +3,9 @@
   <PropertyGroup>
   </PropertyGroup>
   <PropertyGroup>
-    <ReferencePath>D:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\CameraPlus\Harmony\;D:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin_Data\Managed\</ReferencePath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>
+    </ReferencePath>
   </PropertyGroup>
 </Project>
