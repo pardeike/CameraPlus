@@ -2,7 +2,6 @@
 using Harmony;
 using UnityEngine;
 using System.Reflection;
-using Harmony.ILCopying;
 using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
@@ -22,7 +21,6 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(GenMapUI))]
 	[HarmonyPatch("DrawThingLabel")]
 	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
-
 	static class GenMapUI_DrawThingLabel_Patch
 	{
 		static GameFont GetAdaptedGameFont()
@@ -33,26 +31,19 @@ namespace CameraPlus
 			return GameFont.Tiny;
 		}
 
-		class AdaptedGameFontReplacer : IILProcessor
+		class AdaptedGameFontReplacer : CodeProcessor
 		{
 			bool firstInstruction = true;
 
-			public List<ILInstruction> Start(ILGenerator generator, MethodBase original)
-			{
-				return new List<ILInstruction>();
-			}
-
 			// we replace the first "GameFont.Tiny" with our "GetAdaptedGameFont()"
 			//
-			public List<ILInstruction> Process(ILInstruction instruction)
+			public override List<CodeInstruction> Process(CodeInstruction instruction)
 			{
-				var result = new List<ILInstruction>();
+				var result = new List<CodeInstruction>();
 				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
 				{
 					var method = AccessTools.Method(typeof(GenMapUI_DrawThingLabel_Patch), "GetAdaptedGameFont");
-					var call = new ILInstruction(OpCodes.Call);
-					call.operand = method;
-					call.argument = method;
+					var call = new CodeInstruction(OpCodes.Call, method);
 					result.Add(call);
 				}
 				else
@@ -61,18 +52,13 @@ namespace CameraPlus
 				firstInstruction = false;
 				return result;
 			}
-
-			public List<ILInstruction> End(ILGenerator generator, MethodBase original)
-			{
-				return new List<ILInstruction>();
-			}
 		}
 
-		[HarmonyProcessors]
+		[HarmonyProcessorFactory]
 		static HarmonyProcessor AdaptedGameFontReplacerPatch(MethodBase original)
 		{
 			var processor = new HarmonyProcessor();
-			processor.AddILProcessor(new AdaptedGameFontReplacer());
+			processor.Add(new AdaptedGameFontReplacer());
 			return processor;
 		}
 	}
@@ -81,38 +67,27 @@ namespace CameraPlus
 	[HarmonyPatch("get_CurrentZoom")]
 	static class CameraDriver_get_CurrentZoom_Patch
 	{
-		class ZoomLerper : IILProcessor
+		class ZoomLerper : CodeProcessor
 		{
-			public List<ILInstruction> Start(ILGenerator generator, MethodBase original)
-			{
-				return new List<ILInstruction>();
-			}
-
 			// Normal values: 12, 13.8, 42, 57
 			//
-			public List<ILInstruction> Process(ILInstruction instruction)
+			public override List<CodeInstruction> Process(CodeInstruction instruction)
 			{
 				if (instruction.opcode == OpCodes.Ldc_R4)
 				{
 					var f = (float)instruction.operand;
 					f = GenMath.LerpDouble(12, 57, 30, 60, f);
 					instruction.operand = f;
-					instruction.argument = f;
 				}
-				return new List<ILInstruction>() { instruction };
-			}
-
-			public List<ILInstruction> End(ILGenerator generator, MethodBase original)
-			{
-				return new List<ILInstruction>();
+				return new List<CodeInstruction>() { instruction };
 			}
 		}
 
-		[HarmonyProcessors]
+		[HarmonyProcessorFactory]
 		static HarmonyProcessor LerpCurrentZoom(MethodBase original)
 		{
 			var processor = new HarmonyProcessor();
-			processor.AddILProcessor(new ZoomLerper());
+			processor.Add(new ZoomLerper());
 			return processor;
 		}
 	}
