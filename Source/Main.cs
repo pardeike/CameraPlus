@@ -31,35 +31,24 @@ namespace CameraPlus
 			return GameFont.Tiny;
 		}
 
-		class AdaptedGameFontReplacer : CodeProcessor
+		// we replace the first "GameFont.Tiny" with our "GetAdaptedGameFont()"
+		//
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> AdaptedGameFontReplacerPatch(IEnumerable<CodeInstruction> instructions)
 		{
 			bool firstInstruction = true;
-
-			// we replace the first "GameFont.Tiny" with our "GetAdaptedGameFont()"
-			//
-			public override List<CodeInstruction> Process(CodeInstruction instruction)
+			foreach (var instruction in instructions)
 			{
-				var result = new List<CodeInstruction>();
 				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
 				{
 					var method = AccessTools.Method(typeof(GenMapUI_DrawThingLabel_Patch), "GetAdaptedGameFont");
-					var call = new CodeInstruction(OpCodes.Call, method);
-					result.Add(call);
+					yield return new CodeInstruction(OpCodes.Call, method);
 				}
 				else
-					result.Add(instruction);
+					yield return instruction;
 
 				firstInstruction = false;
-				return result;
 			}
-		}
-
-		[HarmonyProcessorFactory]
-		static HarmonyProcessor AdaptedGameFontReplacerPatch(MethodBase original)
-		{
-			var processor = new HarmonyProcessor();
-			processor.Add(new AdaptedGameFontReplacer());
-			return processor;
 		}
 	}
 
@@ -67,28 +56,23 @@ namespace CameraPlus
 	[HarmonyPatch("get_CurrentZoom")]
 	static class CameraDriver_get_CurrentZoom_Patch
 	{
-		class ZoomLerper : CodeProcessor
+		// Normal values: 12, 13.8, 42, 57
+		//
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> LerpCurrentZoom(IEnumerable<CodeInstruction> instructions)
 		{
-			// Normal values: 12, 13.8, 42, 57
-			//
-			public override List<CodeInstruction> Process(CodeInstruction instruction)
+			foreach (var instruction in instructions)
 			{
 				if (instruction.opcode == OpCodes.Ldc_R4)
 				{
 					var f = (float)instruction.operand;
 					f = GenMath.LerpDouble(12, 57, 30, 60, f);
 					instruction.operand = f;
+					yield return instruction;
 				}
-				return new List<CodeInstruction>() { instruction };
+				else
+					yield return instruction;
 			}
-		}
-
-		[HarmonyProcessorFactory]
-		static HarmonyProcessor LerpCurrentZoom(MethodBase original)
-		{
-			var processor = new HarmonyProcessor();
-			processor.Add(new ZoomLerper());
-			return processor;
 		}
 	}
 
