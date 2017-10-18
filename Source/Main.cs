@@ -8,41 +8,57 @@ using System.Reflection.Emit;
 
 namespace CameraPlus
 {
-	[StaticConstructorOnStartup]
-	class Main
+	class CameraPlusMain : Mod
 	{
-		static Main()
+		public static CameraPlusSettings Settings;
+
+		public CameraPlusMain(ModContentPack content) : base(content)
 		{
+			Settings = GetSettings<CameraPlusSettings>();
+
 			var harmony = HarmonyInstance.Create("net.pardeike.rimworld.mod.camera+");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
 		}
+
+		public override void DoSettingsWindowContents(Rect inRect)
+		{
+			Settings.DoWindowContents(inRect);
+		}
+
+		public override string SettingsCategory()
+		{
+			return "Camera+";
+		}
 	}
 
+	// if we zoom in alot, tiny font labels look very out of place
+	// so we make them bigger with the available fonts
+	//
 	[HarmonyPatch(typeof(GenMapUI))]
 	[HarmonyPatch("DrawThingLabel")]
 	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
-		static GameFont GetAdaptedGameFont()
+		static GameFont GetAdaptedGameFont(float rootSize)
 		{
-			var rootSize = Traverse.Create(Find.CameraDriver).Field("rootSize").GetValue<float>();
-			if (rootSize < 14f) return GameFont.Medium;
-			if (rootSize < 19f) return GameFont.Small;
+			if (rootSize < 11f) return GameFont.Medium;
+			if (rootSize < 15f) return GameFont.Small;
 			return GameFont.Tiny;
 		}
 
-		// we replace the first "GameFont.Tiny" with our "GetAdaptedGameFont()"
+		// we replace the first "GameFont.Tiny" with "GetAdaptedGameFont(Find.CameraDriver.rootSize)"
 		//
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> AdaptedGameFontReplacerPatch(IEnumerable<CodeInstruction> instructions)
 		{
-			bool firstInstruction = true;
+			var firstInstruction = true;
 			foreach (var instruction in instructions)
 			{
 				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
 				{
-					var method = AccessTools.Method(typeof(GenMapUI_DrawThingLabel_Patch), "GetAdaptedGameFont");
-					yield return new CodeInstruction(OpCodes.Call, method);
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Find), "get_CameraDriver"));
+					yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(CameraDriver), "rootSize"));
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GenMapUI_DrawThingLabel_Patch), "GetAdaptedGameFont"));
 				}
 				else
 					yield return instruction;
@@ -52,11 +68,13 @@ namespace CameraPlus
 		}
 	}
 
+	// map our new camera settings to meaningful enum values
+	//
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("get_CurrentZoom")]
-	static class CameraDriver_get_CurrentZoom_Patch
+	[HarmonyPatch("CurrentZoom", PropertyMethod.Getter)]
+	static class CameraDriver_CurrentZoom_Patch
 	{
-		// Normal values: 12, 13.8, 42, 57
+		// normal values: 12, 13.8, 42, 57
 		//
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> LerpCurrentZoom(IEnumerable<CodeInstruction> instructions)
@@ -80,48 +98,99 @@ namespace CameraPlus
 	[HarmonyPatch("ApplyPositionToGameObject")]
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
-		static void Postfix(CameraDriver __instance)
+		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
-			var trv = Traverse.Create(__instance);
-			var p_MyCamera = trv.Property("MyCamera").GetValue<Camera>();
-			var pos = p_MyCamera.transform.position;
-			var y = p_MyCamera.transform.position.y;
-			var o = p_MyCamera.orthographicSize;
+			var pos = camera.transform.position;
+			var y = camera.transform.position.y;
 
-			var y2 = GenMath.LerpDouble(65, 15, 65, 32, y);
-			var o2 = GenMath.LerpDouble(60, 11, 60, 0.5f, o);
-			var dolly = GenMath.LerpDouble(65, 15, 1, 3, y);
-			dolly = 85 - dolly * dolly * dolly * dolly;
+			var y2 = GenMath.LerpDouble(CameraPlusSettings.maxRootOutput, CameraPlusSettings.minRootOutput, CameraPlusSettings.farOutHeight, CameraPlusSettings.nearestHeight, y);
+			camera.transform.position = new Vector3(pos.x, y2, pos.z);
 
-			p_MyCamera.transform.position = new Vector3(pos.x, y2, pos.z);
-			p_MyCamera.orthographicSize = o2;
-			__instance.config.dollyRateKeys = dolly;
+			var orthSize = CameraPlusSettings.LerpRootSize(camera.orthographicSize);
+			camera.orthographicSize = orthSize;
+			driver.config.dollyRateKeys = CameraPlusSettings.GetDollyRate(orthSize);
+		}
+
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> Postfix_ApplyPositionToGameObject(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		{
+			foreach (var instruction in instructions)
+				if (instruction.opcode != OpCodes.Ret)
+					yield return instruction;
+
+			yield return new CodeInstruction(OpCodes.Ldarg_0);
+			yield return new CodeInstruction(OpCodes.Ldarg_0);
+			yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CameraDriver), "get_MyCamera"));
+			yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(CameraDriver_ApplyPositionToGameObject_Patch), "ApplyZoom"));
+			yield return new CodeInstruction(OpCodes.Ret);
 		}
 	}
 
-    [HarmonyPatch(typeof(CameraDriver))]
-    [HarmonyPatch("get_CurrentViewRect")]
-    static class CameraDriver_get_CurrentViewRect_Patch
-    {
-        static FieldInfo FieldInfo_CamerDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
-        static MethodInfo MethodInfo_LerpRootSize = AccessTools.Method(typeof(CameraDriver_get_CurrentViewRect_Patch), nameof(LerpRootSize));
+	// increase clipping distance
+	//
+	[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch("Awake")]
+	static class CameraDriver_Awake_Patch
+	{
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> Postfix_Awake(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		{
+			foreach (var instruction in instructions)
+			{
+				if (instruction.opcode == OpCodes.Ldc_R4)
+					instruction.operand = CameraPlusSettings.farOutHeight + 5;
+				yield return instruction;
+			}
+		}
+	}
 
-        [HarmonyTranspiler]
-        static IEnumerable<CodeInstruction> LerpCurrentZoom(IEnumerable<CodeInstruction> instructions)
-        {
-            foreach (var instruction in instructions)
-            {
-                if (instruction.opcode == OpCodes.Ldfld && instruction.operand == FieldInfo_CamerDriver_rootSize)
-                {
-                    yield return instruction;
-                    yield return new CodeInstruction(OpCodes.Call, MethodInfo_LerpRootSize);
-                }
-                else
-                    yield return instruction;
-            }
-        }
+	// here, we basically add a "var lerpedRootSize = Main.LerpRootSize(this.rootSize);" to
+	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
+	//
+	[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch("CurrentViewRect", PropertyMethod.Getter)]
+	static class CameraDriver_CurrentViewRect_Patch
+	{
+		static FieldInfo f_CameraDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
+		static MethodInfo m_Main_LerpRootSize = AccessTools.Method(typeof(CameraPlusSettings), nameof(CameraPlusSettings.LerpRootSize));
 
-        static float LerpRootSize(float rootSize) => GenMath.LerpDouble(60, 11, 60, 0.5f, rootSize);
-    }
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> LerpCurrentViewRect(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		{
+			var v_lerpedRootSize = generator.DeclareLocal(typeof(float));
 
+			// store lerped rootSize in a new local var
+			//
+			yield return new CodeInstruction(OpCodes.Ldarg_0);
+			yield return new CodeInstruction(OpCodes.Ldfld, f_CameraDriver_rootSize);
+			yield return new CodeInstruction(OpCodes.Call, m_Main_LerpRootSize);
+			yield return new CodeInstruction(OpCodes.Stloc, v_lerpedRootSize);
+
+			var previousCodeWasLdArg0 = false;
+			foreach (var instr in instructions)
+			{
+				var instruction = instr; // make it writeable
+
+				if (instruction.opcode == OpCodes.Ldarg_0)
+				{
+					previousCodeWasLdArg0 = true;
+					continue; // do not emit the code
+				}
+
+				if (previousCodeWasLdArg0)
+				{
+					previousCodeWasLdArg0 = false;
+
+					// looking for Ldarg.0 followed by Ldfld rootSize
+					//
+					if (instruction.opcode == OpCodes.Ldfld && instruction.operand == f_CameraDriver_rootSize)
+						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
+					else
+						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check
+				}
+
+				yield return instruction;
+			}
+		}
+	}
 }
