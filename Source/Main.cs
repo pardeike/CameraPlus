@@ -98,4 +98,30 @@ namespace CameraPlus
 			__instance.config.dollyRateKeys = dolly;
 		}
 	}
+
+    [HarmonyPatch(typeof(CameraDriver))]
+    [HarmonyPatch("get_CurrentViewRect")]
+    static class CameraDriver_get_CurrentViewRect_Patch
+    {
+        static FieldInfo FieldInfo_CamerDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
+        static MethodInfo MethodInfo_LerpRootSize = AccessTools.Method(typeof(CameraDriver_get_CurrentViewRect_Patch), nameof(LerpRootSize));
+
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> LerpCurrentZoom(IEnumerable<CodeInstruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Ldfld && instruction.operand == FieldInfo_CamerDriver_rootSize)
+                {
+                    yield return instruction;
+                    yield return new CodeInstruction(OpCodes.Call, MethodInfo_LerpRootSize);
+                }
+                else
+                    yield return instruction;
+            }
+        }
+
+        static float LerpRootSize(float rootSize) => GenMath.LerpDouble(60, 11, 60, 0.5f, rootSize);
+    }
+
 }

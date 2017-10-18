@@ -5,7 +5,6 @@
   <PropertyGroup>
   </PropertyGroup>
   <PropertyGroup>
-    <ReferencePath>
-    </ReferencePath>
+    <ReferencePath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin_Data\Managed\</ReferencePath>
   </PropertyGroup>
 </Project>
