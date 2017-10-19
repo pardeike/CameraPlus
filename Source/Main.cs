@@ -103,10 +103,8 @@ namespace CameraPlus
 			// small note: moving the camera too far out requires adjusting the clipping distance
 			//
 			var pos = camera.transform.position;
-			var height = pos.y;
 			var cameraSpan = CameraPlusSettings.maxRootOutput - CameraPlusSettings.minRootOutput;
-			Log.Warning("" + height);
-			var f = (height - CameraPlusSettings.minRootOutput) / cameraSpan;
+			var f = (pos.y - CameraPlusSettings.minRootOutput) / cameraSpan;
 			f *= 1 - CameraPlusMain.Settings.soundNearness;
 			pos.y = CameraPlusSettings.minRootOutput + f * cameraSpan;
 			camera.transform.position = pos;
