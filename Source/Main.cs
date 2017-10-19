@@ -100,11 +100,16 @@ namespace CameraPlus
 	{
 		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
+			// small note: moving the camera too far out requires adjusting the clipping distance
+			//
 			var pos = camera.transform.position;
-			var y = camera.transform.position.y;
-
-			var y2 = GenMath.LerpDouble(CameraPlusSettings.maxRootOutput, CameraPlusSettings.minRootOutput, CameraPlusSettings.farOutHeight, CameraPlusSettings.nearestHeight, y);
-			camera.transform.position = new Vector3(pos.x, y2, pos.z);
+			var height = pos.y;
+			var cameraSpan = CameraPlusSettings.maxRootOutput - CameraPlusSettings.minRootOutput;
+			Log.Warning("" + height);
+			var f = (height - CameraPlusSettings.minRootOutput) / cameraSpan;
+			f *= 1 - CameraPlusMain.Settings.soundNearness;
+			pos.y = CameraPlusSettings.minRootOutput + f * cameraSpan;
+			camera.transform.position = pos;
 
 			var orthSize = CameraPlusSettings.LerpRootSize(camera.orthographicSize);
 			camera.orthographicSize = orthSize;
@@ -112,7 +117,7 @@ namespace CameraPlus
 		}
 
 		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> Postfix_ApplyPositionToGameObject(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Postfix_ApplyPositionToGameObject(IEnumerable<CodeInstruction> instructions)
 		{
 			foreach (var instruction in instructions)
 				if (instruction.opcode != OpCodes.Ret)
@@ -126,14 +131,14 @@ namespace CameraPlus
 		}
 	}
 
-	// increase clipping distance
+	/* increase clipping distance
 	//
 	[HarmonyPatch(typeof(CameraDriver))]
 	[HarmonyPatch("Awake")]
 	static class CameraDriver_Awake_Patch
 	{
 		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> Postfix_Awake(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Postfix_Awake(IEnumerable<CodeInstruction> instructions)
 		{
 			foreach (var instruction in instructions)
 			{
@@ -142,7 +147,7 @@ namespace CameraPlus
 				yield return instruction;
 			}
 		}
-	}
+	}*/
 
 	// here, we basically add a "var lerpedRootSize = Main.LerpRootSize(this.rootSize);" to
 	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
@@ -151,8 +156,8 @@ namespace CameraPlus
 	[HarmonyPatch("CurrentViewRect", PropertyMethod.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
-		static FieldInfo f_CameraDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
-		static MethodInfo m_Main_LerpRootSize = AccessTools.Method(typeof(CameraPlusSettings), nameof(CameraPlusSettings.LerpRootSize));
+		static readonly FieldInfo f_CameraDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
+		static readonly MethodInfo m_Main_LerpRootSize = AccessTools.Method(typeof(CameraPlusSettings), nameof(CameraPlusSettings.LerpRootSize));
 
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> LerpCurrentViewRect(ILGenerator generator, IEnumerable<CodeInstruction> instructions)

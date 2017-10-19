@@ -12,6 +12,7 @@ namespace CameraPlus
 		public int exponentiality = 1;
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
+		public float soundNearness = 0;
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -33,6 +34,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref exponentiality, "exponentiality", 1);
 			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
+			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 
 			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
 			{
@@ -113,6 +115,11 @@ namespace CameraPlus
 
 			list.Label("ZoomedOutDollyPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + "%", -1f);
 			zoomedOutDollyPercent = list.Slider(zoomedOutDollyPercent, 0f, 2f);
+
+			list.Gap(12f);
+
+			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%", -1f);
+			soundNearness = list.Slider(soundNearness, 0f, 1f);
 
 			list.End();
 		}
