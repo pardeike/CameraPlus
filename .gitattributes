@@ -61,3 +61,11 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# exclude files from the release
+###############################################################################
+/Source export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/README.md export-ignore
