@@ -68,4 +68,6 @@
 /Source export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
+/*.sln export-ignore
+/LICENSE export-ignore
 /README.md export-ignore
