@@ -71,7 +71,7 @@ namespace CameraPlus
 	// map our new camera settings to meaningful enum values
 	//
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CurrentZoom", PropertyMethod.Getter)]
+	[HarmonyPatch("CurrentZoom", MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
 		// normal values: 12, 13.8, 42, 57
@@ -151,7 +151,7 @@ namespace CameraPlus
 	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
 	//
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CurrentViewRect", PropertyMethod.Getter)]
+	[HarmonyPatch("CurrentViewRect", MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
 		static readonly FieldInfo f_CameraDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");

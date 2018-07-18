@@ -64,7 +64,7 @@ namespace CameraPlus
 		public void DoWindowContents(Rect inRect)
 		{
 			float previous;
-			var map = Current.Game?.VisibleMap;
+			var map = Current.Game?.CurrentMap;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
