@@ -13,6 +13,7 @@ namespace CameraPlus
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
 		public float soundNearness = 0;
+		public bool hideNamesWhenZoomedOut = true;
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -35,6 +36,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
+			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
 
 			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
 			{
@@ -64,7 +66,7 @@ namespace CameraPlus
 		public void DoWindowContents(Rect inRect)
 		{
 			float previous;
-			var map = Current.Game?.VisibleMap;
+			var map = Current.Game?.CurrentMap;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
@@ -120,6 +122,10 @@ namespace CameraPlus
 
 			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%", -1f);
 			soundNearness = list.Slider(soundNearness, 0f, 1f);
+
+			list.Gap(12f);
+
+			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
 
 			list.End();
 		}
