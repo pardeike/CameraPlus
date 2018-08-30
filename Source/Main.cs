@@ -1,10 +1,11 @@
-﻿using Verse;
-using Harmony;
-using UnityEngine;
-using System.Reflection;
+﻿using Harmony;
+using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
+using UnityEngine;
+using Verse;
 
 namespace CameraPlus
 {
@@ -31,7 +32,66 @@ namespace CameraPlus
 		}
 	}
 
-	// if we zoom in alot, tiny font labels look very out of place
+	[HarmonyPatch(typeof(MoteMaker))]
+	[HarmonyPatch("ThrowText")]
+	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
+	static class MoteMaker_ThrowText_Patch
+	{
+		static bool Prefix(Vector3 loc)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return true;
+
+			var d = Find.CameraDriver.CellSizePixels;
+			if (d >= 12f)
+				return true;
+
+			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
+			var v2 = loc.MapToUIPosition();
+			if (Vector2.Distance(v1, v2) <= 28f)
+				return true;
+
+			return false;
+		}
+	}
+
+	[HarmonyPatch(typeof(GenMapUI))]
+	[HarmonyPatch("DrawPawnLabel")]
+	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
+	[StaticConstructorOnStartup]
+	static class GenMapUI_DrawPawnLabel_Patch
+	{
+		public static Texture2D innerTexture = ContentFinder<Texture2D>.Get("InnerMarker", true);
+		public static Texture2D outerTexture = ContentFinder<Texture2D>.Get("OuterMarker", true);
+
+		static bool Prefix(Pawn pawn, float truncateToWidth)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || truncateToWidth != 9999f)
+				return true;
+
+			var d = Find.CameraDriver.CellSizePixels;
+			if (d >= 12f)
+				return true;
+
+			var pos = pawn.DrawPos;
+			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
+			var v2 = pos.MapToUIPosition();
+			if (Vector2.Distance(v1, v2) <= 28f)
+				return true;
+
+			v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
+			v2 = (pos + new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
+
+			GUI.color = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
+			GUI.DrawTexture(new Rect(v1, v2 - v1), outerTexture, ScaleMode.ScaleToFit, true);
+			GUI.color = PawnNameColorUtility.PawnNameColorOf(pawn);
+			GUI.DrawTexture(new Rect(v1, v2 - v1), innerTexture, ScaleMode.ScaleToFit, true);
+
+			return false;
+		}
+	}
+
+	// if we zoom in a lot, tiny font labels look very out of place
 	// so we make them bigger with the available fonts
 	//
 	[HarmonyPatch(typeof(GenMapUI))]

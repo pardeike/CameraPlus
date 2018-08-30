@@ -6,4 +6,5 @@
 	<ZoomedInDollyPercent>Desplazamiento cuando se acerca el zoom</ZoomedInDollyPercent>
 	<ZoomedOutDollyPercent>Desplazamiento cuando se aleja el zoom</ZoomedOutDollyPercent>
 	<SoundNearness>Acercar los sonidos locales</SoundNearness>
+	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
 </LanguageData>
