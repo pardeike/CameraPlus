@@ -19,7 +19,6 @@ namespace CameraPlus
 
 			var harmony = HarmonyInstance.Create("net.pardeike.rimworld.mod.camera+");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
-			FireStats.Trigger(true);
 		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
@@ -39,7 +38,7 @@ namespace CameraPlus
 	{
 		static void Postfix()
 		{
-			FireStats.Trigger(false);
+			ModCounter.Trigger();
 		}
 	}
 
