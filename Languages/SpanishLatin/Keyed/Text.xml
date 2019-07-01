@@ -3,8 +3,10 @@
 	<ZoomedInPercent>Factor máximo de acercamiento (zoom in)</ZoomedInPercent>
 	<ZoomedOutPercent>Factor máximo de alejamiento (zoom out)</ZoomedOutPercent>
 	<Exponentiality>Escalado exponencial:</Exponentiality>
-	<ZoomedInDollyPercent>Desplazamiento cuando se acerca el zoom</ZoomedInDollyPercent>
-	<ZoomedOutDollyPercent>Desplazamiento cuando se aleja el zoom</ZoomedOutDollyPercent>
 	<SoundNearness>Acercar los sonidos locales</SoundNearness>
 	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
+	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
+	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
+	<ZoomedIn>Completamente ampliado</ZoomedIn>
+	<ZoomedOut>Completamente alejado</ZoomedOut>
 </LanguageData>

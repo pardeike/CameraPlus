@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-  <ZoomedInPercent>最大ズームイン倍率</ZoomedInPercent>
-  <ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
-  <Exponentiality>指数関数スケーリング:</Exponentiality>
-  <ZoomedInDollyPercent>ズームイン時スクロール速度</ZoomedInDollyPercent>
-  <ZoomedOutDollyPercent>ズームアウト時スクロール速度</ZoomedOutDollyPercent>
-  <SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
-  <HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
-
+	<ZoomedInPercent>最大ズームイン倍率</ZoomedInPercent>
+	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
+	<Exponentiality>指数関数スケーリング:</Exponentiality>
+	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
+	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
+	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
+	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
+	<ZoomedIn>完全にズームイン</ZoomedIn>
+	<ZoomedOut>完全にズームアウト</ZoomedOut>
 </LanguageData>

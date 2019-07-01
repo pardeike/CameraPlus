@@ -2,7 +2,10 @@
 <ModMetaData>
 	<name>Camera+</name>
 	<author>Andreas Pardeike</author>
-	<targetVersion>1.0.0</targetVersion>
+	<supportedVersions>
+		<li>0.19</li>
+		<li>1.0</li>
+	</supportedVersions>
 	<description>You want more zoom and different paning?
 
 Powered by Harmony Patch Library
