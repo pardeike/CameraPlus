@@ -109,7 +109,10 @@ namespace CameraPlus
 	{
 		public static Texture2D innerTexture = ContentFinder<Texture2D>.Get("InnerMarker", true);
 		public static Texture2D outerTexture = ContentFinder<Texture2D>.Get("OuterMarker", true);
-		public static Texture2D draftTexture = ContentFinder<Texture2D>.Get("DraftMarker", true);
+		public static Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
+		public static Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
+		public static Color downedColor = new Color(0.9f, 0f, 0f);
+		public static Color draftedColor = new Color(0f, 0.5f, 0f);
 
 		static bool Prefix(Pawn pawn, float truncateToWidth, ref GameFont font)
 		{
@@ -145,10 +148,15 @@ namespace CameraPlus
 			GUI.DrawTexture(r, outerTexture, ScaleMode.ScaleToFit, true);
 			GUI.color = PawnNameColorUtility.PawnNameColorOf(pawn);
 			GUI.DrawTexture(r, innerTexture, ScaleMode.ScaleToFit, true);
-			if (pawn.Drafted)
+			if (pawn.Downed)
 			{
-				GUI.color = Color.black; // todo: make it colorful and reflect state
-				GUI.DrawTexture(r, draftTexture, ScaleMode.ScaleToFit, true);
+				GUI.color = downedColor;
+				GUI.DrawTexture(r, downedTexture, ScaleMode.ScaleToFit, true);
+			}
+			else if (pawn.Drafted)
+			{
+				GUI.color = draftedColor;
+				GUI.DrawTexture(r, draftedTexture, ScaleMode.ScaleToFit, true);
 			}
 
 			return false;
