@@ -14,6 +14,7 @@ namespace CameraPlus
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutDollyFrictionPercent = 0.15f;
 		public float zoomedInDollyFrictionPercent = 0.15f;
+		public bool zoomToMouse = true;
 		public float soundNearness = 0;
 		public bool scalePawnNames = true;
 		public bool hideNamesWhenZoomedOut = true;
@@ -41,6 +42,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedOutDollyFrictionPercent, "zoomedOutDollySpeedDecayPercent", 0.15f);
 			Scribe_Values.Look(ref zoomedInDollyFrictionPercent, "zoomedInDollySpeedDecayPercent", 0.15f);
+			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref scalePawnNames, "scalePawnNames", true);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
@@ -89,7 +91,7 @@ namespace CameraPlus
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
 
-			list.Gap(12f);
+			list.Gap(16f);
 
 			list.Label("ZoomedInPercent".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%", -1f);
 			previous = zoomedInPercent;
@@ -144,11 +146,6 @@ namespace CameraPlus
 				list.Gap(-4f);
 			}
 
-			list.Gap(12f);
-
-			list.CheckboxLabeled("ScalePawnNames".Translate(), ref scalePawnNames);
-			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
-
 			list.NewColumn();
 			list.Gap(12f);
 
@@ -169,6 +166,12 @@ namespace CameraPlus
 			list.Gap(4f);
 			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%", -1f);
 			zoomedOutDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyFrictionPercent, 0f, 1f)) / 100f;
+
+			list.Gap(12f);
+
+			list.CheckboxLabeled("ScalePawnNames".Translate(), ref scalePawnNames);
+			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
+			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 
 			list.Gap(12f);
 

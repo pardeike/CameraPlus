@@ -56,6 +56,57 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch("Update")]
+	static class CameraDriver_Update_Patch
+	{
+		static readonly FieldRef<CameraDriver, Vector3> rootPosRef = FieldRefAccess<CameraDriver, Vector3>("rootPos");
+		static readonly FieldRef<CameraDriver, float> rootSizeRef = FieldRefAccess<CameraDriver, float>("rootSize");
+		static readonly MethodInfo m_ApplyPositionToGameObject = Method(typeof(CameraDriver), "ApplyPositionToGameObject");
+		static readonly FastInvokeHandler applyPositionToGameObjectInvoker = MethodInvoker.GetHandler(m_ApplyPositionToGameObject);
+
+		static void SetRootSize(CameraDriver driver, float rootSize)
+		{
+			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
+			{
+				rootSizeRef(driver) = rootSize;
+				return;
+			}
+			var rootPos = rootPosRef(driver);
+			applyPositionToGameObjectInvoker(driver, new object[0]);
+			var oldMousePos = UI.MouseMapPosition();
+			rootSizeRef(driver) = rootSize;
+			applyPositionToGameObjectInvoker(driver, new object[0]);
+			rootPos += oldMousePos - UI.MouseMapPosition();
+			rootPosRef(driver) = rootPos;
+		}
+
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			var f_CameraDriver_rootSize = Field(typeof(CameraDriver), "rootSize");
+			if (f_CameraDriver_rootSize == null)
+				Log.Error("Cannot find field CameraDriver.rootSize");
+
+			var m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
+			var found = false;
+			foreach (var instruction in instructions)
+			{
+				if (instruction.opcode == OpCodes.Stfld && instruction.operand == f_CameraDriver_rootSize)
+				{
+					instruction.opcode = OpCodes.Call;
+					instruction.operand = m_SetRootSize;
+					found = true;
+				}
+				yield return instruction;
+			}
+			if (found == false)
+				Log.Error("Cannot find field Stdfld rootSize in CameraDriver.Update");
+		}
+	}
+
+	// open Camera+ preferences by pressing Shift-Tab
+	// (for now disabled because this might conflict with other usages of that key combo)
+	/*
 	[HarmonyPatch(typeof(MainTabsRoot))]
 	[HarmonyPatch(nameof(MainTabsRoot.HandleLowPriorityShortcuts))]
 	static class MainTabsRoot_HandleLowPriorityShortcuts_Patch
@@ -79,6 +130,7 @@ namespace CameraPlus
 			stack.Add(dialog);
 		}
 	}
+	*/
 
 	[HarmonyPatch(typeof(MoteMaker))]
 	[HarmonyPatch("ThrowText")]
@@ -231,7 +283,7 @@ namespace CameraPlus
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
-		static readonly MethodInfo m_get_MyCamera = AccessTools.Method(typeof(CameraDriver), "get_MyCamera");
+		static readonly MethodInfo m_get_MyCamera = Method(typeof(CameraDriver), "get_MyCamera");
 
 		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
@@ -293,7 +345,7 @@ namespace CameraPlus
 	[HarmonyPatch("CurrentViewRect", MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
-		static readonly FieldInfo f_CameraDriver_rootSize = AccessTools.Field(typeof(CameraDriver), "rootSize");
+		static readonly FieldInfo f_CameraDriver_rootSize = Field(typeof(CameraDriver), "rootSize");
 		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => CameraPlusSettings.LerpRootSize(0f));
 
 		[HarmonyTranspiler]

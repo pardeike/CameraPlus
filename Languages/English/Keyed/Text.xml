@@ -13,6 +13,7 @@
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
+	<ZoomToMouse>Zoom to mouse</ZoomToMouse>
 	<ZoomedIn>Fully zoomed in</ZoomedIn>
 	<ZoomedOut>Fully zoomed out</ZoomedOut>
 </LanguageData>
