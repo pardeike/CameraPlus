@@ -4,12 +4,6 @@
 	<ZoomedOutPercent>Maximum zoomed out factor</ZoomedOutPercent>
 	<Exponentiality>Exponential scaling:</Exponentiality>
 	<SoundNearness>Bring local sounds closer</SoundNearness>
-	<ZoomLevelPixelSizes>Pixel sizes defining zoom levels:</ZoomLevelPixelSizes>
-	<ClosestZoom>Closest</ClosestZoom>
-	<CloseZoom>Close</CloseZoom>
-	<MiddleZoom>Middle</MiddleZoom>
-	<FarZoom>Far</FarZoom>
-	<ScalePawnNames>Scale name labels</ScalePawnNames>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>

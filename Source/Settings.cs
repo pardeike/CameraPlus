@@ -16,9 +16,7 @@ namespace CameraPlus
 		public float zoomedInDollyFrictionPercent = 0.15f;
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
-		public bool scalePawnNames = true;
 		public bool hideNamesWhenZoomedOut = true;
-		public int[] zoomLevelPixelSizes = new int[] { 56, 31, 16, 10 };
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -44,12 +42,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedInDollyFrictionPercent, "zoomedInDollySpeedDecayPercent", 0.15f);
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
-			Scribe_Values.Look(ref scalePawnNames, "scalePawnNames", true);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
-			Scribe_Values.Look(ref zoomLevelPixelSizes[0], "zoomLevelPixelSizeClosest", 56);
-			Scribe_Values.Look(ref zoomLevelPixelSizes[1], "zoomLevelPixelSizeClose", 31);
-			Scribe_Values.Look(ref zoomLevelPixelSizes[2], "zoomLevelPixelSizeMiddle", 16);
-			Scribe_Values.Look(ref zoomLevelPixelSizes[3], "zoomLevelPixelSizeFar", 10);
 
 			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
 			{
@@ -132,20 +125,6 @@ namespace CameraPlus
 			// cannot preview here because this value is not showing differences in either
 			// min or max setting (that is when you have changed any of the above sliders)
 
-			list.Gap(12f);
-
-			list.Label("ZoomLevelPixelSizes".Translate(), -1f);
-			var zoomLevelLabels = new string[] { "ClosestZoom", "CloseZoom", "MiddleZoom", "FarZoom" };
-			var max = 64f;
-			for (var i = 0; i < zoomLevelLabels.Length; i++)
-			{
-				list.Label(zoomLevelLabels[i].Translate() + ": " + zoomLevelPixelSizes[i] + " pixels", -1f);
-				list.Gap(-2f);
-				zoomLevelPixelSizes[i] = (int)Math.Min(max, list.Slider(zoomLevelPixelSizes[i], 1f, 64f));
-				max = Math.Min(max, zoomLevelPixelSizes[i]);
-				list.Gap(-4f);
-			}
-
 			list.NewColumn();
 			list.Gap(12f);
 
@@ -169,7 +148,6 @@ namespace CameraPlus
 
 			list.Gap(12f);
 
-			list.CheckboxLabeled("ScalePawnNames".Translate(), ref scalePawnNames);
 			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 
@@ -185,9 +163,7 @@ namespace CameraPlus
 				zoomedOutDollyFrictionPercent = 0.15f;
 				zoomedInDollyFrictionPercent = 0.15f;
 				soundNearness = 0;
-				scalePawnNames = true;
 				hideNamesWhenZoomedOut = true;
-				zoomLevelPixelSizes = new int[] { 56, 31, 16, 10 };
 			}
 
 			list.End();

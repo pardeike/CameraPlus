@@ -2,6 +2,7 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
@@ -30,19 +31,6 @@ namespace CameraPlus
 		public override string SettingsCategory()
 		{
 			return "Camera+";
-		}
-	}
-
-	static class Tools
-	{
-		public static float ActualCellScreenSize()
-		{
-			var v = Vector3.zero;
-			var cam = Find.Camera;
-			var c1 = cam.WorldToScreenPoint(v);
-			v.x += 1;
-			var c2 = cam.WorldToScreenPoint(v);
-			return (c2.x - c1.x) / Prefs.UIScale;
 		}
 	}
 
@@ -129,8 +117,7 @@ namespace CameraPlus
 			selModByRef(dialog) = me;
 			stack.Add(dialog);
 		}
-	}
-	*/
+	}*/
 
 	[HarmonyPatch(typeof(MoteMaker))]
 	[HarmonyPatch("ThrowText")]
@@ -142,9 +129,8 @@ namespace CameraPlus
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return true;
 
-			var d = Tools.ActualCellScreenSize();
-			if (d >= 12f)
-				return true; // always show
+			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
+				return true;
 
 			// show if mouse is nearby
 			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
@@ -168,22 +154,10 @@ namespace CameraPlus
 
 		static bool Prefix(Pawn pawn, float truncateToWidth, ref GameFont font)
 		{
-			var d = (int)Tools.ActualCellScreenSize();
-
-			if (CameraPlusMain.Settings.scalePawnNames)
-			{
-				if (d >= CameraPlusMain.Settings.zoomLevelPixelSizes[0])
-					font = GameFont.Medium;
-				else if (d >= CameraPlusMain.Settings.zoomLevelPixelSizes[1])
-					font = GameFont.Small;
-				else
-					font = GameFont.Tiny;
-			}
-
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || truncateToWidth != 9999f)
 				return true;
 
-			if (d >= 12)
+			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
 				return true;
 
 			var pos = pawn.DrawPos;
@@ -223,36 +197,33 @@ namespace CameraPlus
 	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
-		static readonly MethodInfo m_GetAdaptedGameFont = SymbolExtensions.GetMethodInfo(() => GetAdaptedGameFont());
+		static readonly MethodInfo m_GetAdaptedGameFont = SymbolExtensions.GetMethodInfo(() => GetAdaptedGameFont(0f));
+		static readonly MethodInfo m_get_CameraDriver = Method(typeof(Find), "get_CameraDriver");
+		static readonly FieldInfo f_rootSize = Field(typeof(CameraDriver), "rootSize");
 
-		static GameFont GetAdaptedGameFont()
+		static GameFont GetAdaptedGameFont(float rootSize)
 		{
-			var d = (int)Tools.ActualCellScreenSize();
-			if (d >= CameraPlusMain.Settings.zoomLevelPixelSizes[0]) return GameFont.Medium;
-			if (d >= CameraPlusMain.Settings.zoomLevelPixelSizes[1]) return GameFont.Small;
+			if (rootSize < 11f) return GameFont.Medium;
+			if (rootSize < 15f) return GameFont.Small;
 			return GameFont.Tiny;
-		}
-
-		static bool Prefix()
-		{
-			var d = (int)Tools.ActualCellScreenSize();
-			return d >= CameraPlusMain.Settings.zoomLevelPixelSizes[2];
 		}
 
 		// we replace the first "GameFont.Tiny" with "GetAdaptedGameFont()"
 		//
-		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> AdaptedGameFontReplacerPatch(IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			var firstInstruction = true;
 			foreach (var instruction in instructions)
 			{
 				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
+				{
+					yield return new CodeInstruction(OpCodes.Call, m_get_CameraDriver);
+					yield return new CodeInstruction(OpCodes.Ldfld, f_rootSize);
 					yield return new CodeInstruction(OpCodes.Call, m_GetAdaptedGameFont);
+					firstInstruction = false;
+				}
 				else
 					yield return instruction;
-
-				firstInstruction = false;
 			}
 		}
 	}
@@ -263,17 +234,21 @@ namespace CameraPlus
 	[HarmonyPatch("CurrentZoom", MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
-		static bool Prefix(ref CameraZoomRange __result)
+		static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
 		{
-			var n = (int)Tools.ActualCellScreenSize();
-			var sizes = CameraPlusMain.Settings.zoomLevelPixelSizes;
+			// these values are from vanilla
+			// we remap them to the range 30 - 60
+			var sizes = new[] { 12f, 13.8f, 42f, 57f }
+				.Select(f => GenMath.LerpDouble(12, 57, 30, 60, f))
+				.ToArray();
+
+			__result = CameraZoomRange.Furthest;
 			for (var i = 0; i < 4; i++)
-				if (n > sizes[i])
+				if (CameraPlusSettings.LerpRootSize(___rootSize) < sizes[i])
 				{
 					__result = (CameraZoomRange)i;
-					return false;
+					break;
 				}
-			__result = CameraZoomRange.Furthest;
 			return false;
 		}
 	}
@@ -302,8 +277,7 @@ namespace CameraPlus
 			driver.config.camSpeedDecayFactor = CameraPlusSettings.GetDollySpeedDecay(orthSize);
 		}
 
-		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> Postfix_ApplyPositionToGameObject(IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			if (m_get_MyCamera == null)
 				Log.Error("Cannot find property CameraDriver.MyCamera");
@@ -326,8 +300,7 @@ namespace CameraPlus
 	[HarmonyPatch("Awake")]
 	static class CameraDriver_Awake_Patch
 	{
-		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> Postfix_Awake(IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			foreach (var instruction in instructions)
 			{
@@ -348,8 +321,7 @@ namespace CameraPlus
 		static readonly FieldInfo f_CameraDriver_rootSize = Field(typeof(CameraDriver), "rootSize");
 		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => CameraPlusSettings.LerpRootSize(0f));
 
-		[HarmonyTranspiler]
-		static IEnumerable<CodeInstruction> LerpCurrentViewRect(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
 		{
 			if (f_CameraDriver_rootSize == null)
 				Log.Error("Cannot find field CameraDriver.rootSize");

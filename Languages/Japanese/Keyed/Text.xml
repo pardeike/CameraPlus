@@ -4,16 +4,10 @@
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
 	<Exponentiality>指数関数スケーリング:</Exponentiality>
 	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
-	<ZoomLevelPixelSizes>ズームレベルを定義するピクセルサイズ:</ZoomLevelPixelSizes>
-	<ClosestZoom>最も近いズーム</ClosestZoom>
-	<CloseZoom>近いズーム</CloseZoom>
-	<MiddleZoom>中ズーム</MiddleZoom>
-	<FarZoom>遠いズーム</FarZoom>
-	<ScalePawnNames>名前ラベルを拡大縮小する</ScalePawnNames>
 	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
-	<ZoomToMouse>マウスにズーム</ZoomToMouse>
-	<ZoomedIn>完全にズームイン</ZoomedIn>
-	<ZoomedOut>完全にズームアウト</ZoomedOut>
+	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
+	<ZoomedIn>最大ズームイン</ZoomedIn>
+	<ZoomedOut>最大ズームアウト</ZoomedOut>
 </LanguageData>
