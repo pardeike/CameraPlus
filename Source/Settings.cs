@@ -17,6 +17,10 @@ namespace CameraPlus
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
 		public bool hideNamesWhenZoomedOut = true;
+		public KeyCode cameraSettingsMod1 = KeyCode.LeftShift;
+		public KeyCode cameraSettingsMod2 = KeyCode.None;
+		public KeyCode cameraSettingsOption = KeyCode.LeftAlt;
+		public KeyCode cameraSettingsKey = KeyCode.Tab;
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -43,6 +47,10 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
+			Scribe_Values.Look(ref cameraSettingsMod1, "cameraSettingsMod1", KeyCode.LeftShift);
+			Scribe_Values.Look(ref cameraSettingsMod2, "cameraSettingsMod2", KeyCode.None);
+			Scribe_Values.Look(ref cameraSettingsOption, "cameraSettingsOption", KeyCode.LeftAlt);
+			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
 
 			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
 			{
@@ -51,45 +59,22 @@ namespace CameraPlus
 			}
 		}
 
-		public static float LerpRootSize(float x)
-		{
-			var n = CameraPlusMain.Settings.exponentiality;
-			if (n == 0)
-				return GenMath.LerpDouble(minRootInput, maxRootInput, minRootResult, maxRootResult, x);
-
-			var factor = (maxRootResult - minRootResult) / Math.Pow(maxRootInput - minRootInput, 2 * n);
-			var y = minRootResult + Math.Pow(x - minRootInput, 2 * n) * factor;
-			return (float)y;
-		}
-
-		public static float GetDollyRate(float orthSize)
-		{
-			var zoomedIn = orthSize * CameraPlusMain.Settings.zoomedInDollyPercent * 4;
-			var zoomedOut = orthSize * CameraPlusMain.Settings.zoomedOutDollyPercent;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
-		}
-
-		public static float GetDollySpeedDecay(float orthSize)
-		{
-			var minVal = 1f - CameraPlusMain.Settings.zoomedInDollyFrictionPercent;
-			var maxVal = 1f - CameraPlusMain.Settings.zoomedOutDollyFrictionPercent;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, minVal, maxVal, orthSize);
-		}
-
 		public void DoWindowContents(Rect inRect)
 		{
 			float previous;
+			Rect rect;
 			var map = Current.Game?.CurrentMap;
+			const float buttonWidth = 90f;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
 
 			list.Gap(16f);
 
-			list.Label("ZoomedInPercent".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%", -1f);
+			list.Label("ZoomedInPercent".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
 			previous = zoomedInPercent;
 			zoomedInPercent = list.Slider(zoomedInPercent, 0.1f, 20f);
-			minRootResult = CameraPlusMain.Settings.zoomedInPercent * 2;
+			minRootResult = zoomedInPercent * 2;
 			if (previous != zoomedInPercent && map != null)
 			{
 				var val = Traverse.Create(Find.CameraDriver).Field("rootSize").GetValue<float>();
@@ -99,10 +84,10 @@ namespace CameraPlus
 
 			list.Gap(12f);
 
-			list.Label("ZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%", -1f);
+			list.Label("ZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
 			previous = zoomedOutPercent;
 			zoomedOutPercent = list.Slider(zoomedOutPercent, 50f, 100f);
-			maxRootResult = CameraPlusMain.Settings.zoomedOutPercent * 2;
+			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
 			{
 				var val = Traverse.Create(Find.CameraDriver).Field("rootSize").GetValue<float>();
@@ -112,15 +97,46 @@ namespace CameraPlus
 
 			list.Gap(12f);
 
-			list.Label("Exponentiality".Translate(), -1f);
+			list.Label("Exponentiality".Translate());
 			if (list.RadioButton("Off", exponentiality == 0, 8f)) exponentiality = 0;
 			for (var i = 1; i <= 3; i++)
 				if (list.RadioButton(i + "x", exponentiality == i, 8f)) exponentiality = i;
 
 			list.Gap(12f);
 
-			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%", -1f);
+			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
 			soundNearness = list.Slider(soundNearness, 0f, 1f);
+
+			list.Gap(12f);
+
+			list.Label("CameraKeys".Translate());
+			list.Gap(6f);
+
+			rect = list.GetRect(28f);
+			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+			Widgets.Label(rect, "ModifierKeys".Translate());
+			GenUI.ResetLabelAlign();
+			rect.xMin = rect.xMax - buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsMod1, code => cameraSettingsMod1 = code);
+			rect.xMin -= buttonWidth + 12f;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsMod2, code => cameraSettingsMod2 = code);
+			list.Gap(6f);
+
+			rect = list.GetRect(28f);
+			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+			Widgets.Label(rect, "SaveModifier".Translate());
+			GenUI.ResetLabelAlign();
+			rect.xMin = rect.xMax - buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsOption, code => cameraSettingsOption = code);
+			list.Gap(6f);
+
+			rect = list.GetRect(28f);
+			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+			Widgets.Label(rect, "SettingsKey".Translate());
+			GenUI.ResetLabelAlign();
+			rect.xMin = rect.xMax - buttonWidth;
+			Tools.KeySettingsButton(rect, true, cameraSettingsKey, code => cameraSettingsKey = code);
 
 			// cannot preview here because this value is not showing differences in either
 			// min or max setting (that is when you have changed any of the above sliders)
@@ -164,6 +180,10 @@ namespace CameraPlus
 				zoomedInDollyFrictionPercent = 0.15f;
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
+				cameraSettingsMod1 = KeyCode.LeftShift;
+				cameraSettingsMod2 = KeyCode.None;
+				cameraSettingsOption = KeyCode.LeftAlt;
+				cameraSettingsKey = KeyCode.Tab;
 			}
 
 			list.End();

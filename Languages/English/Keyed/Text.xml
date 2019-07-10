@@ -4,10 +4,24 @@
 	<ZoomedOutPercent>Maximum zoomed out factor</ZoomedOutPercent>
 	<Exponentiality>Exponential scaling:</Exponentiality>
 	<SoundNearness>Bring local sounds closer</SoundNearness>
+	<CameraKeys>Hot keys (use with 1 - 9):</CameraKeys>
+	<ModifierKeys>Hold to activate</ModifierKeys>
+	<SaveModifier>Hold to save view</SaveModifier>
+	<SettingsKey>Show Camera+ settings</SettingsKey>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
 	<ZoomToMouse>Zoom to mouse</ZoomToMouse>
 	<ZoomedIn>Fully zoomed in</ZoomedIn>
 	<ZoomedOut>Fully zoomed out</ZoomedOut>
+	<KeyLeftShift>Left Shift</KeyLeftShift>
+	<KeyLeftAlt>Left Alt</KeyLeftAlt>
+	<KeyLeftControl>Left Ctrl</KeyLeftControl>
+	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
+	<KeyLeftWindows>Left Win</KeyLeftWindows>
+	<KeyRightShift>Right Shift</KeyRightShift>
+	<KeyRightAlt>Right Alt</KeyRightAlt>
+	<KeyRightControl>Right Ctrl</KeyRightControl>
+	<KeyRightCommand>Right Cmd</KeyRightCommand>
+	<KeyRightWindows>Right Win</KeyRightWindows>
 </LanguageData>

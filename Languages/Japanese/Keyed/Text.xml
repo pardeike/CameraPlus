@@ -4,10 +4,24 @@
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
 	<Exponentiality>指数関数スケーリング:</Exponentiality>
 	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
+	<CameraKeys>ホットキー（1〜9を押すとき</CameraKeys>
+	<ModifierKeys>有効にするにはホールド</ModifierKeys>
+	<SaveModifier>ビューを保存するために保持します</SaveModifier>
+	<SettingsKey>これらの設定を表示</SettingsKey>
 	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
 	<ZoomedIn>最大ズームイン</ZoomedIn>
 	<ZoomedOut>最大ズームアウト</ZoomedOut>
+	<KeyLeftShift>Left Shift</KeyLeftShift>
+	<KeyLeftAlt>Left Alt</KeyLeftAlt>
+	<KeyLeftControl>Left Ctrl</KeyLeftControl>
+	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
+	<KeyLeftWindows>Left Win</KeyLeftWindows>
+	<KeyRightShift>Right Shift</KeyRightShift>
+	<KeyRightAlt>Right Alt</KeyRightAlt>
+	<KeyRightControl>Right Ctrl</KeyRightControl>
+	<KeyRightCommand>Right Cmd</KeyRightCommand>
+	<KeyRightWindows>Right Win</KeyRightWindows>
 </LanguageData>

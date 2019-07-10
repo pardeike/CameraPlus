@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<ZoomedInPercent>Faktor: maximal eingezoomt</ZoomedInPercent>
+	<ZoomedOutPercent>Faktor: maximal ausgezoomt</ZoomedOutPercent>
+	<Exponentiality>Exponentielles zoomen:</Exponentiality>
+	<SoundNearness>Bringe lokale Geräusche näher</SoundNearness>
+	<CameraKeys>Hotkeys (mit 1 - 9 benutzen):</CameraKeys>
+	<ModifierKeys>Aktivieren mit</ModifierKeys>
+	<SaveModifier>Speichern mit</SaveModifier>
+	<SettingsKey>Camera+ Einstellungen</SettingsKey>
+	<HideNamesWhenZoomedOut>Verstecke die Kolonistennamen wenn ausgezoomt</HideNamesWhenZoomedOut>
+	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
+	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
+	<ZoomToMouse>Zoom an die Maus</ZoomToMouse>
+	<ZoomedIn>Komplett eingezoomt</ZoomedIn>
+	<ZoomedOut>Komplett ausgezoomt</ZoomedOut>
+	<KeyLeftShift>Left Shift</KeyLeftShift>
+	<KeyLeftAlt>Left Alt</KeyLeftAlt>
+	<KeyLeftControl>Left Ctrl</KeyLeftControl>
+	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
+	<KeyLeftWindows>Left Win</KeyLeftWindows>
+	<KeyRightShift>Right Shift</KeyRightShift>
+	<KeyRightAlt>Right Alt</KeyRightAlt>
+	<KeyRightControl>Right Ctrl</KeyRightControl>
+	<KeyRightCommand>Right Cmd</KeyRightCommand>
+	<KeyRightWindows>Right Win</KeyRightWindows>
+</LanguageData>

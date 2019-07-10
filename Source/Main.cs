@@ -48,76 +48,137 @@ namespace CameraPlus
 	[HarmonyPatch("Update")]
 	static class CameraDriver_Update_Patch
 	{
-		static readonly FieldRef<CameraDriver, Vector3> rootPosRef = FieldRefAccess<CameraDriver, Vector3>("rootPos");
-		static readonly FieldRef<CameraDriver, float> rootSizeRef = FieldRefAccess<CameraDriver, float>("rootSize");
-		static readonly MethodInfo m_ApplyPositionToGameObject = Method(typeof(CameraDriver), "ApplyPositionToGameObject");
-		static readonly FastInvokeHandler applyPositionToGameObjectInvoker = MethodInvoker.GetHandler(m_ApplyPositionToGameObject);
+		static readonly MethodInfo m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
 
 		static void SetRootSize(CameraDriver driver, float rootSize)
 		{
 			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
 			{
-				rootSizeRef(driver) = rootSize;
+				Refs.rootSize(driver) = rootSize;
 				return;
 			}
-			var rootPos = rootPosRef(driver);
-			applyPositionToGameObjectInvoker(driver, new object[0]);
+			var rootPos = Refs.rootPos(driver);
+			Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
 			var oldMousePos = UI.MouseMapPosition();
-			rootSizeRef(driver) = rootSize;
-			applyPositionToGameObjectInvoker(driver, new object[0]);
+			Refs.rootSize(driver) = rootSize;
+			Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
 			rootPos += oldMousePos - UI.MouseMapPosition();
-			rootPosRef(driver) = rootPos;
+			Refs.rootPos(driver) = rootPos;
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			var f_CameraDriver_rootSize = Field(typeof(CameraDriver), "rootSize");
-			if (f_CameraDriver_rootSize == null)
-				Log.Error("Cannot find field CameraDriver.rootSize");
-
-			var m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
 			var found = false;
 			foreach (var instruction in instructions)
 			{
-				if (instruction.opcode == OpCodes.Stfld && instruction.operand == f_CameraDriver_rootSize)
+				if (instruction.opcode == OpCodes.Stfld && instruction.operand == Refs.f_rootSize)
 				{
 					instruction.opcode = OpCodes.Call;
 					instruction.operand = m_SetRootSize;
 					found = true;
 				}
+
 				yield return instruction;
 			}
 			if (found == false)
 				Log.Error("Cannot find field Stdfld rootSize in CameraDriver.Update");
 		}
+
+		static void Postfix(CameraDriver __instance)
+		{
+			if (Refs.mouseDragVect(__instance) != Vector2.zero)
+				Refs.velocity(__instance) = Vector3.zero;
+		}
 	}
 
-	// open Camera+ preferences by pressing Shift-Tab
-	// (for now disabled because this might conflict with other usages of that key combo)
-	/*
-	[HarmonyPatch(typeof(MainTabsRoot))]
-	[HarmonyPatch(nameof(MainTabsRoot.HandleLowPriorityShortcuts))]
-	static class MainTabsRoot_HandleLowPriorityShortcuts_Patch
+	[HarmonyPatch(typeof(TimeControls))]
+	[HarmonyPatch("DoTimeControlsGUI")]
+	static class TimeControls_DoTimeControlsGUI_Patch
 	{
-		static readonly FieldRef<Dialog_ModSettings, Mod> selModByRef = FieldRefAccess<Dialog_ModSettings, Mod>("selMod");
-
-		static void Postfix()
+		static void Prefix()
 		{
-			if (Input.GetKey(KeyCode.Tab) == false)
-				return;
-			if (Input.GetKey(KeyCode.LeftShift) == false)
-				return;
-
-			var stack = Find.WindowStack;
-			if (stack.IsOpen<Dialog_ModSettings>())
-				return;
-
-			var dialog = new Dialog_ModSettings();
-			var me = LoadedModManager.GetMod<CameraPlusMain>();
-			selModByRef(dialog) = me;
-			stack.Add(dialog);
+			Tools.HandleHotkeys();
 		}
-	}*/
+	}
+
+	[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch("OnGUI")]
+	static class CameraDriver_OnGUI_Patch
+	{
+		static Vector2 dummy;
+		static readonly MethodInfo m_Patch = SymbolExtensions.GetMethodInfo(() => Patch(null, ref dummy, ref dummy));
+
+		static void Patch(CameraDriver cameraDriver, ref Vector2 mouseDragVect, ref Vector2 desiredDolly)
+		{
+			if (mouseDragVect != Vector2.zero)
+			{
+				var factor = CameraDriver.HitchReduceFactor;
+				if (mouseDragVect != Vector2.zero)
+					factor = 1 / RealTime.deltaTime / 60f;
+
+				mouseDragVect *= factor;
+				mouseDragVect.x *= -1f;
+				desiredDolly += mouseDragVect * cameraDriver.config.dollyRateMouseDrag;
+
+				// done in postfix for CameraDriver.Update()
+				// mouseDragVect = Vector2.zero;
+			}
+		}
+
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			var list = instructions.ToList();
+			list.InsertRange(0, new CodeInstruction[]
+				{
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Call, Refs.p_get_zero),
+					new CodeInstruction(OpCodes.Stfld, Refs.f_mouseDragVect)
+				}
+			);
+
+			var found = false;
+			for (var i = 0; i < list.Count - 4; i++)
+			{
+				if (list[i].opcode != OpCodes.Ldarg_0)
+					continue;
+				if (list[i + 1].opcode != OpCodes.Ldfld || list[i + 1].operand != Refs.f_mouseDragVect)
+					continue;
+				if (list[i + 2].opcode != OpCodes.Call || list[i + 2].operand != Refs.p_get_zero)
+					continue;
+				if (list[i + 3].opcode != OpCodes.Call || list[i + 3].operand != Refs.m_op_Inequality)
+					continue;
+				if (list[i + 4].opcode != OpCodes.Brfalse)
+					continue;
+
+				var jumpLabel = (Label)list[i + 4].operand;
+				var j = list.FindIndex(i, instr => instr.labels.Contains(jumpLabel));
+				if (j == -1)
+					continue;
+				list[j].labels.Remove(jumpLabel);
+				var labels = list[i].labels;
+				var blocks = list[i].blocks;
+				list.RemoveRange(i, j - i);
+
+				var callPatchInstructions = new CodeInstruction[]
+				{
+					new CodeInstruction(OpCodes.Ldarg_0) { labels = labels, blocks = blocks },
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldflda, Refs.f_mouseDragVect),
+					new CodeInstruction(OpCodes.Ldarg_0),
+					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDolly),
+					new CodeInstruction(OpCodes.Call, m_Patch)
+				};
+				list.InsertRange(i, callPatchInstructions);
+
+				found = true;
+				break;
+			}
+			if (found == false)
+				Log.Error("Cannot find and replace last if() in CameraDriver.OnGUI");
+
+			return list.AsEnumerable();
+		}
+	}
 
 	[HarmonyPatch(typeof(MoteMaker))]
 	[HarmonyPatch("ThrowText")]
@@ -145,14 +206,14 @@ namespace CameraPlus
 	[StaticConstructorOnStartup]
 	static class GenMapUI_DrawPawnLabel_Patch
 	{
-		public static Texture2D innerTexture = ContentFinder<Texture2D>.Get("InnerMarker", true);
-		public static Texture2D outerTexture = ContentFinder<Texture2D>.Get("OuterMarker", true);
-		public static Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
-		public static Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
-		public static Color downedColor = new Color(0.9f, 0f, 0f);
-		public static Color draftedColor = new Color(0f, 0.5f, 0f);
+		static readonly Texture2D innerTexture = ContentFinder<Texture2D>.Get("InnerMarker", true);
+		static readonly Texture2D outerTexture = ContentFinder<Texture2D>.Get("OuterMarker", true);
+		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
+		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
+		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
+		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
 
-		static bool Prefix(Pawn pawn, float truncateToWidth, ref GameFont font)
+		static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || truncateToWidth != 9999f)
 				return true;
@@ -198,8 +259,6 @@ namespace CameraPlus
 	static class GenMapUI_DrawThingLabel_Patch
 	{
 		static readonly MethodInfo m_GetAdaptedGameFont = SymbolExtensions.GetMethodInfo(() => GetAdaptedGameFont(0f));
-		static readonly MethodInfo m_get_CameraDriver = Method(typeof(Find), "get_CameraDriver");
-		static readonly FieldInfo f_rootSize = Field(typeof(CameraDriver), "rootSize");
 
 		static GameFont GetAdaptedGameFont(float rootSize)
 		{
@@ -217,8 +276,8 @@ namespace CameraPlus
 			{
 				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
 				{
-					yield return new CodeInstruction(OpCodes.Call, m_get_CameraDriver);
-					yield return new CodeInstruction(OpCodes.Ldfld, f_rootSize);
+					yield return new CodeInstruction(OpCodes.Call, Refs.p_CameraDriver);
+					yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
 					yield return new CodeInstruction(OpCodes.Call, m_GetAdaptedGameFont);
 					firstInstruction = false;
 				}
@@ -244,7 +303,7 @@ namespace CameraPlus
 
 			__result = CameraZoomRange.Furthest;
 			for (var i = 0; i < 4; i++)
-				if (CameraPlusSettings.LerpRootSize(___rootSize) < sizes[i])
+				if (Tools.LerpRootSize(___rootSize) < sizes[i])
 				{
 					__result = (CameraZoomRange)i;
 					break;
@@ -258,7 +317,6 @@ namespace CameraPlus
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
-		static readonly MethodInfo m_get_MyCamera = Method(typeof(CameraDriver), "get_MyCamera");
 
 		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
@@ -271,24 +329,22 @@ namespace CameraPlus
 			pos.y = CameraPlusSettings.minRootOutput + f * cameraSpan;
 			camera.transform.position = pos;
 
-			var orthSize = CameraPlusSettings.LerpRootSize(camera.orthographicSize);
+			var orthSize = Tools.LerpRootSize(camera.orthographicSize);
 			camera.orthographicSize = orthSize;
-			driver.config.dollyRateKeys = CameraPlusSettings.GetDollyRate(orthSize);
-			driver.config.camSpeedDecayFactor = CameraPlusSettings.GetDollySpeedDecay(orthSize);
+			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(orthSize);
+			driver.config.dollyRateMouseDrag = Tools.GetDollyRateMouse(orthSize);
+			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(orthSize);
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			if (m_get_MyCamera == null)
-				Log.Error("Cannot find property CameraDriver.MyCamera");
-
 			foreach (var instruction in instructions)
 				if (instruction.opcode != OpCodes.Ret)
 					yield return instruction;
 
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
-			yield return new CodeInstruction(OpCodes.Call, m_get_MyCamera);
+			yield return new CodeInstruction(OpCodes.Call, Refs.p_MyCamera);
 			yield return new CodeInstruction(OpCodes.Call, m_ApplyZoom);
 			yield return new CodeInstruction(OpCodes.Ret);
 		}
@@ -318,20 +374,16 @@ namespace CameraPlus
 	[HarmonyPatch("CurrentViewRect", MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
-		static readonly FieldInfo f_CameraDriver_rootSize = Field(typeof(CameraDriver), "rootSize");
-		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => CameraPlusSettings.LerpRootSize(0f));
+		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
 
 		static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
 		{
-			if (f_CameraDriver_rootSize == null)
-				Log.Error("Cannot find field CameraDriver.rootSize");
-
 			var v_lerpedRootSize = generator.DeclareLocal(typeof(float));
 
 			// store lerped rootSize in a new local var
 			//
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
-			yield return new CodeInstruction(OpCodes.Ldfld, f_CameraDriver_rootSize);
+			yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
 			yield return new CodeInstruction(OpCodes.Call, m_Main_LerpRootSize);
 			yield return new CodeInstruction(OpCodes.Stloc, v_lerpedRootSize);
 
@@ -352,7 +404,7 @@ namespace CameraPlus
 
 					// looking for Ldarg.0 followed by Ldfld rootSize
 					//
-					if (instruction.opcode == OpCodes.Ldfld && instruction.operand == f_CameraDriver_rootSize)
+					if (instruction.opcode == OpCodes.Ldfld && instruction.operand == Refs.f_rootSize)
 						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
 					else
 						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check
