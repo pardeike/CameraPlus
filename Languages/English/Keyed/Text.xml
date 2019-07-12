@@ -9,6 +9,9 @@
 	<SaveModifier>Hold to save view</SaveModifier>
 	<SettingsKey>Show Camera+ settings</SettingsKey>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
+	<IncludeAnimals>Animals have the same marker</IncludeAnimals>
+	<AnimalsDifferent>Animals have a different marker</AnimalsDifferent>
+	<HideAnimals>Animals have no marker</HideAnimals>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
 	<ZoomToMouse>Zoom to mouse</ZoomToMouse>

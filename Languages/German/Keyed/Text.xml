@@ -9,6 +9,9 @@
 	<SaveModifier>Speichern mit</SaveModifier>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
 	<HideNamesWhenZoomedOut>Verstecke die Kolonistennamen wenn ausgezoomt</HideNamesWhenZoomedOut>
+	<IncludeAnimals>Tiere haben den gleichen Marker</IncludeAnimals>
+	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
+	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
 	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
 	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
 	<ZoomToMouse>Zoom an die Maus</ZoomToMouse>

@@ -9,6 +9,9 @@
 	<SaveModifier>Presione para guardar la vista</SaveModifier>
 	<SettingsKey>Mostrar estos ajustes</SettingsKey>
 	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
+	<IncludeAnimals>Los animales tienen el mismo marcador</IncludeAnimals>
+	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
+	<HideAnimals>Los animales no tienen marcador</HideAnimals>
 	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
 	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>

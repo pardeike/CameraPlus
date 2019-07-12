@@ -9,6 +9,9 @@
 	<SaveModifier>ビューを保存するために保持します</SaveModifier>
 	<SettingsKey>これらの設定を表示</SettingsKey>
 	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
+	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
+	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
+	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>

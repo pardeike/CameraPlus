@@ -5,6 +5,28 @@ using Verse;
 
 namespace CameraPlus
 {
+	public enum LabelStyle
+	{
+		IncludeAnimals = 0,
+		AnimalsDifferent = 1,
+		HideAnimals = 2
+	}
+
+	public class SavedViews : MapComponent
+	{
+		public RememberedCameraPos[] views = new RememberedCameraPos[9];
+
+		public SavedViews(Map map) : base(map)
+		{
+		}
+
+		public override void ExposeData()
+		{
+			for (var i = 0; i < 9; i++)
+				Scribe_Deep.Look(ref views[i], "view" + (i + 1), new object[] { map });
+		}
+	}
+
 	public class CameraPlusSettings : ModSettings
 	{
 		public float zoomedOutPercent = 65;
@@ -17,6 +39,7 @@ namespace CameraPlus
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
 		public bool hideNamesWhenZoomedOut = true;
+		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public KeyCode cameraSettingsMod1 = KeyCode.LeftShift;
 		public KeyCode cameraSettingsMod2 = KeyCode.None;
 		public KeyCode cameraSettingsOption = KeyCode.LeftAlt;
@@ -47,6 +70,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
+			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
 			Scribe_Values.Look(ref cameraSettingsMod1, "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod2, "cameraSettingsMod2", KeyCode.None);
 			Scribe_Values.Look(ref cameraSettingsOption, "cameraSettingsOption", KeyCode.LeftAlt);
@@ -138,9 +162,6 @@ namespace CameraPlus
 			rect.xMin = rect.xMax - buttonWidth;
 			Tools.KeySettingsButton(rect, true, cameraSettingsKey, code => cameraSettingsKey = code);
 
-			// cannot preview here because this value is not showing differences in either
-			// min or max setting (that is when you have changed any of the above sliders)
-
 			list.NewColumn();
 			list.Gap(12f);
 
@@ -148,7 +169,6 @@ namespace CameraPlus
 			list.Gap(4f);
 			list.Label("ZoomedIn".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%", -1f);
 			zoomedInDollyPercent = Mathf.Round(100f * list.Slider(zoomedInDollyPercent, 0f, 4f)) / 100f;
-			list.Gap(4f);
 			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + "%", -1f);
 			zoomedOutDollyPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyPercent, 0f, 4f)) / 100f;
 
@@ -158,13 +178,24 @@ namespace CameraPlus
 			list.Gap(4f);
 			list.Label("ZoomedIn".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%", -1f);
 			zoomedInDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedInDollyFrictionPercent, 0f, 1f)) / 100f;
-			list.Gap(4f);
 			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%", -1f);
 			zoomedOutDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyFrictionPercent, 0f, 1f)) / 100f;
 
 			list.Gap(12f);
 
 			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
+			if (hideNamesWhenZoomedOut)
+			{
+				list.Gap(4f);
+				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
+				{
+					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
+					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
+				}
+			}
+
+			list.Gap(12f);
+
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 
 			list.Gap(12f);
@@ -180,6 +211,7 @@ namespace CameraPlus
 				zoomedInDollyFrictionPercent = 0.15f;
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
+				customNameStyle = LabelStyle.AnimalsDifferent;
 				cameraSettingsMod1 = KeyCode.LeftShift;
 				cameraSettingsMod2 = KeyCode.None;
 				cameraSettingsOption = KeyCode.LeftAlt;

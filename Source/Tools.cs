@@ -7,23 +7,53 @@ using Verse;
 
 namespace CameraPlus
 {
-	public class SavedViews : MapComponent
-	{
-		public RememberedCameraPos[] views = new RememberedCameraPos[9];
-
-		public SavedViews(Map map) : base(map)
-		{
-		}
-
-		public override void ExposeData()
-		{
-			for (var i = 0; i < 9; i++)
-				Scribe_Deep.Look(ref views[i], "view" + (i + 1), new object[] { map });
-		}
-	}
-
 	class Tools : CameraPlusSettings
 	{
+		static readonly Dictionary<Graphic, Color> cachedMainColors = new Dictionary<Graphic, Color>();
+		public static Color? GetMainColor(Pawn pawn)
+		{
+			const float colorLimiterPercentage = 85f;
+			const int uniteColorsTolerance = 5;
+			const float minimiumColorPercentage = 10f;
+
+			var graphic = pawn.Drawer.renderer.graphics?.nakedGraphic;
+			if (graphic == null)
+				return null;
+
+			if (cachedMainColors.TryGetValue(graphic, out var color) == false)
+			{
+				var material = graphic.MatEast;
+				var texture = material.mainTexture;
+				var width = texture.width;
+				var height = texture.width;
+
+				var outputTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+				var buffer = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+				Graphics.Blit(texture, buffer, material, 0);
+				RenderTexture.active = buffer;
+				outputTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
+
+				var color32s = ProminentColor.GetColors32FromImage(outputTexture, 1, colorLimiterPercentage, uniteColorsTolerance, minimiumColorPercentage);
+				color = new Color(color32s[0].r / 255f, color32s[0].g / 255f, color32s[0].b / 255f);
+				cachedMainColors[graphic] = color;
+			}
+			return color;
+		}
+
+		public static bool ReplacePawnWithDot(Pawn pawn)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return false;
+
+			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
+				return false;
+
+			var pos = pawn.DrawPos;
+			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
+			var v2 = pos.MapToUIPosition();
+			return Vector2.Distance(v1, v2) > 28f;
+		}
+
 		public static float LerpRootSize(float x)
 		{
 			var n = CameraPlusMain.Settings.exponentiality;
@@ -114,6 +144,9 @@ namespace CameraPlus
 
 		public static void HandleHotkeys()
 		{
+			if (Event.current.type == EventType.repaint)
+				return;
+
 			var settings = CameraPlusMain.Settings;
 			var m1 = settings.cameraSettingsMod1;
 			var m2 = settings.cameraSettingsMod2;
