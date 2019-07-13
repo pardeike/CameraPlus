@@ -14,6 +14,7 @@
 	<HideAnimals>Animals have no marker</HideAnimals>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
+	<StickyMiddleMouseDragging>Sticky middle mouse dragging</StickyMiddleMouseDragging>
 	<ZoomToMouse>Zoom to mouse</ZoomToMouse>
 	<ZoomedIn>Fully zoomed in</ZoomedIn>
 	<ZoomedOut>Fully zoomed out</ZoomedOut>

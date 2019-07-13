@@ -14,6 +14,7 @@
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
 	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
 	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
+	<StickyMiddleMouseDragging>Mittelmaus verschieben ohne gleiten</StickyMiddleMouseDragging>
 	<ZoomToMouse>Zoom an die Maus</ZoomToMouse>
 	<ZoomedIn>Komplett eingezoomt</ZoomedIn>
 	<ZoomedOut>Komplett ausgezoomt</ZoomedOut>

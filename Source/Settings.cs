@@ -36,6 +36,7 @@ namespace CameraPlus
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutDollyFrictionPercent = 0.15f;
 		public float zoomedInDollyFrictionPercent = 0.15f;
+		public bool stickyMiddleMouse = false;
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
 		public bool hideNamesWhenZoomedOut = true;
@@ -67,6 +68,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedOutDollyFrictionPercent, "zoomedOutDollySpeedDecayPercent", 0.15f);
 			Scribe_Values.Look(ref zoomedInDollyFrictionPercent, "zoomedInDollySpeedDecayPercent", 0.15f);
+			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", false);
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
@@ -180,6 +182,8 @@ namespace CameraPlus
 			zoomedInDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedInDollyFrictionPercent, 0f, 1f)) / 100f;
 			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%", -1f);
 			zoomedOutDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyFrictionPercent, 0f, 1f)) / 100f;
+			list.CheckboxLabeled("StickyMiddleMouseDragging".Translate(), ref stickyMiddleMouse);
+			list.Gap(4f);
 
 			list.Gap(12f);
 
@@ -209,6 +213,7 @@ namespace CameraPlus
 				zoomedInDollyPercent = 1;
 				zoomedOutDollyFrictionPercent = 0.15f;
 				zoomedInDollyFrictionPercent = 0.15f;
+				stickyMiddleMouse = false;
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
 				customNameStyle = LabelStyle.AnimalsDifferent;

@@ -14,6 +14,7 @@
 	<HideAnimals>Los animales no tienen marcador</HideAnimals>
 	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
 	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
+	<StickyMiddleMouseDragging>Arrastrar con el botón central del ratón es pegajoso</StickyMiddleMouseDragging>
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>
 	<ZoomedIn>Completamente ampliado</ZoomedIn>
 	<ZoomedOut>Completamente alejado</ZoomedOut>

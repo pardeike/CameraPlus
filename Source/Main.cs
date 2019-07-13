@@ -85,8 +85,9 @@ namespace CameraPlus
 
 		static void Postfix(CameraDriver __instance)
 		{
-			if (Refs.mouseDragVect(__instance) != Vector2.zero)
-				Refs.velocity(__instance) = Vector3.zero;
+			if (CameraPlusMain.Settings.stickyMiddleMouse)
+				if (Refs.mouseDragVect(__instance) != Vector2.zero)
+					Refs.velocity(__instance) = Vector3.zero;
 		}
 	}
 
@@ -207,8 +208,16 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals)
+			var cameraDelegate = Tools.GetCachedCameraDelegate(___pawn);
+			if (cameraDelegate.GetCameraColors == null)
+			{
+				if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals)
+					return true;
+			}
+
+			if (Tools.PawnHasNoLabel(___pawn))
 				return true;
+
 			return Tools.ReplacePawnWithDot(___pawn) == false;
 		}
 
@@ -225,56 +234,49 @@ namespace CameraPlus
 	[StaticConstructorOnStartup]
 	static class GenMapUI_DrawPawnLabel_Patch
 	{
-		static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
-		static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
-		static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
-		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
 		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
 		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
 		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
 		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
 
-		static bool Prefix(Pawn pawn, float truncateToWidth)
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
-			if (truncateToWidth != 9999f)
-				return true;
+			if (truncateToWidth != 9999f || Tools.ReplacePawnWithDot(pawn) == false)
+				return true; // use label
 
-			if (Tools.ReplacePawnWithDot(pawn) == false)
-				return true;
+			var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
+			if (useMarkers == false)
+				return true; // use label
+
+			Tools.GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
 
 			var pos = pawn.DrawPos;
 			var v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
 			var v2 = (pos + new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
-			var r = new Rect(v1, v2 - v1);
+			var markerRect = new Rect(v1, v2 - v1);
 
-			var isAnimal = pawn.RaceProps.Animal;
-			var showAnimals = CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals;
-			var customAnimalStyle = CameraPlusMain.Settings.customNameStyle == LabelStyle.AnimalsDifferent;
+			// draw outer marker
+			GUI.color = outerColor;
+			GUI.DrawTexture(markerRect, outerTexture, ScaleMode.ScaleToFit, true);
 
-			if (!isAnimal || showAnimals)
+			// draw inner marker
+			GUI.color = innerColor;
+			GUI.DrawTexture(markerRect, innerTexture, ScaleMode.ScaleToFit, true);
+
+			// draw extra marker
+			if (pawn.Downed)
 			{
-				var innerColor = PawnNameColorUtility.PawnNameColorOf(pawn);
-				if (isAnimal)
-					innerColor = Tools.GetMainColor(pawn) ?? innerColor;
-
-				var inner = isAnimal && customAnimalStyle ? innerAnimalTexture : innerColonistTexture;
-				var outer = isAnimal && customAnimalStyle ? outerAnimalTexture : outerColonistTexture;
-				GUI.color = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
-				GUI.DrawTexture(r, outer, ScaleMode.ScaleToFit, true);
-				GUI.color = innerColor;
-				GUI.DrawTexture(r, inner, ScaleMode.ScaleToFit, true);
-				if (pawn.Downed)
-				{
-					GUI.color = downedColor;
-					GUI.DrawTexture(r, downedTexture, ScaleMode.ScaleToFit, true);
-				}
-				else if (pawn.Drafted)
-				{
-					GUI.color = draftedColor;
-					GUI.DrawTexture(r, draftedTexture, ScaleMode.ScaleToFit, true);
-				}
+				GUI.color = downedColor;
+				GUI.DrawTexture(markerRect, downedTexture, ScaleMode.ScaleToFit, true);
+			}
+			else if (pawn.Drafted)
+			{
+				GUI.color = draftedColor;
+				GUI.DrawTexture(markerRect, draftedTexture, ScaleMode.ScaleToFit, true);
 			}
 
+			// skip label
 			return false;
 		}
 	}

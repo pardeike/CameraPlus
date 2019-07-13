@@ -1,17 +1,58 @@
-﻿using RimWorld;
+﻿using Harmony;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
+	class CameraDelegates
+	{
+		public Func<Pawn, Color[]> GetCameraColors = null;
+		public Func<Pawn, Texture2D[]> GetCameraMarkers = null;
+
+		static MethodInfo GetMethod(Pawn pawn, string name)
+		{
+			return pawn.GetType().Assembly
+				.GetType("CameraPlusSupport.Methods", false)?
+				.GetMethod(name, AccessTools.all);
+		}
+
+		public CameraDelegates(Pawn pawn)
+		{
+			var m_GetCameraColors = GetMethod(pawn, "GetCameraPlusColors");
+			if (m_GetCameraColors != null)
+			{
+				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Color[]) });
+				GetCameraColors = (Func<Pawn, Color[]>)Delegate.CreateDelegate(funcType, m_GetCameraColors);
+			}
+
+			var m_GetCameraTextures = GetMethod(pawn, "GetCameraPlusMarkers");
+			if (m_GetCameraTextures != null)
+			{
+				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Texture2D[]) });
+				GetCameraMarkers = (Func<Pawn, Texture2D[]>)Delegate.CreateDelegate(funcType, m_GetCameraTextures);
+			}
+		}
+	}
+
+	[StaticConstructorOnStartup]
 	class Tools : CameraPlusSettings
 	{
-		static readonly Dictionary<Graphic, Color> cachedMainColors = new Dictionary<Graphic, Color>();
+		static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
+		static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
+		static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
+		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
+
+		static readonly Dictionary<string, Color> cachedMainColors = new Dictionary<string, Color>();
 		public static Color? GetMainColor(Pawn pawn)
 		{
+			const int resizedTo = 8;
+			const int maxColorAmount = 1;
 			const float colorLimiterPercentage = 85f;
 			const int uniteColorsTolerance = 5;
 			const float minimiumColorPercentage = 10f;
@@ -20,24 +61,66 @@ namespace CameraPlus
 			if (graphic == null)
 				return null;
 
-			if (cachedMainColors.TryGetValue(graphic, out var color) == false)
+			var key = pawn.GetType().FullName + ":" + graphic.path;
+			if (cachedMainColors.TryGetValue(key, out var color) == false)
 			{
 				var material = graphic.MatEast;
+				if (material == null) material = graphic.MatSingle;
+				if (material == null)
+				{
+					cachedMainColors[key] = Color.gray;
+					return null;
+				}
+
 				var texture = material.mainTexture;
+				if (texture == null)
+				{
+					cachedMainColors[key] = Color.gray;
+					return null;
+				}
+
 				var width = texture.width;
 				var height = texture.width;
-
 				var outputTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
 				var buffer = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
 				Graphics.Blit(texture, buffer, material, 0);
 				RenderTexture.active = buffer;
 				outputTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
 
-				var color32s = ProminentColor.GetColors32FromImage(outputTexture, 1, colorLimiterPercentage, uniteColorsTolerance, minimiumColorPercentage);
-				color = new Color(color32s[0].r / 255f, color32s[0].g / 255f, color32s[0].b / 255f);
-				cachedMainColors[graphic] = color;
+				var color32s = ProminentColor.GetColors32FromImage(outputTexture, resizedTo, maxColorAmount, colorLimiterPercentage, uniteColorsTolerance, minimiumColorPercentage);
+				if (color32s == null || color32s.Count == 0)
+					color = Color.gray;
+				else
+					color = new Color(color32s[0].r / 255f, color32s[0].g / 255f, color32s[0].b / 255f);
+
+				cachedMainColors[key] = color;
 			}
 			return color;
+		}
+
+		// shameless copy of vanilla
+		public static bool PawnHasNoLabel(Pawn pawn)
+		{
+			if (!pawn.Spawned || pawn.Map.fogGrid.IsFogged(pawn.Position))
+				return true;
+			if (!pawn.RaceProps.Humanlike)
+			{
+				var animalNameMode = Prefs.AnimalNameMode;
+				if (animalNameMode == AnimalNameDisplayMode.None)
+					return true;
+				if (animalNameMode != AnimalNameDisplayMode.TameAll)
+				{
+					if (animalNameMode == AnimalNameDisplayMode.TameNamed)
+					{
+						if (pawn.Name == null || pawn.Name.Numerical)
+							return true;
+					}
+				}
+				else if (pawn.Name == null)
+					return true;
+			}
+
+			return false;
 		}
 
 		public static bool ReplacePawnWithDot(Pawn pawn)
@@ -52,6 +135,76 @@ namespace CameraPlus
 			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
 			var v2 = pos.MapToUIPosition();
 			return Vector2.Distance(v1, v2) > 28f;
+		}
+
+		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();
+		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
+		{
+			var type = pawn.GetType();
+			if (cachedCameraDelegates.TryGetValue(type, out var result) == false)
+			{
+				result = new CameraDelegates(pawn);
+				cachedCameraDelegates[type] = result;
+			}
+			return result;
+		}
+
+		// returning true will prefer markers over labels
+		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
+		{
+			var cameraDelegate = GetCachedCameraDelegate(pawn);
+			if (cameraDelegate.GetCameraColors != null)
+			{
+				var colors = cameraDelegate.GetCameraColors(pawn);
+				if (colors == null || colors.Length != 2)
+				{
+					innerColor = default;
+					outerColor = default;
+					return false;
+				}
+				innerColor = colors[0];
+				outerColor = colors[1];
+				return true;
+			}
+
+			var isAnimal = pawn.RaceProps.Animal;
+			var showAnimals = CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals;
+			if (isAnimal && showAnimals == false)
+			{
+				innerColor = default;
+				outerColor = default;
+				return false;
+			}
+
+			innerColor = PawnNameColorUtility.PawnNameColorOf(pawn);
+			if (pawn.RaceProps.Animal)
+				innerColor = GetMainColor(pawn) ?? innerColor;
+			outerColor = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
+			return true;
+		}
+
+		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
+		{
+			var cameraDelegate = GetCachedCameraDelegate(pawn);
+			if (cameraDelegate.GetCameraMarkers != null)
+			{
+				var textures = cameraDelegate.GetCameraMarkers(pawn);
+				if (textures == null || textures.Length != 2)
+				{
+					innerTexture = default;
+					outerTexture = default;
+					return false;
+				}
+				innerTexture = textures[0];
+				outerTexture = textures[1];
+				return true;
+			}
+
+			var isAnimal = pawn.RaceProps.Animal;
+			var customAnimalStyle = CameraPlusMain.Settings.customNameStyle == LabelStyle.AnimalsDifferent;
+			innerTexture = isAnimal && customAnimalStyle ? innerAnimalTexture : innerColonistTexture;
+			outerTexture = isAnimal && customAnimalStyle ? outerAnimalTexture : outerColonistTexture;
+			return true;
 		}
 
 		public static float LerpRootSize(float x)

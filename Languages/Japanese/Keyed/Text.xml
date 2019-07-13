@@ -14,6 +14,7 @@
 	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
+	<StickyMiddleMouseDragging>マウスの中ボタンでドラッグすると、粘着性があります</StickyMiddleMouseDragging>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
 	<ZoomedIn>最大ズームイン</ZoomedIn>
 	<ZoomedOut>最大ズームアウト</ZoomedOut>

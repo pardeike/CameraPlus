@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class ColorAmount
+class ColorAmount
 {
 	public Color32 color;
 	public int amount;
@@ -15,37 +15,18 @@ public class ColorAmount
 	}
 }
 
-public struct Vector2Int
-{
-	public int x;
-	public int y;
-
-	public Vector2Int(int x, int y)
-	{
-		this.x = x;
-		this.y = y;
-	}
-}
-
 public static class ProminentColor
 {
-	private static readonly List<Color32> colorList = new List<Color32>();
-	private static List<ColorAmount> pixelColorAmount = new List<ColorAmount>();
+	static readonly List<Color32> colorList = new List<Color32>();
+	static List<ColorAmount> pixelColorAmount = new List<ColorAmount>();
 
-	public static Texture2D RemoveBorder(Texture2D texture, Color32 compareColor, float tolerance)
-	{
-		if (texture == null)
-			throw new Exception("Texture null");
-		texture = FloodFill(texture, compareColor, 0, 0, tolerance);
-		return texture;
-	}
-
-	public static List<Color32> GetColors32FromImage(Texture2D texture, int maxColorAmount, float colorLimiterPercentage, int toleranceUniteColors, float minimiumColorPercentage)
+	public static List<Color32> GetColors32FromImage(Texture2D texture, int resizedTo, int maxColorAmount, float colorLimiterPercentage, int toleranceUniteColors, float minimiumColorPercentage)
 	{
 		colorList.Clear();
 		pixelColorAmount.Clear();
 
 		var pixels = texture.GetPixels32();
+		pixels = ResizeCanvas(pixels, texture.width, texture.height, resizedTo, resizedTo);
 
 		for (var i = 0; i < pixels.Length; i += 1)
 		{
@@ -85,81 +66,34 @@ public static class ProminentColor
 		return colorList;
 	}
 
-	public static List<string> GetHexColorsFromImage(Texture2D texture, int maxColorAmount, float colorLimiterPercentage, int toleranceUniteColors, float minimiumColorPercentage)
+	static Color32[] ResizeCanvas(IList<Color32> pixels, int oldWidth, int oldHeight, int width, int height)
 	{
-		var color32List = GetColors32FromImage(texture, maxColorAmount, colorLimiterPercentage, toleranceUniteColors, minimiumColorPercentage);
-		if (color32List == null) return null;
+		var newPixels = new Color32[(width * height)];
+		var wBorder = (width - oldWidth) / 2;
+		var hBorder = (height - oldHeight) / 2;
 
-		var hexColors = new List<string>();
-		color32List.ForEach(x => hexColors.Add(ColorToHex(x)));
-
-		return hexColors;
-	}
-
-	private static Texture2D FloodFill(Texture2D texture, Color32 compareColor, int x, int y, float tolerance)
-	{
-		var textureColors = texture.GetPixels32();
-		var nodes = new Queue<Vector2Int>();
-		nodes.Enqueue(new Vector2Int(x, y));
-
-		var textureWidth = texture.width;
-		var textureHeight = texture.height;
-		var alphaColor = new Color32(0, 0, 0, 0);
-
-		while (nodes.Count > 0)
+		for (int r = 0; r < height; r++)
 		{
-			var current = nodes.Dequeue();
+			var oldR = r - hBorder;
+			if (oldR < 0) { continue; }
+			if (oldR >= oldHeight) { break; }
 
-			Color32 color;
-
-			for (var i = current.x; i < textureWidth; i++)
+			for (int c = 0; c < width; c++)
 			{
-				color = textureColors[i + current.y * textureWidth];
-				if (!ColorTest(compareColor, color, tolerance) || color.Equals(alphaColor))
-					break;
-				textureColors[i + current.y * textureWidth] = alphaColor;
-				if (current.y + 1 < textureHeight)
-				{
-					color = textureColors[i + current.y * textureWidth + textureWidth];
-					if (ColorTest(compareColor, color, tolerance) && !color.Equals(alphaColor))
-						nodes.Enqueue(new Vector2Int(i, current.y + 1));
-				}
-				if (current.y - 1 >= 0)
-				{
-					color = textureColors[i + current.y * textureWidth - textureWidth];
-					if (ColorTest(compareColor, color, tolerance) && !color.Equals(alphaColor))
-						nodes.Enqueue(new Vector2Int(i, current.y - 1));
-				}
-			}
+				var oldC = c - wBorder;
+				if (oldC < 0) { continue; }
+				if (oldC >= oldWidth) { break; }
 
-			for (var i = current.x - 1; i >= 0; i--)
-			{
-				color = textureColors[i + current.y * textureWidth];
-				if (!ColorTest(compareColor, color, tolerance) || !color.Equals(alphaColor))
-					break;
-				textureColors[i + current.y * textureWidth] = alphaColor;
-				if (current.y + 1 < textureHeight)
-				{
-					color = textureColors[i + current.y * textureWidth + textureWidth];
-					if (ColorTest(compareColor, color, tolerance) && !color.Equals(alphaColor))
-						nodes.Enqueue(new Vector2Int(i, current.y + 1));
-				}
-				if (current.y - 1 >= 0)
-				{
-					color = textureColors[i + current.y * textureWidth - textureWidth];
-					if (ColorTest(compareColor, color, tolerance) && !color.Equals(alphaColor))
-						nodes.Enqueue(new Vector2Int(i, current.y - 1));
-				}
+				var oldI = oldR * oldWidth + oldC;
+				var i = r * width + c;
+				newPixels[i] = pixels[oldI];
 			}
 		}
 
-		texture.SetPixels32(textureColors);
-		texture.Apply();
-
-		return texture;
+		return newPixels;
 	}
 
-	private static List<ColorAmount> UniteSimilarColors(List<ColorAmount> colorAmounts, int tolerance = 30, bool replaceSimilarColors = false)
+	static List<ColorAmount> UniteSimilarColors(List<ColorAmount> colorAmounts, int tolerance = 30, bool replaceSimilarColors = false)
 	{
 		var toReturn = new List<ColorAmount>();
 
@@ -168,11 +102,11 @@ public static class ProminentColor
 			var found = false;
 			for (var j = 0; j < toReturn.Count; j++)
 			{
-				if (ColorTest(colorAmounts[i].color, toReturn[j].color, tolerance))
+				if (ColorTest(ref colorAmounts[i].color, ref toReturn[j].color, tolerance))
 				{
 					if (replaceSimilarColors)
 					{
-						if (GetColorSaturation(toReturn[j].color) < GetColorSaturation(colorAmounts[i].color))
+						if (GetColorSaturation(ref toReturn[j].color) < GetColorSaturation(ref colorAmounts[i].color))
 							toReturn[j].color = colorAmounts[i].color;
 					}
 
@@ -188,7 +122,7 @@ public static class ProminentColor
 		return toReturn;
 	}
 
-	private static bool ColorTest(Color32 c1, Color32 c2, float tol)
+	static bool ColorTest(ref Color32 c1, ref Color32 c2, float tol)
 	{
 		float diffRed = Mathf.Abs(c1.r - c2.r);
 		float diffGreen = Mathf.Abs(c1.g - c2.g);
@@ -198,12 +132,7 @@ public static class ProminentColor
 		return diffPercentage < tol;
 	}
 
-	private static string ColorToHex(Color32 color)
-	{
-		return "#" + color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
-	}
-
-	private static double GetColorSaturation(Color32 color)
+	static double GetColorSaturation(ref Color32 color)
 	{
 		int max = Math.Max(color.r, Math.Max(color.g, color.b));
 		int min = Math.Min(color.r, Math.Min(color.g, color.b));
