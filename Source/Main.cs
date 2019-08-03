@@ -57,10 +57,10 @@ namespace CameraPlus
 				return;
 			}
 			var rootPos = Refs.rootPos(driver);
-			Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
+			_ = Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
 			var oldMousePos = UI.MouseMapPosition();
 			Refs.rootSize(driver) = rootSize;
-			Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
+			_ = Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
 			rootPos += oldMousePos - UI.MouseMapPosition();
 			Refs.rootPos(driver) = rootPos;
 		}
@@ -154,7 +154,7 @@ namespace CameraPlus
 				var j = list.FindIndex(i, instr => instr.labels.Contains(jumpLabel));
 				if (j == -1)
 					continue;
-				list[j].labels.Remove(jumpLabel);
+				_ = list[j].labels.Remove(jumpLabel);
 				var labels = list[i].labels;
 				var blocks = list[i].blocks;
 				list.RemoveRange(i, j - i);
@@ -194,9 +194,7 @@ namespace CameraPlus
 				return true;
 
 			// show if mouse is nearby
-			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
-			var v2 = loc.MapToUIPosition();
-			return Vector2.Distance(v1, v2) <= 28f;
+			return Tools.MouseNear(loc);
 		}
 	}
 
@@ -224,7 +222,7 @@ namespace CameraPlus
 		static void Postfix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut && CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals)
-				Tools.GetMainColor(___pawn); // trigger caching
+				_ = Tools.GetMainColor(___pawn); // trigger caching
 		}
 	}
 
@@ -249,7 +247,7 @@ namespace CameraPlus
 			if (useMarkers == false)
 				return true; // use label
 
-			Tools.GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
+			_ = Tools.GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
 
 			var pos = pawn.DrawPos;
 			var v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();

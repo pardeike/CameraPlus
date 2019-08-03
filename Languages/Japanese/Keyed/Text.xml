@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+	<Zoom>ズーム</Zoom>
+	<Near>近所の</Near>
+	<Far>遠く</Far>
 	<ZoomedInPercent>最大ズームイン倍率</ZoomedInPercent>
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
 	<Exponentiality>指数関数スケーリング:</Exponentiality>
@@ -8,16 +11,16 @@
 	<ModifierKeys>有効にするにはホールド</ModifierKeys>
 	<SaveModifier>ビューを保存するために保持します</SaveModifier>
 	<SettingsKey>これらの設定を表示</SettingsKey>
-	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
-	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
-	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
-	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>マウスの中ボタンでドラッグすると、粘着性があります</StickyMiddleMouseDragging>
+	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
+	<Marker>マーカー</Marker>
+	<Pixel>ピクセル</Pixel>
+	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
+	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
+	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
-	<ZoomedIn>最大ズームイン</ZoomedIn>
-	<ZoomedOut>最大ズームアウト</ZoomedOut>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>

@@ -40,6 +40,43 @@ namespace CameraPlus
 		}
 	}
 
+	static class Extensions
+	{
+		public static void Slider(this Listing_Standard list, ref int value, int min, int max, Func<string> label)
+		{
+			float f = value;
+			var h = HorizontalSlider(list.GetRect(22f), ref f, min, max, label == null ? null : label(), 1f);
+			value = (int)f;
+			list.Gap(h);
+		}
+
+		public static void Slider(this Listing_Standard list, ref float value, float min, float max, Func<string> label, float roundTo = -1f)
+		{
+			var rect = list.GetRect(22f);
+			var h = HorizontalSlider(rect, ref value, min, max, label == null ? null : label(), roundTo);
+			list.Gap(h);
+		}
+
+		public static float HorizontalSlider(Rect rect, ref float value, float leftValue, float rightValue, string label = null, float roundTo = -1f)
+		{
+			if (label != null)
+			{
+				var anchor = Text.Anchor;
+				var font = Text.Font;
+				Text.Font = GameFont.Tiny;
+				Text.Anchor = TextAnchor.UpperLeft;
+				Widgets.Label(rect, label);
+				Text.Anchor = anchor;
+				Text.Font = font;
+				rect.y += 18f;
+			}
+			value = GUI.HorizontalSlider(rect, value, leftValue, rightValue);
+			if (roundTo > 0f)
+				value = Mathf.RoundToInt(value / roundTo) * roundTo;
+			return 4f + label != null ? 18f : 0f;
+		}
+	}
+
 	[StaticConstructorOnStartup]
 	class Tools : CameraPlusSettings
 	{
@@ -123,18 +160,24 @@ namespace CameraPlus
 			return false;
 		}
 
+		public static bool MouseNear(Vector3 pos)
+		{
+			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
+			var v2 = pos.MapToUIPosition();
+			return Vector2.Distance(v1, v2) <= 28f;
+		}
+
 		public static bool ReplacePawnWithDot(Pawn pawn)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return false;
 
-			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
-				return false;
+			var v1 = Vector3.zero.MapToUIPosition();
+			var v2 = Vector3.one.MapToUIPosition();
+			var len = v2.x - v1.x;
+			if (len > CameraPlusMain.Settings.dotSize) return false;
 
-			var pos = pawn.DrawPos;
-			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
-			var v2 = pos.MapToUIPosition();
-			return Vector2.Distance(v1, v2) > 28f;
+			return MouseNear(pawn.DrawPos) == false;
 		}
 
 		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();

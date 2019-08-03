@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CrossPromotion.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ModCounter.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MultiVersionModFix.cs" />

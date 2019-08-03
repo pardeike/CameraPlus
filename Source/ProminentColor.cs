@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
+using UnityEngine;
 
 class ColorAmount
 {
@@ -72,13 +72,13 @@ public static class ProminentColor
 		var wBorder = (width - oldWidth) / 2;
 		var hBorder = (height - oldHeight) / 2;
 
-		for (int r = 0; r < height; r++)
+		for (var r = 0; r < height; r++)
 		{
 			var oldR = r - hBorder;
 			if (oldR < 0) { continue; }
 			if (oldR >= oldHeight) { break; }
 
-			for (int c = 0; c < width; c++)
+			for (var c = 0; c < width; c++)
 			{
 				var oldC = c - wBorder;
 				if (oldC < 0) { continue; }

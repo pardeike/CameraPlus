@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
+	<Zoom>Zoom</Zoom>
+	<Near>Near</Near>
+	<Far>Far</Far>
 	<ZoomedInPercent>Maximum zoomed in factor</ZoomedInPercent>
 	<ZoomedOutPercent>Maximum zoomed out factor</ZoomedOutPercent>
 	<Exponentiality>Exponential scaling:</Exponentiality>
@@ -8,16 +11,16 @@
 	<ModifierKeys>Hold to activate</ModifierKeys>
 	<SaveModifier>Hold to save view</SaveModifier>
 	<SettingsKey>Show Camera+ settings</SettingsKey>
-	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
-	<IncludeAnimals>Animals have the same marker</IncludeAnimals>
-	<AnimalsDifferent>Animals have a different marker</AnimalsDifferent>
-	<HideAnimals>Animals have no marker</HideAnimals>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Sticky middle mouse dragging</StickyMiddleMouseDragging>
+	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
+	<Marker>Marker</Marker>
+	<Pixel>Pixel</Pixel>
+	<IncludeAnimals>Animals have the same marker</IncludeAnimals>
+	<AnimalsDifferent>Animals have a different marker</AnimalsDifferent>
+	<HideAnimals>Animals have no marker</HideAnimals>
 	<ZoomToMouse>Zoom to mouse</ZoomToMouse>
-	<ZoomedIn>Fully zoomed in</ZoomedIn>
-	<ZoomedOut>Fully zoomed out</ZoomedOut>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>

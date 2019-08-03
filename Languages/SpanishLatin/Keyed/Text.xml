@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
+	<Zoom>Zoom</Zoom>
+	<Near>Cerca</Near>
+	<Far>Muy lejos</Far>
 	<ZoomedInPercent>Factor máximo de acercamiento (zoom in)</ZoomedInPercent>
 	<ZoomedOutPercent>Factor máximo de alejamiento (zoom out)</ZoomedOutPercent>
 	<Exponentiality>Escalado exponencial:</Exponentiality>
@@ -8,16 +11,16 @@
 	<ModifierKeys>Presione para activar</ModifierKeys>
 	<SaveModifier>Presione para guardar la vista</SaveModifier>
 	<SettingsKey>Mostrar estos ajustes</SettingsKey>
-	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
-	<IncludeAnimals>Los animales tienen el mismo marcador</IncludeAnimals>
-	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
-	<HideAnimals>Los animales no tienen marcador</HideAnimals>
 	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
 	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Arrastrar con el botón central del ratón es pegajoso</StickyMiddleMouseDragging>
+	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
+	<Marker>Marcador</Marker>
+	<Pixel>Píxel</Pixel>
+	<IncludeAnimals>Los animales tienen el mismo marcador</IncludeAnimals>
+	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
+	<HideAnimals>Los animales no tienen marcador</HideAnimals>
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>
-	<ZoomedIn>Completamente ampliado</ZoomedIn>
-	<ZoomedOut>Completamente alejado</ZoomedOut>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>

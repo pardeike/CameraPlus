@@ -40,6 +40,7 @@ namespace CameraPlus
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
 		public bool hideNamesWhenZoomedOut = true;
+		public int dotSize = 9;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public KeyCode cameraSettingsMod1 = KeyCode.LeftShift;
 		public KeyCode cameraSettingsMod2 = KeyCode.None;
@@ -72,6 +73,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
+			Scribe_Values.Look(ref dotSize, "dotSize", 9);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
 			Scribe_Values.Look(ref cameraSettingsMod1, "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod2, "cameraSettingsMod2", KeyCode.None);
@@ -97,9 +99,10 @@ namespace CameraPlus
 
 			list.Gap(16f);
 
-			list.Label("ZoomedInPercent".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
+			list.Label("Zoom".Translate());
+
 			previous = zoomedInPercent;
-			zoomedInPercent = list.Slider(zoomedInPercent, 0.1f, 20f);
+			list.Slider(ref zoomedInPercent, 0.1f, 20f, () => "Near".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
 			minRootResult = zoomedInPercent * 2;
 			if (previous != zoomedInPercent && map != null)
 			{
@@ -108,11 +111,8 @@ namespace CameraPlus
 					Find.CameraDriver.SetRootPosAndSize(map.rememberedCameraPos.rootPos, minRootInput);
 			}
 
-			list.Gap(12f);
-
-			list.Label("ZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
 			previous = zoomedOutPercent;
-			zoomedOutPercent = list.Slider(zoomedOutPercent, 50f, 100f);
+			list.Slider(ref zoomedOutPercent, 50f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
 			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
 			{
@@ -128,12 +128,12 @@ namespace CameraPlus
 			for (var i = 1; i <= 3; i++)
 				if (list.RadioButton(i + "x", exponentiality == i, 8f)) exponentiality = i;
 
-			list.Gap(12f);
+			list.Gap(16f);
 
 			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
-			soundNearness = list.Slider(soundNearness, 0f, 1f);
+			list.Slider(ref soundNearness, 0f, 1f, null);
 
-			list.Gap(12f);
+			list.Gap(6f);
 
 			list.Label("CameraKeys".Translate());
 			list.Gap(6f);
@@ -165,32 +165,26 @@ namespace CameraPlus
 			Tools.KeySettingsButton(rect, true, cameraSettingsKey, code => cameraSettingsKey = code);
 
 			list.NewColumn();
-			list.Gap(12f);
+			list.Gap(16f);
 
 			list.Label("DollyPercentLabel".Translate());
-			list.Gap(4f);
-			list.Label("ZoomedIn".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%", -1f);
-			zoomedInDollyPercent = Mathf.Round(100f * list.Slider(zoomedInDollyPercent, 0f, 4f)) / 100f;
-			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + "%", -1f);
-			zoomedOutDollyPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyPercent, 0f, 4f)) / 100f;
+			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
+			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
 
 			list.Gap(12f);
 
 			list.Label("DollyFrictionLabel".Translate());
-			list.Gap(4f);
-			list.Label("ZoomedIn".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%", -1f);
-			zoomedInDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedInDollyFrictionPercent, 0f, 1f)) / 100f;
-			list.Label("ZoomedOut".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%", -1f);
-			zoomedOutDollyFrictionPercent = Mathf.Round(100f * list.Slider(zoomedOutDollyFrictionPercent, 0f, 1f)) / 100f;
+			list.Slider(ref zoomedInDollyFrictionPercent, 0f, 1f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%");
+			list.Slider(ref zoomedOutDollyFrictionPercent, 0f, 1f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%");
+			list.Gap(-2);
 			list.CheckboxLabeled("StickyMiddleMouseDragging".Translate(), ref stickyMiddleMouse);
-			list.Gap(4f);
 
-			list.Gap(12f);
+			list.Gap(24f);
 
 			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
 			if (hideNamesWhenZoomedOut)
 			{
-				list.Gap(4f);
+				list.Slider(ref dotSize, 1, 32, () => "Marker".Translate() + ": " + dotSize + " " + "Pixel".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
@@ -198,11 +192,11 @@ namespace CameraPlus
 				}
 			}
 
-			list.Gap(12f);
+			list.Gap(24f);
 
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 
-			list.Gap(12f);
+			list.Gap(28f);
 
 			if (list.ButtonText("RestoreToDefaultSettings".Translate()))
 			{
@@ -216,6 +210,7 @@ namespace CameraPlus
 				stickyMiddleMouse = false;
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
+				dotSize = 9;
 				customNameStyle = LabelStyle.AnimalsDifferent;
 				cameraSettingsMod1 = KeyCode.LeftShift;
 				cameraSettingsMod2 = KeyCode.None;
