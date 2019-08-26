@@ -77,6 +77,13 @@ namespace CameraPlus
 		}
 	}
 
+	public enum LabelMode
+	{
+		hide,
+		show,
+		dot
+	}
+
 	[StaticConstructorOnStartup]
 	class Tools : CameraPlusSettings
 	{
@@ -160,24 +167,62 @@ namespace CameraPlus
 			return false;
 		}
 
-		public static bool MouseNear(Vector3 pos)
+		public static float MouseDistanceSquared(Vector3 pos, bool mapCoordinates)
 		{
-			var v1 = UI.MouseCell().ToVector3().MapToUIPosition();
-			var v2 = pos.MapToUIPosition();
-			return Vector2.Distance(v1, v2) <= 28f;
+			var mouse = UI.MouseMapPosition();
+			if (mapCoordinates)
+			{
+				var dx1 = (mouse.x - pos.x);
+				var dz = (mouse.z - pos.z);
+				return dx1 * dx1 + dz * dz;
+			}
+
+			mouse = UI.MapToUIPosition(mouse);
+			var len = CurrentCellLength();
+			mouse.y += len / 2;
+			var dx2 = (mouse.x - pos.x);
+			var dy = (mouse.y - pos.y);
+			var delta = dx2 * dx2 + dy * dy;
+			return delta / len / len;
 		}
 
-		public static bool ReplacePawnWithDot(Pawn pawn)
+		public static float CurrentCellLength()
 		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
-				return false;
+			return Vector3.one.MapToUIPosition().x - Vector3.zero.MapToUIPosition().x;
+		}
 
-			var v1 = Vector3.zero.MapToUIPosition();
-			var v2 = Vector3.one.MapToUIPosition();
-			var len = v2.x - v1.x;
-			if (len > CameraPlusMain.Settings.dotSize) return false;
+		public static bool ShouldShowBody(Pawn pawn)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
+				return true;
 
-			return MouseNear(pawn.DrawPos) == false;
+			return (CurrentCellLength() > CameraPlusMain.Settings.dotSize);
+		}
+
+		public static void ShouldShowLabel(Vector3 location, bool isPawn, out bool showLabel, out bool showDot)
+		{
+			showLabel = true;
+			showDot = false;
+
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || MouseDistanceSquared(location, isPawn) <= 2.25f)
+				return;
+
+			var len = CurrentCellLength();
+
+			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
+			{
+				showLabel = false;
+				showDot = true;
+				return;
+			}
+
+			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
+			if (len <= lower)
+			{
+				showLabel = false;
+				showDot = false;
+				return;
+			}
 		}
 
 		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();

@@ -194,7 +194,7 @@ namespace CameraPlus
 				return true;
 
 			// show if mouse is nearby
-			return Tools.MouseNear(loc);
+			return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
 		}
 	}
 
@@ -216,7 +216,7 @@ namespace CameraPlus
 			if (Tools.PawnHasNoLabel(___pawn))
 				return true;
 
-			return Tools.ReplacePawnWithDot(___pawn) == false;
+			return Tools.ShouldShowBody(___pawn);
 		}
 
 		static void Postfix(Pawn ___pawn)
@@ -240,8 +240,14 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
-			if (truncateToWidth != 9999f || Tools.ReplacePawnWithDot(pawn) == false)
+			if (truncateToWidth != 9999f)
 				return true; // use label
+
+			Tools.ShouldShowLabel(pawn.DrawPos, true, out var showLabel, out var showDot);
+			if (showLabel)
+				return true;
+			if (showDot == false)
+				return false;
 
 			var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
 			if (useMarkers == false)
@@ -294,6 +300,13 @@ namespace CameraPlus
 			if (rootSize < 11f) return GameFont.Medium;
 			if (rootSize < 15f) return GameFont.Small;
 			return GameFont.Tiny;
+		}
+
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Vector2 screenPos)
+		{
+			Tools.ShouldShowLabel(screenPos, false, out var showLabel, out _);
+			return showLabel;
 		}
 
 		// we replace the first "GameFont.Tiny" with "GetAdaptedGameFont()"

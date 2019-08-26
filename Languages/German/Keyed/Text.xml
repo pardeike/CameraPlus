@@ -15,8 +15,11 @@
 	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Mittelmaus verschieben ohne gleiten</StickyMiddleMouseDragging>
 	<HideNamesWhenZoomedOut>Verstecke die Kolonistennamen wenn ausgezoomt</HideNamesWhenZoomedOut>
-	<Marker>Marker</Marker>
+	<Never>nie</Never>
 	<Pixel>Pixel</Pixel>
+	<HidePawnLabelBelow>Keine Kreaturnamen unter: </HidePawnLabelBelow>
+	<HideThingLabelBelow>Kein Labels für Dinge unter: </HideThingLabelBelow>
+	<ShowMarkerBelow>Als Punkt anzeigen unter: </ShowMarkerBelow>
 	<IncludeAnimals>Tiere haben den gleichen Marker</IncludeAnimals>
 	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>

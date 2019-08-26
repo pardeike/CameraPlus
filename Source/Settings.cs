@@ -41,6 +41,8 @@ namespace CameraPlus
 		public float soundNearness = 0;
 		public bool hideNamesWhenZoomedOut = true;
 		public int dotSize = 9;
+		public int hidePawnLabelBelow = 9;
+		public int hideThingLabelBelow = 32;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public KeyCode cameraSettingsMod1 = KeyCode.LeftShift;
 		public KeyCode cameraSettingsMod2 = KeyCode.None;
@@ -74,6 +76,8 @@ namespace CameraPlus
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
 			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
 			Scribe_Values.Look(ref dotSize, "dotSize", 9);
+			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
+			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
 			Scribe_Values.Look(ref cameraSettingsMod1, "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod2, "cameraSettingsMod2", KeyCode.None);
@@ -135,6 +139,10 @@ namespace CameraPlus
 
 			list.Gap(6f);
 
+			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
+
+			list.Gap(24f);
+
 			list.Label("CameraKeys".Translate());
 			list.Gap(6f);
 
@@ -184,17 +192,18 @@ namespace CameraPlus
 			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
 			if (hideNamesWhenZoomedOut)
 			{
-				list.Slider(ref dotSize, 1, 32, () => "Marker".Translate() + ": " + dotSize + " " + "Pixel".Translate());
+				var pixel = "Pixel".Translate();
+				var label1 = "HidePawnLabelBelow".Translate();
+				list.Slider(ref hidePawnLabelBelow, 0, 128, () => label1 + (hidePawnLabelBelow == 0 ? "Never".Translate() : hidePawnLabelBelow + " " + pixel));
+				var label2 = "HideThingLabelBelow".Translate();
+				list.Slider(ref hideThingLabelBelow, 0, 128, () => label2 + (hideThingLabelBelow == 0 ? "Never".Translate() : hideThingLabelBelow + " " + pixel));
+				list.Slider(ref dotSize, 1, 32, () => "ShowMarkerBelow".Translate() + dotSize + " " + "Pixel".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
 				}
 			}
-
-			list.Gap(24f);
-
-			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 
 			list.Gap(28f);
 
@@ -211,6 +220,8 @@ namespace CameraPlus
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
 				dotSize = 9;
+				hidePawnLabelBelow = 9;
+				hideThingLabelBelow = 32;
 				customNameStyle = LabelStyle.AnimalsDifferent;
 				cameraSettingsMod1 = KeyCode.LeftShift;
 				cameraSettingsMod2 = KeyCode.None;

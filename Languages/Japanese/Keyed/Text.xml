@@ -15,20 +15,23 @@
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>マウスの中ボタンでドラッグすると、粘着性があります</StickyMiddleMouseDragging>
 	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
-	<Marker>マーカー</Marker>
+	<Never>決して</Never>
 	<Pixel>ピクセル</Pixel>
+	<HidePawnLabelBelow>以下にポーン名を非表示にします： </HidePawnLabelBelow>
+	<HideThingLabelBelow>以下にモノのラベルを非表示にします： </HideThingLabelBelow>
+	<ShowMarkerBelow>マーカーとして表示： </ShowMarkerBelow>
 	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
 	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
 	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
-	<KeyLeftShift>Left Shift</KeyLeftShift>
-	<KeyLeftAlt>Left Alt</KeyLeftAlt>
-	<KeyLeftControl>Left Ctrl</KeyLeftControl>
-	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
-	<KeyLeftWindows>Left Win</KeyLeftWindows>
-	<KeyRightShift>Right Shift</KeyRightShift>
-	<KeyRightAlt>Right Alt</KeyRightAlt>
-	<KeyRightControl>Right Ctrl</KeyRightControl>
-	<KeyRightCommand>Right Cmd</KeyRightCommand>
-	<KeyRightWindows>Right Win</KeyRightWindows>
+	<KeyLeftShift>左Shift</KeyLeftShift>
+	<KeyLeftAlt>左Alt</KeyLeftAlt>
+	<KeyLeftControl>左Ctrl</KeyLeftControl>
+	<KeyLeftCommand>左Cmd</KeyLeftCommand>
+	<KeyLeftWindows>左Win</KeyLeftWindows>
+	<KeyRightShift>右Shift</KeyRightShift>
+	<KeyRightAlt>右Alt</KeyRightAlt>
+	<KeyRightControl>右Ctrl</KeyRightControl>
+	<KeyRightCommand>右Cmd</KeyRightCommand>
+	<KeyRightWindows>右Win</KeyRightWindows>
 </LanguageData>

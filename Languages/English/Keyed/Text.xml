@@ -15,8 +15,11 @@
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Sticky middle mouse dragging</StickyMiddleMouseDragging>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
-	<Marker>Marker</Marker>
+	<Never>never</Never>
 	<Pixel>Pixel</Pixel>
+	<HidePawnLabelBelow>Hide pawn labels below: </HidePawnLabelBelow>
+	<HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
+	<ShowMarkerBelow>Show as marker below: </ShowMarkerBelow>
 	<IncludeAnimals>Animals have the same marker</IncludeAnimals>
 	<AnimalsDifferent>Animals have a different marker</AnimalsDifferent>
 	<HideAnimals>Animals have no marker</HideAnimals>
