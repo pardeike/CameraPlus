@@ -7,10 +7,10 @@
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
 	<Exponentiality>指数関数スケーリング:</Exponentiality>
 	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
-	<CameraKeys>ホットキー（1〜9を押すとき</CameraKeys>
-	<ModifierKeys>有効にするにはホールド</ModifierKeys>
-	<SaveModifier>ビューを保存するために保持します</SaveModifier>
-	<SettingsKey>これらの設定を表示</SettingsKey>
+	<HotKeys>ホットキー:</HotKeys>
+	<SettingsKey>これらの設定</SettingsKey>
+	<LoadModifier>ビューを復元</LoadModifier>
+	<SaveModifier>ビューを保存</SaveModifier>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
 	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>マウスの中ボタンでドラッグすると、粘着性があります</StickyMiddleMouseDragging>

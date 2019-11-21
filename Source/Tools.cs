@@ -389,15 +389,17 @@ namespace CameraPlus
 				return;
 
 			var settings = CameraPlusMain.Settings;
-			var m1 = settings.cameraSettingsMod1;
-			var m2 = settings.cameraSettingsMod2;
-			if (m1 == KeyCode.None && m2 == KeyCode.None)
-				return;
+			KeyCode m1, m2;
 
-			if (m1 == KeyCode.None || Input.GetKey(m1))
-				if (m2 == KeyCode.None || Input.GetKey(m2))
-				{
-					if (Input.GetKey(settings.cameraSettingsKey))
+			if (Input.GetKey(settings.cameraSettingsKey))
+			{
+				m1 = settings.cameraSettingsMod[0];
+				m2 = settings.cameraSettingsMod[1];
+				if (m1 == KeyCode.None && m2 == KeyCode.None)
+					return;
+
+				if (m1 == KeyCode.None || Input.GetKey(m1))
+					if (m2 == KeyCode.None || Input.GetKey(m2))
 					{
 						var stack = Find.WindowStack;
 						if (stack.IsOpen<Dialog_ModSettings>() == false)
@@ -410,33 +412,47 @@ namespace CameraPlus
 						Event.current.Use();
 						return;
 					}
+			}
 
-					var isSave = Input.GetKey(settings.cameraSettingsOption);
-					for (var i = 1; i <= 9; i++)
-						if (Input.GetKey("" + i))
-						{
-							var map = Find.CurrentMap;
-							var cameraDriver = Find.CameraDriver;
-							var savedViews = map.GetComponent<SavedViews>();
-							if (isSave)
-							{
-								savedViews.views[i - 1] = new RememberedCameraPos(map)
-								{
-									rootPos = Refs.rootPos(cameraDriver),
-									rootSize = Refs.rootSize(cameraDriver)
-								};
-							}
-							else
-							{
-								var view = savedViews.views[i - 1];
-								if (view != null)
-									Find.CameraDriver.SetRootPosAndSize(view.rootPos, view.rootSize);
-							}
-
-							Event.current.Use();
-							return;
-						}
+			var numKey = 0;
+			for (var i = 1; i <= 9; i++)
+				if (Input.GetKey("" + i))
+				{
+					numKey = i;
+					break;
 				}
+			if (numKey == 0)
+				return;
+
+			var map = Find.CurrentMap;
+			var cameraDriver = Find.CameraDriver;
+			var savedViews = map.GetComponent<SavedViews>();
+
+			m1 = settings.cameraSettingsLoad[0];
+			m2 = settings.cameraSettingsLoad[1];
+			if (m1 != KeyCode.None || m2 != KeyCode.None)
+				if (m1 == KeyCode.None || Input.GetKey(m1))
+					if (m2 == KeyCode.None || Input.GetKey(m2))
+					{
+						var view = savedViews.views[numKey - 1];
+						if (view != null)
+							Find.CameraDriver.SetRootPosAndSize(view.rootPos, view.rootSize);
+						Event.current.Use();
+					}
+
+			m1 = settings.cameraSettingsSave[0];
+			m2 = settings.cameraSettingsSave[1];
+			if (m1 != KeyCode.None || m2 != KeyCode.None)
+				if (m1 == KeyCode.None || Input.GetKey(m1))
+					if (m2 == KeyCode.None || Input.GetKey(m2))
+					{
+						savedViews.views[numKey - 1] = new RememberedCameraPos(map)
+						{
+							rootPos = Refs.rootPos(cameraDriver),
+							rootSize = Refs.rootSize(cameraDriver)
+						};
+						Event.current.Use();
+					}
 		}
 	}
 }

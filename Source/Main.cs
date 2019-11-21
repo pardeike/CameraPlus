@@ -51,6 +51,16 @@ namespace CameraPlus
 
 		static void SetRootSize(CameraDriver driver, float rootSize)
 		{
+			if (driver == null)
+			{
+				var harmony = HarmonyInstance.Create("net.pardeike.rimworld.mod.camera+.debugger");
+				var info = harmony.GetPatchInfo(AccessTools.Method(typeof(CameraDriver), "Update"));
+				var owners = "Maybe one of the mods that patch CameraDriver.Update(): ";
+				info.Owners.Do(owner => owners += owner + " ");
+				Log.ErrorOnce("Unexpected null camera driver. Looks like a mod conflict. " + owners, 506973465);
+				return;
+			}
+
 			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
 			{
 				Refs.rootSize(driver) = rootSize;

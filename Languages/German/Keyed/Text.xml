@@ -7,10 +7,10 @@
 	<ZoomedOutPercent>Faktor: maximal ausgezoomt</ZoomedOutPercent>
 	<Exponentiality>Exponentielles zoomen:</Exponentiality>
 	<SoundNearness>Bringe lokale Geräusche näher</SoundNearness>
-	<CameraKeys>Hotkeys (mit 1 - 9 benutzen):</CameraKeys>
-	<ModifierKeys>Aktivieren mit</ModifierKeys>
-	<SaveModifier>Speichern mit</SaveModifier>
+	<HotKeys>Tastaturkürzel:</HotKeys>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
+	<LoadModifier>Laden</LoadModifier>
+	<SaveModifier>Speichern</SaveModifier>
 	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
 	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Mittelmaus verschieben ohne gleiten</StickyMiddleMouseDragging>
