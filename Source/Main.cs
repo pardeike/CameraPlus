@@ -1,24 +1,36 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
+	class LogWriter : TextWriter
+	{
+		public override Encoding Encoding => Encoding.UTF8;
+		public override void WriteLine() { Log.Message(""); }
+		public override void WriteLine(string value) { Log.Message(value); }
+		public override void WriteLine(object value) { Log.Message($"{value}"); }
+	}
+
 	class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
 		{
+			Console.SetOut(new LogWriter());
+
 			Settings = GetSettings<CameraPlusSettings>();
 
-			var harmony = HarmonyInstance.Create("net.pardeike.rimworld.mod.camera+");
+			var harmony = new Harmony("net.pardeike.rimworld.mod.camera+");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
 		}
 
@@ -51,16 +63,25 @@ namespace CameraPlus
 
 		static void SetRootSize(CameraDriver driver, float rootSize)
 		{
+			if (driver == null)
+			{
+				var info = Harmony.GetPatchInfo(AccessTools.Method(typeof(CameraDriver), "Update"));
+				var owners = "Maybe one of the mods that patch CameraDriver.Update(): ";
+				info.Owners.Do(owner => owners += owner + " ");
+				Log.ErrorOnce("Unexpected null camera driver. Looks like a mod conflict. " + owners, 506973465);
+				return;
+			}
+
 			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
 			{
 				Refs.rootSize(driver) = rootSize;
 				return;
 			}
 			var rootPos = Refs.rootPos(driver);
-			_ = Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
+			_ = Refs.applyPositionToGameObjectInvoker(driver, Array.Empty<object>());
 			var oldMousePos = UI.MouseMapPosition();
 			Refs.rootSize(driver) = rootSize;
-			_ = Refs.applyPositionToGameObjectInvoker(driver, new object[0]);
+			_ = Refs.applyPositionToGameObjectInvoker(driver, Array.Empty<object>());
 			rootPos += oldMousePos - UI.MouseMapPosition();
 			Refs.rootPos(driver) = rootPos;
 		}
@@ -70,7 +91,7 @@ namespace CameraPlus
 			var found = false;
 			foreach (var instruction in instructions)
 			{
-				if (instruction.opcode == OpCodes.Stfld && instruction.operand == Refs.f_rootSize)
+				if (instruction.opcode == OpCodes.Stfld && instruction.operand is FieldInfo fi && fi == Refs.f_rootSize)
 				{
 					instruction.opcode = OpCodes.Call;
 					instruction.operand = m_SetRootSize;
@@ -102,8 +123,8 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("OnGUI")]
-	static class CameraDriver_OnGUI_Patch
+	[HarmonyPatch("CameraDriverOnGUI")]
+	static class CameraDriver_CameraDriverOnGUI_Patch
 	{
 		static Vector2 dummy;
 		static readonly MethodInfo m_Patch = SymbolExtensions.GetMethodInfo(() => Patch(null, ref dummy, ref dummy));
@@ -141,23 +162,28 @@ namespace CameraPlus
 			{
 				if (list[i].opcode != OpCodes.Ldarg_0)
 					continue;
-				if (list[i + 1].opcode != OpCodes.Ldfld || list[i + 1].operand != Refs.f_mouseDragVect)
+				var start = i;
+				if ((list[i + 1].opcode == OpCodes.Ldfld && list[i + 1].operand is FieldInfo fi && fi == Refs.f_mouseDragVect) == false)
 					continue;
-				if (list[i + 2].opcode != OpCodes.Call || list[i + 2].operand != Refs.p_get_zero)
+				if ((list[i + 2].opcode == OpCodes.Call && list[i + 2].operand is MethodInfo mi1 && mi1 == Refs.p_get_zero) == false)
 					continue;
-				if (list[i + 3].opcode != OpCodes.Call || list[i + 3].operand != Refs.m_op_Inequality)
-					continue;
-				if (list[i + 4].opcode != OpCodes.Brfalse)
+				if ((list[i + 3].opcode == OpCodes.Call && list[i + 3].operand is MethodInfo mi2 && mi2 == Refs.m_op_Inequality) == false)
 					continue;
 
-				var jumpLabel = (Label)list[i + 4].operand;
-				var j = list.FindIndex(i, instr => instr.labels.Contains(jumpLabel));
+				i += 4;
+				while (list[i].opcode != OpCodes.Brfalse && list[i].opcode != OpCodes.Brfalse_S && i < list.Count - 1)
+					i++;
+				if (list[i].opcode != OpCodes.Brfalse && list[i].opcode != OpCodes.Brfalse_S)
+					continue;
+				var jumpLabel = (Label)list[i].operand;
+
+				var j = list.FindIndex(start, instr => instr.labels.Contains(jumpLabel));
 				if (j == -1)
 					continue;
 				_ = list[j].labels.Remove(jumpLabel);
-				var labels = list[i].labels;
-				var blocks = list[i].blocks;
-				list.RemoveRange(i, j - i);
+				var labels = list[start].labels;
+				var blocks = list[start].blocks;
+				list.RemoveRange(start, j - start);
 
 				var callPatchInstructions = new CodeInstruction[]
 				{
@@ -168,7 +194,7 @@ namespace CameraPlus
 					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDolly),
 					new CodeInstruction(OpCodes.Call, m_Patch)
 				};
-				list.InsertRange(i, callPatchInstructions);
+				list.InsertRange(start, callPatchInstructions);
 
 				found = true;
 				break;
@@ -200,7 +226,7 @@ namespace CameraPlus
 
 	[HarmonyPatch(typeof(PawnRenderer))]
 	[HarmonyPatch("RenderPawnAt")]
-	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(RotDrawMode), typeof(bool) })]
+	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
 	static class PawnRenderer_RenderPawnAt_Patch
 	{
 		[HarmonyPriority(10000)]
@@ -446,7 +472,7 @@ namespace CameraPlus
 
 					// looking for Ldarg.0 followed by Ldfld rootSize
 					//
-					if (instruction.opcode == OpCodes.Ldfld && instruction.operand == Refs.f_rootSize)
+					if (instruction.opcode == OpCodes.Ldfld && instruction.operand is FieldInfo fi && fi == Refs.f_rootSize)
 						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
 					else
 						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check

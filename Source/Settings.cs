@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using System;
 using UnityEngine;
 using Verse;
@@ -44,10 +44,11 @@ namespace CameraPlus
 		public int hidePawnLabelBelow = 9;
 		public int hideThingLabelBelow = 32;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
-		public KeyCode cameraSettingsMod1 = KeyCode.LeftShift;
-		public KeyCode cameraSettingsMod2 = KeyCode.None;
-		public KeyCode cameraSettingsOption = KeyCode.LeftAlt;
+
+		public KeyCode[] cameraSettingsMod = new[] { KeyCode.LeftShift, KeyCode.None };
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
+		public KeyCode[] cameraSettingsSave = new [] { KeyCode.LeftAlt, KeyCode.None };
+		public KeyCode[] cameraSettingsLoad = new[] { KeyCode.LeftShift, KeyCode.None };
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -79,10 +80,13 @@ namespace CameraPlus
 			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
-			Scribe_Values.Look(ref cameraSettingsMod1, "cameraSettingsMod1", KeyCode.LeftShift);
-			Scribe_Values.Look(ref cameraSettingsMod2, "cameraSettingsMod2", KeyCode.None);
-			Scribe_Values.Look(ref cameraSettingsOption, "cameraSettingsOption", KeyCode.LeftAlt);
+			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
+			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
+			Scribe_Values.Look(ref cameraSettingsLoad[0], "cameraSettingsLoad1", KeyCode.LeftShift);
+			Scribe_Values.Look(ref cameraSettingsLoad[1], "cameraSettingsLoad2", KeyCode.None);
+			Scribe_Values.Look(ref cameraSettingsSave[0], "cameraSettingsSave1", KeyCode.LeftAlt);
+			Scribe_Values.Look(ref cameraSettingsSave[1], "cameraSettingsSave2", KeyCode.None);
 
 			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
 			{
@@ -96,7 +100,8 @@ namespace CameraPlus
 			float previous;
 			Rect rect;
 			var map = Current.Game?.CurrentMap;
-			const float buttonWidth = 90f;
+			const float buttonWidth = 80f;
+			const float buttonSpace = 4f;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
@@ -143,26 +148,7 @@ namespace CameraPlus
 
 			list.Gap(24f);
 
-			list.Label("CameraKeys".Translate());
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "ModifierKeys".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod1, code => cameraSettingsMod1 = code);
-			rect.xMin -= buttonWidth + 12f;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod2, code => cameraSettingsMod2 = code);
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "SaveModifier".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsOption, code => cameraSettingsOption = code);
+			list.Label("HotKeys".Translate());
 			list.Gap(6f);
 
 			rect = list.GetRect(28f);
@@ -170,7 +156,46 @@ namespace CameraPlus
 			Widgets.Label(rect, "SettingsKey".Translate());
 			GenUI.ResetLabelAlign();
 			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, true, cameraSettingsKey, code => cameraSettingsKey = code);
+			Tools.KeySettingsButton(rect, false, cameraSettingsKey, code => cameraSettingsKey = code);
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsMod[1], code => cameraSettingsMod[1] = code);
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsMod[0], code => cameraSettingsMod[0] = code);
+			list.Gap(6f);
+
+			rect = list.GetRect(28f);
+			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+			Widgets.Label(rect, "LoadModifier".Translate());
+			GenUI.ResetLabelAlign();
+			rect.xMin = rect.xMax - buttonWidth;
+			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
+			Widgets.Label(rect, "1 - 9");
+			GenUI.ResetLabelAlign();
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[1], code => cameraSettingsLoad[1] = code);
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[0], code => cameraSettingsLoad[0] = code);
+			list.Gap(6f);
+
+			rect = list.GetRect(28f);
+			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
+			Widgets.Label(rect, "SaveModifier".Translate());
+			GenUI.ResetLabelAlign();
+			rect.xMin = rect.xMax - buttonWidth;
+			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
+			Widgets.Label(rect, "1 - 9");
+			GenUI.ResetLabelAlign();
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsSave[1], code => cameraSettingsSave[1] = code);
+			rect.xMin -= buttonWidth + buttonSpace;
+			rect.xMax = rect.xMin + buttonWidth;
+			Tools.KeySettingsButton(rect, false, cameraSettingsSave[0], code => cameraSettingsSave[0] = code);
+			list.Gap(6f);
 
 			list.NewColumn();
 			list.Gap(16f);
@@ -223,10 +248,13 @@ namespace CameraPlus
 				hidePawnLabelBelow = 9;
 				hideThingLabelBelow = 32;
 				customNameStyle = LabelStyle.AnimalsDifferent;
-				cameraSettingsMod1 = KeyCode.LeftShift;
-				cameraSettingsMod2 = KeyCode.None;
-				cameraSettingsOption = KeyCode.LeftAlt;
+				cameraSettingsMod[0] = KeyCode.LeftShift;
+				cameraSettingsMod[1] = KeyCode.None;
 				cameraSettingsKey = KeyCode.Tab;
+				cameraSettingsLoad[0] = KeyCode.LeftShift;
+				cameraSettingsLoad[1] = KeyCode.None;
+				cameraSettingsSave[0] = KeyCode.LeftAlt;
+				cameraSettingsSave[1] = KeyCode.None;
 			}
 
 			list.End();

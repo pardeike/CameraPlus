@@ -7,10 +7,10 @@
 	<ZoomedOutPercent>Factor máximo de alejamiento (zoom out)</ZoomedOutPercent>
 	<Exponentiality>Escalado exponencial:</Exponentiality>
 	<SoundNearness>Acercar los sonidos locales</SoundNearness>
-	<CameraKeys>Accesos directos (utilizan con 1 - 9):</CameraKeys>
-	<ModifierKeys>Presione para activar</ModifierKeys>
-	<SaveModifier>Presione para guardar la vista</SaveModifier>
-	<SettingsKey>Mostrar estos ajustes</SettingsKey>
+	<HotKeys>Atajos de teclado:</HotKeys>
+	<SettingsKey>Configuraciones</SettingsKey>
+	<LoadModifier>Restaurar vista</LoadModifier>
+	<SaveModifier>Guardar vista</SaveModifier>
 	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
 	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Arrastrar con el botón central del ratón es pegajoso</StickyMiddleMouseDragging>

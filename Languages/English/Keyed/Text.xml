@@ -7,10 +7,10 @@
 	<ZoomedOutPercent>Maximum zoomed out factor</ZoomedOutPercent>
 	<Exponentiality>Exponential scaling:</Exponentiality>
 	<SoundNearness>Bring local sounds closer</SoundNearness>
-	<CameraKeys>Hot keys (use with 1 - 9):</CameraKeys>
-	<ModifierKeys>Hold to activate</ModifierKeys>
-	<SaveModifier>Hold to save view</SaveModifier>
-	<SettingsKey>Show Camera+ settings</SettingsKey>
+	<HotKeys>Keyboard Shortcuts:</HotKeys>
+	<SettingsKey>Camera+ settings</SettingsKey>
+	<LoadModifier>Load view</LoadModifier>
+	<SaveModifier>Save view</SaveModifier>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
 	<StickyMiddleMouseDragging>Sticky middle mouse dragging</StickyMiddleMouseDragging>

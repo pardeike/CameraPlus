@@ -1,9 +1,9 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using RimWorld;
 using System.Reflection;
 using UnityEngine;
 using Verse;
-using static Harmony.AccessTools;
+using static HarmonyLib.AccessTools;
 
 namespace CameraPlus
 {
