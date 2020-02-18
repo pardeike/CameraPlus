@@ -46,10 +46,11 @@
     <Compile Include="Refs.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Tools.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.0.0.1\lib\net472\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.0.0.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.0.0.3\lib\net472\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -89,7 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Install.bat" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
