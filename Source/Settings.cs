@@ -47,7 +47,7 @@ namespace CameraPlus
 
 		public KeyCode[] cameraSettingsMod = new[] { KeyCode.LeftShift, KeyCode.None };
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
-		public KeyCode[] cameraSettingsSave = new [] { KeyCode.LeftAlt, KeyCode.None };
+		public KeyCode[] cameraSettingsSave = new[] { KeyCode.LeftAlt, KeyCode.None };
 		public KeyCode[] cameraSettingsLoad = new[] { KeyCode.LeftShift, KeyCode.None };
 
 		public static float minRootResult = 2;
@@ -108,7 +108,7 @@ namespace CameraPlus
 
 			list.Gap(16f);
 
-			list.Label("Zoom".Translate());
+			_ = list.Label("Zoom".Translate());
 
 			previous = zoomedInPercent;
 			list.Slider(ref zoomedInPercent, 0.1f, 20f, () => "Near".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
@@ -121,7 +121,7 @@ namespace CameraPlus
 			}
 
 			previous = zoomedOutPercent;
-			list.Slider(ref zoomedOutPercent, 50f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
+			list.Slider(ref zoomedOutPercent, 25f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
 			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
 			{
@@ -132,14 +132,14 @@ namespace CameraPlus
 
 			list.Gap(12f);
 
-			list.Label("Exponentiality".Translate());
+			_ = list.Label("Exponentiality".Translate());
 			if (list.RadioButton("Off", exponentiality == 0, 8f)) exponentiality = 0;
 			for (var i = 1; i <= 3; i++)
 				if (list.RadioButton(i + "x", exponentiality == i, 8f)) exponentiality = i;
 
 			list.Gap(16f);
 
-			list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
+			_ = list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
 			list.Slider(ref soundNearness, 0f, 1f, null);
 
 			list.Gap(6f);
@@ -148,7 +148,7 @@ namespace CameraPlus
 
 			list.Gap(24f);
 
-			list.Label("HotKeys".Translate());
+			_ = list.Label("HotKeys".Translate());
 			list.Gap(6f);
 
 			rect = list.GetRect(28f);
@@ -200,13 +200,13 @@ namespace CameraPlus
 			list.NewColumn();
 			list.Gap(16f);
 
-			list.Label("DollyPercentLabel".Translate());
+			_ = list.Label("DollyPercentLabel".Translate());
 			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
 
 			list.Gap(12f);
 
-			list.Label("DollyFrictionLabel".Translate());
+			_ = list.Label("DollyFrictionLabel".Translate());
 			list.Slider(ref zoomedInDollyFrictionPercent, 0f, 1f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyFrictionPercent, 0f, 1f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%");
 			list.Gap(-2);
