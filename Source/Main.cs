@@ -2,36 +2,24 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
-	class LogWriter : TextWriter
-	{
-		public override Encoding Encoding => Encoding.UTF8;
-		public override void WriteLine() { Log.Message(""); }
-		public override void WriteLine(string value) { Log.Message(value); }
-		public override void WriteLine(object value) { Log.Message($"{value}"); }
-	}
-
 	class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
 		{
-			Console.SetOut(new LogWriter());
-
 			Settings = GetSettings<CameraPlusSettings>();
 
 			var harmony = new Harmony("net.pardeike.rimworld.mod.camera+");
-			harmony.PatchAll(Assembly.GetExecutingAssembly());
+			harmony.PatchAll();
 		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
