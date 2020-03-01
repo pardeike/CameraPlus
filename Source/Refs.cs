@@ -16,13 +16,13 @@ namespace CameraPlus
 		// Update
 		public static readonly FieldRef<CameraDriver, Vector3> rootPos = FieldRefAccess<CameraDriver, Vector3>("rootPos");
 		public static readonly FieldRef<CameraDriver, float> rootSize = FieldRefAccess<CameraDriver, float>("rootSize");
-		public static readonly FieldRef<CameraDriver, Vector2> mouseDragVect = FieldRefAccess<CameraDriver, Vector2>("mouseDragVect");
+		public static readonly FieldRef<CameraDriver, Vector2> desiredDollyRaw = FieldRefAccess<CameraDriver, Vector2>("desiredDollyRaw");
 		public static readonly FieldRef<CameraDriver, Vector3> velocity = FieldRefAccess<CameraDriver, Vector3>("velocity");
 		public static readonly MethodInfo m_ApplyPositionToGameObject = Method(typeof(CameraDriver), "ApplyPositionToGameObject");
 		public static readonly FastInvokeHandler applyPositionToGameObjectInvoker = MethodInvoker.GetHandler(m_ApplyPositionToGameObject);
 
 		// OnGUI
-		public static readonly FieldInfo f_mouseDragVect = Field(typeof(CameraDriver), "mouseDragVect");
+		public static readonly FieldInfo f_desiredDollyRaw = Field(typeof(CameraDriver), "desiredDollyRaw");
 		public static readonly FieldInfo f_desiredDolly = Field(typeof(CameraDriver), "desiredDolly");
 		public static readonly MethodInfo p_get_zero = Property(typeof(Vector2), nameof(Vector2.zero)).GetGetMethod();
 		public static readonly MethodInfo m_op_Inequality = Method(typeof(Vector2), "op_Inequality");
@@ -44,8 +44,8 @@ namespace CameraPlus
 			if (m_ApplyPositionToGameObject == null)
 				Log.Error("Cannot find method CameraDriver.ApplyPositionToGameObject");
 
-			if (f_mouseDragVect == null)
-				Log.Error("Cannot find field CameraDriver.mouseDragVect");
+			if (f_desiredDollyRaw == null)
+				Log.Error("Cannot find field CameraDriver.desiredDollyRaw");
 			if (f_desiredDolly == null)
 				Log.Error("Cannot find field CameraDriver.desiredDolly");
 			if (m_op_Inequality == null)

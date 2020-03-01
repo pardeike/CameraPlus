@@ -204,13 +204,13 @@ namespace CameraPlus
 			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
 
-			list.Gap(12f);
+			/*list.Gap(12f);
 
 			_ = list.Label("DollyFrictionLabel".Translate());
 			list.Slider(ref zoomedInDollyFrictionPercent, 0f, 1f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyFrictionPercent, 0f, 1f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%");
 			list.Gap(-2);
-			list.CheckboxLabeled("StickyMiddleMouseDragging".Translate(), ref stickyMiddleMouse);
+			list.CheckboxLabeled("StickyMiddleMouseDragging".Translate(), ref stickyMiddleMouse);*/
 
 			list.Gap(24f);
 

@@ -79,7 +79,7 @@ namespace CameraPlus
 			var found = false;
 			foreach (var instruction in instructions)
 			{
-				if (instruction.opcode == OpCodes.Stfld && instruction.operand is FieldInfo fi && fi == Refs.f_rootSize)
+				if (instruction.StoresField(Refs.f_rootSize))
 				{
 					instruction.opcode = OpCodes.Call;
 					instruction.operand = m_SetRootSize;
@@ -92,12 +92,12 @@ namespace CameraPlus
 				Log.Error("Cannot find field Stdfld rootSize in CameraDriver.Update");
 		}
 
-		static void Postfix(CameraDriver __instance)
+		/*static void Postfix(CameraDriver __instance)
 		{
 			if (CameraPlusMain.Settings.stickyMiddleMouse)
-				if (Refs.mouseDragVect(__instance) != Vector2.zero)
+				if (Refs.desiredDollyRaw(__instance) != Vector2.zero)
 					Refs.velocity(__instance) = Vector3.zero;
-		}
+		}*/
 	}
 
 	[HarmonyPatch(typeof(TimeControls))]
@@ -110,6 +110,7 @@ namespace CameraPlus
 		}
 	}
 
+	/*
 	[HarmonyPatch(typeof(CameraDriver))]
 	[HarmonyPatch("CameraDriverOnGUI")]
 	static class CameraDriver_CameraDriverOnGUI_Patch
@@ -117,20 +118,20 @@ namespace CameraPlus
 		static Vector2 dummy;
 		static readonly MethodInfo m_Patch = SymbolExtensions.GetMethodInfo(() => Patch(null, ref dummy, ref dummy));
 
-		static void Patch(CameraDriver cameraDriver, ref Vector2 mouseDragVect, ref Vector2 desiredDolly)
+		static void Patch(CameraDriver cameraDriver, ref Vector2 desiredDollyRaw, ref Vector2 desiredDolly)
 		{
-			if (mouseDragVect != Vector2.zero)
+			if (desiredDollyRaw != Vector2.zero)
 			{
 				var factor = CameraDriver.HitchReduceFactor;
-				if (mouseDragVect != Vector2.zero)
+				if (desiredDollyRaw != Vector2.zero)
 					factor = 1 / RealTime.deltaTime / 60f;
 
-				mouseDragVect *= factor;
-				mouseDragVect.x *= -1f;
-				desiredDolly += mouseDragVect * cameraDriver.config.dollyRateMouseDrag;
+				desiredDollyRaw *= factor;
+				desiredDollyRaw.x *= -1f;
+				desiredDolly += desiredDollyRaw * cameraDriver.config.dollyRateScreenEdge;
 
 				// done in postfix for CameraDriver.Update()
-				// mouseDragVect = Vector2.zero;
+				// desiredDollyRaw = Vector2.zero;
 			}
 		}
 
@@ -141,7 +142,7 @@ namespace CameraPlus
 				{
 					new CodeInstruction(OpCodes.Ldarg_0),
 					new CodeInstruction(OpCodes.Call, Refs.p_get_zero),
-					new CodeInstruction(OpCodes.Stfld, Refs.f_mouseDragVect)
+					new CodeInstruction(OpCodes.Stfld, Refs.f_desiredDollyRaw)
 				}
 			);
 
@@ -151,11 +152,11 @@ namespace CameraPlus
 				if (list[i].opcode != OpCodes.Ldarg_0)
 					continue;
 				var start = i;
-				if ((list[i + 1].opcode == OpCodes.Ldfld && list[i + 1].operand is FieldInfo fi && fi == Refs.f_mouseDragVect) == false)
+				if (list[i + 1].LoadsField(Refs.f_desiredDollyRaw) == false)
 					continue;
-				if ((list[i + 2].opcode == OpCodes.Call && list[i + 2].operand is MethodInfo mi1 && mi1 == Refs.p_get_zero) == false)
+				if (list[i + 2].Calls(Refs.p_get_zero) == false)
 					continue;
-				if ((list[i + 3].opcode == OpCodes.Call && list[i + 3].operand is MethodInfo mi2 && mi2 == Refs.m_op_Inequality) == false)
+				if (list[i + 3].Calls(Refs.m_op_Inequality) == false)
 					continue;
 
 				i += 4;
@@ -177,7 +178,7 @@ namespace CameraPlus
 				{
 					new CodeInstruction(OpCodes.Ldarg_0) { labels = labels, blocks = blocks },
 					new CodeInstruction(OpCodes.Ldarg_0),
-					new CodeInstruction(OpCodes.Ldflda, Refs.f_mouseDragVect),
+					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDollyRaw),
 					new CodeInstruction(OpCodes.Ldarg_0),
 					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDolly),
 					new CodeInstruction(OpCodes.Call, m_Patch)
@@ -193,6 +194,7 @@ namespace CameraPlus
 			return list.AsEnumerable();
 		}
 	}
+	*/
 
 	[HarmonyPatch(typeof(MoteMaker))]
 	[HarmonyPatch("ThrowText")]
@@ -330,7 +332,7 @@ namespace CameraPlus
 			var firstInstruction = true;
 			foreach (var instruction in instructions)
 			{
-				if (firstInstruction && instruction.opcode == OpCodes.Ldc_I4_0)
+				if (firstInstruction && instruction.LoadsConstant(0))
 				{
 					yield return new CodeInstruction(OpCodes.Call, Refs.p_CameraDriver);
 					yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
@@ -388,7 +390,7 @@ namespace CameraPlus
 			var orthSize = Tools.LerpRootSize(camera.orthographicSize);
 			camera.orthographicSize = orthSize;
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(orthSize);
-			driver.config.dollyRateMouseDrag = Tools.GetDollyRateMouse(orthSize);
+			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(orthSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(orthSize);
 		}
 
@@ -460,7 +462,7 @@ namespace CameraPlus
 
 					// looking for Ldarg.0 followed by Ldfld rootSize
 					//
-					if (instruction.opcode == OpCodes.Ldfld && instruction.operand is FieldInfo fi && fi == Refs.f_rootSize)
+					if (instruction.LoadsField(Refs.f_rootSize))
 						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
 					else
 						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check
