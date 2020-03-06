@@ -308,8 +308,16 @@ namespace CameraPlus
 
 		public static float GetDollyRateKeys(float orthSize)
 		{
-			var zoomedIn = orthSize * CameraPlusMain.Settings.zoomedInDollyPercent * 4;
-			var zoomedOut = orthSize * CameraPlusMain.Settings.zoomedOutDollyPercent;
+			var f = GetScreenEdgeDollyFactor(orthSize);
+			var zoomedIn = orthSize * CameraPlusMain.Settings.zoomedInDollyPercent * 4 / f;
+			var zoomedOut = orthSize * CameraPlusMain.Settings.zoomedOutDollyPercent / f;
+			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+		}
+
+		public static float GetScreenEdgeDollyFactor(float orthSize)
+		{
+			var zoomedIn = CameraPlusMain.Settings.zoomedInScreenEdgeDollyFactor * 30;
+			var zoomedOut = CameraPlusMain.Settings.zoomedOutScreenEdgeDollyFactor * 30;
 			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
@@ -322,8 +330,10 @@ namespace CameraPlus
 
 		public static float GetDollySpeedDecay(float orthSize)
 		{
-			var minVal = 1f - CameraPlusMain.Settings.zoomedInDollyFrictionPercent;
-			var maxVal = 1f - CameraPlusMain.Settings.zoomedOutDollyFrictionPercent;
+			// TODO: 0.15f comes from the old zoomedInDollyFrictionPercent/zoomedOutDollyFrictionPercent
+			//
+			var minVal = 1f - 0.15f;
+			var maxVal = 1f - 0.15f;
 			return GenMath.LerpDouble(minRootResult, maxRootResult, minVal, maxVal, orthSize);
 		}
 

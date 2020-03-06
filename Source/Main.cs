@@ -10,9 +10,10 @@ using Verse;
 
 namespace CameraPlus
 {
-	class CameraPlusMain : Mod
+	public class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
+		public static float orthographicSize = -1f;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
 		{
@@ -107,6 +108,17 @@ namespace CameraPlus
 		static void Prefix()
 		{
 			Tools.HandleHotkeys();
+		}
+	}
+
+	[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch("CalculateCurInputDollyVect")]
+	static class CameraDriver_CalculateCurInputDollyVect_Patch
+	{
+		static void Postfix(ref Vector2 __result)
+		{
+			if (CameraPlusMain.orthographicSize != -1f)
+				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
 		}
 	}
 
@@ -392,6 +404,7 @@ namespace CameraPlus
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(orthSize);
 			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(orthSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(orthSize);
+			CameraPlusMain.orthographicSize = orthSize;
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

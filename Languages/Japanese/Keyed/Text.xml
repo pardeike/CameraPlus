@@ -12,8 +12,7 @@
 	<LoadModifier>ビューを復元</LoadModifier>
 	<SaveModifier>ビューを保存</SaveModifier>
 	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
-	<DollyFrictionLabel>スクロール摩擦</DollyFrictionLabel>
-	<StickyMiddleMouseDragging>マウスの中ボタンでドラッグすると、粘着性があります</StickyMiddleMouseDragging>
+	<ScreenEdgeDollyFrictionLabel>エッジスクロール要因</ScreenEdgeDollyFrictionLabel>
 	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
 	<Never>決して</Never>
 	<Pixel>ピクセル</Pixel>

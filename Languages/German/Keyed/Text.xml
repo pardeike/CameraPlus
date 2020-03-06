@@ -12,8 +12,7 @@
 	<LoadModifier>Laden</LoadModifier>
 	<SaveModifier>Speichern</SaveModifier>
 	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
-	<DollyFrictionLabel>Abbremsen beim skrollen</DollyFrictionLabel>
-	<StickyMiddleMouseDragging>Mittelmaus verschieben ohne gleiten</StickyMiddleMouseDragging>
+	<ScreenEdgeDollyFrictionLabel>Kanten-Skrollfaktor</ScreenEdgeDollyFrictionLabel>
 	<HideNamesWhenZoomedOut>Verstecke die Kolonistennamen wenn ausgezoomt</HideNamesWhenZoomedOut>
 	<Never>nie</Never>
 	<Pixel>Pixel</Pixel>

@@ -12,8 +12,7 @@
 	<LoadModifier>Load view</LoadModifier>
 	<SaveModifier>Save view</SaveModifier>
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
-	<DollyFrictionLabel>Scroll friction</DollyFrictionLabel>
-	<StickyMiddleMouseDragging>Sticky middle mouse dragging</StickyMiddleMouseDragging>
+	<ScreenEdgeDollyFrictionLabel>Edge scroll factor</ScreenEdgeDollyFrictionLabel>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
 	<Never>never</Never>
 	<Pixel>Pixel</Pixel>

@@ -12,8 +12,7 @@
 	<LoadModifier>Restaurar vista</LoadModifier>
 	<SaveModifier>Guardar vista</SaveModifier>
 	<DollyPercentLabel>Velocidad de desplazamiento</DollyPercentLabel>
-	<DollyFrictionLabel>Fricción de desplazamiento</DollyFrictionLabel>
-	<StickyMiddleMouseDragging>Arrastrar con el botón central del ratón es pegajoso</StickyMiddleMouseDragging>
+	<ScreenEdgeDollyFrictionLabel>Factor de desplazamiento del borde</ScreenEdgeDollyFrictionLabel>
 	<HideNamesWhenZoomedOut>Ocultar etiquetas de nombre cuando la cámara se aleja</HideNamesWhenZoomedOut>
 	<Never>nunca</Never>
 	<Pixel>Píxel</Pixel>

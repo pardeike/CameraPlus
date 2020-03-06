@@ -34,8 +34,8 @@ namespace CameraPlus
 		public int exponentiality = 1;
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
-		public float zoomedOutDollyFrictionPercent = 0.15f;
-		public float zoomedInDollyFrictionPercent = 0.15f;
+		public float zoomedOutScreenEdgeDollyFactor = 0.5f;
+		public float zoomedInScreenEdgeDollyFactor = 0.5f;
 		public bool stickyMiddleMouse = false;
 		public bool zoomToMouse = true;
 		public float soundNearness = 0;
@@ -70,8 +70,8 @@ namespace CameraPlus
 			Scribe_Values.Look(ref exponentiality, "exponentiality", 1);
 			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
-			Scribe_Values.Look(ref zoomedOutDollyFrictionPercent, "zoomedOutDollySpeedDecayPercent", 0.15f);
-			Scribe_Values.Look(ref zoomedInDollyFrictionPercent, "zoomedInDollySpeedDecayPercent", 0.15f);
+			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", 0.5f);
+			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", 0.5f);
 			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", false);
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
@@ -204,13 +204,11 @@ namespace CameraPlus
 			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
 
-			/*list.Gap(12f);
+			list.Gap(12f);
 
-			_ = list.Label("DollyFrictionLabel".Translate());
-			list.Slider(ref zoomedInDollyFrictionPercent, 0f, 1f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyFrictionPercent * 100, 1) + "%");
-			list.Slider(ref zoomedOutDollyFrictionPercent, 0f, 1f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyFrictionPercent * 100, 1) + "%");
-			list.Gap(-2);
-			list.CheckboxLabeled("StickyMiddleMouseDragging".Translate(), ref stickyMiddleMouse);*/
+			_ = list.Label("ScreenEdgeDollyFrictionLabel".Translate());
+			list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 1f, () => "Near".Translate() + ": " + Math.Round(0.5 + zoomedInScreenEdgeDollyFactor, 1) + "x");
+			list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 1f, () => "Far".Translate() + ": " + Math.Round(0.5 + zoomedOutScreenEdgeDollyFactor, 1) + "x");
 
 			list.Gap(24f);
 
@@ -239,8 +237,8 @@ namespace CameraPlus
 				exponentiality = 1;
 				zoomedOutDollyPercent = 1;
 				zoomedInDollyPercent = 1;
-				zoomedOutDollyFrictionPercent = 0.15f;
-				zoomedInDollyFrictionPercent = 0.15f;
+				zoomedOutScreenEdgeDollyFactor = 0.5f;
+				zoomedInScreenEdgeDollyFactor = 0.5f;
 				stickyMiddleMouse = false;
 				soundNearness = 0;
 				hideNamesWhenZoomedOut = true;
