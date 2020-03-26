@@ -43,6 +43,7 @@ namespace CameraPlus
 		public int dotSize = 9;
 		public int hidePawnLabelBelow = 9;
 		public int hideThingLabelBelow = 32;
+		public bool mouseOverShowsLabels = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 
 		public KeyCode[] cameraSettingsMod = new[] { KeyCode.LeftShift, KeyCode.None };
@@ -79,6 +80,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref dotSize, "dotSize", 9);
 			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
+			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", true);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
 			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
@@ -145,6 +147,7 @@ namespace CameraPlus
 			list.Gap(6f);
 
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
+			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
 
 			list.Gap(24f);
 
@@ -245,6 +248,7 @@ namespace CameraPlus
 				dotSize = 9;
 				hidePawnLabelBelow = 9;
 				hideThingLabelBelow = 32;
+				mouseOverShowsLabels = true;
 				customNameStyle = LabelStyle.AnimalsDifferent;
 				cameraSettingsMod[0] = KeyCode.LeftShift;
 				cameraSettingsMod[1] = KeyCode.None;

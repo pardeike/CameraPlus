@@ -23,6 +23,7 @@
 	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
 	<HideAnimals>Los animales no tienen marcador</HideAnimals>
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>
+	<MouseRevealsLabels>El mouse revela etiquetas</MouseRevealsLabels>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>

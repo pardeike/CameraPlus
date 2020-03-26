@@ -23,6 +23,7 @@
 	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
 	<HideAnimals>動物にはマーカーがありません</HideAnimals>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
+	<MouseRevealsLabels>マウスでラベルが表示される</MouseRevealsLabels>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>

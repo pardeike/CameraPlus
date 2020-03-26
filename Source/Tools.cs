@@ -204,7 +204,10 @@ namespace CameraPlus
 			showLabel = true;
 			showDot = false;
 
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || MouseDistanceSquared(location, isPawn) <= 2.25f)
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return;
+
+			if (MouseDistanceSquared(location, isPawn) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
 				return;
 
 			var len = CurrentCellLength();

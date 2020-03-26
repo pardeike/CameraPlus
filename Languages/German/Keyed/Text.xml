@@ -23,6 +23,7 @@
 	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
 	<ZoomToMouse>Zoom an die Maus</ZoomToMouse>
+	<MouseRevealsLabels>Maus zeigt Labels</MouseRevealsLabels>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>

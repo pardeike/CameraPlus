@@ -222,7 +222,10 @@ namespace CameraPlus
 				return true;
 
 			// show if mouse is nearby
-			return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
+			if (CameraPlusMain.Settings.mouseOverShowsLabels)
+				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
+
+			return false;
 		}
 	}
 
