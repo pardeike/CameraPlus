@@ -14,7 +14,6 @@
 	<DollyPercentLabel>Scroll speed</DollyPercentLabel>
 	<ScreenEdgeDollyFrictionLabel>Edge scroll factor</ScreenEdgeDollyFrictionLabel>
 	<HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
-	<Never>never</Never>
 	<Pixel>Pixel</Pixel>
 	<HidePawnLabelBelow>Hide pawn labels below: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
