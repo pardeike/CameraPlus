@@ -45,6 +45,7 @@ namespace CameraPlus
 		public int hideThingLabelBelow = 32;
 		public bool mouseOverShowsLabels = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
+		public bool includeNotTamedAnimals = true;
 
 		public KeyCode[] cameraSettingsMod = new[] { KeyCode.LeftShift, KeyCode.None };
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
@@ -82,6 +83,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", true);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
+			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", true);
 			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
@@ -94,6 +96,12 @@ namespace CameraPlus
 			{
 				minRootResult = zoomedInPercent * 2;
 				maxRootResult = zoomedOutPercent * 2;
+
+				if (includeNotTamedAnimals && Prefs.AnimalNameMode != AnimalNameDisplayMode.TameAll)
+				{
+					Prefs.AnimalNameMode = AnimalNameDisplayMode.TameAll;
+					Prefs.Save();
+				}
 			}
 		}
 
@@ -229,6 +237,13 @@ namespace CameraPlus
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
 				}
+				var oldIncludeNotTamedAnimals = includeNotTamedAnimals;
+				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
+				if (oldIncludeNotTamedAnimals == false || includeNotTamedAnimals == true)
+				{
+					Prefs.AnimalNameMode = AnimalNameDisplayMode.TameAll;
+					Prefs.Save();
+				}
 			}
 
 			list.Gap(28f);
@@ -250,6 +265,7 @@ namespace CameraPlus
 				hideThingLabelBelow = 32;
 				mouseOverShowsLabels = true;
 				customNameStyle = LabelStyle.AnimalsDifferent;
+				includeNotTamedAnimals = true;
 				cameraSettingsMod[0] = KeyCode.LeftShift;
 				cameraSettingsMod[1] = KeyCode.None;
 				cameraSettingsKey = KeyCode.Tab;

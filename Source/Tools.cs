@@ -142,6 +142,11 @@ namespace CameraPlus
 			return color;
 		}
 
+		public static bool IncludeNonTamedAnimals()
+		{
+			return CameraPlusMain.Settings.includeNotTamedAnimals && Prefs.AnimalNameMode == AnimalNameDisplayMode.TameAll;
+		}
+
 		// shameless copy of vanilla
 		public static bool PawnHasNoLabel(Pawn pawn)
 		{
@@ -149,6 +154,9 @@ namespace CameraPlus
 				return true;
 			if (!pawn.RaceProps.Humanlike)
 			{
+				if (IncludeNonTamedAnimals())
+					return false;
+
 				var animalNameMode = Prefs.AnimalNameMode;
 				if (animalNameMode == AnimalNameDisplayMode.None)
 					return true;
@@ -241,6 +249,7 @@ namespace CameraPlus
 		}
 
 		// returning true will prefer markers over labels
+		static readonly Color dangerousAnimalColor = new Color(0.62f, 0f, 0.05f);
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 		{
 			var cameraDelegate = GetCachedCameraDelegate(pawn);
@@ -269,7 +278,11 @@ namespace CameraPlus
 
 			innerColor = PawnNameColorUtility.PawnNameColorOf(pawn);
 			if (pawn.RaceProps.Animal)
-				innerColor = GetMainColor(pawn) ?? innerColor;
+			{
+				var stateDef = pawn.mindState.mentalStateHandler.CurStateDef;
+				var isDangerous = stateDef == MentalStateDefOf.ManhunterPermanent || stateDef == MentalStateDefOf.Manhunter;
+				innerColor = isDangerous ? dangerousAnimalColor : (GetMainColor(pawn) ?? innerColor);
+			}
 			outerColor = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
 			return true;
 		}

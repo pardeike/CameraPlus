@@ -22,6 +22,7 @@
 	<IncludeAnimals>Los animales tienen el mismo marcador</IncludeAnimals>
 	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
 	<HideAnimals>Los animales no tienen marcador</HideAnimals>
+	<IncludeNotTamedAnimals>Incluir animales indómitos</IncludeNotTamedAnimals>
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>
 	<MouseRevealsLabels>El mouse revela etiquetas</MouseRevealsLabels>
 	<KeyLeftShift>Left Shift</KeyLeftShift>

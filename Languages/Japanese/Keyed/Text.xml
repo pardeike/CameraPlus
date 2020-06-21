@@ -23,6 +23,7 @@
 	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
 	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
 	<HideAnimals>動物にはマーカーがありません</HideAnimals>
+	<IncludeNotTamedAnimals>飼いならされていない動物を含める</IncludeNotTamedAnimals>
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>

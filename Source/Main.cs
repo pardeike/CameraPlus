@@ -16,7 +16,7 @@ namespace CameraPlus
 		public static float orthographicSize = -1f;
 
 		// for other mods: set temporarily to true to skip any hiding
-		public static bool renderEverything = false;
+		public static bool skipCustomRendering = false;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
 		{
@@ -38,7 +38,7 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(Game))]
-	[HarmonyPatch("FinalizeInit")]
+	[HarmonyPatch(nameof(Game.FinalizeInit))]
 	static class Game_FinalizeInit_Patch
 	{
 		static void Postfix()
@@ -48,7 +48,7 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("Update")]
+	[HarmonyPatch(nameof(CameraDriver.Update))]
 	static class CameraDriver_Update_Patch
 	{
 		static readonly MethodInfo m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
@@ -98,7 +98,7 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(TimeControls))]
-	[HarmonyPatch("DoTimeControlsGUI")]
+	[HarmonyPatch(nameof(TimeControls.DoTimeControlsGUI))]
 	static class TimeControls_DoTimeControlsGUI_Patch
 	{
 		static void Prefix()
@@ -119,13 +119,13 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(MoteMaker))]
-	[HarmonyPatch("ThrowText")]
+	[HarmonyPatch(nameof(MoteMaker.ThrowText))]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
 	static class MoteMaker_ThrowText_Patch
 	{
 		static bool Prefix(Vector3 loc)
 		{
-			if (CameraPlusMain.renderEverything)
+			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
@@ -143,14 +143,14 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(PawnRenderer))]
-	[HarmonyPatch("RenderPawnAt")]
+	[HarmonyPatch(nameof(PawnRenderer.RenderPawnAt))]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
 	static class PawnRenderer_RenderPawnAt_Patch
 	{
 		[HarmonyPriority(10000)]
 		static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.renderEverything)
+			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
 			var cameraDelegate = Tools.GetCachedCameraDelegate(___pawn);
@@ -173,8 +173,32 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(PawnUIOverlay))]
+	[HarmonyPatch(nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
+	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
+	{
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Pawn ___pawn)
+		{
+			if (CameraPlusMain.skipCustomRendering)
+				return true;
+
+			if (Tools.IncludeNonTamedAnimals() == false)
+				return true;
+
+			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
+				return true;
+			if (___pawn.RaceProps.Humanlike)
+				return true;
+			if (___pawn.Name != null)
+				return true;
+
+			return GenMapUI_DrawPawnLabel_Patch.HandlePawn(___pawn);
+		}
+	}
+
 	[HarmonyPatch(typeof(GenMapUI))]
-	[HarmonyPatch("DrawPawnLabel")]
+	[HarmonyPatch(nameof(GenMapUI.DrawPawnLabel))]
 	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
 	[StaticConstructorOnStartup]
 	static class GenMapUI_DrawPawnLabel_Patch
@@ -184,15 +208,8 @@ namespace CameraPlus
 		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
 		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
 
-		[HarmonyPriority(10000)]
-		public static bool Prefix(Pawn pawn, float truncateToWidth)
+		public static bool HandlePawn(Pawn pawn)
 		{
-			if (CameraPlusMain.renderEverything)
-				return true;
-
-			if (truncateToWidth != 9999f)
-				return true; // use label
-
 			Tools.ShouldShowLabel(pawn.DrawPos, true, out var showLabel, out var showDot);
 			if (showLabel)
 				return true;
@@ -233,13 +250,25 @@ namespace CameraPlus
 			// skip label
 			return false;
 		}
+
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Pawn pawn, float truncateToWidth)
+		{
+			if (CameraPlusMain.skipCustomRendering)
+				return true;
+
+			if (truncateToWidth != 9999f)
+				return true; // use label
+
+			return HandlePawn(pawn);
+		}
 	}
 
 	// if we zoom in a lot, tiny font labels look very out of place
 	// so we make them bigger with the available fonts
 	//
 	[HarmonyPatch(typeof(GenMapUI))]
-	[HarmonyPatch("DrawThingLabel")]
+	[HarmonyPatch(nameof(GenMapUI.DrawThingLabel))]
 	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
@@ -255,7 +284,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Vector2 screenPos)
 		{
-			if (CameraPlusMain.renderEverything)
+			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
 			Tools.ShouldShowLabel(screenPos, false, out var showLabel, out _);
@@ -285,7 +314,7 @@ namespace CameraPlus
 	// map our new camera settings to meaningful enum values
 	//
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CurrentZoom", MethodType.Getter)]
+	[HarmonyPatch(nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
 		static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
@@ -350,7 +379,7 @@ namespace CameraPlus
 	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
 	//
 	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CurrentViewRect", MethodType.Getter)]
+	[HarmonyPatch(nameof(CameraDriver.CurrentViewRect), MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
 		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
