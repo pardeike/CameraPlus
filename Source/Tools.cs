@@ -438,7 +438,9 @@ namespace CameraPlus
 				return;
 
 			var map = Find.CurrentMap;
-			var cameraDriver = Find.CameraDriver;
+			if (map == null)
+				return;
+
 			var savedViews = map.GetComponent<SavedViews>();
 
 			m1 = settings.cameraSettingsLoad[0];
@@ -459,6 +461,7 @@ namespace CameraPlus
 				if (m1 == KeyCode.None || Input.GetKey(m1))
 					if (m2 == KeyCode.None || Input.GetKey(m2))
 					{
+						var cameraDriver = Find.CameraDriver;
 						savedViews.views[numKey - 1] = new RememberedCameraPos(map)
 						{
 							rootPos = Refs.rootPos(cameraDriver),

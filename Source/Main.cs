@@ -15,6 +15,9 @@ namespace CameraPlus
 		public static CameraPlusSettings Settings;
 		public static float orthographicSize = -1f;
 
+		// for other mods: set temporarily to true to skip any hiding
+		public static bool renderEverything = false;
+
 		public CameraPlusMain(ModContentPack content) : base(content)
 		{
 			Settings = GetSettings<CameraPlusSettings>();
@@ -92,13 +95,6 @@ namespace CameraPlus
 			if (found == false)
 				Log.Error("Cannot find field Stdfld rootSize in CameraDriver.Update");
 		}
-
-		/*static void Postfix(CameraDriver __instance)
-		{
-			if (CameraPlusMain.Settings.stickyMiddleMouse)
-				if (Refs.desiredDollyRaw(__instance) != Vector2.zero)
-					Refs.velocity(__instance) = Vector3.zero;
-		}*/
 	}
 
 	[HarmonyPatch(typeof(TimeControls))]
@@ -122,92 +118,6 @@ namespace CameraPlus
 		}
 	}
 
-	/*
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CameraDriverOnGUI")]
-	static class CameraDriver_CameraDriverOnGUI_Patch
-	{
-		static Vector2 dummy;
-		static readonly MethodInfo m_Patch = SymbolExtensions.GetMethodInfo(() => Patch(null, ref dummy, ref dummy));
-
-		static void Patch(CameraDriver cameraDriver, ref Vector2 desiredDollyRaw, ref Vector2 desiredDolly)
-		{
-			if (desiredDollyRaw != Vector2.zero)
-			{
-				var factor = CameraDriver.HitchReduceFactor;
-				if (desiredDollyRaw != Vector2.zero)
-					factor = 1 / RealTime.deltaTime / 60f;
-
-				desiredDollyRaw *= factor;
-				desiredDollyRaw.x *= -1f;
-				desiredDolly += desiredDollyRaw * cameraDriver.config.dollyRateScreenEdge;
-
-				// done in postfix for CameraDriver.Update()
-				// desiredDollyRaw = Vector2.zero;
-			}
-		}
-
-		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			var list = instructions.ToList();
-			list.InsertRange(0, new CodeInstruction[]
-				{
-					new CodeInstruction(OpCodes.Ldarg_0),
-					new CodeInstruction(OpCodes.Call, Refs.p_get_zero),
-					new CodeInstruction(OpCodes.Stfld, Refs.f_desiredDollyRaw)
-				}
-			);
-
-			var found = false;
-			for (var i = 0; i < list.Count - 4; i++)
-			{
-				if (list[i].opcode != OpCodes.Ldarg_0)
-					continue;
-				var start = i;
-				if (list[i + 1].LoadsField(Refs.f_desiredDollyRaw) == false)
-					continue;
-				if (list[i + 2].Calls(Refs.p_get_zero) == false)
-					continue;
-				if (list[i + 3].Calls(Refs.m_op_Inequality) == false)
-					continue;
-
-				i += 4;
-				while (list[i].opcode != OpCodes.Brfalse && list[i].opcode != OpCodes.Brfalse_S && i < list.Count - 1)
-					i++;
-				if (list[i].opcode != OpCodes.Brfalse && list[i].opcode != OpCodes.Brfalse_S)
-					continue;
-				var jumpLabel = (Label)list[i].operand;
-
-				var j = list.FindIndex(start, instr => instr.labels.Contains(jumpLabel));
-				if (j == -1)
-					continue;
-				_ = list[j].labels.Remove(jumpLabel);
-				var labels = list[start].labels;
-				var blocks = list[start].blocks;
-				list.RemoveRange(start, j - start);
-
-				var callPatchInstructions = new CodeInstruction[]
-				{
-					new CodeInstruction(OpCodes.Ldarg_0) { labels = labels, blocks = blocks },
-					new CodeInstruction(OpCodes.Ldarg_0),
-					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDollyRaw),
-					new CodeInstruction(OpCodes.Ldarg_0),
-					new CodeInstruction(OpCodes.Ldflda, Refs.f_desiredDolly),
-					new CodeInstruction(OpCodes.Call, m_Patch)
-				};
-				list.InsertRange(start, callPatchInstructions);
-
-				found = true;
-				break;
-			}
-			if (found == false)
-				Log.Error("Cannot find and replace last if() in CameraDriver.OnGUI");
-
-			return list.AsEnumerable();
-		}
-	}
-	*/
-
 	[HarmonyPatch(typeof(MoteMaker))]
 	[HarmonyPatch("ThrowText")]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
@@ -215,6 +125,9 @@ namespace CameraPlus
 	{
 		static bool Prefix(Vector3 loc)
 		{
+			if (CameraPlusMain.renderEverything)
+				return true;
+
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return true;
 
@@ -237,6 +150,9 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		static bool Prefix(Pawn ___pawn)
 		{
+			if (CameraPlusMain.renderEverything)
+				return true;
+
 			var cameraDelegate = Tools.GetCachedCameraDelegate(___pawn);
 			if (cameraDelegate.GetCameraColors == null)
 			{
@@ -271,6 +187,9 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
+			if (CameraPlusMain.renderEverything)
+				return true;
+
 			if (truncateToWidth != 9999f)
 				return true; // use label
 
@@ -336,6 +255,9 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Vector2 screenPos)
 		{
+			if (CameraPlusMain.renderEverything)
+				return true;
+
 			Tools.ShouldShowLabel(screenPos, false, out var showLabel, out _);
 			return showLabel;
 		}
@@ -423,23 +345,6 @@ namespace CameraPlus
 			yield return new CodeInstruction(OpCodes.Ret);
 		}
 	}
-
-	/* increase clipping distance
-	//
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("Awake")]
-	static class CameraDriver_Awake_Patch
-	{
-		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			foreach (var instruction in instructions)
-			{
-				if (instruction.opcode == OpCodes.Ldc_R4)
-					instruction.operand = CameraPlusSettings.farOutHeight + 5;
-				yield return instruction;
-			}
-		}
-	}*/
 
 	// here, we basically add a "var lerpedRootSize = Main.LerpRootSize(this.rootSize);" to
 	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
