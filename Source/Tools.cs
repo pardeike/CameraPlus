@@ -142,11 +142,6 @@ namespace CameraPlus
 			return color;
 		}
 
-		public static bool IncludeNonTamedAnimals()
-		{
-			return CameraPlusMain.Settings.includeNotTamedAnimals && Prefs.AnimalNameMode == AnimalNameDisplayMode.TameAll;
-		}
-
 		// shameless copy of vanilla
 		public static bool PawnHasNoLabel(Pawn pawn)
 		{
@@ -154,7 +149,7 @@ namespace CameraPlus
 				return true;
 			if (!pawn.RaceProps.Humanlike)
 			{
-				if (IncludeNonTamedAnimals())
+				if (CameraPlusMain.Settings.includeNotTamedAnimals)
 					return false;
 
 				var animalNameMode = Prefs.AnimalNameMode;

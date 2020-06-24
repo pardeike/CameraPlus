@@ -96,12 +96,6 @@ namespace CameraPlus
 			{
 				minRootResult = zoomedInPercent * 2;
 				maxRootResult = zoomedOutPercent * 2;
-
-				if (includeNotTamedAnimals && Prefs.AnimalNameMode != AnimalNameDisplayMode.TameAll)
-				{
-					Prefs.AnimalNameMode = AnimalNameDisplayMode.TameAll;
-					Prefs.Save();
-				}
 			}
 		}
 
@@ -237,13 +231,7 @@ namespace CameraPlus
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
 				}
-				var oldIncludeNotTamedAnimals = includeNotTamedAnimals;
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
-				if (oldIncludeNotTamedAnimals == false || includeNotTamedAnimals == true)
-				{
-					Prefs.AnimalNameMode = AnimalNameDisplayMode.TameAll;
-					Prefs.Save();
-				}
 			}
 
 			list.Gap(28f);

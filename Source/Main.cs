@@ -177,13 +177,27 @@ namespace CameraPlus
 	[HarmonyPatch(nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
+		static AnimalNameDisplayMode AnimalNameMode()
+		{
+			if (CameraPlusMain.Settings.includeNotTamedAnimals)
+				return AnimalNameDisplayMode.TameAll;
+			return Prefs.AnimalNameMode;
+		}
+
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			var from = AccessTools.PropertyGetter(typeof(Prefs), nameof(Prefs.AnimalNameMode));
+			var into = SymbolExtensions.GetMethodInfo(() => AnimalNameMode());
+			return Transpilers.MethodReplacer(instructions, from, into);
+		}
+
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
-			if (Tools.IncludeNonTamedAnimals() == false)
+			if (CameraPlusMain.Settings.includeNotTamedAnimals == false)
 				return true;
 
 			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
