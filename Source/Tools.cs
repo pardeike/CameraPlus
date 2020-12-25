@@ -181,7 +181,7 @@ namespace CameraPlus
 			}
 
 			mouse = UI.MapToUIPosition(mouse);
-			var len = CurrentCellLength();
+			var len = UI.CurUICellSize();
 			mouse.y += len / 2;
 			var dx2 = (mouse.x - pos.x);
 			var dy = (mouse.y - pos.y);
@@ -189,17 +189,12 @@ namespace CameraPlus
 			return delta / len / len;
 		}
 
-		public static float CurrentCellLength()
-		{
-			return Vector3.one.MapToUIPosition().x - Vector3.zero.MapToUIPosition().x;
-		}
-
 		public static bool ShouldShowBody(Pawn pawn)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
 				return true;
 
-			return (CurrentCellLength() > CameraPlusMain.Settings.dotSize);
+			return (UI.CurUICellSize() > CameraPlusMain.Settings.dotSize);
 		}
 
 		public static void ShouldShowLabel(Vector3 location, bool isPawn, out bool showLabel, out bool showDot)
@@ -213,7 +208,7 @@ namespace CameraPlus
 			if (MouseDistanceSquared(location, isPawn) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
 				return;
 
-			var len = CurrentCellLength();
+			var len = UI.CurUICellSize();
 
 			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
 			{

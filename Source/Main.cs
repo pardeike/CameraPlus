@@ -15,6 +15,11 @@ namespace CameraPlus
 		public static CameraPlusSettings Settings;
 		public static float orthographicSize = -1f;
 
+		//public static float nMinusCameraScale;
+		//public static float viewActivityLevel;
+		//public static float viewDollyLevel;
+		//public static float previousTickRateMultiplier;
+
 		// for other mods: set temporarily to true to skip any hiding
 		public static bool skipCustomRendering = false;
 
@@ -115,6 +120,9 @@ namespace CameraPlus
 		{
 			if (CameraPlusMain.orthographicSize != -1f)
 				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
+
+			//if (CameraPlusMain.Settings.dynamicSpeedControl)
+			//	CameraPlusMain.viewDollyLevel = __result.magnitude;
 		}
 	}
 
@@ -436,4 +444,89 @@ namespace CameraPlus
 			}
 		}
 	}
+
+	/*[HarmonyPatch(typeof(TickManager))]
+	[HarmonyPatch(nameof(TickManager.TickRateMultiplier), MethodType.Getter)]
+	static class TickManager_TickRateMultiplier_Patch
+	{
+		static void Postfix(ref float __result, TickManager __instance)
+		{
+			if (CameraPlusMain.Settings.dynamicSpeedControl == false)
+				return;
+
+			var gameSpeed = __instance.CurTimeSpeed;
+			if (gameSpeed == TimeSpeed.Paused)
+				return;
+
+			var rootSize = Refs.rootSize(Find.CameraDriver);
+
+			var deltaTime = Time.deltaTime;
+			if (Mathf.Abs(rootSize - CameraPlusMain.nMinusCameraScale) > 0.001f)
+			{
+				CameraPlusMain.nMinusCameraScale = rootSize;
+				CameraPlusMain.viewActivityLevel = 2 * rootSize;
+				deltaTime *= 10;
+			}
+
+			if (CameraPlusMain.viewActivityLevel + CameraPlusMain.viewDollyLevel > 5f)
+			{
+				switch (gameSpeed)
+				{
+					case TimeSpeed.Normal:
+						__result = 1.0f;
+						break;
+					case TimeSpeed.Fast:
+						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 0.5f * deltaTime, CameraPlusMain.Settings.speedControlLimits[0]);
+						break;
+					case TimeSpeed.Superfast:
+						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 1.25f * deltaTime, CameraPlusMain.Settings.speedControlLimits[1]);
+						break;
+					case TimeSpeed.Ultrafast:
+						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 4.5f * deltaTime, CameraPlusMain.Settings.speedControlLimits[2]);
+						break;
+				}
+			}
+			else
+				__result = Mathf.Min(CameraPlusMain.previousTickRateMultiplier + CameraPlusMain.Settings.speedGain * deltaTime, __result);
+
+			CameraPlusMain.previousTickRateMultiplier = __result;
+		}
+	}*/
+
+	/*[HarmonyPatch(typeof(CameraDriver))]
+	[HarmonyPatch(nameof(CameraDriver.CameraDriverOnGUI))]
+	static class CameraDriver_CameraDriverOnGUI_Patch
+	{
+		static void Postfix(CameraDriver __instance)
+		{
+			if (CameraPlusMain.Settings.dynamicSpeedControl == false)
+				return;
+
+			if (Find.TickManager.Paused || Find.TickManager.NotPlaying)
+				return;
+
+			CameraPlusMain.viewActivityLevel = 0f;
+			if (KeyBindingDefOf.MapDolly_Left.IsDown || KeyBindingDefOf.MapDolly_Up.IsDown || KeyBindingDefOf.MapDolly_Right.IsDown || KeyBindingDefOf.MapDolly_Down.IsDown)
+			{
+				switch (__instance.CurrentZoom)
+				{
+					case CameraZoomRange.Furthest:
+						CameraPlusMain.viewActivityLevel = 150f;
+						break;
+					case CameraZoomRange.Far:
+						CameraPlusMain.viewActivityLevel = 80f;
+						break;
+					case CameraZoomRange.Middle:
+						CameraPlusMain.viewActivityLevel = 40f;
+						break;
+					case CameraZoomRange.Close:
+						CameraPlusMain.viewActivityLevel = 5f;
+						break;
+					case CameraZoomRange.Closest:
+						CameraPlusMain.viewActivityLevel = 1f;
+						break;
+				}
+			}
+		}
+	}*/
 }

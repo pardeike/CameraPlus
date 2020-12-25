@@ -32,6 +32,9 @@ namespace CameraPlus
 		public float zoomedOutPercent = 65;
 		public float zoomedInPercent = 1;
 		public int exponentiality = 1;
+		//public bool dynamicSpeedControl = true;
+		//public float speedGain = 0.5f;
+		//public float[] speedControlLimits = new[] { 1.5f, 2f, 3f };
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutScreenEdgeDollyFactor = 0.5f;
@@ -70,6 +73,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", 65);
 			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", 1);
 			Scribe_Values.Look(ref exponentiality, "exponentiality", 1);
+			//Scribe_Values.Look(ref dynamicSpeedControl, "dynamicSpeedControl", true);
 			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", 0.5f);
@@ -208,6 +212,7 @@ namespace CameraPlus
 			_ = list.Label("DollyPercentLabel".Translate());
 			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "Near".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
 			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "Far".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
+			//list.CheckboxLabeled("Smooth Dolly", ref dynamicSpeedControl);
 
 			list.Gap(12f);
 
@@ -241,6 +246,7 @@ namespace CameraPlus
 				zoomedOutPercent = 65;
 				zoomedInPercent = 1;
 				exponentiality = 1;
+				//dynamicSpeedControl = true;
 				zoomedOutDollyPercent = 1;
 				zoomedInDollyPercent = 1;
 				zoomedOutScreenEdgeDollyFactor = 0.5f;
