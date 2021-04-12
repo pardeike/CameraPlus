@@ -344,7 +344,7 @@ namespace CameraPlus
 			// these values are from vanilla
 			// we remap them to the range 30 - 60
 			var sizes = new[] { 12f, 13.8f, 42f, 57f }
-				.Select(f => GenMath.LerpDouble(12, 57, 30, 60, f))
+				.Select(f => Tools.LerpDoubleSafe(12, 57, 30, 60, f))
 				.ToArray();
 
 			__result = CameraZoomRange.Furthest;

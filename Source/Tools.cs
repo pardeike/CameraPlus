@@ -301,12 +301,20 @@ namespace CameraPlus
 			return true;
 		}
 
+		public static float LerpDoubleSafe(float inFrom, float inTo, float outFrom, float outTo, float x)
+		{
+			if (inFrom == inTo) return (outFrom + outTo) / 2;
+			return GenMath.LerpDouble(inFrom, inTo, outFrom, outTo, x);
+		}
+
 		public static float LerpRootSize(float x)
 		{
 			var n = CameraPlusMain.Settings.exponentiality;
 			if (n == 0)
-				return GenMath.LerpDouble(minRootInput, maxRootInput, minRootResult, maxRootResult, x);
+				return LerpDoubleSafe(minRootInput, maxRootInput, minRootResult, maxRootResult, x);
 
+			if (minRootResult == maxRootResult)
+				return minRootResult;
 			var factor = (maxRootResult - minRootResult) / Math.Pow(maxRootInput - minRootInput, 2 * n);
 			var y = minRootResult + Math.Pow(x - minRootInput, 2 * n) * factor;
 			return (float)y;
@@ -317,21 +325,21 @@ namespace CameraPlus
 			var f = GetScreenEdgeDollyFactor(orthSize);
 			var zoomedIn = orthSize * CameraPlusMain.Settings.zoomedInDollyPercent * 4 / f;
 			var zoomedOut = orthSize * CameraPlusMain.Settings.zoomedOutDollyPercent / f;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetScreenEdgeDollyFactor(float orthSize)
 		{
 			var zoomedIn = CameraPlusMain.Settings.zoomedInScreenEdgeDollyFactor * 30;
 			var zoomedOut = CameraPlusMain.Settings.zoomedOutScreenEdgeDollyFactor * 30;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetDollyRateMouse(float orthSize)
 		{
 			var zoomedIn = 1f * CameraPlusMain.Settings.zoomedInDollyPercent;
 			var zoomedOut = 10f * CameraPlusMain.Settings.zoomedOutDollyPercent;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetDollySpeedDecay(float orthSize)
@@ -340,7 +348,7 @@ namespace CameraPlus
 			//
 			var minVal = 1f - 0.15f;
 			var maxVal = 1f - 0.15f;
-			return GenMath.LerpDouble(minRootResult, maxRootResult, minVal, maxVal, orthSize);
+			return LerpDoubleSafe(minRootResult, maxRootResult, minVal, maxVal, orthSize);
 		}
 
 		public static string ToLabel(KeyCode code)

@@ -119,7 +119,8 @@ namespace CameraPlus
 			_ = list.Label("Zoom".Translate());
 
 			previous = zoomedInPercent;
-			list.Slider(ref zoomedInPercent, 0.1f, 20f, () => "Near".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
+			list.Slider(ref zoomedInPercent, 0.1f, 25f, () => "Near".Translate() + ": " + Math.Round(zoomedInPercent, 1) + "%");
+			zoomedInPercent = Mathf.Min(zoomedInPercent, zoomedOutPercent);
 			minRootResult = zoomedInPercent * 2;
 			if (previous != zoomedInPercent && map != null)
 			{
@@ -129,7 +130,8 @@ namespace CameraPlus
 			}
 
 			previous = zoomedOutPercent;
-			list.Slider(ref zoomedOutPercent, 25f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
+			list.Slider(ref zoomedOutPercent, 10f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
+			zoomedOutPercent = Mathf.Max(zoomedInPercent, zoomedOutPercent);
 			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
 			{
