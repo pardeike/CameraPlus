@@ -15,6 +15,6 @@
   </loadBefore>
   <loadAfter>
   </loadAfter>
-  <manifestUri>https://raw.githubusercontent.com/pardeike/CameraPlus/master/About/Manifest.xml</manifestUri>
+  <manifestUri>https://raw.githubusercontent.com/pardeike/CameraPlus/latest/About/Manifest.xml</manifestUri>
   <downloadUri>https://github.com/pardeike/CameraPlus/releases/latest</downloadUri>
 </Manifest>
