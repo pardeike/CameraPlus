@@ -143,9 +143,11 @@ namespace CameraPlus
 			list.Gap(12f);
 
 			_ = list.Label("Exponentiality".Translate());
+#pragma warning disable CS0612
 			if (list.RadioButton("Off", exponentiality == 0, 8f)) exponentiality = 0;
 			for (var i = 1; i <= 3; i++)
 				if (list.RadioButton(i + "x", exponentiality == i, 8f)) exponentiality = i;
+#pragma warning restore CS0612
 
 			list.Gap(16f);
 
@@ -236,7 +238,9 @@ namespace CameraPlus
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
+#pragma warning disable CS0612
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
+#pragma warning restore CS0612
 				}
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
 			}
