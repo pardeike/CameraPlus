@@ -384,7 +384,7 @@ namespace CameraPlus
 
 		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, Action<KeyCode> action)
 		{
-			List<KeyCode> AllWithNoneFirst()
+			static List<KeyCode> AllWithNoneFirst()
 			{
 				return Enum.GetValues(typeof(KeyCode))
 					.Cast<KeyCode>()
@@ -430,7 +430,7 @@ namespace CameraPlus
 						{
 							var dialog = new Dialog_ModSettings();
 							var me = LoadedModManager.GetMod<CameraPlusMain>();
-							Refs.selMod(dialog) = me;
+							dialog.selMod = me;
 							stack.Add(dialog);
 						}
 						Event.current.Use();
@@ -475,8 +475,8 @@ namespace CameraPlus
 						var cameraDriver = Find.CameraDriver;
 						savedViews.views[numKey - 1] = new RememberedCameraPos(map)
 						{
-							rootPos = Refs.rootPos(cameraDriver),
-							rootSize = Refs.rootSize(cameraDriver)
+							rootPos = cameraDriver.rootPos,
+							rootSize = cameraDriver.rootSize
 						};
 						Event.current.Use();
 					}

@@ -71,16 +71,15 @@ namespace CameraPlus
 
 			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
 			{
-				Refs.rootSize(driver) = rootSize;
+				driver.rootSize = rootSize;
 				return;
 			}
-			var rootPos = Refs.rootPos(driver);
-			_ = Refs.applyPositionToGameObjectInvoker(driver, Array.Empty<object>());
+
+			driver.ApplyPositionToGameObject();
 			var oldMousePos = UI.MouseMapPosition();
-			Refs.rootSize(driver) = rootSize;
-			_ = Refs.applyPositionToGameObjectInvoker(driver, Array.Empty<object>());
-			rootPos += oldMousePos - UI.MouseMapPosition();
-			Refs.rootPos(driver) = rootPos;
+			driver.rootSize = rootSize;
+			driver.ApplyPositionToGameObject();
+			driver.rootPos += oldMousePos - UI.MouseMapPosition();
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

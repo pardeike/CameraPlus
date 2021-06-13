@@ -130,7 +130,7 @@ namespace CameraPlus
 			}
 
 			previous = zoomedOutPercent;
-			list.Slider(ref zoomedOutPercent, 10f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
+			list.Slider(ref zoomedOutPercent, 1f, 100f, () => "Far".Translate() + ": " + Math.Round(zoomedOutPercent, 1) + "%");
 			zoomedOutPercent = Mathf.Max(zoomedInPercent, zoomedOutPercent);
 			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
