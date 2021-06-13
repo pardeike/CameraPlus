@@ -74,7 +74,7 @@ if not errorlevel 1 (
 	ModBuilder XMLPut -file "$(MSBuildProjectDirectory)\..\About\Manifest.xml" -xpath /Manifest/version -value "{{$(MSBuildProjectName)-version}}"
 )
 if defined INSTALL_MOD (
-	"%INSTALL_MOD%" "$(Configuration)" "$(MSBuildProjectDirectory)\..\" "$(MSBuildProjectName)" "1.1 1.2 About Assemblies " "LoadFolders.xml"
+	"%INSTALL_MOD%" "$(Configuration)" "$(MSBuildProjectDirectory)\..\" "$(MSBuildProjectName)" "1.1 1.2 About Assemblies Languages Textures" "LoadFolders.xml"
 )</PostBuildEvent>
 		<Company>Brrainz</Company>
 		<Authors>Andreas Pardeike</Authors>
