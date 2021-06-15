@@ -346,7 +346,7 @@ namespace CrossPromotionModule
 			var headerHeight = 30f;
 			var headerRect = new Rect(leftColumn + 10f, -4f, rightColumn - 20f, headerHeight);
 			Text.Anchor = TextAnchor.UpperCenter;
-			Widgets.Label(headerRect, "Mods of " + mod.Author.Replace("Andreas Pardeike", "Brrainz") + ":".Truncate(headerRect.width, null));
+			Widgets.Label(headerRect, "Mods of " + mod.AuthorsString.Replace("Andreas Pardeike", "Brrainz") + ":".Truncate(headerRect.width, null));
 			Text.Anchor = TextAnchor.UpperLeft;
 
 			var outRect = new Rect(leftColumn + 10f, headerHeight - 4f, rightColumn, mainRect.height - (headerHeight - 4f));
