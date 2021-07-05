@@ -151,7 +151,7 @@ namespace CameraPlus
 
 	[HarmonyPatch(typeof(PawnRenderer))]
 	[HarmonyPatch(nameof(PawnRenderer.RenderPawnAt))]
-	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(RotDrawMode), typeof(bool), typeof(bool) })]
+	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
 	static class PawnRenderer_RenderPawnAt_Patch
 	{
 		[HarmonyPriority(10000)]

@@ -353,33 +353,22 @@ namespace CameraPlus
 
 		public static string ToLabel(KeyCode code)
 		{
-			switch (code)
+			return code switch
 			{
 				// cannot be more optimized because the enum has multiple equal values
 				//
-				case KeyCode.LeftShift:
-					return "KeyLeftShift".Translate();
-				case KeyCode.LeftAlt:
-					return "KeyLeftAlt".Translate();
-				case KeyCode.LeftControl:
-					return "KeyLeftControl".Translate();
-				case KeyCode.LeftCommand:
-					return "KeyLeftCommand".Translate();
-				case KeyCode.LeftWindows:
-					return "KeyLeftWindows".Translate();
-				case KeyCode.RightShift:
-					return "KeyRightShift".Translate();
-				case KeyCode.RightAlt:
-					return "KeyRightAlt".Translate();
-				case KeyCode.RightControl:
-					return "KeyRightControl".Translate();
-				case KeyCode.RightCommand:
-					return "KeyRightCommand".Translate();
-				case KeyCode.RightWindows:
-					return "KeyRightWindows".Translate();
-				default:
-					return code.ToStringReadable();
-			}
+				KeyCode.LeftShift => "KeyLeftShift".Translate(),
+				KeyCode.LeftAlt => "KeyLeftAlt".Translate(),
+				KeyCode.LeftControl => "KeyLeftControl".Translate(),
+				KeyCode.LeftCommand => "KeyLeftCommand".Translate(),
+				KeyCode.LeftWindows => "KeyLeftWindows".Translate(),
+				KeyCode.RightShift => "KeyRightShift".Translate(),
+				KeyCode.RightAlt => "KeyRightAlt".Translate(),
+				KeyCode.RightControl => "KeyRightControl".Translate(),
+				KeyCode.RightCommand => "KeyRightCommand".Translate(),
+				KeyCode.RightWindows => "KeyRightWindows".Translate(),
+				_ => code.ToStringReadable(),
+			};
 		}
 
 		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, Action<KeyCode> action)
