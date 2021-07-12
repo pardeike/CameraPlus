@@ -8,13 +8,13 @@ namespace CameraPlus
 	static class Refs
 	{
 		// Common
-		public static readonly FieldInfo f_rootSize = Field(typeof(CameraDriver), "rootSize");
+		public static readonly FieldInfo f_rootSize = Field(typeof(CameraDriver), nameof(CameraDriver.rootSize));
 
 		// DrawThingLabel
-		public static readonly MethodInfo p_CameraDriver = Property(typeof(Find), "CameraDriver")?.GetGetMethod(true);
+		public static readonly MethodInfo p_CameraDriver = PropertyGetter(typeof(Find), nameof(Find.CameraDriver));
 
 		// ApplyPositionToGameObject
-		public static readonly MethodInfo p_MyCamera = Property(typeof(CameraDriver), "MyCamera")?.GetGetMethod(true);
+		public static readonly MethodInfo p_MyCamera = PropertyGetter(typeof(CameraDriver), nameof(CameraDriver.MyCamera));
 
 		static Refs()
 		{

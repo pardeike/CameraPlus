@@ -42,8 +42,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(Game))]
-	[HarmonyPatch(nameof(Game.FinalizeInit))]
+	[HarmonyPatch(typeof(Game), nameof(Game.FinalizeInit))]
 	static class Game_FinalizeInit_Patch
 	{
 		static void Postfix()
@@ -52,8 +51,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch(nameof(CameraDriver.Update))]
+	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.Update))]
 	static class CameraDriver_Update_Patch
 	{
 		static readonly MethodInfo m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
@@ -62,7 +60,7 @@ namespace CameraPlus
 		{
 			if (driver == null)
 			{
-				var info = Harmony.GetPatchInfo(AccessTools.Method(typeof(CameraDriver), "Update"));
+				var info = Harmony.GetPatchInfo(AccessTools.Method(typeof(CameraDriver), nameof(CameraDriver.Update)));
 				var owners = "Maybe one of the mods that patch CameraDriver.Update(): ";
 				info.Owners.Do(owner => owners += owner + " ");
 				Log.ErrorOnce("Unexpected null camera driver. Looks like a mod conflict. " + owners, 506973465);
@@ -101,8 +99,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(TimeControls))]
-	[HarmonyPatch(nameof(TimeControls.DoTimeControlsGUI))]
+	[HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
 	static class TimeControls_DoTimeControlsGUI_Patch
 	{
 		static void Prefix()
@@ -111,8 +108,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("CalculateCurInputDollyVect")]
+	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CalculateCurInputDollyVect))]
 	static class CameraDriver_CalculateCurInputDollyVect_Patch
 	{
 		static void Postfix(ref Vector2 __result)
@@ -125,8 +121,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(MoteMaker))]
-	[HarmonyPatch(nameof(MoteMaker.ThrowText))]
+	[HarmonyPatch(typeof(MoteMaker), nameof(MoteMaker.ThrowText))]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
 	static class MoteMaker_ThrowText_Patch
 	{
@@ -149,8 +144,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(PawnRenderer))]
-	[HarmonyPatch(nameof(PawnRenderer.RenderPawnAt))]
+	[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
 	static class PawnRenderer_RenderPawnAt_Patch
 	{
@@ -180,8 +174,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(PawnUIOverlay))]
-	[HarmonyPatch(nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
+	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
 		static AnimalNameDisplayMode AnimalNameMode()
@@ -218,8 +211,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(GenMapUI))]
-	[HarmonyPatch(nameof(GenMapUI.DrawPawnLabel))]
+	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
 	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
 	[StaticConstructorOnStartup]
 	static class GenMapUI_DrawPawnLabel_Patch
@@ -288,8 +280,7 @@ namespace CameraPlus
 	// if we zoom in a lot, tiny font labels look very out of place
 	// so we make them bigger with the available fonts
 	//
-	[HarmonyPatch(typeof(GenMapUI))]
-	[HarmonyPatch(nameof(GenMapUI.DrawThingLabel))]
+	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawThingLabel))]
 	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
@@ -334,8 +325,7 @@ namespace CameraPlus
 
 	// map our new camera settings to meaningful enum values
 	//
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch(nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
+	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
 		static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
@@ -357,8 +347,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch("ApplyPositionToGameObject")]
+	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.ApplyPositionToGameObject))]
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
@@ -399,8 +388,7 @@ namespace CameraPlus
 	// here, we basically add a "var lerpedRootSize = Main.LerpRootSize(this.rootSize);" to
 	// the beginning of this method and replace every "this.rootSize" witn "lerpedRootSize"
 	//
-	[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch(nameof(CameraDriver.CurrentViewRect), MethodType.Getter)]
+	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentViewRect), MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
 		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
@@ -444,8 +432,7 @@ namespace CameraPlus
 		}
 	}
 
-	/*[HarmonyPatch(typeof(TickManager))]
-	[HarmonyPatch(nameof(TickManager.TickRateMultiplier), MethodType.Getter)]
+	/*[HarmonyPatch(typeof(TickManager), nameof(TickManager.TickRateMultiplier), MethodType.Getter)]
 	static class TickManager_TickRateMultiplier_Patch
 	{
 		static void Postfix(ref float __result, TickManager __instance)
@@ -492,8 +479,7 @@ namespace CameraPlus
 		}
 	}*/
 
-	/*[HarmonyPatch(typeof(CameraDriver))]
-	[HarmonyPatch(nameof(CameraDriver.CameraDriverOnGUI))]
+	/*[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CameraDriverOnGUI))]
 	static class CameraDriver_CameraDriverOnGUI_Patch
 	{
 		static void Postfix(CameraDriver __instance)
