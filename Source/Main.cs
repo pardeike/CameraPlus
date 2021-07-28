@@ -42,15 +42,6 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(Game), nameof(Game.FinalizeInit))]
-	static class Game_FinalizeInit_Patch
-	{
-		static void Postfix()
-		{
-			ModCounter.Trigger();
-		}
-	}
-
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.Update))]
 	static class CameraDriver_Update_Patch
 	{
@@ -328,7 +319,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
-		static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
+		public static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
 		{
 			// these values are from vanilla
 			// we remap them to the range 30 - 60
@@ -393,7 +384,7 @@ namespace CameraPlus
 	{
 		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
 
-		static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
+		public static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
 		{
 			var v_lerpedRootSize = generator.DeclareLocal(typeof(float));
 
