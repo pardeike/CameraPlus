@@ -145,19 +145,10 @@ namespace CameraPlus
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
-			var cameraDelegate = Tools.GetCachedCameraDelegate(___pawn);
-			if (cameraDelegate.GetCameraColors == null)
-			{
-				if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals)
-					return true;
-			}
-
-			if (Tools.PawnHasNoLabel(___pawn))
-				return true;
-
-			return Tools.ShouldShowBody(___pawn);
+			return Tools.ShouldShowDot(___pawn) == false;
 		}
 
+		[HarmonyPriority(10000)]
 		static void Postfix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut && CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals)
@@ -168,27 +159,25 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
-		static AnimalNameDisplayMode AnimalNameMode()
-		{
-			if (CameraPlusMain.Settings.includeNotTamedAnimals)
-				return AnimalNameDisplayMode.TameAll;
-			return Prefs.AnimalNameMode;
-		}
-
+		// fake everything being humanlike so Prefs.AnimalNameMode is ignored (we handle it ourselves)
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			var from = AccessTools.PropertyGetter(typeof(Prefs), nameof(Prefs.AnimalNameMode));
-			var into = SymbolExtensions.GetMethodInfo(() => AnimalNameMode());
-			return Transpilers.MethodReplacer(instructions, from, into);
+			var mHumanlike = AccessTools.PropertyGetter(typeof(RaceProperties), nameof(RaceProperties.Humanlike));
+			foreach (var code in instructions)
+			{
+				yield return code;
+				if (code.Calls(mHumanlike))
+				{
+					yield return new CodeInstruction(OpCodes.Pop);
+					yield return new CodeInstruction(OpCodes.Ldc_I4_1);
+				}
+			}
 		}
 
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.skipCustomRendering)
-				return true;
-
-			if (CameraPlusMain.Settings.includeNotTamedAnimals == false)
 				return true;
 
 			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
@@ -198,63 +187,23 @@ namespace CameraPlus
 			if (___pawn.Name != null)
 				return true;
 
-			return GenMapUI_DrawPawnLabel_Patch.HandlePawn(___pawn);
+			var useMarkers = Tools.GetMarkerColors(___pawn, out var innerColor, out var outerColor);
+			if (useMarkers == false)
+				return true; // use label
+
+			if (Tools.ShouldShowDot(___pawn))
+			{
+				Tools.DrawDot(___pawn, innerColor, outerColor);
+				return false;
+			}
+			return Tools.CorrectLabelRendering(___pawn);
 		}
 	}
 
 	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
 	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
-	[StaticConstructorOnStartup]
 	static class GenMapUI_DrawPawnLabel_Patch
 	{
-		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
-		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
-		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
-		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
-
-		public static bool HandlePawn(Pawn pawn)
-		{
-			Tools.ShouldShowLabel(pawn.DrawPos, true, out var showLabel, out var showDot);
-			if (showLabel)
-				return true;
-			if (showDot == false)
-				return false;
-
-			var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
-			if (useMarkers == false)
-				return true; // use label
-
-			_ = Tools.GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
-
-			var pos = pawn.DrawPos;
-			var v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
-			var v2 = (pos + new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
-			var markerRect = new Rect(v1, v2 - v1);
-
-			// draw outer marker
-			GUI.color = outerColor;
-			GUI.DrawTexture(markerRect, outerTexture, ScaleMode.ScaleToFit, true);
-
-			// draw inner marker
-			GUI.color = innerColor;
-			GUI.DrawTexture(markerRect, innerTexture, ScaleMode.ScaleToFit, true);
-
-			// draw extra marker
-			if (pawn.Downed)
-			{
-				GUI.color = downedColor;
-				GUI.DrawTexture(markerRect, downedTexture, ScaleMode.ScaleToFit, true);
-			}
-			else if (pawn.Drafted)
-			{
-				GUI.color = draftedColor;
-				GUI.DrawTexture(markerRect, draftedTexture, ScaleMode.ScaleToFit, true);
-			}
-
-			// skip label
-			return false;
-		}
-
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
@@ -262,9 +211,23 @@ namespace CameraPlus
 				return true;
 
 			if (truncateToWidth != 9999f)
-				return true; // use label
+				return true;
 
-			return HandlePawn(pawn);
+			if (Tools.ShouldShowDot(pawn))
+			{
+				var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
+				if (useMarkers == false)
+					return Tools.CorrectLabelRendering(pawn);
+
+				Tools.DrawDot(pawn, innerColor, outerColor);
+				return false;
+			}
+
+			// we fake "show all" so we need to skip if original could would not render labels
+			if (ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false)
+				return false;
+
+			return Tools.ShouldShowLabel(pawn);
 		}
 	}
 
@@ -290,8 +253,7 @@ namespace CameraPlus
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
-			Tools.ShouldShowLabel(screenPos, false, out var showLabel, out _);
-			return showLabel;
+			return Tools.ShouldShowLabel(null, screenPos);
 		}
 
 		// we replace the first "GameFont.Tiny" with "GetAdaptedGameFont()"

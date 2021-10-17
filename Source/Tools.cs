@@ -1,82 +1,12 @@
-﻿using HarmonyLib;
-using RimWorld;
+﻿using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
-	class CameraDelegates
-	{
-		public Func<Pawn, Color[]> GetCameraColors = null;
-		public Func<Pawn, Texture2D[]> GetCameraMarkers = null;
-
-		static MethodInfo GetMethod(Pawn pawn, string name)
-		{
-			return pawn.GetType().Assembly
-				.GetType("CameraPlusSupport.Methods", false)?
-				.GetMethod(name, AccessTools.all);
-		}
-
-		public CameraDelegates(Pawn pawn)
-		{
-			var m_GetCameraColors = GetMethod(pawn, "GetCameraPlusColors");
-			if (m_GetCameraColors != null)
-			{
-				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Color[]) });
-				GetCameraColors = (Func<Pawn, Color[]>)Delegate.CreateDelegate(funcType, m_GetCameraColors);
-			}
-
-			var m_GetCameraTextures = GetMethod(pawn, "GetCameraPlusMarkers");
-			if (m_GetCameraTextures != null)
-			{
-				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Texture2D[]) });
-				GetCameraMarkers = (Func<Pawn, Texture2D[]>)Delegate.CreateDelegate(funcType, m_GetCameraTextures);
-			}
-		}
-	}
-
-	static class Extensions
-	{
-		public static void Slider(this Listing_Standard list, ref int value, int min, int max, Func<string> label)
-		{
-			float f = value;
-			var h = HorizontalSlider(list.GetRect(22f), ref f, min, max, label == null ? null : label(), 1f);
-			value = (int)f;
-			list.Gap(h);
-		}
-
-		public static void Slider(this Listing_Standard list, ref float value, float min, float max, Func<string> label, float roundTo = -1f)
-		{
-			var rect = list.GetRect(22f);
-			var h = HorizontalSlider(rect, ref value, min, max, label == null ? null : label(), roundTo);
-			list.Gap(h);
-		}
-
-		public static float HorizontalSlider(Rect rect, ref float value, float leftValue, float rightValue, string label = null, float roundTo = -1f)
-		{
-			if (label != null)
-			{
-				var anchor = Text.Anchor;
-				var font = Text.Font;
-				Text.Font = GameFont.Tiny;
-				Text.Anchor = TextAnchor.UpperLeft;
-				Widgets.Label(rect, label);
-				Text.Anchor = anchor;
-				Text.Font = font;
-				rect.y += 18f;
-			}
-			value = GUI.HorizontalSlider(rect, value, leftValue, rightValue);
-			if (roundTo > 0f)
-				value = Mathf.RoundToInt(value / roundTo) * roundTo;
-			return 4f + label != null ? 18f : 0f;
-		}
-	}
-
 	public enum LabelMode
 	{
 		hide,
@@ -91,6 +21,83 @@ namespace CameraPlus
 		static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
 		static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
 		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
+
+		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
+		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
+		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
+		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
+
+		public static bool ShouldShowDot(Pawn pawn)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return false;
+
+			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
+				return false;
+
+			if (MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
+				return false;
+
+			var len = UI.CurUICellSize();
+			var isSmall = len <= CameraPlusMain.Settings.dotSize;
+			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
+			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
+		}
+
+		public static bool ShouldShowLabel(Thing thing, Vector2 screenPos = default)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return true;
+
+			var isPawn = thing is Pawn;
+
+			if (MouseDistanceSquared(thing?.DrawPos ?? screenPos, isPawn) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
+				return true;
+
+			var len = UI.CurUICellSize();
+
+			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
+			if (len <= lower)
+				return false;
+
+			if (isPawn && CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && (thing as Pawn).RaceProps.Animal)
+				return true;
+
+			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
+				return false;
+
+			return true;
+		}
+
+		public static void DrawDot(Pawn pawn, Color innerColor, Color outerColor)
+		{
+			_ = GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
+
+			var pos = pawn.DrawPos;
+			var v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
+			var v2 = (pos + new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
+			var markerRect = new Rect(v1, v2 - v1);
+
+			// draw outer marker
+			GUI.color = outerColor;
+			GUI.DrawTexture(markerRect, outerTexture, ScaleMode.ScaleToFit, true);
+
+			// draw inner marker
+			GUI.color = innerColor;
+			GUI.DrawTexture(markerRect, innerTexture, ScaleMode.ScaleToFit, true);
+
+			// draw extra marker
+			if (pawn.Downed)
+			{
+				GUI.color = downedColor;
+				GUI.DrawTexture(markerRect, downedTexture, ScaleMode.ScaleToFit, true);
+			}
+			else if (pawn.Drafted)
+			{
+				GUI.color = draftedColor;
+				GUI.DrawTexture(markerRect, draftedTexture, ScaleMode.ScaleToFit, true);
+			}
+		}
 
 		static readonly Dictionary<string, Color> cachedMainColors = new Dictionary<string, Color>();
 		public static Color? GetMainColor(Pawn pawn)
@@ -142,34 +149,6 @@ namespace CameraPlus
 			return color;
 		}
 
-		// shameless copy of vanilla
-		public static bool PawnHasNoLabel(Pawn pawn)
-		{
-			if (!pawn.Spawned || pawn.Map.fogGrid.IsFogged(pawn.Position))
-				return true;
-			if (!pawn.RaceProps.Humanlike)
-			{
-				if (CameraPlusMain.Settings.includeNotTamedAnimals)
-					return false;
-
-				var animalNameMode = Prefs.AnimalNameMode;
-				if (animalNameMode == AnimalNameDisplayMode.None)
-					return true;
-				if (animalNameMode != AnimalNameDisplayMode.TameAll)
-				{
-					if (animalNameMode == AnimalNameDisplayMode.TameNamed)
-					{
-						if (pawn.Name == null || pawn.Name.Numerical)
-							return true;
-					}
-				}
-				else if (pawn.Name == null)
-					return true;
-			}
-
-			return false;
-		}
-
 		public static float MouseDistanceSquared(Vector3 pos, bool mapCoordinates)
 		{
 			var mouse = UI.MouseMapPosition();
@@ -189,43 +168,6 @@ namespace CameraPlus
 			return delta / len / len;
 		}
 
-		public static bool ShouldShowBody(Pawn pawn)
-		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false || MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
-				return true;
-
-			return (UI.CurUICellSize() > CameraPlusMain.Settings.dotSize);
-		}
-
-		public static void ShouldShowLabel(Vector3 location, bool isPawn, out bool showLabel, out bool showDot)
-		{
-			showLabel = true;
-			showDot = false;
-
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
-				return;
-
-			if (MouseDistanceSquared(location, isPawn) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
-				return;
-
-			var len = UI.CurUICellSize();
-
-			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
-			{
-				showLabel = false;
-				showDot = true;
-				return;
-			}
-
-			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
-			if (len <= lower)
-			{
-				showLabel = false;
-				showDot = false;
-				return;
-			}
-		}
-
 		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{
@@ -236,6 +178,12 @@ namespace CameraPlus
 				cachedCameraDelegates[type] = result;
 			}
 			return result;
+		}
+
+		public static bool CorrectLabelRendering(Pawn pawn)
+		{
+			// we fake "show all" so we need to skip if original could would not render labels
+			return ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false;
 		}
 
 		// returning true will prefer markers over labels
@@ -257,9 +205,9 @@ namespace CameraPlus
 				return true;
 			}
 
-			var isAnimal = pawn.RaceProps.Animal;
-			var showAnimals = CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals;
-			if (isAnimal && showAnimals == false)
+			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
+			var hideAnimalMarkers = CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals;
+			if (isAnimal && hideAnimalMarkers)
 			{
 				innerColor = default;
 				outerColor = default;
