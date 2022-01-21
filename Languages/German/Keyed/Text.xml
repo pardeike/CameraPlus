@@ -1,38 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 	<Zoom>Zoom</Zoom>
-	<Near>Nahe</Near>
-	<Far>Weit</Far>
-	<ZoomedInPercent>Faktor: maximal eingezoomt</ZoomedInPercent>
-	<ZoomedOutPercent>Faktor: maximal ausgezoomt</ZoomedOutPercent>
-	<Exponentiality>Exponentielles zoomen:</Exponentiality>
-	<SoundNearness>Bringe lokale Geräusche näher</SoundNearness>
-	<HotKeys>Tastaturkürzel:</HotKeys>
+	<Near>Nah</Near>
+	<Far>Fern</Far>
+	<ZoomedInPercent>Höchster Zoomfaktor</ZoomedInPercent>
+	<ZoomedOutPercent>Niedrigster Zoomfaktor</ZoomedOutPercent>
+	<Exponentiality>Exponentielle Skalierung:</Exponentiality>
+	<SoundNearness>Lokale Geräusche näher bringen</SoundNearness>
+	<HotKeys>Tastenkürzel:</HotKeys>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
-	<LoadModifier>Laden</LoadModifier>
-	<SaveModifier>Speichern</SaveModifier>
-	<DollyPercentLabel>Skrollgeschwindigkeit</DollyPercentLabel>
-	<ScreenEdgeDollyFrictionLabel>Kanten-Skrollfaktor</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>Verstecke die Kolonistennamen wenn ausgezoomt</HideNamesWhenZoomedOut>
-	<Never>nie</Never>
+	<LoadModifier>Ansicht laden</LoadModifier>
+	<SaveModifier>Ansicht speichern</SaveModifier>
+	<DollyPercentLabel>Scrollgeschwindigkeit</DollyPercentLabel>
+	<ScreenEdgeDollyFrictionLabel>Bildschirmrand-Scrollfaktor</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>Labels beim Rauszoomen verstecken</HideNamesWhenZoomedOut>
 	<Pixel>Pixel</Pixel>
-	<HidePawnLabelBelow>Keine Kreaturnamen unter: </HidePawnLabelBelow>
-	<HideThingLabelBelow>Kein Labels für Dinge unter: </HideThingLabelBelow>
-	<ShowMarkerBelow>Als Punkt anzeigen unter: </ShowMarkerBelow>
+	<HidePawnLabelBelow>Labels von Spielfiguren verstecken, wenn kleiner als: </HidePawnLabelBelow>
+	<HideThingLabelBelow>Labels von Objekten verstecken, wenn kleiner als: </HideThingLabelBelow>
+	<ShowMarkerBelow>Spielfiguren als Marker darstellen, wenn kleiner als: </ShowMarkerBelow>
 	<IncludeAnimals>Tiere haben den gleichen Marker</IncludeAnimals>
 	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
-	<IncludeNotTamedAnimals>Auch ungezähmte Tiere</IncludeNotTamedAnimals>
-	<ZoomToMouse>Zoom an die Maus</ZoomToMouse>
-	<MouseRevealsLabels>Maus zeigt Labels</MouseRevealsLabels>
-	<KeyLeftShift>Left Shift</KeyLeftShift>
-	<KeyLeftAlt>Left Alt</KeyLeftAlt>
-	<KeyLeftControl>Left Ctrl</KeyLeftControl>
-	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
-	<KeyLeftWindows>Left Win</KeyLeftWindows>
-	<KeyRightShift>Right Shift</KeyRightShift>
-	<KeyRightAlt>Right Alt</KeyRightAlt>
-	<KeyRightControl>Right Ctrl</KeyRightControl>
-	<KeyRightCommand>Right Cmd</KeyRightCommand>
-	<KeyRightWindows>Right Win</KeyRightWindows>
+	<IncludeNotTamedAnimals>Ungezähmte Tiere einbeziehen</IncludeNotTamedAnimals>
+	<ZoomToMouse>Beim Mauszeiger zoomen</ZoomToMouse>
+	<MouseRevealsLabels>Mauszeiger enthüllt Labels</MouseRevealsLabels>
+	<KeyLeftShift>L-Umschalt</KeyLeftShift>
+	<KeyLeftAlt>L-Alt</KeyLeftAlt>
+	<KeyLeftControl>L-Strg</KeyLeftControl>
+	<KeyLeftCommand>L-Cmd</KeyLeftCommand>
+	<KeyLeftWindows>L-Win</KeyLeftWindows>
+	<KeyRightShift>R-Umschalt</KeyRightShift>
+	<KeyRightAlt>R-Alt</KeyRightAlt>
+	<KeyRightControl>R-Strg</KeyRightControl>
+	<KeyRightCommand>R-Cmd</KeyRightCommand>
+	<KeyRightWindows>R-Win</KeyRightWindows>
 </LanguageData>
