@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -382,6 +383,68 @@ namespace CameraPlus
 
 				yield return instruction;
 			}
+		}
+	}
+
+	[HarmonyPatch]
+	static class SaveOurShip2BackgroundPatch
+	{
+		public static bool Prepare() => TargetMethod() != null;
+		public static MethodBase TargetMethod() { return AccessTools.Method("SaveOurShip2.MeshRecalculateHelper:RecalculateMesh"); }
+		public static readonly MethodInfo mCenter = AccessTools.PropertyGetter(AccessTools.TypeByName("SaveOurShip2.SectionThreadManager"), "Center");
+
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			var state = 0;
+			foreach (var code in instructions)
+			{
+				switch (state)
+				{
+					case 0:
+						if (code.opcode == OpCodes.Ldsflda && code.operand is MethodInfo method && method == mCenter)
+							state = 1;
+						break;
+					case 1:
+						if (code.opcode == OpCodes.Sub)
+							state = 2;
+						break;
+					case 2:
+						state = 3;
+						break;
+					case 3:
+						yield return new CodeInstruction(OpCodes.Ldc_R4, 4f);
+						yield return new CodeInstruction(OpCodes.Mul);
+						state = 0;
+						break;
+				}
+				yield return code;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(Map))]
+	[HarmonyPatch(nameof(Map.MapUpdate))]
+	static class Map_MapUpdate_Patch
+	{
+		static bool done = false;
+		static void FixSoSMaterial()
+		{
+			done = true;
+			var type = AccessTools.TypeByName("SaveOurShip2.RenderPlanetBehindMap");
+			if (type != null)
+			{
+				var mat = Traverse.Create(type).Field("PlanetMaterial").GetValue<Material>();
+				mat.mainTextureOffset = new Vector2(0.3f, 0.3f);
+				mat.mainTextureScale = new Vector2(0.4f, 0.4f);
+			}
+		}
+
+		static void Postfix(Map __instance)
+		{
+			if (done) return;
+			if (WorldRendererUtility.WorldRenderedNow) return;
+			if (Find.CurrentMap != __instance) return;
+			FixSoSMaterial();
 		}
 	}
 
