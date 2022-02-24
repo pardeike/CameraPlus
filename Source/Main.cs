@@ -282,21 +282,25 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
-		public static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
-		{
-			// these values are from vanilla
-			// we remap them to the range 30 - 60
-			var sizes = new[] { 12f, 13.8f, 42f, 57f }
+		// these values are from vanilla
+		// we remap them to the range 30 - 60
+		static readonly float[] sizes = new[] { 12f, 13.8f, 42f, 57f }
 				.Select(f => Tools.LerpDoubleSafe(12, 57, 30, 60, f))
 				.ToArray();
 
-			__result = CameraZoomRange.Furthest;
-			for (var i = 0; i < 4; i++)
-				if (Tools.LerpRootSize(___rootSize) < sizes[i])
-				{
-					__result = (CameraZoomRange)i;
-					break;
-				}
+		public static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
+		{
+			var lerped = Tools.LerpRootSize(___rootSize);
+			if (lerped < sizes[0])
+				__result = CameraZoomRange.Closest;
+			else if (lerped < sizes[1])
+				__result = CameraZoomRange.Close;
+			else if (lerped < sizes[2])
+				__result = CameraZoomRange.Middle;
+			else if (lerped < sizes[3])
+				__result = CameraZoomRange.Far;
+			else
+				__result = CameraZoomRange.Furthest;
 			return false;
 		}
 	}
