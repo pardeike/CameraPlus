@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Brrainz;
+using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -30,6 +31,8 @@ namespace CameraPlus
 
 			var harmony = new Harmony("net.pardeike.rimworld.mod.camera+");
 			harmony.PatchAll();
+
+			CrossPromotion.Install(76561197973010050);
 		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
