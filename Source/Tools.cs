@@ -35,10 +35,10 @@ namespace CameraPlus
 			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return false;
 
-			if (MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
 				return false;
 
-			var len = UI.CurUICellSize();
+			var len = FastUI.CurUICellSize;
 			var isSmall = len <= CameraPlusMain.Settings.dotSize;
 			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
@@ -51,10 +51,10 @@ namespace CameraPlus
 
 			var isPawn = thing is Pawn;
 
-			if (MouseDistanceSquared(thing?.DrawPos ?? screenPos, isPawn) <= 2.25f && CameraPlusMain.Settings.mouseOverShowsLabels)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(thing?.DrawPos ?? screenPos, isPawn) <= 2.25f)
 				return true;
 
-			var len = UI.CurUICellSize();
+			var len = FastUI.CurUICellSize;
 
 			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
 			if (len <= lower)
@@ -151,21 +151,23 @@ namespace CameraPlus
 
 		public static float MouseDistanceSquared(Vector3 pos, bool mapCoordinates)
 		{
-			var mouse = UI.MouseMapPosition();
 			if (mapCoordinates)
 			{
+				var mouse = FastUI.MouseMapPosition;
 				var dx1 = (mouse.x - pos.x);
 				var dz = (mouse.z - pos.z);
 				return dx1 * dx1 + dz * dz;
 			}
-
-			mouse = UI.MapToUIPosition(mouse);
-			var len = UI.CurUICellSize();
-			mouse.y += len / 2;
-			var dx2 = (mouse.x - pos.x);
-			var dy = (mouse.y - pos.y);
-			var delta = dx2 * dx2 + dy * dy;
-			return delta / len / len;
+			else
+			{
+				var mouse = FastUI.MousePositionOnUIInverted;
+				var len = FastUI.CurUICellSize;
+				mouse.y += len / 2;
+				var dx2 = (mouse.x - pos.x);
+				var dy = (mouse.y - pos.y);
+				var delta = dx2 * dx2 + dy * dy;
+				return delta / len / len;
+			}
 		}
 
 		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();
