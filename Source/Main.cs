@@ -69,10 +69,10 @@ namespace CameraPlus
 			}
 
 			driver.ApplyPositionToGameObject();
-			var oldMousePos = UI.MouseMapPosition();
+			var oldMousePos = FastUI.MouseMapPosition;
 			driver.rootSize = rootSize;
 			driver.ApplyPositionToGameObject();
-			driver.rootPos += oldMousePos - UI.MouseMapPosition();
+			driver.rootPos += oldMousePos - FastUI.MouseMapPosition;
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
