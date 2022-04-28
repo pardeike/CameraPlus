@@ -307,6 +307,7 @@ namespace CameraPlus
 			{
 				// cannot be more optimized because the enum has multiple equal values
 				//
+				KeyCode.None => "None".Translate(),
 				KeyCode.LeftShift => "KeyLeftShift".Translate(),
 				KeyCode.LeftAlt => "KeyLeftAlt".Translate(),
 				KeyCode.LeftControl => "KeyLeftControl".Translate(),

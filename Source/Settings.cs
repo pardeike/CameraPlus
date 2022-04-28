@@ -143,7 +143,7 @@ namespace CameraPlus
 			list.Gap(12f);
 
 			_ = list.Label("Exponentiality".Translate());
-			if (list.RadioButton("Off", exponentiality == 0, 8f)) exponentiality = 0;
+			if (list.RadioButton("Off".Translate(), exponentiality == 0, 8f)) exponentiality = 0;
 			for (var i = 1; i <= 3; i++)
 				if (list.RadioButton(i + "x", exponentiality == i, 8f)) exponentiality = i;
 
