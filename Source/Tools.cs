@@ -294,7 +294,7 @@ namespace CameraPlus
 
 		public static float GetDollySpeedDecay(float orthSize)
 		{
-			// TODO: 0.15f comes from the old zoomedInDollyFrictionPercent/zoomedOutDollyFrictionPercent
+			// 0.15f comes from the old zoomedInDollyFrictionPercent/zoomedOutDollyFrictionPercent
 			//
 			var minVal = 1f - 0.15f;
 			var maxVal = 1f - 0.15f;
@@ -322,28 +322,45 @@ namespace CameraPlus
 			};
 		}
 
-		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, Action<KeyCode> action)
+		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, KeyCode defaultKey, Action<KeyCode> action)
 		{
-			static List<KeyCode> AllWithNoneFirst()
+			if (allKeys)
 			{
-				return Enum.GetValues(typeof(KeyCode))
-					.Cast<KeyCode>()
-					.Where(code => code != KeyCode.None && code < KeyCode.JoystickButton0)
-					.ToList();
+				TooltipHandler.TipRegionByKey(rect, "BindingButtonToolTip");
+				if (Widgets.ButtonText(rect, setting == KeyCode.None ? "" : ToLabel(setting)))
+				{
+					if (Event.current.button == 0)
+					{
+						Find.WindowStack.Add(new Dialog_AskForKey(action));
+						Event.current.Use();
+						return;
+					}
+					if (Event.current.button == 1)
+					{
+						List<FloatMenuOption> list = new List<FloatMenuOption>
+						{
+							new FloatMenuOption("ResetBinding".Translate(), () => action(defaultKey), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
+							new FloatMenuOption("ClearBinding".Translate(), () => action(KeyCode.None), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)
+						};
+						Find.WindowStack.Add(new FloatMenu(list));
+					}
+				}
+				return;
 			}
 
 			if (Widgets.ButtonText(rect, setting == KeyCode.None ? "" : ToLabel(setting)))
 			{
-				var keys = allKeys ? AllWithNoneFirst() : new List<KeyCode>()
+				var keys = new List<KeyCode>()
 				{
+					KeyCode.None,
 					KeyCode.LeftShift, KeyCode.LeftAlt, KeyCode.LeftControl, KeyCode.LeftCommand, KeyCode.LeftWindows,
 					KeyCode.RightShift, KeyCode.RightAlt, KeyCode.RightControl, KeyCode.RightCommand, KeyCode.RightWindows,
 				};
-				keys.Insert(0, KeyCode.None);
 				var choices = keys
 					.Select(code => new FloatMenuOption(ToLabel(code), delegate () { action(code); }, MenuOptionPriority.Default, null, null, 0f, null, null))
 					.ToList();
 				Find.WindowStack.Add(new FloatMenu(choices));
+				Event.current.Use();
 			}
 		}
 

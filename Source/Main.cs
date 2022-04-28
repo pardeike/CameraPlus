@@ -17,11 +17,6 @@ namespace CameraPlus
 		public static CameraPlusSettings Settings;
 		public static float orthographicSize = -1f;
 
-		//public static float nMinusCameraScale;
-		//public static float viewActivityLevel;
-		//public static float viewDollyLevel;
-		//public static float previousTickRateMultiplier;
-
 		// for other mods: set temporarily to true to skip any hiding
 		public static bool skipCustomRendering = false;
 
@@ -72,7 +67,13 @@ namespace CameraPlus
 			var oldMousePos = FastUI.MouseMapPosition;
 			driver.rootSize = rootSize;
 			driver.ApplyPositionToGameObject();
-			driver.rootPos += oldMousePos - UI.MouseMapPosition()/*FastUI.MouseMapPosition*/;
+			driver.rootPos += oldMousePos - UI.MouseMapPosition(); // dont use FastUI.MouseMapPosition here
+		}
+
+		static void Prefix(CameraDriver __instance)
+		{
+			if (CameraPlusMain.Settings.disableCameraShake)
+				__instance.shaker.curShakeMag = 0;
 		}
 
 		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -110,9 +111,6 @@ namespace CameraPlus
 		{
 			if (CameraPlusMain.orthographicSize != -1f)
 				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
-
-			//if (CameraPlusMain.Settings.dynamicSpeedControl)
-			//	CameraPlusMain.viewDollyLevel = __result.magnitude;
 		}
 	}
 
@@ -131,7 +129,6 @@ namespace CameraPlus
 			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
 				return true;
 
-			// show if mouse is nearby
 			if (CameraPlusMain.Settings.mouseOverShowsLabels)
 				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
 
@@ -285,8 +282,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
-		// these values are from vanilla
-		// we remap them to the range 30 - 60
+		// these values are from vanilla. we remap them to the range 30 - 60
 		static readonly float[] sizes = new[] { 12f, 13.8f, 42f, 57f }
 				.Select(f => Tools.LerpDoubleSafe(12, 57, 30, 60, f))
 				.ToArray();
@@ -454,87 +450,4 @@ namespace CameraPlus
 			FixSoSMaterial();
 		}
 	}
-
-	/*[HarmonyPatch(typeof(TickManager), nameof(TickManager.TickRateMultiplier), MethodType.Getter)]
-	static class TickManager_TickRateMultiplier_Patch
-	{
-		static void Postfix(ref float __result, TickManager __instance)
-		{
-			if (CameraPlusMain.Settings.dynamicSpeedControl == false)
-				return;
-
-			var gameSpeed = __instance.CurTimeSpeed;
-			if (gameSpeed == TimeSpeed.Paused)
-				return;
-
-			var rootSize = Refs.rootSize(Find.CameraDriver);
-
-			var deltaTime = Time.deltaTime;
-			if (Mathf.Abs(rootSize - CameraPlusMain.nMinusCameraScale) > 0.001f)
-			{
-				CameraPlusMain.nMinusCameraScale = rootSize;
-				CameraPlusMain.viewActivityLevel = 2 * rootSize;
-				deltaTime *= 10;
-			}
-
-			if (CameraPlusMain.viewActivityLevel + CameraPlusMain.viewDollyLevel > 5f)
-			{
-				switch (gameSpeed)
-				{
-					case TimeSpeed.Normal:
-						__result = 1.0f;
-						break;
-					case TimeSpeed.Fast:
-						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 0.5f * deltaTime, CameraPlusMain.Settings.speedControlLimits[0]);
-						break;
-					case TimeSpeed.Superfast:
-						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 1.25f * deltaTime, CameraPlusMain.Settings.speedControlLimits[1]);
-						break;
-					case TimeSpeed.Ultrafast:
-						__result = Mathf.Max(CameraPlusMain.previousTickRateMultiplier - 4.5f * deltaTime, CameraPlusMain.Settings.speedControlLimits[2]);
-						break;
-				}
-			}
-			else
-				__result = Mathf.Min(CameraPlusMain.previousTickRateMultiplier + CameraPlusMain.Settings.speedGain * deltaTime, __result);
-
-			CameraPlusMain.previousTickRateMultiplier = __result;
-		}
-	}*/
-
-	/*[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CameraDriverOnGUI))]
-	static class CameraDriver_CameraDriverOnGUI_Patch
-	{
-		static void Postfix(CameraDriver __instance)
-		{
-			if (CameraPlusMain.Settings.dynamicSpeedControl == false)
-				return;
-
-			if (Find.TickManager.Paused || Find.TickManager.NotPlaying)
-				return;
-
-			CameraPlusMain.viewActivityLevel = 0f;
-			if (KeyBindingDefOf.MapDolly_Left.IsDown || KeyBindingDefOf.MapDolly_Up.IsDown || KeyBindingDefOf.MapDolly_Right.IsDown || KeyBindingDefOf.MapDolly_Down.IsDown)
-			{
-				switch (__instance.CurrentZoom)
-				{
-					case CameraZoomRange.Furthest:
-						CameraPlusMain.viewActivityLevel = 150f;
-						break;
-					case CameraZoomRange.Far:
-						CameraPlusMain.viewActivityLevel = 80f;
-						break;
-					case CameraZoomRange.Middle:
-						CameraPlusMain.viewActivityLevel = 40f;
-						break;
-					case CameraZoomRange.Close:
-						CameraPlusMain.viewActivityLevel = 5f;
-						break;
-					case CameraZoomRange.Closest:
-						CameraPlusMain.viewActivityLevel = 1f;
-						break;
-				}
-			}
-		}
-	}*/
 }

@@ -3,7 +3,7 @@
 	<friendlyNameNative>Deutsch</friendlyNameNative>
 	<friendlyNameEnglish>German</friendlyNameEnglish>
 	<canBeTiny>true</canBeTiny>
-	<languageWorkerClass>LanguageWorker_Default</languageWorkerClass>
+	<languageWorkerClass>LanguageWorker_German</languageWorkerClass>
 	<credits>
 		<li Class="CreditRecord_Role">
 			<roleKey>Credit_Translator</roleKey>

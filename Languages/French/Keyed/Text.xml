@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 	<Zoom>Zoom</Zoom>
-	<Near>Près</Near>
-	<Far>Loin</Far>
 	<ZoomedInPercent>Facteur de zoom maximal</ZoomedInPercent>
 	<ZoomedOutPercent>Facteur de zoom arrière maximal</ZoomedOutPercent>
+	<ForZoomedInPercent>Pour le facteur de zoom le plus élevé</ForZoomedInPercent>
+	<ForZoomedOutPercent>Pour le facteur de zoom le plus bas</ForZoomedOutPercent>
 	<Exponentiality>Mise à l'échelle exponentielle:</Exponentiality>
 	<SoundNearness>Rapprocher les sons proches</SoundNearness>
 	<HotKeys>Raccourcis clavier:</HotKeys>
@@ -23,6 +23,7 @@
 	<HideAnimals>Les animaux n'ont pas de marqueur</HideAnimals>
 	<IncludeNotTamedAnimals>Inclure les animaux sauvages</IncludeNotTamedAnimals>
 	<ZoomToMouse>Zoom sur la souris</ZoomToMouse>
+	<DisableCameraShake>Désactiver la caméra secouer</DisableCameraShake>
 	<MouseRevealsLabels>La souris révèle les étiquettes</MouseRevealsLabels>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
