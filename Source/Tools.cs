@@ -116,7 +116,8 @@ namespace CameraPlus
 			if (cachedMainColors.TryGetValue(key, out var color) == false)
 			{
 				var material = graphic.MatEast;
-				if (material == null) material = graphic.MatSingle;
+				if (material == null)
+					material = graphic.MatSingle;
 				if (material == null)
 				{
 					cachedMainColors[key] = Color.gray;
@@ -253,7 +254,8 @@ namespace CameraPlus
 
 		public static float LerpDoubleSafe(float inFrom, float inTo, float outFrom, float outTo, float x)
 		{
-			if (inFrom == inTo) return (outFrom + outTo) / 2;
+			if (inFrom == inTo)
+				return (outFrom + outTo) / 2;
 			return GenMath.LerpDouble(inFrom, inTo, outFrom, outTo, x);
 		}
 
@@ -385,9 +387,8 @@ namespace CameraPlus
 						var stack = Find.WindowStack;
 						if (stack.IsOpen<Dialog_ModSettings>() == false)
 						{
-							var dialog = new Dialog_ModSettings();
 							var me = LoadedModManager.GetMod<CameraPlusMain>();
-							dialog.selMod = me;
+							var dialog = new Dialog_ModSettings(me);
 							stack.Add(dialog);
 						}
 						Event.current.Use();
