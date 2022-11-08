@@ -9,9 +9,17 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace CameraPlus
 {
+	[DefOf]
+	public static class Defs
+	{
+		public static SoundDef SnapBack;
+		public static SoundDef ApplySnap;
+	}
+	
 	public class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
@@ -70,13 +78,13 @@ namespace CameraPlus
 			driver.rootPos += oldMousePos - UI.MouseMapPosition(); // dont use FastUI.MouseMapPosition here
 		}
 
-		static void Prefix(CameraDriver __instance)
+		public static void Prefix(CameraDriver __instance)
 		{
 			if (CameraPlusMain.Settings.disableCameraShake)
 				__instance.shaker.curShakeMag = 0;
 		}
 
-		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			var found = false;
 			foreach (var instruction in instructions)
@@ -98,7 +106,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
 	static class TimeControls_DoTimeControlsGUI_Patch
 	{
-		static void Prefix()
+		public static void Prefix()
 		{
 			Tools.HandleHotkeys();
 		}
@@ -107,7 +115,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CalculateCurInputDollyVect))]
 	static class CameraDriver_CalculateCurInputDollyVect_Patch
 	{
-		static void Postfix(ref Vector2 __result)
+		public static void Postfix(ref Vector2 __result)
 		{
 			if (CameraPlusMain.orthographicSize != -1f)
 				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
@@ -118,7 +126,7 @@ namespace CameraPlus
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
 	static class MoteMaker_ThrowText_Patch
 	{
-		static bool Prefix(Vector3 loc)
+		public static bool Prefix(Vector3 loc)
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
@@ -141,7 +149,7 @@ namespace CameraPlus
 	static class PawnRenderer_RenderPawnAt_Patch
 	{
 		[HarmonyPriority(10000)]
-		static bool Prefix(Pawn ___pawn)
+		public static bool Prefix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
@@ -150,7 +158,7 @@ namespace CameraPlus
 		}
 
 		[HarmonyPriority(10000)]
-		static void Postfix(Pawn ___pawn)
+		public static void Postfix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut && CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals)
 				_ = Tools.GetMainColor(___pawn); // trigger caching
@@ -259,7 +267,7 @@ namespace CameraPlus
 
 		// we replace the first "GameFont.Tiny" with "GetAdaptedGameFont()"
 		//
-		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			var firstInstruction = true;
 			foreach (var instruction in instructions)
@@ -328,7 +336,7 @@ namespace CameraPlus
 			CameraPlusMain.orthographicSize = orthSize;
 		}
 
-		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			foreach (var instruction in instructions)
 				if (instruction.opcode != OpCodes.Ret)
@@ -442,12 +450,103 @@ namespace CameraPlus
 			}
 		}
 
-		static void Postfix(Map __instance)
+		public static void Postfix(Map __instance)
 		{
-			if (done) return;
-			if (WorldRendererUtility.WorldRenderedNow) return;
-			if (Find.CurrentMap != __instance) return;
+			if (done)
+				return;
+			if (WorldRendererUtility.WorldRenderedNow)
+				return;
+			if (Find.CurrentMap != __instance)
+				return;
 			FixSoSMaterial();
+		}
+	}
+	
+	[HarmonyPatch(typeof(KeyBindingDef))]
+	[HarmonyPatch(nameof(KeyBindingDef.KeyDownEvent))]
+	[HarmonyPatch(MethodType.Getter)]
+	static class KeyBindingDef_KeyDownEvent_Patch
+	{
+		static bool wasDown = false;
+
+		public static void CheckForTogglePauseUp()
+		{
+			if (Event.current.type == EventType.KeyUp && KeyBindingDefOf.TogglePause.IsDown == false)
+				wasDown = false;
+		}	
+
+		public static bool Prefix(KeyBindingDef __instance, ref bool __result)
+		{
+			if (__instance != KeyBindingDefOf.TogglePause)
+				return true;
+
+			if (__instance.IsDown && wasDown == false)
+			{
+				wasDown = true;
+				__result = true;
+			}
+			return false;
+		}
+	}
+
+	[HarmonyPatch(typeof(Game))]
+	[HarmonyPatch(nameof(Game.UpdatePlay))]
+	static class Game_UpdatePlay_Patch
+	{
+		static DateTime lastChange = DateTime.MinValue;
+		static bool eventFired = false;
+
+		public static void Postfix()
+		{
+			KeyBindingDef_KeyDownEvent_Patch.CheckForTogglePauseUp();
+
+			if (Tools.HasSnapback && Find.TickManager.Paused == false)
+				Tools.RestoreSnapback();
+
+			if (KeyBindingDefOf.TogglePause.IsDown && Find.TickManager.Paused)
+			{
+				var now = DateTime.Now;
+				if (lastChange == DateTime.MinValue)
+					lastChange = now;
+				else if (eventFired == false && now.Subtract(lastChange).TotalSeconds > 1)
+				{
+					Tools.CreateSnapback();
+					eventFired = true;
+				}
+			}
+			else
+			{
+				lastChange = DateTime.MinValue;
+				eventFired = false;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(TickManager))]
+	[HarmonyPatch(nameof(TickManager.TogglePaused))]
+	static class TickManager_TogglePaused_Patch
+	{
+		public static void Postfix(TickManager __instance)
+		{
+			if (Tools.HasSnapback && __instance.Paused == false)
+				Tools.RestoreSnapback();
+		}
+	}
+
+	[HarmonyPatch(typeof(UIRoot_Play))]
+	[HarmonyPatch(nameof(UIRoot_Play.UIRootOnGUI))]
+	static class UIRoot_Play_UIRootOnGUI_Patch
+	{
+		public static void Postfix()
+		{
+			if (Tools.HasSnapback == false)
+				return;
+
+			var rect = new Rect(0, 0, UI.screenWidth, UI.screenHeight);
+			var color = GUI.color;
+			GUI.color = new Color(0, 0, 0, 0.5f);
+			Widgets.DrawBox(rect, 20);
+			GUI.color = color;
 		}
 	}
 }

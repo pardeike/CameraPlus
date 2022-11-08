@@ -1,9 +1,13 @@
 ﻿using RimWorld;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using Verse;
+using Verse.Noise;
+using Verse.Sound;
 
 namespace CameraPlus
 {
@@ -364,6 +368,38 @@ namespace CameraPlus
 				Find.WindowStack.Add(new FloatMenu(choices));
 				Event.current.Use();
 			}
+		}
+
+		static Vector3 snapbackRootPos;
+		static float snapbackRootSize = 0;
+		
+		public static void CreateSnapback()
+		{
+			Defs.SnapBack.PlayOneShotOnCamera(null);
+			var cameraDriver = Find.CameraDriver;
+			snapbackRootPos = cameraDriver.rootPos;
+			snapbackRootSize = cameraDriver.rootSize;
+		}
+
+		public static bool HasSnapback => snapbackRootSize != 0;
+
+		public static void RestoreSnapback()
+		{
+			var tm = Find.TickManager;
+			var savedSpeed = tm.curTimeSpeed;
+
+			IEnumerator ApplyRootPosAndSize()
+			{
+				yield return new WaitForSeconds(0.35f);
+				Find.CameraDriver.SetRootPosAndSize(snapbackRootPos, snapbackRootSize);
+				snapbackRootPos = default;
+				snapbackRootSize = default;
+				tm.curTimeSpeed = savedSpeed;
+			}
+
+			tm.curTimeSpeed = TimeSpeed.Paused;
+			Defs.ApplySnap.PlayOneShotOnCamera(null);
+			_ = Find.CameraDriver.StartCoroutine(ApplyRootPosAndSize());
 		}
 
 		public static void HandleHotkeys()
