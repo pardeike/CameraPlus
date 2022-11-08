@@ -383,6 +383,12 @@ namespace CameraPlus
 
 		public static bool HasSnapback => snapbackRootSize != 0;
 
+		public static void ResetSnapback()
+		{
+			snapbackRootPos = default;
+			snapbackRootSize = default;
+		}
+
 		public static void RestoreSnapback()
 		{
 			var tm = Find.TickManager;
@@ -392,8 +398,7 @@ namespace CameraPlus
 			{
 				yield return new WaitForSeconds(0.35f);
 				Find.CameraDriver.SetRootPosAndSize(snapbackRootPos, snapbackRootSize);
-				snapbackRootPos = default;
-				snapbackRootSize = default;
+				ResetSnapback();
 				tm.curTimeSpeed = savedSpeed;
 			}
 

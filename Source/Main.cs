@@ -533,6 +533,16 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(MainTabWindow_Menu))]
+	[HarmonyPatch(nameof(MainTabWindow_Menu.PreOpen))]
+	static class MainTabWindow_Menu_PreOpen_Patch
+	{
+		public static void Postfix()
+		{
+			Tools.ResetSnapback();
+		}
+	}
+
 	[HarmonyPatch(typeof(UIRoot_Play))]
 	[HarmonyPatch(nameof(UIRoot_Play.UIRootOnGUI))]
 	static class UIRoot_Play_UIRootOnGUI_Patch
