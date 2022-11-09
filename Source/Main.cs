@@ -71,11 +71,14 @@ namespace CameraPlus
 				return;
 			}
 
-			driver.ApplyPositionToGameObject();
-			var oldMousePos = FastUI.MouseMapPosition;
-			driver.rootSize = rootSize;
-			driver.ApplyPositionToGameObject();
-			driver.rootPos += oldMousePos - UI.MouseMapPosition(); // dont use FastUI.MouseMapPosition here
+			if (driver.rootSize != rootSize)
+			{
+				driver.ApplyPositionToGameObject();
+				var oldMousePos = FastUI.MouseMapPosition;
+				driver.rootSize = rootSize;
+				driver.ApplyPositionToGameObject();
+				driver.rootPos += oldMousePos - UI.MouseMapPosition(); // dont use FastUI.MouseMapPosition here
+			}
 		}
 
 		public static void Prefix(CameraDriver __instance)
@@ -251,8 +254,10 @@ namespace CameraPlus
 
 		static GameFont GetAdaptedGameFont(float rootSize)
 		{
-			if (rootSize < 11f) return GameFont.Medium;
-			if (rootSize < 15f) return GameFont.Small;
+			if (rootSize < 11f)
+				return GameFont.Medium;
+			if (rootSize < 15f)
+				return GameFont.Small;
 			return GameFont.Tiny;
 		}
 
