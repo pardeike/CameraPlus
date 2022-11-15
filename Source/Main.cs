@@ -473,12 +473,15 @@ namespace CameraPlus
 	static class KeyBindingDef_KeyDownEvent_Patch
 	{
 		static bool wasDown = false;
+		static bool downInsideTick = false;
 
-		public static void CheckForTogglePauseUp()
+		public static void CleanupAtEndOfFrame()
 		{
 			if (Event.current.type == EventType.KeyUp && KeyBindingDefOf.TogglePause.IsDown == false)
 				wasDown = false;
-		}	
+
+			downInsideTick = false;
+		}
 
 		public static bool Prefix(KeyBindingDef __instance, ref bool __result)
 		{
@@ -488,9 +491,21 @@ namespace CameraPlus
 			if (__instance.IsDown && wasDown == false)
 			{
 				wasDown = true;
-				__result = true;
+				downInsideTick = true;
 			}
+
+			__result = downInsideTick;
 			return false;
+		}
+	}
+
+	[HarmonyPatch(typeof(Root))]
+	[HarmonyPatch(nameof(Root.OnGUI))]
+	static class Root_OnGUI_Patch
+	{
+		public static void Postfix()
+		{
+			KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
 		}
 	}
 
@@ -503,8 +518,6 @@ namespace CameraPlus
 
 		public static void Postfix()
 		{
-			KeyBindingDef_KeyDownEvent_Patch.CheckForTogglePauseUp();
-
 			if (Tools.HasSnapback && Find.TickManager.Paused == false)
 				Tools.RestoreSnapback();
 
