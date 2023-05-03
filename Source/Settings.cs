@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -123,9 +122,9 @@ namespace CameraPlus
 			minRootResult = zoomedInPercent * 2;
 			if (previous != zoomedInPercent && map != null)
 			{
-				var val = Traverse.Create(Find.CameraDriver).Field("rootSize").GetValue<float>();
+				var val = Current.cameraDriverInt.rootSize;
 				if (val != minRootInput)
-					Find.CameraDriver.SetRootPosAndSize(map.rememberedCameraPos.rootPos, minRootInput);
+					Current.cameraDriverInt.SetRootPosAndSize(map.rememberedCameraPos.rootPos, minRootInput);
 			}
 
 			previous = zoomedOutPercent;
@@ -134,9 +133,9 @@ namespace CameraPlus
 			maxRootResult = zoomedOutPercent * 2;
 			if (previous != zoomedOutPercent && map != null)
 			{
-				var val = Traverse.Create(Find.CameraDriver).Field("rootSize").GetValue<float>();
+				var val = Current.cameraDriverInt.rootSize;
 				if (val != maxRootInput)
-					Find.CameraDriver.SetRootPosAndSize(map.rememberedCameraPos.rootPos, maxRootInput);
+					Current.cameraDriverInt.SetRootPosAndSize(map.rememberedCameraPos.rootPos, maxRootInput);
 			}
 
 			list.Gap(12f);

@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
-using Verse.Sound;
 
 namespace CameraPlus
 {
@@ -134,13 +133,15 @@ namespace CameraPlus
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
 
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+			var settings = CameraPlusMain.Settings;
+
+			if (settings.hideNamesWhenZoomedOut == false)
 				return true;
 
-			if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
+			if (Current.cameraDriverInt.CurrentZoom == CameraZoomRange.Closest)
 				return true;
 
-			if (CameraPlusMain.Settings.mouseOverShowsLabels)
+			if (settings.mouseOverShowsLabels)
 				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
 
 			return false;
@@ -299,17 +300,18 @@ namespace CameraPlus
 		static readonly float[] sizes = new[] { 12f, 13.8f, 42f, 57f }
 				.Select(f => Tools.LerpDoubleSafe(12, 57, 30, 60, f))
 				.ToArray();
+		static readonly float size0 = sizes[0], size1 = sizes[1], size2 = sizes[2], size3 = sizes[3];
 
 		public static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
 		{
 			var lerped = Tools.LerpRootSize(___rootSize);
-			if (lerped < sizes[0])
+			if (lerped < size0)
 				__result = CameraZoomRange.Closest;
-			else if (lerped < sizes[1])
+			else if (lerped < size1)
 				__result = CameraZoomRange.Close;
-			else if (lerped < sizes[2])
+			else if (lerped < size2)
 				__result = CameraZoomRange.Middle;
-			else if (lerped < sizes[3])
+			else if (lerped < size3)
 				__result = CameraZoomRange.Far;
 			else
 				__result = CameraZoomRange.Furthest;
@@ -443,16 +445,25 @@ namespace CameraPlus
 	static class Map_MapUpdate_Patch
 	{
 		static bool done = false;
+
+		public static bool Prepare() => ModLister.HasActiveModWithName("Save Our Ship 2");
+
+		static FieldInfo PlanetMaterialField(string typeName)
+		{
+			var type = AccessTools.TypeByName($"SaveOurShip2.{typeName}");
+			if (type == null) return null;
+			return AccessTools.Field(type, "PlanetMaterial");
+		}
+
 		static void FixSoSMaterial()
 		{
 			done = true;
-			var type = AccessTools.TypeByName("SaveOurShip2.RenderPlanetBehindMap");
-			if (type != null)
-			{
-				var mat = Traverse.Create(type).Field("PlanetMaterial").GetValue<Material>();
-				mat.mainTextureOffset = new Vector2(0.3f, 0.3f);
-				mat.mainTextureScale = new Vector2(0.4f, 0.4f);
-			}
+			var fPlanetMaterial = PlanetMaterialField("RenderPlanetBehindMap") ?? PlanetMaterialField("ResourceBank");
+			if (fPlanetMaterial == null) return;
+			var mat = fPlanetMaterial.GetValue(null) as Material;
+			if (mat == null) return;
+			mat.mainTextureOffset = new Vector2(0.3f, 0.3f);
+			mat.mainTextureScale = new Vector2(0.4f, 0.4f);
 		}
 
 		public static void Postfix(Map __instance)
@@ -518,10 +529,10 @@ namespace CameraPlus
 
 		public static void Postfix()
 		{
-			if (Tools.HasSnapback && Find.TickManager.Paused == false)
+			if (Tools.HasSnapback && Current.gameInt.tickManager.Paused == false)
 				Tools.RestoreSnapback();
 
-			if (KeyBindingDefOf.TogglePause.IsDown && Find.TickManager.Paused)
+			if (KeyBindingDefOf.TogglePause.IsDown && Current.gameInt.tickManager.Paused)
 			{
 				var now = DateTime.Now;
 				if (lastChange == DateTime.MinValue)
@@ -567,6 +578,8 @@ namespace CameraPlus
 	{
 		public static void Postfix()
 		{
+			KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
+
 			if (Tools.HasSnapback == false)
 				return;
 
