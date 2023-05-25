@@ -133,8 +133,8 @@ public static class ProminentColor
 
 	static double GetColorSaturation(ref Color32 color)
 	{
-		int max = Mathf.Max(color.r, Mathf.Max(color.g, color.b));
-		int min = Mathf.Min(color.r, Mathf.Min(color.g, color.b));
+		var max = Mathf.Max(color.r, Mathf.Max(color.g, color.b));
+		var min = Mathf.Min(color.r, Mathf.Min(color.g, color.b));
 		return (max == 0) ? 0 : 1d - (1d * min / max);
 	}
 }

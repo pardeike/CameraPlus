@@ -119,9 +119,7 @@ namespace CameraPlus
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (cachedMainColors.TryGetValue(key, out var color) == false)
 			{
-				var material = graphic.MatEast;
-				if (material == null)
-					material = graphic.MatSingle;
+				var material = graphic.MatEast ?? graphic.MatSingle;
 				if (material == null)
 				{
 					cachedMainColors[key] = Color.gray;
@@ -343,7 +341,7 @@ namespace CameraPlus
 					}
 					if (Event.current.button == 1)
 					{
-						List<FloatMenuOption> list = new List<FloatMenuOption>
+						var list = new List<FloatMenuOption>
 						{
 							new FloatMenuOption("ResetBinding".Translate(), () => action(defaultKey), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
 							new FloatMenuOption("ClearBinding".Translate(), () => action(KeyCode.None), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)
