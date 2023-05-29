@@ -4,8 +4,8 @@
 		<ModName>Product</ModName>
 		<ModFileName>CameraPlus</ModFileName>
 		<Repository>https://github.com/pardeike/CameraPlus</Repository>
-		<ModVersion>2.5.2.4</ModVersion>
-		<ModFolders>About Assemblies Defs Languages Sounds Textures</ModFolders>
+		<ModVersion>2.6.0.0</ModVersion>
+		<ModFolders>About;Assemblies;Defs;Languages;Sounds;Textures</ModFolders>
 		<ProjectGuid>{AC5EE7A1-16EA-498D-B21A-83ACF78F0E5A}</ProjectGuid>
 	</PropertyGroup>
 

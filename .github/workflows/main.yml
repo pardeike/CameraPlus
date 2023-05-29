@@ -9,10 +9,10 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.5.2
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v3.2.0
         with:
           dotnet-version: 5.0.x
 
@@ -23,7 +23,7 @@ jobs:
         run: dotnet build
 
       - name: Run latest-tag
-        uses: EndBug/latest-tag@latest
+        uses: EndBug/latest-tag@1.5.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -31,13 +31,19 @@ jobs:
         id: tag
         run: git fetch --tags --force
 
-      - uses: ericcornelissen/git-tag-annotation-action@v2
+      - uses: ericcornelissen/git-tag-annotation-action@v2.0.6
         id: tag-data
 
       - name: Create GitHub release
-        uses: Roang-zero1/github-create-release-action@v3
+        uses: Roang-zero1/github-create-release-action@v3.0.1
         with:
           version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
           release_text: ${{ steps.tag-data.outputs.git-tag-annotation }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload
+        uses: djn24/add-asset-to-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: 'CameraPlus.zip'
