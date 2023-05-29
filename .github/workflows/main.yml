@@ -1,4 +1,4 @@
-name: Create release test01
+name: Create release test02
 on:
   push:
     tags:
@@ -31,7 +31,7 @@ jobs:
         id: tag
         run: git fetch --tags --force
 
-      - uses: ericcornelissen/git-tag-annotation-action@v3
+      - uses: ericcornelissen/git-tag-annotation-action@v2
         id: tag-data
 
       - name: Create GitHub release
