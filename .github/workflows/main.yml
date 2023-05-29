@@ -1,4 +1,4 @@
-name: Create release test05
+name: Create mod release
 on:
   push:
     tags:
