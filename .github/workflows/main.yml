@@ -1,4 +1,4 @@
-name: Create release if tag is pushed
+name: Create release test01
 on:
   push:
     tags:
