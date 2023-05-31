@@ -52,7 +52,10 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="MSBuildTasks" Version="1.5.0.235" />
+		<PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="TaskPubliciser" Version="1.0.3" />
 	</ItemGroup>
 
@@ -87,17 +90,13 @@
 		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
 	</Target>
 
-	<Target Name="CreateZipFile" AfterTargets="PostBuildAction">
+	<Target Name="CreateZipFile" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
 		<ItemGroup>
-			<FilesToCopy Include="$(ModFolders)"/>
+			<FilesToCopy Include="$(ModFolders)" />
 		</ItemGroup>
 		<Zip Files="@(FilesToCopy->'..\%(Filename)')" WorkingDirectory=".." ZipFileName="..\$(ModFileName).zip" Flatten="false" />
-	</Target>
-
-	<Target Name="InstallLocally" AfterTargets="CreateZipFile" Condition=" '$(RIMWORLD_MOD_DIR)' != '' ">
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-		<Copy SourceFiles="..\$(ModFileName).zip" DestinationFolder="$(RIMWORLD_MOD_DIR)" />
-		<Unzip ZipFileName="$(RIMWORLD_MOD_DIR)\$(ModFileName).zip" TargetDirectory="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
+		<Unzip ZipFileName="..\$(ModFileName).zip" TargetDirectory="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 	</Target>
 
 </Project>

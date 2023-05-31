@@ -41,9 +41,3 @@ jobs:
           release_text: ${{ steps.tag-data.outputs.git-tag-annotation }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload
-        uses: djn24/add-asset-to-release@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: 'CameraPlus.zip'
