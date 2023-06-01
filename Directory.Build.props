@@ -1,7 +1,7 @@
 <Project>
 
 	<PropertyGroup>
-		<ModName>Product</ModName>
+		<ModName>Camera+</ModName>
 		<ModFileName>CameraPlus</ModFileName>
 		<Repository>https://github.com/pardeike/CameraPlus</Repository>
 		<ModVersion>2.6.0.0</ModVersion>

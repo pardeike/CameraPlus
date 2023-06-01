@@ -240,6 +240,3 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-
-# zip releases
-*.zip

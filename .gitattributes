@@ -72,5 +72,4 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /*.sln export-ignore
-/*.zip export-ignore
 /Directory.Build.props export-ignore
