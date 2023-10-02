@@ -18,7 +18,7 @@ namespace CameraPlus
 		public static SoundDef SnapBack;
 		public static SoundDef ApplySnap;
 	}
-	
+
 	public class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
@@ -210,6 +210,20 @@ namespace CameraPlus
 				return false;
 			}
 			return Tools.CorrectLabelRendering(___pawn);
+		}
+	}
+	//
+	// Dubs Performance Analyzer patch on PawnUIOverlay.DrawPawnGUIOverlay needs to be turned off
+	//
+	[HarmonyPatch]
+	static class Analyzer_Fixes_H_DrawNamesFix_Prefix_Patch
+	{
+		public static bool Prepare() => TargetMethod() != null;
+		public static MethodInfo TargetMethod() => AccessTools.Method("Analyzer.Fixes.H_DrawNamesFix:Prefix");
+		public static bool Prefix(ref bool __result)
+		{
+			__result = true;
+			return false;
 		}
 	}
 
@@ -451,7 +465,8 @@ namespace CameraPlus
 		static FieldInfo PlanetMaterialField(string typeName)
 		{
 			var type = AccessTools.TypeByName($"SaveOurShip2.{typeName}");
-			if (type == null) return null;
+			if (type == null)
+				return null;
 			return AccessTools.Field(type, "PlanetMaterial");
 		}
 
@@ -459,9 +474,11 @@ namespace CameraPlus
 		{
 			done = true;
 			var fPlanetMaterial = PlanetMaterialField("RenderPlanetBehindMap") ?? PlanetMaterialField("ResourceBank");
-			if (fPlanetMaterial == null) return;
+			if (fPlanetMaterial == null)
+				return;
 			var mat = fPlanetMaterial.GetValue(null) as Material;
-			if (mat == null) return;
+			if (mat == null)
+				return;
 			mat.mainTextureOffset = new Vector2(0.3f, 0.3f);
 			mat.mainTextureScale = new Vector2(0.4f, 0.4f);
 		}
@@ -477,7 +494,7 @@ namespace CameraPlus
 			FixSoSMaterial();
 		}
 	}
-	
+
 	[HarmonyPatch(typeof(KeyBindingDef))]
 	[HarmonyPatch(nameof(KeyBindingDef.KeyDownEvent))]
 	[HarmonyPatch(MethodType.Getter)]

@@ -3,10 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 using Verse;
-using Verse.Noise;
 using Verse.Sound;
 
 namespace CameraPlus
@@ -370,7 +368,7 @@ namespace CameraPlus
 
 		static Vector3 snapbackRootPos;
 		static float snapbackRootSize = 0;
-		
+
 		public static void CreateSnapback()
 		{
 			Defs.SnapBack.PlayOneShotOnCamera(null);
