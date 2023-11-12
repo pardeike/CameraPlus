@@ -145,6 +145,7 @@ namespace CameraPlus
 				else
 					color = new Color(color32s[0].r / 255f, color32s[0].g / 255f, color32s[0].b / 255f);
 
+				UnityEngine.Object.Destroy(outputTexture);
 				cachedMainColors[key] = color;
 			}
 			return color;
@@ -405,7 +406,7 @@ namespace CameraPlus
 
 		public static void HandleHotkeys()
 		{
-			if (Event.current.type == EventType.Repaint)
+			if (Event.current.type == EventType.Repaint || Current.ProgramState != ProgramState.Playing)
 				return;
 
 			var settings = CameraPlusMain.Settings;

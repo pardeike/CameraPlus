@@ -505,6 +505,9 @@ namespace CameraPlus
 
 		public static void CleanupAtEndOfFrame()
 		{
+			if (Current.ProgramState != ProgramState.Playing)
+				return;
+
 			if (Event.current.type == EventType.KeyUp && KeyBindingDefOf.TogglePause.IsDown == false)
 				wasDown = false;
 
