@@ -276,8 +276,8 @@ namespace CameraPlus
 		public static float GetDollyRateKeys(float orthSize)
 		{
 			var f = GetScreenEdgeDollyFactor(orthSize);
-			var zoomedIn = orthSize * CameraPlusMain.Settings.zoomedInDollyPercent * 4 / f;
-			var zoomedOut = orthSize * CameraPlusMain.Settings.zoomedOutDollyPercent / f;
+			var zoomedIn = CameraPlusMain.Settings.zoomedInDollyPercent * f / 9f;
+			var zoomedOut = CameraPlusMain.Settings.zoomedOutDollyPercent * f * 1.1f;
 			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 

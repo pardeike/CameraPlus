@@ -222,8 +222,12 @@ namespace CameraPlus
 			list.Gap(12f);
 
 			_ = list.Label("ScreenEdgeDollyFrictionLabel".Translate());
-			list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 1f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(0.5 + zoomedInScreenEdgeDollyFactor, 1) + "x");
-			list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 1f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(0.5 + zoomedOutScreenEdgeDollyFactor, 1) + "x");
+			zoomedInScreenEdgeDollyFactor *= 2f;
+			zoomedOutScreenEdgeDollyFactor *= 2f;
+			list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x");
+			list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x");
+			zoomedInScreenEdgeDollyFactor /= 2f;
+			zoomedOutScreenEdgeDollyFactor /= 2f;
 
 			list.Gap(12f);
 
