@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -110,7 +111,7 @@ namespace CameraPlus
 			const int uniteColorsTolerance = 5;
 			const float minimiumColorPercentage = 10f;
 
-			var graphic = pawn.Drawer.renderer.graphics?.nakedGraphic;
+			var graphic = pawn.Drawer.renderer.BodyGraphic;
 			if (graphic == null)
 				return null;
 
