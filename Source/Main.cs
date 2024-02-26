@@ -297,7 +297,7 @@ namespace CameraPlus
 				if (firstInstruction && instruction.LoadsConstant(0))
 				{
 					yield return new CodeInstruction(OpCodes.Call, Refs.p_CameraDriver);
-					yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
+					yield return new CodeInstruction(OpCodes.Call, Refs.p_RootSize);
 					yield return new CodeInstruction(OpCodes.Call, m_GetAdaptedGameFont);
 					firstInstruction = false;
 				}
@@ -380,7 +380,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentViewRect), MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
-		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
+		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(default));
 
 		public static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
 		{
@@ -389,7 +389,7 @@ namespace CameraPlus
 			// store lerped rootSize in a new local var
 			//
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
-			yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
+			yield return new CodeInstruction(OpCodes.Call, Refs.p_RootSize);
 			yield return new CodeInstruction(OpCodes.Call, m_Main_LerpRootSize);
 			yield return new CodeInstruction(OpCodes.Stloc, v_lerpedRootSize);
 
@@ -410,7 +410,7 @@ namespace CameraPlus
 
 					// looking for Ldarg.0 followed by Ldfld rootSize
 					//
-					if (instruction.LoadsField(Refs.f_rootSize))
+					if (instruction.Calls(Refs.p_RootSize))
 						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
 					else
 						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check
