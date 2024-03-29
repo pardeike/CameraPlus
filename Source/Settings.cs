@@ -12,18 +12,14 @@ namespace CameraPlus
 		HideAnimals = 2
 	}
 
-	public class SavedViews : MapComponent
+	public class SavedViews(Map map) : MapComponent(map)
 	{
 		public RememberedCameraPos[] views = new RememberedCameraPos[9];
-
-		public SavedViews(Map map) : base(map)
-		{
-		}
 
 		public override void ExposeData()
 		{
 			for (var i = 0; i < 9; i++)
-				Scribe_Deep.Look(ref views[i], "view" + (i + 1), new object[] { map });
+				Scribe_Deep.Look(ref views[i], "view" + (i + 1), [map]);
 		}
 	}
 
@@ -48,10 +44,10 @@ namespace CameraPlus
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
 
-		public KeyCode[] cameraSettingsMod = new[] { KeyCode.LeftShift, KeyCode.None };
+		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
-		public KeyCode[] cameraSettingsLoad = new[] { KeyCode.LeftShift, KeyCode.None };
-		public KeyCode[] cameraSettingsSave = new[] { KeyCode.LeftAlt, KeyCode.None };
+		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
+		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;

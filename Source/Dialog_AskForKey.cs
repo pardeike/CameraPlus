@@ -6,10 +6,10 @@ namespace CameraPlus
 {
 	public class Dialog_AskForKey : Window
 	{
-		public Vector2 windowSize = new Vector2(400f, 200f);
+		public Vector2 windowSize = new(400f, 200f);
 		public Action<KeyCode> callback;
 
-		public override Vector2 InitialSize => new Vector2(400f, 200f);
+		public override Vector2 InitialSize => new(400f, 200f);
 		public override float Margin => 0f;
 
 		public Dialog_AskForKey(Action<KeyCode> callback)

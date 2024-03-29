@@ -24,14 +24,14 @@ namespace CameraPlus
 			var m_GetCameraColors = GetMethod(pawn, "GetCameraPlusColors");
 			if (m_GetCameraColors != null)
 			{
-				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Color[]) });
+				var funcType = Expression.GetFuncType([typeof(Pawn), typeof(Color[])]);
 				GetCameraColors = (Func<Pawn, Color[]>)Delegate.CreateDelegate(funcType, m_GetCameraColors);
 			}
 
 			var m_GetCameraTextures = GetMethod(pawn, "GetCameraPlusMarkers");
 			if (m_GetCameraTextures != null)
 			{
-				var funcType = Expression.GetFuncType(new[] { typeof(Pawn), typeof(Texture2D[]) });
+				var funcType = Expression.GetFuncType([typeof(Pawn), typeof(Texture2D[])]);
 				GetCameraMarkers = (Func<Pawn, Texture2D[]>)Delegate.CreateDelegate(funcType, m_GetCameraTextures);
 			}
 		}

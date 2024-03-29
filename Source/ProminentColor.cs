@@ -2,22 +2,16 @@
 using System.Linq;
 using UnityEngine;
 
-class ColorAmount
+class ColorAmount(Color32 color, int amount)
 {
-	public Color32 color;
-	public int amount;
-
-	public ColorAmount(Color32 color, int amount)
-	{
-		this.color = color;
-		this.amount = amount;
-	}
+	public Color32 color = color;
+	public int amount = amount;
 }
 
 public static class ProminentColor
 {
-	static readonly List<Color32> colorList = new List<Color32>();
-	static List<ColorAmount> pixelColorAmount = new List<ColorAmount>();
+	static readonly List<Color32> colorList = [];
+	static List<ColorAmount> pixelColorAmount = [];
 
 	public static List<Color32> GetColors32FromImage(Texture2D texture, int resizedTo, int maxColorAmount, float colorLimiterPercentage, int toleranceUniteColors, float minimiumColorPercentage)
 	{
@@ -30,7 +24,8 @@ public static class ProminentColor
 		for (var i = 0; i < pixels.Length; i += 1)
 		{
 			var px = pixels[i];
-			if (px.a < 255) continue;
+			if (px.a < 255)
+				continue;
 			var c = pixelColorAmount.Find(x => x.color.Equals(px));
 			if (c == null)
 				pixelColorAmount.Add(new ColorAmount(px, 1));
@@ -43,7 +38,7 @@ public static class ProminentColor
 
 		pixelColorAmount = UniteSimilarColors(pixelColorAmount, toleranceUniteColors);
 
-		pixelColorAmount = pixelColorAmount.OrderByDescending(x => x.amount).ToList();
+		pixelColorAmount = [.. pixelColorAmount.OrderByDescending(x => x.amount)];
 
 		var totalAmount = pixelColorAmount.Sum(x => x.amount);
 
@@ -53,7 +48,8 @@ public static class ProminentColor
 
 		for (var i = 0; i < pixelColorAmount.Count; i++)
 		{
-			if (pixelColorAmount.Count <= i || colorList.Count >= maxColorAmount || pixelColorAmount[i].amount < (float)totalAmount / minimiumColorPercentage) continue;
+			if (pixelColorAmount.Count <= i || colorList.Count >= maxColorAmount || pixelColorAmount[i].amount < (float)totalAmount / minimiumColorPercentage)
+				continue;
 
 			if (((float)pixelColorAmount[i].amount / lastAmount) * 100f > (i == 0 ? 5f : colorLimiterPercentage))
 			{
@@ -74,14 +70,18 @@ public static class ProminentColor
 		for (var r = 0; r < height; r++)
 		{
 			var oldR = r - hBorder;
-			if (oldR < 0) { continue; }
-			if (oldR >= oldHeight) { break; }
+			if (oldR < 0)
+			{ continue; }
+			if (oldR >= oldHeight)
+			{ break; }
 
 			for (var c = 0; c < width; c++)
 			{
 				var oldC = c - wBorder;
-				if (oldC < 0) { continue; }
-				if (oldC >= oldWidth) { break; }
+				if (oldC < 0)
+				{ continue; }
+				if (oldC >= oldWidth)
+				{ break; }
 
 				var oldI = oldR * oldWidth + oldC;
 				var i = r * width + c;

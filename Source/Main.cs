@@ -51,6 +51,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.Update))]
 	static class CameraDriver_Update_Patch
 	{
+		static readonly MethodInfo m_SetRootSizeOriginal = AccessTools.PropertySetter(typeof(CameraDriver), nameof(CameraDriver.RootSize));
 		static readonly MethodInfo m_SetRootSize = SymbolExtensions.GetMethodInfo(() => SetRootSize(null, 0f));
 
 		static void SetRootSize(CameraDriver driver, float rootSize)
@@ -88,20 +89,7 @@ namespace CameraPlus
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			var found = false;
-			foreach (var instruction in instructions)
-			{
-				if (instruction.StoresField(Refs.f_rootSize))
-				{
-					instruction.opcode = OpCodes.Call;
-					instruction.operand = m_SetRootSize;
-					found = true;
-				}
-
-				yield return instruction;
-			}
-			if (found == false)
-				Log.Error("Cannot find field Stdfld rootSize in CameraDriver.Update");
+			return instructions.MethodReplacer(m_SetRootSizeOriginal, m_SetRootSize);
 		}
 	}
 
@@ -227,6 +215,20 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(SilhouetteUtility), nameof(SilhouetteUtility.ShouldDrawSilhouette))]
+	static class SilhouetteUtility_ShouldDrawSilhouette_Patch
+	{
+		static bool Prefix(Thing thing, ref bool __result)
+		{
+			if (thing is Pawn pawn && Tools.ShouldShowDot(pawn))
+			{
+				__result = false;
+				return false;
+			}
+			return true;
+		}
+	}
+
 	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
 	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
 	static class GenMapUI_DrawPawnLabel_Patch
@@ -295,7 +297,7 @@ namespace CameraPlus
 				if (firstInstruction && instruction.LoadsConstant(0))
 				{
 					yield return new CodeInstruction(OpCodes.Call, Refs.p_CameraDriver);
-					yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
+					yield return new CodeInstruction(OpCodes.Call, Refs.p_RootSize);
 					yield return new CodeInstruction(OpCodes.Call, m_GetAdaptedGameFont);
 					firstInstruction = false;
 				}
@@ -360,10 +362,11 @@ namespace CameraPlus
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
 			foreach (var instruction in instructions)
-				if (instruction.opcode != OpCodes.Ret)
-					yield return instruction;
-
-			yield return new CodeInstruction(OpCodes.Ldarg_0);
+			{
+				if (instruction.opcode == OpCodes.Ret)
+					instruction.opcode = OpCodes.Ldarg_0;
+				yield return instruction;
+			}
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
 			yield return new CodeInstruction(OpCodes.Call, Refs.p_MyCamera);
 			yield return new CodeInstruction(OpCodes.Call, m_ApplyZoom);
@@ -377,7 +380,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentViewRect), MethodType.Getter)]
 	static class CameraDriver_CurrentViewRect_Patch
 	{
-		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(0f));
+		static readonly MethodInfo m_Main_LerpRootSize = SymbolExtensions.GetMethodInfo(() => Tools.LerpRootSize(default));
 
 		public static IEnumerable<CodeInstruction> Transpiler(ILGenerator generator, IEnumerable<CodeInstruction> instructions)
 		{
@@ -386,7 +389,7 @@ namespace CameraPlus
 			// store lerped rootSize in a new local var
 			//
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
-			yield return new CodeInstruction(OpCodes.Ldfld, Refs.f_rootSize);
+			yield return new CodeInstruction(OpCodes.Call, Refs.p_RootSize);
 			yield return new CodeInstruction(OpCodes.Call, m_Main_LerpRootSize);
 			yield return new CodeInstruction(OpCodes.Stloc, v_lerpedRootSize);
 
@@ -407,7 +410,7 @@ namespace CameraPlus
 
 					// looking for Ldarg.0 followed by Ldfld rootSize
 					//
-					if (instruction.LoadsField(Refs.f_rootSize))
+					if (instruction.Calls(Refs.p_RootSize))
 						instruction = new CodeInstruction(OpCodes.Ldloc, v_lerpedRootSize);
 					else
 						yield return new CodeInstruction(OpCodes.Ldarg_0); // repeat the code we did not emit in the first check

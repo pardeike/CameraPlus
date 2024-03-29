@@ -26,8 +26,8 @@ namespace CameraPlus
 
 		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
 		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
-		static readonly Color downedColor = new Color(0.9f, 0f, 0f);
-		static readonly Color draftedColor = new Color(0f, 0.5f, 0f);
+		static readonly Color downedColor = new(0.9f, 0f, 0f);
+		static readonly Color draftedColor = new(0f, 0.5f, 0f);
 
 		public static bool ShouldShowDot(Pawn pawn)
 		{
@@ -101,7 +101,7 @@ namespace CameraPlus
 			}
 		}
 
-		static readonly Dictionary<string, Color> cachedMainColors = new Dictionary<string, Color>();
+		static readonly Dictionary<string, Color> cachedMainColors = [];
 		public static Color? GetMainColor(Pawn pawn)
 		{
 			const int resizedTo = 8;
@@ -110,7 +110,7 @@ namespace CameraPlus
 			const int uniteColorsTolerance = 5;
 			const float minimiumColorPercentage = 10f;
 
-			var graphic = pawn.Drawer.renderer.graphics?.nakedGraphic;
+			var graphic = pawn.Drawer.renderer.BodyGraphic;
 			if (graphic == null)
 				return null;
 
@@ -172,7 +172,7 @@ namespace CameraPlus
 			}
 		}
 
-		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = new Dictionary<Type, CameraDelegates>();
+		static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = [];
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{
 			var type = pawn.GetType();
@@ -191,7 +191,7 @@ namespace CameraPlus
 		}
 
 		// returning true will prefer markers over labels
-		static readonly Color dangerousAnimalColor = new Color(0.62f, 0f, 0.05f);
+		static readonly Color dangerousAnimalColor = new(0.62f, 0f, 0.05f);
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 		{
 			var cameraDelegate = GetCachedCameraDelegate(pawn);
@@ -342,8 +342,8 @@ namespace CameraPlus
 					{
 						var list = new List<FloatMenuOption>
 						{
-							new FloatMenuOption("ResetBinding".Translate(), () => action(defaultKey), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
-							new FloatMenuOption("ClearBinding".Translate(), () => action(KeyCode.None), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)
+							new("ResetBinding".Translate(), () => action(defaultKey), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0),
+							new("ClearBinding".Translate(), () => action(KeyCode.None), MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)
 						};
 						Find.WindowStack.Add(new FloatMenu(list));
 					}
