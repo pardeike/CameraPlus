@@ -29,21 +29,52 @@ namespace CameraPlus
 		static readonly Color downedColor = new(0.9f, 0f, 0f);
 		static readonly Color draftedColor = new(0f, 0.5f, 0f);
 
-		public static bool ShouldShowDot(Pawn pawn)
+		static readonly QuotaCache<Pawn, bool> shouldShowDotCache = new(60, pawn =>
 		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
-				return false;
-
 			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return false;
 
 			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
 				return false;
 
+			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
+				return false;
+
 			var len = FastUI.CurUICellSize;
 			var isSmall = len <= CameraPlusMain.Settings.dotSize;
 			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
+		});
+
+		static readonly QuotaCache<Thing, bool> shouldShowLabelCache = new(60, thing =>
+		{
+			var len = FastUI.CurUICellSize;
+			var isPawn = thing is Pawn;
+
+			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
+			if (len <= lower)
+				return false;
+
+			var pawn = thing as Pawn;
+
+			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
+				return false;
+
+			if (pawn != null && CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
+				return true;
+
+			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
+				return false;
+
+			return true;
+		});
+
+		public static bool ShouldShowDot(Pawn pawn)
+		{
+			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+				return false;
+
+			return shouldShowDotCache.Get(pawn);
 		}
 
 		public static bool ShouldShowLabel(Thing thing, Vector2 screenPos = default)
@@ -51,24 +82,10 @@ namespace CameraPlus
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return true;
 
-			var isPawn = thing is Pawn;
-
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(thing?.DrawPos ?? screenPos, isPawn) <= 2.25f)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(thing?.DrawPos ?? screenPos, thing is Pawn) <= 2.25f)
 				return true;
 
-			var len = FastUI.CurUICellSize;
-
-			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
-			if (len <= lower)
-				return false;
-
-			if (isPawn && CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && (thing as Pawn).RaceProps.Animal)
-				return true;
-
-			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
-				return false;
-
-			return true;
+			return shouldShowLabelCache.Get(thing);
 		}
 
 		public static void DrawDot(Pawn pawn, Color innerColor, Color outerColor)
