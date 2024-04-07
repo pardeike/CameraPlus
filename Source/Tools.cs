@@ -29,7 +29,7 @@ namespace CameraPlus
 		static readonly Color downedColor = new(0.9f, 0f, 0f);
 		static readonly Color draftedColor = new(0f, 0.5f, 0f);
 
-		static readonly QuotaCache<Pawn, bool> shouldShowDotCache = new(60, pawn =>
+		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
 			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return false;
@@ -46,7 +46,7 @@ namespace CameraPlus
 			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
 		});
 
-		static readonly QuotaCache<Thing, bool> shouldShowLabelCache = new(60, thing =>
+		static readonly QuotaCache<Thing, int, bool> shouldShowLabelCache = new(60, thing => thing.thingIDNumber, thing =>
 		{
 			var len = FastUI.CurUICellSize;
 			var isPawn = thing is Pawn;
