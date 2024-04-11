@@ -46,16 +46,11 @@ namespace CameraPlus
 			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
 		});
 
-		static readonly QuotaCache<Thing, int, bool> shouldShowLabelCache = new(60, thing => thing.thingIDNumber, thing =>
+		static readonly QuotaCache<Pawn, int, bool> shouldShowLabelCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
 			var len = FastUI.CurUICellSize;
-			var isPawn = thing is Pawn;
-
-			var lower = isPawn ? CameraPlusMain.Settings.hidePawnLabelBelow : CameraPlusMain.Settings.hideThingLabelBelow;
-			if (len <= lower)
+			if (len <= CameraPlusMain.Settings.hidePawnLabelBelow)
 				return false;
-
-			var pawn = thing as Pawn;
 
 			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
 				return false;
@@ -63,7 +58,7 @@ namespace CameraPlus
 			if (pawn != null && CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return true;
 
-			if (isPawn && len <= CameraPlusMain.Settings.dotSize)
+			if (pawn != null && len <= CameraPlusMain.Settings.dotSize)
 				return false;
 
 			return true;
@@ -71,21 +66,24 @@ namespace CameraPlus
 
 		public static bool ShouldShowDot(Pawn pawn)
 		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+			if (pawn == null || CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return false;
 
 			return shouldShowDotCache.Get(pawn);
 		}
 
-		public static bool ShouldShowLabel(Thing thing, Vector2 screenPos = default)
+		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)
 		{
 			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
 				return true;
 
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(thing?.DrawPos ?? screenPos, thing is Pawn) <= 2.25f)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f)
 				return true;
 
-			return shouldShowLabelCache.Get(thing);
+			if (pawn == null)
+				return FastUI.CurUICellSize > CameraPlusMain.Settings.hideThingLabelBelow;
+
+			return shouldShowLabelCache.Get(pawn);
 		}
 
 		public static void DrawDot(Pawn pawn, Color innerColor, Color outerColor)
