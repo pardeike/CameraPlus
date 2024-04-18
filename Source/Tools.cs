@@ -23,6 +23,8 @@ namespace CameraPlus
 		static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
 		static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
 		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
+		static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
+		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
 
 		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
 		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
@@ -240,6 +242,9 @@ namespace CameraPlus
 				var isDangerous = stateDef == MentalStateDefOf.ManhunterPermanent || stateDef == MentalStateDefOf.Manhunter;
 				innerColor = isDangerous ? dangerousAnimalColor : (GetMainColor(pawn) ?? innerColor);
 			}
+			else if (pawn.IsEntity)
+				innerColor = GetMainColor(pawn) ?? innerColor;
+
 			outerColor = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
 			return true;
 		}
@@ -258,6 +263,13 @@ namespace CameraPlus
 				}
 				innerTexture = textures[0];
 				outerTexture = textures[1];
+				return true;
+			}
+
+			if (pawn.IsEntity)
+			{
+				innerTexture = innerEntityTexture;
+				outerTexture = outerEntityTexture;
 				return true;
 			}
 

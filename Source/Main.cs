@@ -183,10 +183,14 @@ namespace CameraPlus
 
 			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
 				return true;
-			if (___pawn.RaceProps.Humanlike)
-				return true;
-			if (___pawn.Name != null)
-				return true;
+
+			if (___pawn.IsEntity == false)
+			{
+				if (___pawn.RaceProps.Humanlike)
+					return true;
+				if (___pawn.Name != null)
+					return true;
+			}
 
 			var useMarkers = Tools.GetMarkerColors(___pawn, out var innerColor, out var outerColor);
 			if (useMarkers == false)
