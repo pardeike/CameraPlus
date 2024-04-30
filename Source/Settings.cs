@@ -5,6 +5,13 @@ using Verse;
 
 namespace CameraPlus
 {
+	public enum DotStyle
+	{
+		VanillaDefault = 0,
+		ClassicDots = 1,
+		BetterSilhouettes = 2
+	}
+
 	public enum LabelStyle
 	{
 		IncludeAnimals = 0,
@@ -36,11 +43,12 @@ namespace CameraPlus
 		public bool zoomToMouse = true;
 		public bool disableCameraShake = false;
 		public float soundNearness = 0;
-		public bool hideNamesWhenZoomedOut = true;
+		public DotStyle dotStyle = DotStyle.BetterSilhouettes;
 		public int dotSize = 9;
 		public int hidePawnLabelBelow = 9;
 		public int hideThingLabelBelow = 32;
 		public bool mouseOverShowsLabels = true;
+		public bool edgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
 
@@ -75,7 +83,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
 			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", false);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
-			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
+			Scribe_Values.Look(ref dotStyle, "dotStyle", DotStyle.BetterSilhouettes);
 			Scribe_Values.Look(ref dotSize, "dotSize", 9);
 			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
@@ -99,8 +107,40 @@ namespace CameraPlus
 
 		public void DoWindowContents(Rect inRect)
 		{
+			var restoreText = "RestoreToDefaultSettings".Translate();
+			var restoreLen = restoreText.GetWidthCached() + 12f;
+			var rect = new Rect(inRect.width - restoreLen, inRect.yMin - 30f, restoreLen, 30f);
+			if (Widgets.ButtonText(rect, restoreText))
+			{
+				zoomedOutPercent = 65;
+				zoomedInPercent = 1;
+				exponentiality = 1;
+				zoomedOutDollyPercent = 1;
+				zoomedInDollyPercent = 1;
+				zoomedOutScreenEdgeDollyFactor = 0.5f;
+				zoomedInScreenEdgeDollyFactor = 0.5f;
+				stickyMiddleMouse = false;
+				zoomToMouse = true;
+				disableCameraShake = false;
+				soundNearness = 0;
+				dotStyle = DotStyle.BetterSilhouettes;
+				dotSize = 9;
+				hidePawnLabelBelow = 9;
+				hideThingLabelBelow = 32;
+				mouseOverShowsLabels = true;
+				edgeIndicators = true;
+				customNameStyle = LabelStyle.AnimalsDifferent;
+				includeNotTamedAnimals = true;
+				cameraSettingsMod[0] = KeyCode.LeftShift;
+				cameraSettingsMod[1] = KeyCode.None;
+				cameraSettingsKey = KeyCode.Tab;
+				cameraSettingsLoad[0] = KeyCode.LeftShift;
+				cameraSettingsLoad[1] = KeyCode.None;
+				cameraSettingsSave[0] = KeyCode.LeftAlt;
+				cameraSettingsSave[1] = KeyCode.None;
+			}
+
 			float previous;
-			Rect rect;
 			var map = Current.Game?.CurrentMap;
 			const float buttonWidth = 80f;
 			const float buttonSpace = 4f;
@@ -152,6 +192,7 @@ namespace CameraPlus
 
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
+			list.CheckboxLabeled("EdgeIndicators".Translate(), ref edgeIndicators);
 
 			list.Gap(20f);
 
@@ -206,7 +247,6 @@ namespace CameraPlus
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
 			Tools.KeySettingsButton(rect, false, cameraSettingsSave[0], KeyCode.LeftAlt, code => cameraSettingsSave[0] = code);
-			list.Gap(6f);
 
 			list.NewColumn();
 			list.Gap(16f);
@@ -227,8 +267,18 @@ namespace CameraPlus
 
 			list.Gap(12f);
 
-			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
-			if (hideNamesWhenZoomedOut)
+			var oldDotStyle = dotStyle;
+			foreach (var label in Enum.GetNames(typeof(DotStyle)))
+			{
+				var val = (DotStyle)Enum.Parse(typeof(DotStyle), label);
+				if (list.RadioButton(label.Translate(), dotStyle == val, 8f))
+					dotStyle = val;
+			}
+
+			//if (dotStyle == DotStyle.BetterSilhouettes && dotStyle != oldDotStyle && DotTools.silhouetteCache.Count == 0)
+			//	Find.WindowStack.Add(new LoadingDialog());
+
+			if (dotStyle != DotStyle.VanillaDefault)
 			{
 				list.Gap(4f);
 
@@ -241,41 +291,11 @@ namespace CameraPlus
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
-					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
+					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f))
+						customNameStyle = val;
 				}
 				list.Gap(4f);
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
-			}
-
-			list.Gap(28f);
-
-			if (list.ButtonText("RestoreToDefaultSettings".Translate()))
-			{
-				zoomedOutPercent = 65;
-				zoomedInPercent = 1;
-				exponentiality = 1;
-				zoomedOutDollyPercent = 1;
-				zoomedInDollyPercent = 1;
-				zoomedOutScreenEdgeDollyFactor = 0.5f;
-				zoomedInScreenEdgeDollyFactor = 0.5f;
-				stickyMiddleMouse = false;
-				zoomToMouse = true;
-				disableCameraShake = false;
-				soundNearness = 0;
-				hideNamesWhenZoomedOut = true;
-				dotSize = 9;
-				hidePawnLabelBelow = 9;
-				hideThingLabelBelow = 32;
-				mouseOverShowsLabels = true;
-				customNameStyle = LabelStyle.AnimalsDifferent;
-				includeNotTamedAnimals = true;
-				cameraSettingsMod[0] = KeyCode.LeftShift;
-				cameraSettingsMod[1] = KeyCode.None;
-				cameraSettingsKey = KeyCode.Tab;
-				cameraSettingsLoad[0] = KeyCode.LeftShift;
-				cameraSettingsLoad[1] = KeyCode.None;
-				cameraSettingsSave[0] = KeyCode.LeftAlt;
-				cameraSettingsSave[1] = KeyCode.None;
 			}
 
 			list.End();

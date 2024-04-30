@@ -96,10 +96,7 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
 	static class TimeControls_DoTimeControlsGUI_Patch
 	{
-		public static void Prefix()
-		{
-			Tools.HandleHotkeys();
-		}
+		public static void Prefix() => Tools.HandleHotkeys();
 	}
 
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CalculateCurInputDollyVect))]
@@ -123,7 +120,7 @@ namespace CameraPlus
 
 			var settings = CameraPlusMain.Settings;
 
-			if (settings.hideNamesWhenZoomedOut == false)
+			if (settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
 
 			if (Current.cameraDriverInt.CurrentZoom == CameraZoomRange.Closest)
@@ -136,6 +133,51 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(DynamicDrawManager))]
+	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
+	static class DynamicDrawManager_DrawDynamicThings_Patch
+	{
+		public static void Postfix()
+		{
+			var map = Find.CurrentMap;
+			if (map == null)
+				return;
+
+			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
+			var viewRect = DotTools.RealViewRect(borderMarkerSize.x / 1.5f);
+
+			var markersTreshold = FastUI.CurUICellSize <= CameraPlusMain.Settings.dotSize;
+			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
+			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(Tools.ShouldShowMarker, pawn =>
+			{
+				altitute -= 0.0001f;
+
+				var materials = MarkerCache.MaterialFor(pawn);
+				if (materials == null)
+					return;
+
+				if (CameraPlusMain.Settings.edgeIndicators)
+				{
+					var (vec, clipped) = DotTools.ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
+					if (clipped)
+					{
+						var materialClipped = materials.dot;
+						if (materialClipped != null)
+							DotTools.DrawClipped(borderMarkerSize, altitute, vec, materialClipped);
+						return;
+					}
+				}
+
+				if (markersTreshold == false)
+					return;
+
+				var materialMarker = CameraPlusMain.Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
+				if (materialMarker != null)
+					DotTools.DrawMarker(pawn, materialMarker);
+			});
+		}
+	}
+
 	[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
 	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
 	static class PawnRenderer_RenderPawnAt_Patch
@@ -145,15 +187,7 @@ namespace CameraPlus
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
-
-			return Tools.ShouldShowDot(___pawn) == false;
-		}
-
-		[HarmonyPriority(10000)]
-		public static void Postfix(Pawn ___pawn)
-		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut && CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals)
-				_ = Tools.GetMainColor(___pawn); // trigger caching
+			return Tools.ShouldShowMarker(___pawn) == false;
 		}
 	}
 
@@ -192,16 +226,14 @@ namespace CameraPlus
 					return true;
 			}
 
-			var useMarkers = Tools.GetMarkerColors(___pawn, out var innerColor, out var outerColor);
+			var useMarkers = Tools.GetMarkerColors(___pawn, out _, out _);
 			if (useMarkers == false)
 				return true; // use label
 
-			if (Tools.ShouldShowDot(___pawn))
-			{
-				Tools.DrawDot(___pawn, innerColor, outerColor);
+			if (Tools.ShouldShowMarker(___pawn))
 				return false;
-			}
-			return Tools.CorrectLabelRendering(___pawn);
+
+			return true;// Tools.CorrectLabelRendering(___pawn);
 		}
 	}
 	//
@@ -224,7 +256,7 @@ namespace CameraPlus
 	{
 		static bool Prefix(Thing thing, ref bool __result)
 		{
-			if (thing is Pawn pawn && Tools.ShouldShowDot(pawn))
+			if (thing is Pawn pawn && Tools.ShouldShowMarker(pawn))
 			{
 				__result = false;
 				return false;
@@ -246,19 +278,14 @@ namespace CameraPlus
 			if (truncateToWidth != 9999f)
 				return true;
 
-			if (Tools.ShouldShowDot(pawn))
+			if (Tools.ShouldShowMarker(pawn))
 			{
-				var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
-				if (useMarkers == false)
-					return Tools.CorrectLabelRendering(pawn);
-
-				Tools.DrawDot(pawn, innerColor, outerColor);
-				return false;
+				var useMarkers = Tools.GetMarkerColors(pawn, out _, out _);
+				return useMarkers == false;
+				//if (useMarkers == false)
+				//	return Tools.CorrectLabelRendering(pawn);
+				//return false;
 			}
-
-			// we fake "show all" so we need to skip if original could would not render labels
-			if (ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false)
-				return false;
 
 			return Tools.ShouldShowLabel(pawn);
 		}

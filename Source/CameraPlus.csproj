@@ -99,6 +99,7 @@
 			<CopyAssemblies Include="..\Assemblies\**" />
 			<CopyDefs Include="..\Defs\**" />
 			<CopyLanguages Include="..\Languages\**" />
+			<CopyResources Include="..\Resources\**" />
 			<CopySounds Include="..\Sounds\**" />
 			<CopyTextures Include="..\Textures\**" />
 			<CopyLicense Include="..\LICENSE" />
@@ -114,6 +115,7 @@
 		<Copy SourceFiles="@(CopyAssemblies)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Assemblies\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyDefs)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Defs\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyLanguages)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Languages\%(RecursiveDir)" />
+		<Copy SourceFiles="@(CopyResources)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Resources\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopySounds)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Sounds\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyTextures)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Textures\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />

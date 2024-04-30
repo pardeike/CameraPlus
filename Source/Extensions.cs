@@ -18,7 +18,7 @@ namespace CameraPlus
 		{
 			var rect = list.GetRect(22f);
 			var h = HorizontalSlider(rect, ref value, min, max, label == null ? null : label(), roundTo);
-			list.Gap(h);
+			list.Gap(h - 4);
 		}
 
 		public static float HorizontalSlider(Rect rect, ref float value, float leftValue, float rightValue, string label = null, float roundTo = -1f)

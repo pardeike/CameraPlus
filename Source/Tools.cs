@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using HarmonyLib;
+using RimWorld;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,10 +27,14 @@ namespace CameraPlus
 		static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
 		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
 
-		static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
-		static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
-		static readonly Color downedColor = new(0.9f, 0f, 0f);
-		static readonly Color draftedColor = new(0f, 0.5f, 0f);
+		//static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
+		//static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
+
+		static readonly Color selectedColor = Color.white;
+		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f);
+		static readonly Color[] colonistColor = [Color.black, Color.white];
+		static readonly Color[] downedColor = [Color.gray, Color.white];
+		static readonly Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
 
 		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
@@ -42,10 +47,8 @@ namespace CameraPlus
 			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
 				return false;
 
-			var len = FastUI.CurUICellSize;
-			var isSmall = len <= CameraPlusMain.Settings.dotSize;
 			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			return isSmall && (CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal);
+			return CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal;
 		});
 
 		static readonly QuotaCache<Pawn, int, bool> shouldShowLabelCache = new(60, pawn => pawn.thingIDNumber, pawn =>
@@ -66,103 +69,112 @@ namespace CameraPlus
 			return true;
 		});
 
-		public static bool ShouldShowDot(Pawn pawn)
+		public static bool ShouldShowMarker(Pawn pawn)
 		{
-			if (pawn == null || CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+			if (pawn == null || CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
 				return false;
-
 			return shouldShowDotCache.Get(pawn);
 		}
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)
 		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut == false)
+			if (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
-
 			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f)
 				return true;
-
 			if (pawn == null)
 				return FastUI.CurUICellSize > CameraPlusMain.Settings.hideThingLabelBelow;
-
 			return shouldShowLabelCache.Get(pawn);
 		}
 
-		public static void DrawDot(Pawn pawn, Color innerColor, Color outerColor)
+		static Texture2D DownsampleTexture(Texture2D nonReadableTexture, int n)
 		{
-			_ = GetMarkerTextures(pawn, out var innerTexture, out var outerTexture);
+			RenderTexture tempRT = RenderTexture.GetTemporary(n, n, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+			tempRT.filterMode = FilterMode.Point;
+			Graphics.Blit(nonReadableTexture, tempRT);
+			RenderTexture previous = RenderTexture.active;
+			RenderTexture.active = tempRT;
+			Texture2D readableTexture = new Texture2D(n, n, TextureFormat.ARGB32, false);
+			readableTexture.ReadPixels(new Rect(0, 0, n, n), 0, 0);
+			readableTexture.Apply();
+			RenderTexture.active = previous;
+			RenderTexture.ReleaseTemporary(tempRT);
+			return readableTexture;
+		}
 
-			var pos = pawn.DrawPos;
-			var v1 = (pos - new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
-			var v2 = (pos + new Vector3(0.75f, 0f, 0.75f)).MapToUIPosition().Rounded();
-			var markerRect = new Rect(v1, v2 - v1);
-
-			// draw outer marker
-			GUI.color = outerColor;
-			GUI.DrawTexture(markerRect, outerTexture, ScaleMode.ScaleToFit, true);
-
-			// draw inner marker
-			GUI.color = innerColor;
-			GUI.DrawTexture(markerRect, innerTexture, ScaleMode.ScaleToFit, true);
-
-			// draw extra marker
-			if (pawn.Downed)
+		static (float h, float s, float l) HSL(Color color)
+		{
+			var (r, g, b) = (color.r, color.g, color.b);
+			var max = Mathf.Max(r, Mathf.Max(g, b));
+			var min = Mathf.Min(r, Mathf.Min(g, b));
+			float h, s, l;
+			l = (max + min) / 2;
+			if (max == min)
+				h = s = 0; // achromatic
+			else
 			{
-				GUI.color = downedColor;
-				GUI.DrawTexture(markerRect, downedTexture, ScaleMode.ScaleToFit, true);
+				var d = max - min;
+				s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+				if (max == r)
+					h = (g - b) / d + (g < b ? 6 : 0);
+				else if (max == g)
+					h = (b - r) / d + 2;
+				else
+					h = (r - g) / d + 4;
+				h /= 6;
 			}
-			else if (pawn.Drafted)
-			{
-				GUI.color = draftedColor;
-				GUI.DrawTexture(markerRect, draftedTexture, ScaleMode.ScaleToFit, true);
-			}
+			return (h, s, l);
 		}
 
 		static readonly Dictionary<string, Color> cachedMainColors = [];
 		public static Color? GetMainColor(Pawn pawn)
 		{
-			const int resizedTo = 8;
-			const int maxColorAmount = 1;
-			const float colorLimiterPercentage = 85f;
-			const int uniteColorsTolerance = 5;
-			const float minimiumColorPercentage = 10f;
-
-			var graphic = pawn.Drawer.renderer.BodyGraphic;
-			if (graphic == null)
-				return null;
+			var renderer = pawn.Drawer.renderer;
+			var pawnRenderFlags = renderer.DefaultRenderFlagsNow | PawnRenderFlags.Clothes | PawnRenderFlags.Headgear;
+			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
+			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
+				return Color.clear;
+			var graphic = bodyNode.Graphic;
 
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (cachedMainColors.TryGetValue(key, out var color) == false)
 			{
+				if (graphic.color != Color.white)
+				{
+					color = graphic.color;
+					goto SET_COLOR;
+				}
+
 				var material = graphic.MatEast ?? graphic.MatSingle;
 				if (material == null)
 				{
-					cachedMainColors[key] = Color.gray;
-					return null;
+					color = Color.clear;
+					goto SET_COLOR;
 				}
 
-				var texture = material.mainTexture;
+				var texture = (Texture2D)material.mainTexture;
 				if (texture == null)
 				{
-					cachedMainColors[key] = Color.gray;
-					return null;
+					color = Color.clear;
+					goto SET_COLOR;
 				}
 
-				var width = texture.width;
-				var height = texture.width;
-				var outputTexture = new Texture2D(width, height, TextureFormat.ARGB32, false);
-				var buffer = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-				Graphics.Blit(texture, buffer, material, 0);
-				RenderTexture.active = buffer;
-				outputTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
+				var readableTexture = DownsampleTexture(texture, 16);
+				var combinedColors = readableTexture
+					.GetPixels32()
+					.Where(c => c.a == 255 && c.r + c.g + c.b > 0)
+					.GroupBy(color => color)
+					.OrderByDescending(group => group.Count())
+					.Select(group => (color: group.Key, hsl: HSL(group.Key), count: group.Count()))
+					.ToArray();
 
-				var color32s = ProminentColor.GetColors32FromImage(outputTexture, resizedTo, maxColorAmount, colorLimiterPercentage, uniteColorsTolerance, minimiumColorPercentage);
-				if (color32s == null || color32s.Count == 0)
-					color = Color.gray;
+				var colorIndex = combinedColors.FirstIndexOf(tuple => tuple.hsl.s > 0.2 && tuple.hsl.l < 0.8 && tuple.hsl.l > 0.2);
+				if (colorIndex == 1 && combinedColors[0].hsl.s < 0.2)
+					color = combinedColors[1].color;
 				else
-					color = new Color(color32s[0].r / 255f, color32s[0].g / 255f, color32s[0].b / 255f);
+					color = combinedColors[0].color;
 
-				UnityEngine.Object.Destroy(outputTexture);
+				SET_COLOR:
 				cachedMainColors[key] = color;
 			}
 			return color;
@@ -201,14 +213,15 @@ namespace CameraPlus
 			return result;
 		}
 
+		/*
 		public static bool CorrectLabelRendering(Pawn pawn)
 		{
 			// we fake "show all" so we need to skip if original could would not render labels
 			return ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false;
 		}
+		*/
 
 		// returning true will prefer markers over labels
-		static readonly Color dangerousAnimalColor = new(0.62f, 0f, 0.05f);
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 		{
 			var cameraDelegate = GetCachedCameraDelegate(pawn);
@@ -235,18 +248,32 @@ namespace CameraPlus
 				return false;
 			}
 
-			innerColor = PawnNameColorUtility.PawnNameColorOf(pawn);
-			if (pawn.RaceProps.Animal)
+			if (pawn.Faction != Faction.OfPlayer)
 			{
-				var stateDef = pawn.mindState.mentalStateHandler.CurStateDef;
-				var isDangerous = stateDef == MentalStateDefOf.ManhunterPermanent || stateDef == MentalStateDefOf.Manhunter;
-				innerColor = isDangerous ? dangerousAnimalColor : (GetMainColor(pawn) ?? innerColor);
+				innerColor = GetMainColor(pawn) ?? Color.gray;
+				outerColor = Find.Selector.IsSelected(pawn) ? selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
+				return true;
 			}
-			else if (pawn.IsEntity)
-				innerColor = GetMainColor(pawn) ?? innerColor;
 
-			outerColor = Find.Selector.IsSelected(pawn) ? Color.black : Color.white;
+			innerColor = pawn.IsPlayerControlled ? Color.white : uncontrollableColor;
+			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
+			outerColor = pawn.Downed ? downedColor[selected] : pawn.Drafted ? draftedColor[selected] : colonistColor[selected];
 			return true;
+		}
+
+		public static void DefaultMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
+		{
+			if (pawn.IsEntity)
+			{
+				innerTexture = innerEntityTexture;
+				outerTexture = outerEntityTexture;
+				return;
+			}
+
+			var isAnimal = pawn.RaceProps.Animal;
+			var customAnimalStyle = CameraPlusMain.Settings.customNameStyle == LabelStyle.AnimalsDifferent;
+			innerTexture = isAnimal && customAnimalStyle ? innerAnimalTexture : innerColonistTexture;
+			outerTexture = isAnimal && customAnimalStyle ? outerAnimalTexture : outerColonistTexture;
 		}
 
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
@@ -266,17 +293,7 @@ namespace CameraPlus
 				return true;
 			}
 
-			if (pawn.IsEntity)
-			{
-				innerTexture = innerEntityTexture;
-				outerTexture = outerEntityTexture;
-				return true;
-			}
-
-			var isAnimal = pawn.RaceProps.Animal;
-			var customAnimalStyle = CameraPlusMain.Settings.customNameStyle == LabelStyle.AnimalsDifferent;
-			innerTexture = isAnimal && customAnimalStyle ? innerAnimalTexture : innerColonistTexture;
-			outerTexture = isAnimal && customAnimalStyle ? outerAnimalTexture : outerColonistTexture;
+			DefaultMarkerTextures(pawn, out innerTexture, out outerTexture);
 			return true;
 		}
 
