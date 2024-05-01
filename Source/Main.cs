@@ -148,7 +148,7 @@ namespace CameraPlus
 
 			var markersTreshold = FastUI.CurUICellSize <= CameraPlusMain.Settings.dotSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
-			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(Tools.ShouldShowMarker, pawn =>
+			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
 			{
 				altitute -= 0.0001f;
 
@@ -187,7 +187,7 @@ namespace CameraPlus
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
-			return Tools.ShouldShowMarker(___pawn) == false;
+			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
 	}
 
@@ -226,14 +226,10 @@ namespace CameraPlus
 					return true;
 			}
 
-			var useMarkers = Tools.GetMarkerColors(___pawn, out _, out _);
-			if (useMarkers == false)
-				return true; // use label
+			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
+				return true;
 
-			if (Tools.ShouldShowMarker(___pawn))
-				return false;
-
-			return true;// Tools.CorrectLabelRendering(___pawn);
+			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
 	}
 	//
@@ -256,7 +252,7 @@ namespace CameraPlus
 	{
 		static bool Prefix(Thing thing, ref bool __result)
 		{
-			if (thing is Pawn pawn && Tools.ShouldShowMarker(pawn))
+			if (thing is Pawn pawn && Tools.ShouldShowMarker(pawn, true))
 			{
 				__result = false;
 				return false;
@@ -278,14 +274,8 @@ namespace CameraPlus
 			if (truncateToWidth != 9999f)
 				return true;
 
-			if (Tools.ShouldShowMarker(pawn))
-			{
-				var useMarkers = Tools.GetMarkerColors(pawn, out _, out _);
-				return useMarkers == false;
-				//if (useMarkers == false)
-				//	return Tools.CorrectLabelRendering(pawn);
-				//return false;
-			}
+			if (Tools.ShouldShowMarker(pawn, true))
+				return Tools.GetMarkerColors(pawn, out _, out _) == false;
 
 			return Tools.ShouldShowLabel(pawn);
 		}

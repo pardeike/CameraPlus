@@ -27,9 +27,6 @@ namespace CameraPlus
 		static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
 		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
 
-		//static readonly Texture2D downedTexture = ContentFinder<Texture2D>.Get("DownedMarker", true);
-		//static readonly Texture2D draftedTexture = ContentFinder<Texture2D>.Get("DraftedMarker", true);
-
 		static readonly Color selectedColor = Color.white;
 		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f);
 		static readonly Color[] colonistColor = [Color.black, Color.white];
@@ -69,8 +66,10 @@ namespace CameraPlus
 			return true;
 		});
 
-		public static bool ShouldShowMarker(Pawn pawn)
+		public static bool ShouldShowMarker(Pawn pawn, bool checkCellSize)
 		{
+			if (checkCellSize && FastUI.CurUICellSize > CameraPlusMain.Settings.dotSize)
+				return false;
 			if (pawn == null || CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
 				return false;
 			return shouldShowDotCache.Get(pawn);
@@ -212,14 +211,6 @@ namespace CameraPlus
 			}
 			return result;
 		}
-
-		/*
-		public static bool CorrectLabelRendering(Pawn pawn)
-		{
-			// we fake "show all" so we need to skip if original could would not render labels
-			return ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false;
-		}
-		*/
 
 		// returning true will prefer markers over labels
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using RimWorld;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Verse;
@@ -31,7 +32,7 @@ namespace CameraPlus
 			{
 				var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
 				silhouette.SetTexture("_MainTex", GetTexture(pawn));
-				silhouette.SetColor("_FillColor", GetColor(pawn, innerColor));
+				silhouette.SetColor("_FillColor", innerColor);
 				silhouette.SetColor("_OutlineColor", outerColor);
 				silhouette.SetFloat("_OutlineFactor", 0.15f);
 				silhouette.renderQueue = (int)RenderQueue.Overlay;
@@ -41,7 +42,7 @@ namespace CameraPlus
 				{
 					dot = MaterialAllocator.Create(Assets.BorderedShader);
 					dot.SetTexture("_MainTex", dotTexture);
-					dot.SetColor("_FillColor", GetColor(pawn, innerColor));
+					dot.SetColor("_FillColor", innerColor);
 					dot.SetColor("_OutlineColor", outerColor);
 					dot.SetFloat("_OutlineFactor", 0.15f);
 					dot.renderQueue = (int)RenderQueue.Overlay;
@@ -67,29 +68,31 @@ namespace CameraPlus
 			cache.Remove(pawn);
 		}
 
-		//
+		// copied from RenderPawnAt(Vector3 drawLoc, Rot4? rotOverride, bool neverAimWeapon)
+		static void UpdateSilhouetteCache(Pawn pawn)
+		{
+			var renderer = pawn.Drawer.renderer;
+			var graphic = pawn.RaceProps.Humanlike
+				? pawn.ageTracker.CurLifeStage.silhouetteGraphicData.Graphic
+				: (pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData == null
+					? renderer.BodyGraphic
+					: pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData.Graphic
+					);
+			var bodyPos = renderer.GetBodyPos(pawn.DrawPos, PawnPosture.Standing, out _);
+			renderer.SetSilhouetteData(graphic, bodyPos);
+		}
 
 		static Texture GetTexture(Pawn pawn)
 		{
+			UpdateSilhouetteCache(pawn);
 			if (pawn.Drawer.renderer.SilhouetteGraphic != null)
 			{
 				var (_, material) = SilhouetteUtility.GetCachedSilhouetteData(pawn);
 				return material.mainTexture;
 			}
-			else
-			{
-				Tools.DefaultMarkerTextures(pawn, out var inner, out _);
-				return inner;
-			}
-		}
 
-		static Color GetColor(Pawn pawn, Color markerColor)
-		{
-			_ = pawn;
-			_ = markerColor;
-			//return Color.clear;
-			//markerColor = Tools.ColorChange(markerColor, saturationRange, brightnessRange);
-			return markerColor;
+			Tools.DefaultMarkerTextures(pawn, out var inner, out _);
+			return inner;
 		}
 	}
 }

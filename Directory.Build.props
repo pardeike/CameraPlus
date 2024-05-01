@@ -1,11 +1,9 @@
 ﻿<Project>
-
-	<PropertyGroup>
-		<ModName>Camera+</ModName>
-		<ModFileName>CameraPlus</ModFileName>
-		<Repository>https://github.com/pardeike/CameraPlus</Repository>
-		<ModVersion>2.7.5.1</ModVersion>
-		<ProjectGuid>{AC5EE7A1-16EA-498D-B21A-83ACF78F0E5A}</ProjectGuid>
-	</PropertyGroup>
-
+    <PropertyGroup>
+        <ModName>Camera+</ModName>
+        <ModFileName>CameraPlus</ModFileName>
+        <Repository>https://github.com/pardeike/CameraPlus</Repository>
+        <ModVersion>3.0.0.0</ModVersion>
+        <ProjectGuid>{AC5EE7A1-16EA-498D-B21A-83ACF78F0E5A}</ProjectGuid>
+    </PropertyGroup>
 </Project>
