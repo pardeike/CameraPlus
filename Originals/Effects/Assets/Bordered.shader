@@ -12,8 +12,8 @@
     SubShader
     {
         Tags
-        { 
-            "RenderType"="Transparent" 
+        {
+            "RenderType"="Transparent"
             "Queue"="Transparent"
         }
 

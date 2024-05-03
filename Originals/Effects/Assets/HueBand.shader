@@ -1,4 +1,4 @@
-﻿Shader "Camera+/ColorBed"
+﻿Shader "Camera+/HueBand"
 {
     Properties
     {
@@ -46,8 +46,17 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed3 hsv = fixed3(_Hue, i.uv.x, i.uv.y);
-                fixed3 rgb = HSVtoRGB(hsv);
+                float y = 1 - i.uv.y;
+                fixed3 rgb;
+                fixed d = abs(_Hue - y);
+                if (d <= 0.0025)
+                    rgb = fixed3(1, 1, 1);
+                else {
+                    if (d >= 0.006)
+                        rgb = HSVtoRGB(fixed3(y, 1, 1));
+                    else
+                        rgb = fixed3(0, 0, 0);
+                }
                 return fixed4(rgb, 1.0);
             }
             ENDCG

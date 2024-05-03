@@ -26,6 +26,7 @@ namespace CameraPlus
 		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
 		static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
 		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
+		public static readonly Texture2D colorMarkerTexture = ContentFinder<Texture2D>.Get("ColorMarker", true);
 
 		static readonly Color selectedColor = Color.white;
 		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f);

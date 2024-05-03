@@ -10,8 +10,7 @@ namespace CameraPlus
 	public static class Assets
 	{
 		public static bool initialized = false;
-
-		private static Material borderedMaterial;
+		private static Material colorBedMaterial, huesMaterial;
 		private static Shader borderedShader;
 
 		[HarmonyPatch(typeof(UIRoot_Entry), nameof(UIRoot_Entry.Init))]
@@ -32,13 +31,23 @@ namespace CameraPlus
 			var path = Path.Combine(me.Content.RootDir, "Resources", arch, "effects");
 			var assets = AssetBundle.LoadFromFile(path);
 
-			borderedMaterial = assets.LoadAsset<Material>("Silhouette");
+			colorBedMaterial = assets.LoadAsset<Material>("ColorBed");
+			if (colorBedMaterial == null)
+				Log.Error("Cannot load ColorBed material from asset bundle.");
+
+			huesMaterial = assets.LoadAsset<Material>("Hues");
+			if (huesMaterial == null)
+				Log.Error("Cannot load Hues material from asset bundle.");
+
 			borderedShader = assets.LoadAsset<Shader>("Bordered");
+			if (borderedShader == null)
+				Log.Error("Cannot load Bordered shader from asset bundle.");
 
 			initialized = true;
 		}
 
-		public static Material BorderedMaterial => borderedMaterial;
+		public static Material ColorBedMaterial => colorBedMaterial;
+		public static Material HuesMaterial => huesMaterial;
 		public static Shader BorderedShader => borderedShader;
 	}
 }
