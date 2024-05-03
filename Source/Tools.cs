@@ -41,6 +41,9 @@ namespace CameraPlus
 			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
 				return false;
 
+			if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
+				return false;
+
 			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
 				return false;
 
@@ -52,6 +55,9 @@ namespace CameraPlus
 		{
 			var len = FastUI.CurUICellSize;
 			if (len <= CameraPlusMain.Settings.hidePawnLabelBelow)
+				return false;
+
+			if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
 				return false;
 
 			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
@@ -239,7 +245,7 @@ namespace CameraPlus
 				return false;
 			}
 
-			if (pawn.Faction != Faction.OfPlayer)
+			if (isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
 				innerColor = GetMainColor(pawn) ?? Color.gray;
 				outerColor = Find.Selector.IsSelected(pawn) ? selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);

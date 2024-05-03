@@ -194,37 +194,11 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
-		// fake everything being humanlike so Prefs.AnimalNameMode is ignored (we handle it ourselves)
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			var mHumanlike = AccessTools.PropertyGetter(typeof(RaceProperties), nameof(RaceProperties.Humanlike));
-			foreach (var code in instructions)
-			{
-				yield return code;
-				if (code.Calls(mHumanlike))
-				{
-					yield return new CodeInstruction(OpCodes.Pop);
-					yield return new CodeInstruction(OpCodes.Ldc_I4_1);
-				}
-			}
-		}
-
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
 			if (CameraPlusMain.skipCustomRendering)
 				return true;
-
-			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
-				return true;
-
-			if (___pawn.IsEntity == false)
-			{
-				if (___pawn.RaceProps.Humanlike)
-					return true;
-				if (___pawn.Name != null)
-					return true;
-			}
 
 			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
 				return true;
