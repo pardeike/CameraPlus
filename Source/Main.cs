@@ -38,14 +38,9 @@ namespace CameraPlus
 		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
-		{
-			Settings.DoWindowContents(inRect);
-		}
+			=> Settings.DoWindowContents(inRect);
 
-		public override string SettingsCategory()
-		{
-			return "Camera+";
-		}
+		public override string SettingsCategory() => "Camera+";
 	}
 
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.Update))]
@@ -88,9 +83,7 @@ namespace CameraPlus
 		}
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			return instructions.MethodReplacer(m_SetRootSizeOriginal, m_SetRootSize);
-		}
+			=> instructions.MethodReplacer(m_SetRootSizeOriginal, m_SetRootSize);
 	}
 
 	[HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
@@ -110,7 +103,7 @@ namespace CameraPlus
 	}
 
 	[HarmonyPatch(typeof(MoteMaker), nameof(MoteMaker.ThrowText))]
-	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
+	[HarmonyPatch([typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float)])]
 	static class MoteMaker_ThrowText_Patch
 	{
 		public static bool Prefix(Vector3 loc)
@@ -130,51 +123,6 @@ namespace CameraPlus
 				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
 
 			return false;
-		}
-	}
-
-	[HarmonyPatch(typeof(DynamicDrawManager))]
-	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
-	static class DynamicDrawManager_DrawDynamicThings_Patch
-	{
-		public static void Postfix()
-		{
-			var map = Find.CurrentMap;
-			if (map == null)
-				return;
-
-			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
-			var viewRect = DotTools.RealViewRect(borderMarkerSize.x / 1.5f);
-
-			var markersTreshold = FastUI.CurUICellSize <= CameraPlusMain.Settings.dotSize;
-			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
-			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
-			{
-				altitute -= 0.0001f;
-
-				var materials = MarkerCache.MaterialFor(pawn);
-				if (materials == null)
-					return;
-
-				if (CameraPlusMain.Settings.edgeIndicators)
-				{
-					var (vec, clipped) = DotTools.ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
-					if (clipped)
-					{
-						var materialClipped = materials.dot;
-						if (materialClipped != null)
-							DotTools.DrawClipped(borderMarkerSize, altitute, vec, materialClipped);
-						return;
-					}
-				}
-
-				if (markersTreshold == false)
-					return;
-
-				var materialMarker = CameraPlusMain.Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
-				if (materialMarker != null)
-					DotTools.DrawMarker(pawn, materialMarker);
-			});
 		}
 	}
 
@@ -558,10 +506,7 @@ namespace CameraPlus
 	[HarmonyPatch(nameof(Root.OnGUI))]
 	static class Root_OnGUI_Patch
 	{
-		public static void Postfix()
-		{
-			KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
-		}
+		public static void Postfix() => KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
 	}
 
 	[HarmonyPatch(typeof(Game))]
@@ -610,10 +555,7 @@ namespace CameraPlus
 	[HarmonyPatch(nameof(MainTabWindow_Menu.PreOpen))]
 	static class MainTabWindow_Menu_PreOpen_Patch
 	{
-		public static void Postfix()
-		{
-			Tools.ResetSnapback();
-		}
+		public static void Postfix() => Tools.ResetSnapback();
 	}
 
 	[HarmonyPatch(typeof(UIRoot_Play))]
