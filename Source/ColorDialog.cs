@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -14,12 +13,12 @@ namespace CameraPlus
 	{
 		public static void Postfix()
 		{
-			Find.WindowStack.Add(new LoadingDialog("Silhouette Border", new Color(Rand.Range(0f, 1f), Rand.Range(0f, 1f), Rand.Range(0f, 1f))));
+			Find.WindowStack.Add(new ColorDialog("Silhouette Border", new Color(Rand.Range(0f, 1f), Rand.Range(0f, 1f), Rand.Range(0f, 1f))));
 		}
 	}
 
 	[StaticConstructorOnStartup]
-	public class LoadingDialog : Window
+	public class ColorDialog : Window
 	{
 		enum Tracking
 		{
@@ -40,12 +39,14 @@ namespace CameraPlus
 		const int colorHeight = 60;
 		const float spacing = 10f;
 
-		static readonly Texture2D texture = new(1, 1);
-		static readonly Color borderColor = Color.white.ToTransparent(0.2f);
-		static readonly Vector2 swatchSize = new(16, 16);
-
 		static Color[] swatches = new Color[swatchXCount * swatchYCount];
-		static bool MouseButtonDown => UnityGUIBugsFixer.IsLeftMouseButtonPressed();
+
+		static readonly Texture2D texture = new(1, 1);
+		static readonly Color borderEmptyColor = Color.white.ToTransparent(0.1f);
+		static readonly Color borderFullColor = Color.white.ToTransparent(0.6f);
+		static readonly Vector2 swatchSize = new(16, 16);
+		static bool LeftMouseDown => Input.GetMouseButton(0);
+		static bool RightMouseDown => Input.GetMouseButton(1);
 
 		Tracking tracking = Tracking.Nothing;
 		readonly string title;
@@ -53,8 +54,10 @@ namespace CameraPlus
 		float hue, sat, light;
 		Color _color;
 		Color? draggedColor = null;
+		int draggedSwatch = -1;
 		int targetSwatch = -1;
 
+		bool IsDragging => draggedColor.HasValue;
 		Color CurrentColor { get => _color; set { _color = value; Color.RGBToHSV(value, out hue, out sat, out light); } }
 
 		public override Vector2 InitialSize => new(
@@ -62,7 +65,7 @@ namespace CameraPlus
 			StandardMargin + titleHeight + spacing + bedSize + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public LoadingDialog(string title, Color color)
+		public ColorDialog(string title, Color color)
 		{
 			this.title = title;
 			CurrentColor = color;
@@ -125,40 +128,52 @@ namespace CameraPlus
 			list.curY += titleHeight + spacing;
 
 			var colorRect = list.GetRect(colorHeight);
-			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor, draggedColor.HasValue ? Color.white : borderColor);
-			if (MouseButtonDown && Mouse.IsOver(colorRect))
+			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor, IsDragging ? Color.white : borderEmptyColor);
+			if (LeftMouseDown && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing)
 				draggedColor = CurrentColor;
 
 			list.Gap(spacing);
 
 			var swatchesRect = list.GetRect(inRect.height - list.curY - spacing - CloseButSize.y);
-			var sw = (swatchesRect.width - (swatchXCount - 1) * swatchSpace) / swatchXCount;
-			var sh = (swatchesRect.height - (swatchYCount - 1) * swatchSpace) / swatchYCount;
 			var draggedTo = -1;
 			for (var sy = 0; sy < swatchYCount; sy++)
 				for (var sx = 0; sx < swatchXCount; sx++)
-				{
-					var rx = swatchesRect.xMin + sx * (sw + swatchSpace);
-					var ry = swatchesRect.yMin + sy * (sh + swatchSpace);
-					var swatchRect = new Rect(rx, ry, sw, sh);
-					var n = sy * swatchXCount + sx;
-					if (draggedColor.HasValue && Mouse.IsOver(swatchRect))
-						draggedTo = n;
-					Widgets.DrawBoxSolidWithOutline(swatchRect, swatches[n], draggedTo == n ? Color.white : borderColor);
-					if (Widgets.ButtonInvisible(swatchRect))
-						CurrentColor = swatches[n];
-				}
+					DoSwatch(swatchesRect, sx, sy, ref draggedTo);
 			targetSwatch = draggedTo;
 
 			list.End();
 
-			if (draggedColor.HasValue)
+			if (IsDragging)
 			{
 				var swatchRect = new Rect(Event.current.mousePosition - swatchSize / 2, swatchSize);
 				Widgets.DrawBoxSolidWithOutline(swatchRect, draggedColor.Value, Color.white);
 			}
 
 			HandleTracking(originalInRect, bedRect, hueRect);
+		}
+
+		private void DoSwatch(Rect swatchesRect, int sx, int sy, ref int draggedTo)
+		{
+			var sw = (swatchesRect.width - (swatchXCount - 1) * swatchSpace) / swatchXCount;
+			var sh = (swatchesRect.height - (swatchYCount - 1) * swatchSpace) / swatchYCount;
+			var rx = swatchesRect.xMin + sx * (sw + swatchSpace);
+			var ry = swatchesRect.yMin + sy * (sh + swatchSpace);
+			var swatchRect = new Rect(rx, ry, sw, sh);
+			var n = sy * swatchXCount + sx;
+			var over = Mouse.IsOver(swatchRect) && tracking == Tracking.Nothing;
+			if (IsDragging && over)
+				draggedTo = n;
+			var borderColor = swatches[n].a == 0 ? borderEmptyColor : borderFullColor;
+			Widgets.DrawBoxSolidWithOutline(swatchRect, swatches[n], draggedTo == n ? Color.white : borderColor);
+			if (LeftMouseDown && IsDragging == false && over)
+			{
+				draggedColor = swatches[n];
+				draggedSwatch = n;
+			}
+			if (Widgets.ButtonInvisible(swatchRect) && swatches[n].a > 0)
+				CurrentColor = swatches[n];
+			if (RightMouseDown && over)
+				swatches[n] = new Color(0, 0, 0, 0);
 		}
 
 		static void LoadSwatches()
@@ -183,7 +198,28 @@ namespace CameraPlus
 
 		void HandleTracking(Rect inRect, Rect bedRect, Rect hueRect)
 		{
-			if (MouseButtonDown && tracking == Tracking.Nothing)
+			if (LeftMouseDown == false || Mouse.IsOver(inRect) == false)
+			{
+				tracking = Tracking.Nothing;
+				if (IsDragging)
+				{
+					if (targetSwatch > -1)
+					{
+						if (draggedSwatch > -1)
+							(swatches[draggedSwatch], swatches[targetSwatch]) = (swatches[targetSwatch], swatches[draggedSwatch]);
+						else
+							swatches[targetSwatch] = draggedColor.Value;
+					}
+					draggedSwatch = -1;
+					targetSwatch = -1;
+					draggedColor = null;
+				}
+			}
+
+			if (IsDragging)
+				return;
+
+			if (LeftMouseDown && tracking == Tracking.Nothing)
 			{
 				if (Mouse.IsOver(bedRect))
 				{
@@ -195,15 +231,6 @@ namespace CameraPlus
 					tracking = Tracking.Hues;
 					Event.current.Use();
 				}
-			}
-
-			if (MouseButtonDown == false || Mouse.IsOver(inRect) == false)
-			{
-				tracking = Tracking.Nothing;
-				if (targetSwatch > -1 && draggedColor.HasValue)
-					swatches[targetSwatch] = draggedColor.Value;
-				targetSwatch = -1;
-				draggedColor = null;
 			}
 
 			var mousePosition = Event.current.mousePosition;
