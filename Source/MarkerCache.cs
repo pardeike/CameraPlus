@@ -27,29 +27,21 @@ namespace CameraPlus
 				Remove(pawn);
 			}
 
-			var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
-			if (useMarkers)
+			var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
+			silhouette.SetTexture("_MainTex", GetTexture(pawn));
+			silhouette.SetFloat("_OutlineFactor", CameraPlusMain.Settings.outlineFactor);
+			silhouette.renderQueue = (int)RenderQueue.Overlay;
+
+			Material dot = null;
+			if (Tools.GetMarkerTextures(pawn, out var dotTexture, out _))
 			{
-				var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
-				silhouette.SetTexture("_MainTex", GetTexture(pawn));
-				silhouette.SetColor("_FillColor", innerColor);
-				silhouette.SetColor("_OutlineColor", outerColor);
-				silhouette.SetFloat("_OutlineFactor", 0.15f);
-				silhouette.renderQueue = (int)RenderQueue.Overlay;
-
-				Material dot = null;
-				if (Tools.GetMarkerTextures(pawn, out var dotTexture, out _))
-				{
-					dot = MaterialAllocator.Create(Assets.BorderedShader);
-					dot.SetTexture("_MainTex", dotTexture);
-					dot.SetColor("_FillColor", innerColor);
-					dot.SetColor("_OutlineColor", outerColor);
-					dot.SetFloat("_OutlineFactor", 0.15f);
-					dot.renderQueue = (int)RenderQueue.Overlay;
-				}
-
-				materials = new Materials { dot = dot, silhouette = silhouette, refreshTick = 60 };
+				dot = MaterialAllocator.Create(Assets.BorderedShader);
+				dot.SetTexture("_MainTex", dotTexture);
+				dot.SetFloat("_OutlineFactor", CameraPlusMain.Settings.outlineFactor);
+				dot.renderQueue = (int)RenderQueue.Overlay;
 			}
+
+			materials = new Materials { dot = dot, silhouette = silhouette, refreshTick = 300 };
 
 			cache.Add(pawn, materials);
 			return materials;

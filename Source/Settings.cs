@@ -34,7 +34,7 @@ namespace CameraPlus
 	{
 		public float zoomedOutPercent = 65;
 		public float zoomedInPercent = 1;
-		public int exponentiality = 1;
+		public float exponentiality = 0.5f;
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutScreenEdgeDollyFactor = 0.5f;
@@ -51,8 +51,11 @@ namespace CameraPlus
 		public bool edgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
+		public float dotRelativeSize = 1f;
+		public float clippedRelativeSize = 1f;
+		public float outlineFactor = 0.15f;
 
-		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
+		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.LeftControl];
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
 		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
@@ -74,7 +77,7 @@ namespace CameraPlus
 			base.ExposeData();
 			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", 65);
 			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", 1);
-			Scribe_Values.Look(ref exponentiality, "exponentiality", 1);
+			Scribe_Values.Look(ref exponentiality, "exponentiality", 0.5f);
 			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
 			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", 0.5f);
@@ -90,6 +93,9 @@ namespace CameraPlus
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", true);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
 			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", true);
+			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", 1f);
+			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", 1f);
+			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1f);
 			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
@@ -114,7 +120,7 @@ namespace CameraPlus
 			{
 				zoomedOutPercent = 65;
 				zoomedInPercent = 1;
-				exponentiality = 1;
+				exponentiality = 0.5f;
 				zoomedOutDollyPercent = 1;
 				zoomedInDollyPercent = 1;
 				zoomedOutScreenEdgeDollyFactor = 0.5f;
@@ -131,6 +137,9 @@ namespace CameraPlus
 				edgeIndicators = true;
 				customNameStyle = LabelStyle.AnimalsDifferent;
 				includeNotTamedAnimals = true;
+				dotRelativeSize = 1f;
+				clippedRelativeSize = 1f;
+				outlineFactor = 0.15f;
 				cameraSettingsMod[0] = KeyCode.LeftShift;
 				cameraSettingsMod[1] = KeyCode.None;
 				cameraSettingsKey = KeyCode.Tab;
@@ -142,8 +151,6 @@ namespace CameraPlus
 
 			float previous;
 			var map = Current.Game?.CurrentMap;
-			const float buttonWidth = 80f;
-			const float buttonSpace = 4f;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
@@ -174,99 +181,63 @@ namespace CameraPlus
 					Current.cameraDriverInt.SetRootPosAndSize(map.rememberedCameraPos.rootPos, maxRootInput);
 			}
 
-			list.Gap(12f);
+			exponentiality = Mathf.Floor(exponentiality * 100) / 100f;
+			list.Slider(ref exponentiality, 0f, 3f, () => $"{"Exponentiality".Translate()}: " + (exponentiality == 0 ? "Off".Translate() : $"{Mathf.Round(exponentiality * 100)} %"));
 
-			if (list.ButtonTextLabeled("Exponentiality".Translate(), exponentiality == 0 ? "Off".Translate() : new TaggedString($"{exponentiality}x")))
-			{
-				var options = new[] { 0, 1, 2, 3 }.Select(n => new FloatMenuOption(n == 0 ? "Off".Translate() : new TaggedString($"{n}x"), () => exponentiality = n,
-					MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)).ToList();
-				Find.WindowStack.Add(new FloatMenu(options));
-			}
-
-			list.Gap(16f);
-
-			_ = list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
-			list.Slider(ref soundNearness, 0f, 1f, null);
-
-			list.Gap(2f);
-
-			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
-			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
-			list.CheckboxLabeled("EdgeIndicators".Translate(), ref edgeIndicators);
-
-			list.Gap(20f);
-
-			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
-
-			list.Gap(20f);
-
-			_ = list.Label("HotKeys".Translate());
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "SettingsKey".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, true, cameraSettingsKey, KeyCode.Tab, code => cameraSettingsKey = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod[1], KeyCode.None, code => cameraSettingsMod[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod[0], KeyCode.None, code => cameraSettingsMod[0] = code);
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "LoadModifier".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
-			Widgets.Label(rect, "1 - 9");
-			GenUI.ResetLabelAlign();
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[1], KeyCode.None, code => cameraSettingsLoad[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[0], KeyCode.LeftShift, code => cameraSettingsLoad[0] = code);
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "SaveModifier".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
-			Widgets.Label(rect, "1 - 9");
-			GenUI.ResetLabelAlign();
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsSave[1], KeyCode.None, code => cameraSettingsSave[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsSave[0], KeyCode.LeftAlt, code => cameraSettingsSave[0] = code);
-
-			list.NewColumn();
 			list.Gap(16f);
 
 			_ = list.Label("DollyPercentLabel".Translate());
-			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
-			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
+			Tools.TwoColumns(
+				list,
+				() => list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%"),
+				() => list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ")
+			);
 
-			list.Gap(12f);
+			list.Gap(16f);
 
 			_ = list.Label("ScreenEdgeDollyFrictionLabel".Translate());
 			zoomedInScreenEdgeDollyFactor *= 2f;
 			zoomedOutScreenEdgeDollyFactor *= 2f;
-			list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x");
-			list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x");
+			Tools.TwoColumns(
+				list,
+				() => list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x"),
+				() => list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x")
+			);
 			zoomedInScreenEdgeDollyFactor /= 2f;
 			zoomedOutScreenEdgeDollyFactor /= 2f;
 
-			list.Gap(12f);
+			list.Gap(16f);
 
+			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
+			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
+			list.CheckboxLabeled("EdgeIndicators".Translate(), ref edgeIndicators);
+			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
+
+			list.Gap(16f);
+
+			_ = list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 0) + "%");
+			list.Slider(ref soundNearness, 0f, 1f, null);
+
+			list.Gap(4f);
+
+			Tools.TwoColumns(list,
+				() =>
+				{
+					if (list.ButtonText("HotKeys".Translate()))
+						Find.WindowStack.Add(new ShortcutsDialog());
+				},
+				() =>
+				{
+					if (list.ButtonText("Colors".Translate()))
+						Log.Warning("Not implemented yet");
+				}
+			);
+
+			list.NewColumn(); // -----------------------------------------------------------------------------------------------
+			list.curX += 17;
+			list.Gap(16f);
+
+			_ = list.Label("DotStyle".Translate());
 			var oldDotStyle = dotStyle;
 			foreach (var label in Enum.GetNames(typeof(DotStyle)))
 			{
@@ -275,8 +246,7 @@ namespace CameraPlus
 					dotStyle = val;
 			}
 
-			//if (dotStyle == DotStyle.BetterSilhouettes && dotStyle != oldDotStyle && DotTools.silhouetteCache.Count == 0)
-			//	Find.WindowStack.Add(new LoadingDialog());
+			list.Gap(12f);
 
 			if (dotStyle != DotStyle.VanillaDefault)
 			{
@@ -288,6 +258,10 @@ namespace CameraPlus
 				var label2 = "HideThingLabelBelow".Translate();
 				list.Slider(ref hideThingLabelBelow, 0, 128, () => label2 + (hideThingLabelBelow == 0 ? "Never".Translate() : hideThingLabelBelow + " " + pixel));
 				list.Slider(ref dotSize, 1, 32, () => "ShowMarkerBelow".Translate() + dotSize + " " + "Pixel".Translate());
+
+				list.Gap(12f);
+
+				_ = list.Label("Animals".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
@@ -297,6 +271,12 @@ namespace CameraPlus
 				list.Gap(4f);
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
 			}
+
+			list.Gap(16f);
+
+			list.Slider(ref dotRelativeSize, 0f, 2f, () => "DotSilhouetteSize".Translate() + ": " + Math.Round(dotRelativeSize * 100, 0) + "%");
+			list.Slider(ref clippedRelativeSize, 0f, 2f, () => "EdgeDotSize".Translate() + ": " + Math.Round(clippedRelativeSize * 100, 0) + "%");
+			list.Slider(ref outlineFactor, 0f, 0.4f, () => "OutlineSize".Translate() + ": " + Math.Round(outlineFactor * 100, 0) + "%");
 
 			list.End();
 		}

@@ -139,6 +139,18 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
+	static class SelectionDrawer_DrawSelectionBracketFor_Patch
+	{
+		[HarmonyPriority(10000)]
+		public static bool Prefix(object obj)
+		{
+			if (obj is not Pawn pawn)
+				return true;
+			return Tools.ShouldShowMarker(pawn, true) == false;
+		}
+	}
+
 	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{

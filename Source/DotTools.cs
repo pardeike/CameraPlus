@@ -34,6 +34,10 @@ namespace CameraPlus
 			{
 				altitute -= 0.0001f;
 
+				var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
+				if (useMarkers == false)
+					return;
+
 				var materials = MarkerCache.MaterialFor(pawn);
 				if (materials == null)
 					return;
@@ -45,17 +49,28 @@ namespace CameraPlus
 					{
 						var materialClipped = materials.dot;
 						if (materialClipped != null)
+						{
+							materialClipped.SetColor("_FillColor", innerColor);
+							materialClipped.SetColor("_OutlineColor", outerColor);
 							DrawClipped(borderMarkerSize, altitute, vec, materialClipped);
+						}
 						return;
 					}
 				}
+
+				if (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
+					return;
 
 				if (markersTreshold == false)
 					return;
 
 				var materialMarker = CameraPlusMain.Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
 				if (materialMarker != null)
+				{
+					materialMarker.SetColor("_FillColor", innerColor);
+					materialMarker.SetColor("_OutlineColor", outerColor);
 					DrawMarker(pawn, materialMarker);
+				}
 			});
 		}
 
@@ -123,7 +138,7 @@ namespace CameraPlus
 			var scale = p2 - p1;
 			var pos = vec.ToVector3();
 			pos.y = altitute;
-			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale);
+			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * CameraPlusMain.Settings.clippedRelativeSize);
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
 		}
 
@@ -133,7 +148,7 @@ namespace CameraPlus
 			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
 			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var drawSize = (bodyNode.Graphic.drawSize.x + bodyNode.Graphic.drawSize.y) / 2;
-			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow(drawSize, 1 / markerSizeScaler) * markerScale);
+			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow(drawSize, 1 / markerSizeScaler) * markerScale * CameraPlusMain.Settings.dotRelativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
 		}

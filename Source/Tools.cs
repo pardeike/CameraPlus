@@ -77,7 +77,7 @@ namespace CameraPlus
 		{
 			if (checkCellSize && FastUI.CurUICellSize > CameraPlusMain.Settings.dotSize)
 				return false;
-			if (pawn == null || CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
+			if (pawn == null || (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize))
 				return false;
 			return shouldShowDotCache.Get(pawn);
 		}
@@ -246,15 +246,18 @@ namespace CameraPlus
 				return false;
 			}
 
+			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
 			if (isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
 				innerColor = GetMainColor(pawn) ?? Color.gray;
-				outerColor = Find.Selector.IsSelected(pawn) ? selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
+				if (pawn.Faction == Faction.OfPlayer)
+					outerColor = colonistColor[selected];
+				else
+					outerColor = Find.Selector.IsSelected(pawn) ? selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
 			innerColor = pawn.IsPlayerControlled ? Color.white : uncontrollableColor;
-			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
 			outerColor = pawn.Downed ? downedColor[selected] : pawn.Drafted ? draftedColor[selected] : colonistColor[selected];
 			return true;
 		}
@@ -365,6 +368,20 @@ namespace CameraPlus
 				KeyCode.RightWindows => "KeyRightWindows".Translate(),
 				_ => code.ToStringReadable(),
 			};
+		}
+
+		public static void TwoColumns(Listing_Standard list, Action left, Action right)
+		{
+			var cWidth = list.ColumnWidth;
+			var halfWidth = (cWidth - 12f) / 2f;
+			list.ColumnWidth = halfWidth;
+			var (x, y) = (list.curX, list.curY);
+			left();
+			list.curY = y;
+			list.curX += halfWidth + 12f;
+			right();
+			list.ColumnWidth = cWidth;
+			list.curX = x;
 		}
 
 		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, KeyCode defaultKey, Action<KeyCode> action)

@@ -5,9 +5,10 @@
 	<ZoomedOutPercent>Максимальный коэффициент уменьшения</ZoomedOutPercent>
 	<ForZoomedInPercent>Для максимального увеличения</ForZoomedInPercent>
 	<ForZoomedOutPercent>Для минимального увеличения</ForZoomedOutPercent>
-	<Exponentiality>Экспоненциальное масштабирование:</Exponentiality>
+	<Exponentiality>Экспоненциальная скорость зума</Exponentiality>
 	<SoundNearness>Сделать местные звуки ближе</SoundNearness>
-	<HotKeys>Горячие клавиши:</HotKeys>
+	<HotKeys>Горячие клавиши</HotKeys>
+	<Colors>Цвета</Colors>
 	<SettingsKey>Настройки Camera+</SettingsKey>
 	<LoadModifier>Загрузить вид</LoadModifier>
 	<SaveModifier>Сохранить вид</SaveModifier>
@@ -18,6 +19,11 @@
 	<HidePawnLabelBelow>Скрыть метки пешек ниже:</HidePawnLabelBelow>
 	<HideThingLabelBelow>Скрыть метки стека ниже:</HideThingLabelBelow>
 	<ShowMarkerBelow>Показать как маркер ниже:</ShowMarkerBelow>
+	<DotStyle>Стиль точек</DotStyle>
+	<VanillaDefault>Стандарт Vanilla</VanillaDefault>
+	<ClassicDots>Точки Camera+</ClassicDots>
+	<BetterSilhouettes>Силуэты Camera+</BetterSilhouettes>
+	<Animals>Животные</Animals>
 	<IncludeAnimals>У животных одинаковый маркер</IncludeAnimals>
 	<AnimalsDifferent>У животных другой маркер</AnimalsDifferent>
 	<HideAnimals>У животных нет маркера</HideAnimals>
@@ -25,6 +31,7 @@
 	<ZoomToMouse>Увеличить к курсору</ZoomToMouse>
 	<DisableCameraShake>Отключить встряхивание камеры</DisableCameraShake>
 	<MouseRevealsLabels>Мышь показывает ярлыки</MouseRevealsLabels>
+	<EdgeIndicators>Индикаторы краев</EdgeIndicators>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>
@@ -35,4 +42,7 @@
 	<KeyRightControl>Правый Ctrl</KeyRightControl>
 	<KeyRightCommand>Правый Cmd</KeyRightCommand>
 	<KeyRightWindows>Правый Win</KeyRightWindows>
+	<DotSilhouetteSize>Размер точки/силуэта</DotSilhouetteSize>
+	<EdgeDotSize>Размер точки края</EdgeDotSize>
+	<OutlineSize>Размер контура</OutlineSize>
 </LanguageData>

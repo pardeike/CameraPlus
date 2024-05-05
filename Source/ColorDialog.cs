@@ -7,16 +7,6 @@ using Verse;
 
 namespace CameraPlus
 {
-	[HarmonyPatch(typeof(UIRoot_Entry))]
-	[HarmonyPatch(nameof(UIRoot_Entry.Init))]
-	static class UIRoot_Entry_Init_Patch
-	{
-		public static void Postfix()
-		{
-			Find.WindowStack.Add(new ColorDialog("Silhouette Border", new Color(Rand.Range(0f, 1f), Rand.Range(0f, 1f), Rand.Range(0f, 1f))));
-		}
-	}
-
 	[StaticConstructorOnStartup]
 	public class ColorDialog : Window
 	{
@@ -237,26 +227,26 @@ namespace CameraPlus
 			switch (tracking)
 			{
 				case Tracking.Hues:
-					{
-						hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
-						_color = Color.HSVToRGB(hue, sat, light);
-						if (targetSwatch > -1)
-							swatches[targetSwatch] = CurrentColor;
-						break;
-					}
+				{
+					hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
+					_color = Color.HSVToRGB(hue, sat, light);
+					if (targetSwatch > -1)
+						swatches[targetSwatch] = CurrentColor;
+					break;
+				}
 				case Tracking.ColorBed:
-					{
-						sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
-						light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
-						_color = Color.HSVToRGB(hue, sat, light);
-						if (targetSwatch > -1)
-							swatches[targetSwatch] = CurrentColor;
-						break;
-					}
+				{
+					sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
+					light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
+					_color = Color.HSVToRGB(hue, sat, light);
+					if (targetSwatch > -1)
+						swatches[targetSwatch] = CurrentColor;
+					break;
+				}
 				case Tracking.Swatch:
-					{
-						break;
-					}
+				{
+					break;
+				}
 				default:
 					break;
 			}

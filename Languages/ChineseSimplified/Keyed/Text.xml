@@ -5,9 +5,10 @@
 	<ZoomedOutPercent>最大缩小系数</ZoomedOutPercent>
 	<ForZoomedInPercent>对于最高缩放系数</ForZoomedInPercent>
 	<ForZoomedOutPercent>对于最低缩放系数</ForZoomedOutPercent>
-	<Exponentiality>缩放指数:</Exponentiality>
+	<Exponentiality>指数变焦速度</Exponentiality>
 	<SoundNearness>使拉进后的声音更加接近</SoundNearness>
 	<HotKeys>键盘快捷键：</HotKeys>
+	<Colors>颜色</Colors>
 	<SettingsKey>显示 Camera+ 设置</SettingsKey>
 	<LoadModifier>加载视角</LoadModifier>
 	<SaveModifier>保存视角</SaveModifier>
@@ -18,6 +19,11 @@
 	<HidePawnLabelBelow>隐藏的小人标签：</HidePawnLabelBelow>
 	<HideThingLabelBelow>隐藏的堆叠标签：</HideThingLabelBelow>
 	<ShowMarkerBelow>显示的标记：</ShowMarkerBelow>
+	<DotStyle>点样式</DotStyle>
+	<VanillaDefault>原版默认</VanillaDefault>
+	<ClassicDots>Camera+ 点</ClassicDots>
+	<BetterSilhouettes>Camera+ 剪影</BetterSilhouettes>
+	<Animals>动物</Animals>
 	<IncludeAnimals>动物使用相同的标记</IncludeAnimals>
 	<AnimalsDifferent>动物使用不同的标记</AnimalsDifferent>
 	<HideAnimals>动物不使用标记</HideAnimals>
@@ -25,6 +31,7 @@
 	<ZoomToMouse>鼠标缩放</ZoomToMouse>
 	<DisableCameraShake>禁用相机震动</DisableCameraShake>
 	<MouseRevealsLabels>鼠标位置显示名称</MouseRevealsLabels>
+	<EdgeIndicators>边缘指示器</EdgeIndicators>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>
@@ -35,4 +42,7 @@
 	<KeyRightControl>右 Ctrl</KeyRightControl>
 	<KeyRightCommand>右 Cmd</KeyRightCommand>
 	<KeyRightWindows>右 Win</KeyRightWindows>
+	<DotSilhouetteSize>点/轮廓尺寸</DotSilhouetteSize>
+	<EdgeDotSize>边缘点大小</EdgeDotSize>
+	<OutlineSize>轮廓大小</OutlineSize>
 </LanguageData>

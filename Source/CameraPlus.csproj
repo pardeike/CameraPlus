@@ -41,6 +41,21 @@
 		<Content Include="..\Directory.Build.props">
 			<Link>%(Filename)%(Extension)</Link>
 		</Content>
+		<Content Include="..\About\**\*">
+			<Link>About\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Content>
+		<Content Include="..\Defs\**\*">
+			<Link>Defs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Content>
+		<Content Include="..\Languages\**\Keyed\*">
+			<Link>Languages\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Content>
+		<Content Include="..\Sounds\**\*">
+			<Link>Sounds\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Content>
+		<Content Include="..\Textures\**\*">
+			<Link>Textures\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,13 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Facteur de zoom maximal</ZoomedInPercent>
 	<ZoomedOutPercent>Facteur de zoom arrière maximal</ZoomedOutPercent>
 	<ForZoomedInPercent>Pour le facteur de zoom le plus élevé</ForZoomedInPercent>
 	<ForZoomedOutPercent>Pour le facteur de zoom le plus bas</ForZoomedOutPercent>
-	<Exponentiality>Mise à l'échelle exponentielle:</Exponentiality>
+	<Exponentiality>Vitesse de zoom exponentielle</Exponentiality>
 	<SoundNearness>Rapprocher les sons proches</SoundNearness>
-	<HotKeys>Raccourcis clavier:</HotKeys>
+	<HotKeys>Raccourcis clavier</HotKeys>
+	<Colors>Couleurs</Colors>
+	<Animals>Animaux</Animals>
 	<SettingsKey>Camera+ paramètres</SettingsKey>
 	<LoadModifier>Charger la vue</LoadModifier>
 	<SaveModifier>Sauvegarder la vue</SaveModifier>
@@ -18,6 +20,11 @@
 	<HidePawnLabelBelow>Masquer les étiquettes de personnages ci-dessous: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Masquer les étiquettes de stockage ci-dessous: </HideThingLabelBelow>
 	<ShowMarkerBelow>Afficher comme marqueur ci-dessous: </ShowMarkerBelow>
+	<DotStyle>Style de point</DotStyle>
+	<VanillaDefault>Défaut vanille</VanillaDefault>
+	<ClassicDots>Points Camera+</ClassicDots>
+	<BetterSilhouettes>Silhouettes Camera+</BetterSilhouettes>
+	<Animals>Animaux</Animals>
 	<IncludeAnimals>Les animaux ont le même marqueur</IncludeAnimals>
 	<AnimalsDifferent>Les animaux ont un marqueur différent</AnimalsDifferent>
 	<HideAnimals>Les animaux n'ont pas de marqueur</HideAnimals>
@@ -25,6 +32,7 @@
 	<ZoomToMouse>Zoom sur la souris</ZoomToMouse>
 	<DisableCameraShake>Désactiver la caméra secouer</DisableCameraShake>
 	<MouseRevealsLabels>La souris révèle les étiquettes</MouseRevealsLabels>
+	<EdgeIndicators>Indicateurs de bord</EdgeIndicators>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>
@@ -35,4 +43,7 @@
 	<KeyRightControl>Right Ctrl</KeyRightControl>
 	<KeyRightCommand>Right Cmd</KeyRightCommand>
 	<KeyRightWindows>Right Win</KeyRightWindows>
+	<DotSilhouetteSize>Taille Point/Silhouette</DotSilhouetteSize>
+	<EdgeDotSize>Taille Point Bord</EdgeDotSize>
+	<OutlineSize>Taille Contour</OutlineSize>
 </LanguageData>
