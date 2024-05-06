@@ -61,6 +61,7 @@ namespace CameraPlus
 		}
 
 		// copied from RenderPawnAt(Vector3 drawLoc, Rot4? rotOverride, bool neverAimWeapon)
+		// TODO maybe make a reverse patch?
 		static void UpdateSilhouetteCache(Pawn pawn)
 		{
 			var renderer = pawn.Drawer.renderer;

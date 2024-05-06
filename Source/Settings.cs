@@ -95,7 +95,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", true);
 			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", 1f);
 			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", 1f);
-			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1f);
+			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 0.15f);
 			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
 			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
@@ -187,8 +187,7 @@ namespace CameraPlus
 			list.Gap(16f);
 
 			_ = list.Label("DollyPercentLabel".Translate());
-			Tools.TwoColumns(
-				list,
+			list.TwoColumns(
 				() => list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%"),
 				() => list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ")
 			);
@@ -198,8 +197,7 @@ namespace CameraPlus
 			_ = list.Label("ScreenEdgeDollyFrictionLabel".Translate());
 			zoomedInScreenEdgeDollyFactor *= 2f;
 			zoomedOutScreenEdgeDollyFactor *= 2f;
-			Tools.TwoColumns(
-				list,
+			list.TwoColumns(
 				() => list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x"),
 				() => list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x")
 			);
@@ -220,7 +218,7 @@ namespace CameraPlus
 
 			list.Gap(4f);
 
-			Tools.TwoColumns(list,
+			list.TwoColumns(
 				() =>
 				{
 					if (list.ButtonText("HotKeys".Translate()))

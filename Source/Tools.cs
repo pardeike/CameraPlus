@@ -28,18 +28,19 @@ namespace CameraPlus
 		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
 		public static readonly Texture2D colorMarkerTexture = ContentFinder<Texture2D>.Get("ColorMarker", true);
 
-		static readonly Color selectedColor = Color.white;
-		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f);
-		static readonly Color[] colonistColor = [Color.black, Color.white];
-		static readonly Color[] downedColor = [Color.gray, Color.white];
-		static readonly Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
+		static readonly Color playerColor = Color.white; // TODO
+		static readonly Color selectedColor = Color.white; // TODO
+		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f); // TODO
+		static readonly Color[] colonistColor = [Color.black, Color.white]; // TODO
+		static readonly Color[] downedColor = [Color.gray, Color.white]; // TODO
+		static readonly Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)]; // TODO
 
 		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
 			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return false;
 
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
 				return false;
 
 			if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
@@ -86,7 +87,7 @@ namespace CameraPlus
 		{
 			if (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f)
+			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
 				return true;
 			if (pawn == null)
 				return FastUI.CurUICellSize > CameraPlusMain.Settings.hideThingLabelBelow;
@@ -257,7 +258,7 @@ namespace CameraPlus
 				return true;
 			}
 
-			innerColor = pawn.IsPlayerControlled ? Color.white : uncontrollableColor;
+			innerColor = pawn.IsPlayerControlled ? playerColor : uncontrollableColor;
 			outerColor = pawn.Downed ? downedColor[selected] : pawn.Drafted ? draftedColor[selected] : colonistColor[selected];
 			return true;
 		}
@@ -368,20 +369,6 @@ namespace CameraPlus
 				KeyCode.RightWindows => "KeyRightWindows".Translate(),
 				_ => code.ToStringReadable(),
 			};
-		}
-
-		public static void TwoColumns(Listing_Standard list, Action left, Action right)
-		{
-			var cWidth = list.ColumnWidth;
-			var halfWidth = (cWidth - 12f) / 2f;
-			list.ColumnWidth = halfWidth;
-			var (x, y) = (list.curX, list.curY);
-			left();
-			list.curY = y;
-			list.curX += halfWidth + 12f;
-			right();
-			list.ColumnWidth = cWidth;
-			list.curX = x;
 		}
 
 		public static void KeySettingsButton(Rect rect, bool allKeys, KeyCode setting, KeyCode defaultKey, Action<KeyCode> action)

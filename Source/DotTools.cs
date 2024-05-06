@@ -15,9 +15,9 @@ namespace CameraPlus
 		static readonly Mesh meshClipped = MeshPool.GridPlane(Vector2.one / 2);
 		static readonly Quaternion downedRotation = Quaternion.Euler(0, 90, 0);
 
-		static readonly float clippedScale = 3f;
-		static readonly float markerScale = 2f;
-		static readonly float markerSizeScaler = 2f;
+		const float clippedScale = 3f;
+		const float markerScale = 2f;
+		const float markerSizeScaler = 2f;
 
 		static void Postfix()
 		{
@@ -25,7 +25,7 @@ namespace CameraPlus
 			if (map == null)
 				return;
 
-			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
+			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale); // TODO remove 16f somehow?
 			var viewRect = RealViewRect(borderMarkerSize.x / 1.5f);
 
 			var markersTreshold = FastUI.CurUICellSize <= CameraPlusMain.Settings.dotSize;
@@ -76,7 +76,7 @@ namespace CameraPlus
 
 		static Rect RealViewRect(float contract)
 		{
-			var p1 = UI.UIToMapPosition(contract, contract + 36);
+			var p1 = UI.UIToMapPosition(contract, contract + 36); // TODO
 			var wh = UI.UIToMapPosition(UI.screenWidth - contract, UI.screenHeight - contract) - p1;
 			return new Rect(p1.x, p1.z, wh.x, wh.z);
 		}

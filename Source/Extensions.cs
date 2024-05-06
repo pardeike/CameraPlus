@@ -39,5 +39,19 @@ namespace CameraPlus
 				value = Mathf.RoundToInt(value / roundTo) * roundTo;
 			return 4f + label != null ? 18f : 0f;
 		}
+
+		public static void TwoColumns(this Listing_Standard list, Action left, Action right)
+		{
+			var cWidth = list.ColumnWidth;
+			var halfWidth = (cWidth - 12f) / 2f;
+			list.ColumnWidth = halfWidth;
+			var (x, y) = (list.curX, list.curY);
+			left();
+			list.curY = y;
+			list.curX += halfWidth + 12f;
+			right();
+			list.ColumnWidth = cWidth;
+			list.curX = x;
+		}
 	}
 }

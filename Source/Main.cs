@@ -120,7 +120,7 @@ namespace CameraPlus
 				return true;
 
 			if (settings.mouseOverShowsLabels)
-				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
+				return Tools.MouseDistanceSquared(loc, true) <= 2.25f; // TODO
 
 			return false;
 		}
@@ -226,9 +226,9 @@ namespace CameraPlus
 
 		static GameFont GetAdaptedGameFont(float rootSize)
 		{
-			if (rootSize < 11f)
+			if (rootSize < 11f) // TODO
 				return GameFont.Medium;
-			if (rootSize < 15f)
+			if (rootSize < 15f) // TODO
 				return GameFont.Small;
 			return GameFont.Tiny;
 		}
@@ -501,6 +501,8 @@ namespace CameraPlus
 	{
 		static DateTime lastChange = DateTime.MinValue;
 		static bool eventFired = false;
+
+		// TODO make snapback configurable
 
 		public static void Postfix()
 		{
