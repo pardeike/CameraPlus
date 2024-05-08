@@ -38,12 +38,15 @@ namespace CameraPlus
 		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
 
-		public Color playerColor = Color.white;
-		public Color selectedColor = Color.white;
-		public Color uncontrollableColor = new(0.5f, 0f, 0f);
-		public Color[] colonistColor = [Color.black, Color.white];
-		public Color[] downedColor = [Color.gray, Color.white];
-		public Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
+		public OptionalColor[] customInnerColors = [null, null];
+		public OptionalColor[] customOuterColors = [null, null];
+		public OptionalColor[] defaultInnerColors = [null, null];
+		public OptionalColor[] defaultOuterColors = [null, null];
+		public Color[] playerInnerColors = [Color.white, Color.white];
+		public Color[] playerNormalOuterColors = [Color.black, Color.white];
+		public Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
+		public Color[] playerDownedOuterColors = [Color.gray, Color.white];
+		public Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -85,12 +88,15 @@ namespace CameraPlus
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", defaults.cameraSettingsKey);
 			Tools.ScribeArrays(ref cameraSettingsLoad, "cameraSettingsLoad", defaults.cameraSettingsLoad);
 			Tools.ScribeArrays(ref cameraSettingsSave, "cameraSettingsSave", defaults.cameraSettingsSave);
-			Scribe_Values.Look(ref playerColor, "playerColor", defaults.playerColor);
-			Scribe_Values.Look(ref selectedColor, "selectedColor", defaults.selectedColor);
-			Scribe_Values.Look(ref uncontrollableColor, "uncontrollableColor", defaults.uncontrollableColor);
-			Tools.ScribeArrays(ref colonistColor, "colonistColor", defaults.colonistColor);
-			Tools.ScribeArrays(ref downedColor, "downedColor", defaults.downedColor);
-			Tools.ScribeArrays(ref draftedColor, "draftedColor", defaults.draftedColor);
+			Tools.ScribeArrays(ref customInnerColors, "customInnerColors", defaults.customInnerColors);
+			Tools.ScribeArrays(ref customOuterColors, "customOuterColors", defaults.customOuterColors);
+			Tools.ScribeArrays(ref defaultInnerColors, "defaultInnerColors", defaults.defaultInnerColors);
+			Tools.ScribeArrays(ref defaultOuterColors, "defaultOuterColors", defaults.defaultOuterColors);
+			Tools.ScribeArrays(ref playerInnerColors, "playerInnerColors", defaults.playerInnerColors);
+			Tools.ScribeArrays(ref playerNormalOuterColors, "playerNormalOuterColors", defaults.playerNormalOuterColors);
+			Tools.ScribeArrays(ref playerDraftedOuterColors, "playerDraftedOuterColors", defaults.playerDraftedOuterColors);
+			Tools.ScribeArrays(ref playerDownedOuterColors, "playerDownedOuterColors", defaults.playerDownedOuterColors);
+			Tools.ScribeArrays(ref playerMentalInnerColors, "playerMentalInnerColors", defaults.playerMentalInnerColors);
 		}
 
 		public void DoWindowContents(Rect inRect)

@@ -111,7 +111,7 @@ namespace CameraPlus
 		}
 
 		static readonly Dictionary<string, Color> cachedMainColors = [];
-		public static Color? GetMainColor(Pawn pawn)
+		public static Color GetMainColor(Pawn pawn)
 		{
 			var renderer = pawn.Drawer.renderer;
 			var pawnRenderFlags = renderer.DefaultRenderFlagsNow | PawnRenderFlags.Clothes | PawnRenderFlags.Headgear;
@@ -123,6 +123,8 @@ namespace CameraPlus
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (cachedMainColors.TryGetValue(key, out var color) == false)
 			{
+				color = Color.clear;
+
 				if (graphic.color != Color.white)
 				{
 					color = graphic.color;
@@ -200,6 +202,8 @@ namespace CameraPlus
 		// returning true will prefer markers over labels
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 		{
+			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
+
 			var cameraDelegate = GetCachedCameraDelegate(pawn);
 			if (cameraDelegate.GetCameraColors != null)
 			{
@@ -210,8 +214,8 @@ namespace CameraPlus
 					outerColor = default;
 					return false;
 				}
-				innerColor = colors[0];
-				outerColor = colors[1];
+				innerColor = Settings.customInnerColors[selected].color ?? colors[0];
+				outerColor = Settings.customOuterColors[selected].color ?? colors[1];
 				return true;
 			}
 
@@ -224,19 +228,15 @@ namespace CameraPlus
 				return false;
 			}
 
-			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
 			if (isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
-				innerColor = GetMainColor(pawn) ?? Color.gray;
-				if (pawn.Faction == Faction.OfPlayer)
-					outerColor = Settings.colonistColor[selected];
-				else
-					outerColor = Find.Selector.IsSelected(pawn) ? Settings.selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
+				innerColor = Settings.defaultInnerColors[selected].color ?? GetMainColor(pawn);
+				outerColor = pawn.Faction == Faction.OfPlayer ? Settings.playerNormalOuterColors[selected] : Settings.defaultOuterColors[selected].color ?? PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
-			innerColor = pawn.IsPlayerControlled ? Settings.playerColor : Settings.uncontrollableColor;
-			outerColor = pawn.Downed ? Settings.downedColor[selected] : pawn.Drafted ? Settings.draftedColor[selected] : Settings.colonistColor[selected];
+			innerColor = pawn.IsPlayerControlled ? Settings.playerInnerColors[selected] : Settings.playerMentalInnerColors[selected];
+			outerColor = pawn.Downed ? Settings.playerDownedOuterColors[selected] : pawn.Drafted ? Settings.playerDraftedOuterColors[selected] : Settings.playerNormalOuterColors[selected];
 			return true;
 		}
 
@@ -302,7 +302,8 @@ namespace CameraPlus
 			var list = codes.ToList();
 			Scribe_Collections.Look(ref list, name, LookMode.Value, []);
 			codes = list?.ToArray() ?? [];
-			if (codes.Length == 0) codes = defaults;
+			if (codes.Length == 0)
+				codes = defaults;
 		}
 
 		public static float LerpRootSize(float x)

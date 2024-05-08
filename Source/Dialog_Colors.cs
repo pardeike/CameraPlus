@@ -33,31 +33,51 @@ namespace CameraPlus
 			}
 		}
 
+		/* three main groups: player, other, custom
+		 * in two states: normal and selected (player: +drafted +downed +mental)
+		 * in two versions: inner and outer
+		 * 
+		 * Player
+		 * - normal    [ outer ] / [ inner ]
+		 * - drafted   [ outer ] / [ inner ]
+		 * - downed    [ outer ] / [ inner ]
+		 * - mental    [ outer ] / [ inner ]
+		 * - selected  [ outer ] / [ inner ]
+		 * 
+		 * Other
+		 * - normal    [outer+x] / [inner+x]
+		 * - selected  [outer+x] / [inner+x]
+		 * 
+		 * Custom
+		 * - normal    [outer+x] / [inner+x]
+		 * - selected  [outer+x] / [inner+x]
+		 */
+
 		public override void DoWindowContents(Rect inRect)
 		{
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
 
-			ColorField(list, "Player fill", ColorHolder.With(Settings.playerColor, c => Settings.playerColor = c));
-			ColorField(list, "Selected fill", ColorHolder.With(Settings.selectedColor, c => Settings.selectedColor = c));
-			ColorField(list, "Uncontrollable", ColorHolder.With(Settings.uncontrollableColor, c => Settings.uncontrollableColor = c));
+			ColorField(list, "Player fill", ColorHolder.With(Settings.playerInnerColors, c => Settings.playerInnerColors = c));
+			ColorField(list, "Selected fill", ColorHolder.With(Settings.defaultSelectedOuterColor, c => Settings.defaultSelectedOuterColor = c));
+			ColorField(list, "Uncontrollable", ColorHolder.With(Settings.playerMentalInnerColors, c => Settings.playerMentalInnerColors = c));
 
 			list.NewColumn();
 			list.curX += 17;
 
 			list.TwoColumns(
-				() => ColorField(list, "Colonist normal", ColorHolder.With(Settings.colonistColor[0], c => Settings.colonistColor[0] = c)),
-				() => ColorField(list, "Colonist selected", ColorHolder.With(Settings.colonistColor[1], c => Settings.colonistColor[1] = c))
+				() => ColorField(list, "Colonist normal", ColorHolder.With(Settings.playerNormalOuterColors[0], c => Settings.playerNormalOuterColors[0] = c)),
+				() => ColorField(list, "Colonist selected", ColorHolder.With(Settings.playerNormalOuterColors[1], c => Settings.playerNormalOuterColors[1] = c))
 			);
 
 			list.TwoColumns(
-				() => ColorField(list, "Downed normal", ColorHolder.With(Settings.downedColor[0], c => Settings.downedColor[0] = c)),
-				() => ColorField(list, "Downed selected", ColorHolder.With(Settings.downedColor[1], c => Settings.downedColor[1] = c))
+				() => ColorField(list, "Downed normal", ColorHolder.With(Settings.playerDownedOuterColors[0], c => Settings.playerDownedOuterColors[0] = c)),
+				() => ColorField(list, "Downed selected", ColorHolder.With(Settings.playerDownedOuterColors[1], c => Settings.playerDownedOuterColors[1] = c))
 			);
 
 			list.TwoColumns(
-				() => ColorField(list, "Drafted normal", ColorHolder.With(Settings.draftedColor[0], c => Settings.draftedColor[0] = c)),
-				() => ColorField(list, "Drafted selected", ColorHolder.With(Settings.draftedColor[1], c => Settings.draftedColor[1] = c))
+				() => ColorField(list, "Drafted normal", ColorHolder.With(Settings.playerDraftedOuterColors[0], c => Settings.playerDraftedOuterColors[0] = c)),
+				() => ColorField(list, "Drafted selected", ColorHolder.With(Settings.playerDraftedOuterColors[1], c => Settings.playerDraftedOuterColors[1] = c))
 			);
 
 			list.End();
