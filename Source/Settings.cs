@@ -1,35 +1,12 @@
 ﻿using System;
-using System.Linq;
+using HarmonyLib;
+using RimWorld;
 using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public enum DotStyle
-	{
-		VanillaDefault = 0,
-		ClassicDots = 1,
-		BetterSilhouettes = 2
-	}
-
-	public enum LabelStyle
-	{
-		IncludeAnimals = 0,
-		AnimalsDifferent = 1,
-		HideAnimals = 2
-	}
-
-	public class SavedViews(Map map) : MapComponent(map)
-	{
-		public RememberedCameraPos[] views = new RememberedCameraPos[9];
-
-		public override void ExposeData()
-		{
-			for (var i = 0; i < 9; i++)
-				Scribe_Deep.Look(ref views[i], "view" + (i + 1), [map]);
-		}
-	}
-
 	public class CameraPlusSettings : ModSettings
 	{
 		public float zoomedOutPercent = 65;
@@ -51,14 +28,22 @@ namespace CameraPlus
 		public bool edgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
-		public float dotRelativeSize = 1f;
-		public float clippedRelativeSize = 1f;
-		public float outlineFactor = 0.15f;
+		public float dotRelativeSize = 1.25f;
+		public float clippedRelativeSize = 0.4f;
+		public float clippedBorderDistanceFactor = 0.2f;
+		public float outlineFactor = 0.1f;
 
-		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.LeftControl];
+		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
 		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
+
+		public Color playerColor = Color.white;
+		public Color selectedColor = Color.white;
+		public Color uncontrollableColor = new(0.5f, 0f, 0f);
+		public Color[] colonistColor = [Color.black, Color.white];
+		public Color[] downedColor = [Color.gray, Color.white];
+		public Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -69,46 +54,43 @@ namespace CameraPlus
 		public static readonly float minRootOutput = 15;
 		public static readonly float maxRootOutput = 65;
 
-		public static readonly float nearestHeight = 32;
-		public static readonly float farOutHeight = 256;
-
 		public override void ExposeData()
 		{
 			base.ExposeData();
-			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", 65);
-			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", 1);
-			Scribe_Values.Look(ref exponentiality, "exponentiality", 0.5f);
-			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
-			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
-			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", 0.5f);
-			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", 0.5f);
-			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", false);
-			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
-			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", false);
-			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
-			Scribe_Values.Look(ref dotStyle, "dotStyle", DotStyle.BetterSilhouettes);
-			Scribe_Values.Look(ref dotSize, "dotSize", 9);
-			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
-			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
-			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", true);
-			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
-			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", true);
-			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", 1f);
-			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", 1f);
-			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 0.15f);
-			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
-			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
-			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
-			Scribe_Values.Look(ref cameraSettingsLoad[0], "cameraSettingsLoad1", KeyCode.LeftShift);
-			Scribe_Values.Look(ref cameraSettingsLoad[1], "cameraSettingsLoad2", KeyCode.None);
-			Scribe_Values.Look(ref cameraSettingsSave[0], "cameraSettingsSave1", KeyCode.LeftAlt);
-			Scribe_Values.Look(ref cameraSettingsSave[1], "cameraSettingsSave2", KeyCode.None);
-
-			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
-			{
-				minRootResult = zoomedInPercent * 2;
-				maxRootResult = zoomedOutPercent * 2;
-			}
+			var defaults = new CameraPlusSettings();
+			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", defaults.zoomedOutPercent);
+			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", defaults.zoomedInPercent);
+			Scribe_Values.Look(ref exponentiality, "exponentiality", defaults.exponentiality);
+			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", defaults.zoomedOutDollyPercent);
+			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", defaults.zoomedInDollyPercent);
+			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", defaults.zoomedOutScreenEdgeDollyFactor);
+			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", defaults.zoomedInScreenEdgeDollyFactor);
+			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", defaults.stickyMiddleMouse);
+			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", defaults.zoomToMouse);
+			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", defaults.disableCameraShake);
+			Scribe_Values.Look(ref soundNearness, "soundNearness", defaults.soundNearness);
+			Scribe_Values.Look(ref dotStyle, "dotStyle", defaults.dotStyle);
+			Scribe_Values.Look(ref dotSize, "dotSize", defaults.dotSize);
+			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", defaults.hidePawnLabelBelow);
+			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", defaults.hideThingLabelBelow);
+			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
+			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
+			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
+			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", defaults.includeNotTamedAnimals);
+			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", defaults.dotRelativeSize);
+			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", defaults.clippedRelativeSize);
+			Scribe_Values.Look(ref clippedBorderDistanceFactor, "clippedBorderDistanceFactor", defaults.clippedBorderDistanceFactor);
+			Scribe_Values.Look(ref outlineFactor, "outlineFactor", defaults.outlineFactor);
+			Tools.ScribeArrays(ref cameraSettingsMod, "cameraSettingsMod", defaults.cameraSettingsMod);
+			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", defaults.cameraSettingsKey);
+			Tools.ScribeArrays(ref cameraSettingsLoad, "cameraSettingsLoad", defaults.cameraSettingsLoad);
+			Tools.ScribeArrays(ref cameraSettingsSave, "cameraSettingsSave", defaults.cameraSettingsSave);
+			Scribe_Values.Look(ref playerColor, "playerColor", defaults.playerColor);
+			Scribe_Values.Look(ref selectedColor, "selectedColor", defaults.selectedColor);
+			Scribe_Values.Look(ref uncontrollableColor, "uncontrollableColor", defaults.uncontrollableColor);
+			Tools.ScribeArrays(ref colonistColor, "colonistColor", defaults.colonistColor);
+			Tools.ScribeArrays(ref downedColor, "downedColor", defaults.downedColor);
+			Tools.ScribeArrays(ref draftedColor, "draftedColor", defaults.draftedColor);
 		}
 
 		public void DoWindowContents(Rect inRect)
@@ -117,37 +99,7 @@ namespace CameraPlus
 			var restoreLen = restoreText.GetWidthCached() + 12f;
 			var rect = new Rect(inRect.width - restoreLen, inRect.yMin - 30f, restoreLen, 30f);
 			if (Widgets.ButtonText(rect, restoreText))
-			{
-				zoomedOutPercent = 65;
-				zoomedInPercent = 1;
-				exponentiality = 0.5f;
-				zoomedOutDollyPercent = 1;
-				zoomedInDollyPercent = 1;
-				zoomedOutScreenEdgeDollyFactor = 0.5f;
-				zoomedInScreenEdgeDollyFactor = 0.5f;
-				stickyMiddleMouse = false;
-				zoomToMouse = true;
-				disableCameraShake = false;
-				soundNearness = 0;
-				dotStyle = DotStyle.BetterSilhouettes;
-				dotSize = 9;
-				hidePawnLabelBelow = 9;
-				hideThingLabelBelow = 32;
-				mouseOverShowsLabels = true;
-				edgeIndicators = true;
-				customNameStyle = LabelStyle.AnimalsDifferent;
-				includeNotTamedAnimals = true;
-				dotRelativeSize = 1f;
-				clippedRelativeSize = 1f;
-				outlineFactor = 0.15f;
-				cameraSettingsMod[0] = KeyCode.LeftShift;
-				cameraSettingsMod[1] = KeyCode.None;
-				cameraSettingsKey = KeyCode.Tab;
-				cameraSettingsLoad[0] = KeyCode.LeftShift;
-				cameraSettingsLoad[1] = KeyCode.None;
-				cameraSettingsSave[0] = KeyCode.LeftAlt;
-				cameraSettingsSave[1] = KeyCode.None;
-			}
+				Traverse.IterateFields(new CameraPlusSettings(), Settings, (t1, t2) => t2.SetValue(t1.GetValue()));
 
 			float previous;
 			var map = Current.Game?.CurrentMap;
@@ -227,7 +179,7 @@ namespace CameraPlus
 				() =>
 				{
 					if (list.ButtonText("Colors".Translate()))
-						Log.Warning("Not implemented yet");
+						Find.WindowStack.Add(new Dialog_Colors());
 				}
 			);
 
@@ -274,7 +226,11 @@ namespace CameraPlus
 
 			list.Slider(ref dotRelativeSize, 0f, 2f, () => "DotSilhouetteSize".Translate() + ": " + Math.Round(dotRelativeSize * 100, 0) + "%");
 			list.Slider(ref clippedRelativeSize, 0f, 2f, () => "EdgeDotSize".Translate() + ": " + Math.Round(clippedRelativeSize * 100, 0) + "%");
+			list.Slider(ref clippedBorderDistanceFactor, 0f, 2f, () => "EdgeDistanceFactor".Translate() + ": " + Math.Round(clippedBorderDistanceFactor * 100, 0) + "%");
+			var oldOutlineFactor = outlineFactor;
 			list.Slider(ref outlineFactor, 0f, 0.4f, () => "OutlineSize".Translate() + ": " + Math.Round(outlineFactor * 100, 0) + "%");
+			if (oldOutlineFactor != outlineFactor)
+				MarkerCache.cache.Clear();
 
 			list.End();
 		}
