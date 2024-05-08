@@ -9,6 +9,7 @@ namespace CameraPlus
 	[StaticConstructorOnStartup]
 	public static class Assets
 	{
+		public static readonly Texture2D dummyTexture = new(1, 1);
 		public static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
 		public static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
 		public static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);

@@ -11,6 +11,7 @@ namespace CameraPlus
 	{
 		enum Tracking
 		{
+			Init,
 			Nothing,
 			Hues,
 			ColorBed,
@@ -26,18 +27,17 @@ namespace CameraPlus
 		const int swatchYCount = 8;
 		const int swatchSpace = 5;
 		const int colorHeight = 60;
-		const float spacing = 10f;
+		public const float spacing = 10f;
 
 		static Color[] swatches = new Color[swatchXCount * swatchYCount];
 
-		static readonly Texture2D texture = new(1, 1);
-		static readonly Color borderEmptyColor = Color.white.ToTransparent(0.1f);
-		static readonly Color borderFullColor = Color.white.ToTransparent(0.6f);
+		public static readonly Color borderEmptyColor = Color.white.ToTransparent(0.1f);
+		public static readonly Color borderFullColor = Color.white.ToTransparent(0.6f);
 		static readonly Vector2 swatchSize = new(16, 16);
 		static bool LeftMouseDown => Input.GetMouseButton(0);
 		static bool RightMouseDown => Input.GetMouseButton(1);
 
-		Tracking tracking = Tracking.Nothing;
+		Tracking tracking = Tracking.Init;
 		readonly string title;
 		readonly Action<Color> callback;
 
@@ -87,11 +87,16 @@ namespace CameraPlus
 		public override void PostClose()
 		{
 			base.PostClose();
-			UnityEngine.Object.Destroy(texture);
+			UnityEngine.Object.Destroy(Assets.dummyTexture);
 		}
 
 		public override void DoWindowContents(Rect inRect)
 		{
+			// FIXME: material for shader does not draw anymore
+
+			if (tracking == Tracking.Init && LeftMouseDown == false && RightMouseDown == false)
+				tracking = Tracking.Nothing;
+
 			var list = new Listing_Standard();
 
 			var originalInRect = inRect;
@@ -110,11 +115,11 @@ namespace CameraPlus
 
 			var material = Assets.HuesMaterial;
 			material.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(hueRect, texture, material);
+			GenUI.DrawTextureWithMaterial(hueRect, Assets.dummyTexture, material);
 
 			material = Assets.ColorBedMaterial;
 			material.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(bedRect, texture, material);
+			GenUI.DrawTextureWithMaterial(bedRect, Assets.dummyTexture, material);
 
 			var x = bedRect.xMin + bedRect.width * sat;
 			var y = bedRect.yMax - bedRect.height * light;
@@ -198,6 +203,9 @@ namespace CameraPlus
 
 		void HandleTracking(Rect inRect, Rect bedRect, Rect hueRect)
 		{
+			if (tracking == Tracking.Init)
+				return;
+
 			if (LeftMouseDown == false || Mouse.IsOver(inRect) == false)
 			{
 				tracking = Tracking.Nothing;

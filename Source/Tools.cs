@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using HarmonyLib;
+using RimWorld;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -289,7 +290,7 @@ namespace CameraPlus
 				return false;
 
 			for (int i = 0; i < a.Length; i++)
-				if (!a[i].Equals(b[i]))
+				if (a[i].Equals(b[i]) == false)
 					return false;
 
 			return true;
@@ -297,10 +298,11 @@ namespace CameraPlus
 
 		public static void ScribeArrays<T>(ref T[] codes, string name, T[] defaults)
 		{
+			codes ??= defaults;
 			if (Scribe.mode == LoadSaveMode.Saving && ArrayEquals(codes, defaults))
 				return;
 			var list = codes.ToList();
-			Scribe_Collections.Look(ref list, name, LookMode.Value, []);
+			Scribe_Collections.Look(ref list, name, typeof(T).IsSubclassOf(typeof(IExposable)) ? LookMode.Deep : LookMode.Value, []);
 			codes = list?.ToArray() ?? [];
 			if (codes.Length == 0)
 				codes = defaults;
@@ -455,13 +457,12 @@ namespace CameraPlus
 			if (Event.current.type == EventType.Repaint || Current.ProgramState != ProgramState.Playing)
 				return;
 
-			var settings = CameraPlusMain.Settings;
 			KeyCode m1, m2;
 
-			if (Input.GetKey(settings.cameraSettingsKey))
+			if (Input.GetKey(Settings.cameraSettingsKey))
 			{
-				m1 = settings.cameraSettingsMod[0];
-				m2 = settings.cameraSettingsMod[1];
+				m1 = Settings.cameraSettingsMod[0];
+				m2 = Settings.cameraSettingsMod[1];
 				if (m1 == KeyCode.None && m2 == KeyCode.None)
 					return;
 
@@ -496,8 +497,8 @@ namespace CameraPlus
 
 			var savedViews = map.GetComponent<SavedViews>();
 
-			m1 = settings.cameraSettingsLoad[0];
-			m2 = settings.cameraSettingsLoad[1];
+			m1 = Settings.cameraSettingsLoad[0];
+			m2 = Settings.cameraSettingsLoad[1];
 			if (m1 != KeyCode.None || m2 != KeyCode.None)
 				if (m1 == KeyCode.None || Input.GetKey(m1))
 					if (m2 == KeyCode.None || Input.GetKey(m2))
@@ -508,8 +509,8 @@ namespace CameraPlus
 						Event.current.Use();
 					}
 
-			m1 = settings.cameraSettingsSave[0];
-			m2 = settings.cameraSettingsSave[1];
+			m1 = Settings.cameraSettingsSave[0];
+			m2 = Settings.cameraSettingsSave[1];
 			if (m1 != KeyCode.None || m2 != KeyCode.None)
 				if (m1 == KeyCode.None || Input.GetKey(m1))
 					if (m2 == KeyCode.None || Input.GetKey(m2))

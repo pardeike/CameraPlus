@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using HarmonyLib;
+using UnityEngine;
 using Verse;
 using static CameraPlus.CameraPlusMain;
 
@@ -6,79 +9,96 @@ namespace CameraPlus
 {
 	public class Dialog_Colors : Window
 	{
-		const float colorFieldHeight = 40f;
-		static readonly Color borderColor = Color.white.ToTransparent(0.5f);
+		public override Vector2 InitialSize => new(720, 440);
+
+		static readonly Vector2 colorFieldSize = new(120, 30);
+		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
+		static Color[] emptyColors = [];
 
 		public Dialog_Colors()
 		{
 			doCloseButton = true;
 		}
 
-		public override Vector2 InitialSize => new(640, 360);
-
-		static void ColorField(Listing_Standard list, string title, ColorHolder colorHolder)
+		static void CenteredLabel(Rect labelRect, TaggedString label)
 		{
-			list.Gap(16f);
-			list.Label(title);
-			var rect = list.GetRect(colorFieldHeight);
-			Widgets.DrawBoxSolidWithOutline(rect, colorHolder.color, borderColor);
-			if (Mouse.IsOver(rect))
+			Text.Anchor = TextAnchor.MiddleCenter;
+			Widgets.LabelFit(labelRect, label);
+			Text.Anchor = TextAnchor.UpperLeft;
+		}
+
+		static void PrepareRow(Listing_Standard list, TaggedString label, out Rect cRect1, out Rect cRect2, out Rect cRect3, out Rect cRect4)
+		{
+			var rect = list.GetRect(colorFieldSize.y + 5);
+
+			var labelRect = rect.LeftPartPixels(rect.width - 4 * (Dialog_ColorPicker.spacing + colorFieldSize.x));
+			cRect1 = new Rect(labelRect.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, colorFieldSize.y);
+			cRect2 = new Rect(cRect1.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, colorFieldSize.y);
+			cRect3 = new Rect(cRect2.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, colorFieldSize.y);
+			cRect4 = new Rect(cRect3.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, colorFieldSize.y);
+			Widgets.Label(labelRect, label); // CenteredLabel(labelRect, label);
+		}
+
+		static void ColorButton(Rect rect, string title, Color color, Action<Color> newColorCallback)
+		{
+			Widgets.DrawBoxSolidWithOutline(rect, color, borderColor);
+			if (Mouse.IsOver(rect) && Input.GetMouseButtonDown(0))
+				Find.WindowStack.Add(new Dialog_ColorPicker(title, color, newColorCallback));
+		}
+
+		void ColorEditorRow(Listing_Standard list, TaggedString label, string outerName, string innerName)
+		{
+			PrepareRow(list, label, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			var trv = Traverse.Create(Settings);
+			if (outerName != "")
 			{
-				Widgets.DrawBoxSolidWithOutline(rect, Color.white, Color.white);
-				if (Input.GetMouseButton(0))
+				var outers = trv.Field(outerName).GetValue<Array>();
+				if (outers is OptionalColor[] optionals)
 				{
-					var picker = new Dialog_ColorPicker(title, colorHolder.color, colorHolder.update);
-					Find.WindowStack.Add(picker);
+					ColorButton(cRect1, label, optionals[0]?.color ?? Color.clear, c => outers.SetValue(new OptionalColor(c), 0));
+					ColorButton(cRect2, $"{label} selected", optionals[1]?.color ?? Color.clear, c => outers.SetValue(new OptionalColor(c), 1));
+				}
+				if (outers is Color[] colors)
+				{
+					ColorButton(cRect1, label, colors[0], c => outers.SetValue(c, 0));
+					ColorButton(cRect2, $"{label} selected", colors[1], c => outers.SetValue(c, 1));
+				}
+			}
+			if (innerName != "")
+			{
+				var inners = trv.Field(innerName).GetValue<Array>();
+				if (inners is OptionalColor[] optionals)
+				{
+					ColorButton(cRect3, label, optionals[0]?.color ?? Color.clear, c => inners.SetValue(new OptionalColor(c), 0));
+					ColorButton(cRect4, $"{label} selected", optionals[1]?.color ?? Color.clear, c => inners.SetValue(new OptionalColor(c), 1));
+				}
+				if (inners is Color[] colors)
+				{
+					ColorButton(cRect3, label, colors[0], c => inners.SetValue(c, 0));
+					ColorButton(cRect4, $"{label} selected", colors[1], c => inners.SetValue(c, 1));
 				}
 			}
 		}
 
-		/* three main groups: player, other, custom
-		 * in two states: normal and selected (player: +drafted +downed +mental)
-		 * in two versions: inner and outer
-		 * 
-		 * Player
-		 * - normal    [ outer ] / [ inner ]
-		 * - drafted   [ outer ] / [ inner ]
-		 * - downed    [ outer ] / [ inner ]
-		 * - mental    [ outer ] / [ inner ]
-		 * - selected  [ outer ] / [ inner ]
-		 * 
-		 * Other
-		 * - normal    [outer+x] / [inner+x]
-		 * - selected  [outer+x] / [inner+x]
-		 * 
-		 * Custom
-		 * - normal    [outer+x] / [inner+x]
-		 * - selected  [outer+x] / [inner+x]
-		 */
-
 		public override void DoWindowContents(Rect inRect)
 		{
-			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
+			var list = new Listing_Standard();
 			list.Begin(inRect);
 
-			ColorField(list, "Player fill", ColorHolder.With(Settings.playerInnerColors, c => Settings.playerInnerColors = c));
-			ColorField(list, "Selected fill", ColorHolder.With(Settings.defaultSelectedOuterColor, c => Settings.defaultSelectedOuterColor = c));
-			ColorField(list, "Uncontrollable", ColorHolder.With(Settings.playerMentalInnerColors, c => Settings.playerMentalInnerColors = c));
+			PrepareRow(list, "", out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			CenteredLabel(cRect1.Union(cRect2), "Line /Line Selected");
+			CenteredLabel(cRect3.Union(cRect4), "Fill / Fill Selected");
 
-			list.NewColumn();
-			list.curX += 17;
+			ColorEditorRow(list, "Player normal", nameof(Settings.playerNormalOuterColors), nameof(Settings.playerInnerColors));
+			ColorEditorRow(list, "Player drafted", "", nameof(Settings.playerDraftedOuterColors));
+			ColorEditorRow(list, "Player downed", "", nameof(Settings.playerDownedOuterColors));
+			ColorEditorRow(list, "Player mental", "", nameof(Settings.playerMentalInnerColors));
 
-			list.TwoColumns(
-				() => ColorField(list, "Colonist normal", ColorHolder.With(Settings.playerNormalOuterColors[0], c => Settings.playerNormalOuterColors[0] = c)),
-				() => ColorField(list, "Colonist selected", ColorHolder.With(Settings.playerNormalOuterColors[1], c => Settings.playerNormalOuterColors[1] = c))
-			);
+			list.Gap();
+			ColorEditorRow(list, "Animals / Other", nameof(Settings.defaultOuterColors), nameof(Settings.defaultInnerColors));
 
-			list.TwoColumns(
-				() => ColorField(list, "Downed normal", ColorHolder.With(Settings.playerDownedOuterColors[0], c => Settings.playerDownedOuterColors[0] = c)),
-				() => ColorField(list, "Downed selected", ColorHolder.With(Settings.playerDownedOuterColors[1], c => Settings.playerDownedOuterColors[1] = c))
-			);
-
-			list.TwoColumns(
-				() => ColorField(list, "Drafted normal", ColorHolder.With(Settings.playerDraftedOuterColors[0], c => Settings.playerDraftedOuterColors[0] = c)),
-				() => ColorField(list, "Drafted selected", ColorHolder.With(Settings.playerDraftedOuterColors[1], c => Settings.playerDraftedOuterColors[1] = c))
-			);
+			list.Gap();
+			ColorEditorRow(list, "Custom / Mods", nameof(Settings.customOuterColors), nameof(Settings.customInnerColors));
 
 			list.End();
 		}
