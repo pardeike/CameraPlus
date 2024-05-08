@@ -4,12 +4,12 @@ using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public class ColorsDialog : Window
+	public class Dialog_Colors : Window
 	{
 		const float colorFieldHeight = 40f;
 		static readonly Color borderColor = Color.white.ToTransparent(0.5f);
 
-		public ColorsDialog()
+		public Dialog_Colors()
 		{
 			doCloseButton = true;
 		}
@@ -27,7 +27,7 @@ namespace CameraPlus
 				Widgets.DrawBoxSolidWithOutline(rect, Color.white, Color.white);
 				if (Input.GetMouseButton(0))
 				{
-					var picker = new ColorPicker(title, colorHolder.color, colorHolder.update);
+					var picker = new Dialog_ColorPicker(title, colorHolder.color, colorHolder.update);
 					Find.WindowStack.Add(picker);
 				}
 			}

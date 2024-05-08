@@ -4,12 +4,12 @@ using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public class ShortcutsDialog : Window
+	public class Dialog_Shortcuts : Window
 	{
 		const float buttonWidth = 80f;
 		const float buttonSpace = 4f;
 
-		public ShortcutsDialog()
+		public Dialog_Shortcuts()
 		{
 			doCloseButton = true;
 		}

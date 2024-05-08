@@ -7,7 +7,7 @@ using Verse;
 
 namespace CameraPlus
 {
-	public class ColorPicker : Window
+	public class Dialog_ColorPicker : Window
 	{
 		enum Tracking
 		{
@@ -64,7 +64,7 @@ namespace CameraPlus
 			StandardMargin + titleHeight + spacing + bedSize + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public ColorPicker(string title, Color color, Action<Color> callback)
+		public Dialog_ColorPicker(string title, Color color, Action<Color> callback)
 		{
 			this.title = title;
 			this.callback = callback;
