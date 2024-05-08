@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
@@ -28,13 +29,13 @@ namespace CameraPlus
 			Widgets.Label(rect, "SettingsKey".Translate());
 			GenUI.ResetLabelAlign();
 			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, true, CameraPlusMain.Settings.cameraSettingsKey, KeyCode.Tab, code => CameraPlusMain.Settings.cameraSettingsKey = code);
+			Tools.KeySettingsButton(rect, true, Settings.cameraSettingsKey, KeyCode.Tab, code => Settings.cameraSettingsKey = code);
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsMod[1], KeyCode.None, code => CameraPlusMain.Settings.cameraSettingsMod[1] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsMod[1], KeyCode.None, code => Settings.cameraSettingsMod[1] = code);
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsMod[0], KeyCode.None, code => CameraPlusMain.Settings.cameraSettingsMod[0] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsMod[0], KeyCode.None, code => Settings.cameraSettingsMod[0] = code);
 			list.Gap(6f);
 
 			rect = list.GetRect(28f);
@@ -47,10 +48,10 @@ namespace CameraPlus
 			GenUI.ResetLabelAlign();
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsLoad[1], KeyCode.None, code => CameraPlusMain.Settings.cameraSettingsLoad[1] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsLoad[1], KeyCode.None, code => Settings.cameraSettingsLoad[1] = code);
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsLoad[0], KeyCode.LeftShift, code => CameraPlusMain.Settings.cameraSettingsLoad[0] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsLoad[0], KeyCode.LeftShift, code => Settings.cameraSettingsLoad[0] = code);
 			list.Gap(6f);
 
 			rect = list.GetRect(28f);
@@ -63,10 +64,10 @@ namespace CameraPlus
 			GenUI.ResetLabelAlign();
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsSave[1], KeyCode.None, code => CameraPlusMain.Settings.cameraSettingsSave[1] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsSave[1], KeyCode.None, code => Settings.cameraSettingsSave[1] = code);
 			rect.xMin -= buttonWidth + buttonSpace;
 			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, CameraPlusMain.Settings.cameraSettingsSave[0], KeyCode.LeftAlt, code => CameraPlusMain.Settings.cameraSettingsSave[0] = code);
+			Tools.KeySettingsButton(rect, false, Settings.cameraSettingsSave[0], KeyCode.LeftAlt, code => Settings.cameraSettingsSave[0] = code);
 
 			list.End();
 		}

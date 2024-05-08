@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using RimWorld;
+﻿using RimWorld;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,40 +6,18 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public enum LabelMode
+	class Tools
 	{
-		hide,
-		show,
-		dot
-	}
-
-	[StaticConstructorOnStartup]
-	class Tools : CameraPlusSettings
-	{
-		static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
-		static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
-		static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
-		static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
-		static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
-		static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
-		public static readonly Texture2D colorMarkerTexture = ContentFinder<Texture2D>.Get("ColorMarker", true);
-
-		static readonly Color playerColor = Color.white; // TODO
-		static readonly Color selectedColor = Color.white; // TODO
-		static readonly Color uncontrollableColor = new(0.5f, 0f, 0f); // TODO
-		static readonly Color[] colonistColor = [Color.black, Color.white]; // TODO
-		static readonly Color[] downedColor = [Color.gray, Color.white]; // TODO
-		static readonly Color[] draftedColor = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)]; // TODO
-
 		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
-			if (CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
+			if (Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return false;
 
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
+			if (Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
 				return false;
 
 			if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
@@ -50,13 +27,13 @@ namespace CameraPlus
 				return false;
 
 			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			return CameraPlusMain.Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal;
+			return Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal;
 		});
 
 		static readonly QuotaCache<Pawn, int, bool> shouldShowLabelCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
 			var len = FastUI.CurUICellSize;
-			if (len <= CameraPlusMain.Settings.hidePawnLabelBelow)
+			if (len <= Settings.hidePawnLabelBelow)
 				return false;
 
 			if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
@@ -65,10 +42,10 @@ namespace CameraPlus
 			if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
 				return false;
 
-			if (pawn != null && CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
+			if (pawn != null && Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
 				return true;
 
-			if (pawn != null && len <= CameraPlusMain.Settings.dotSize)
+			if (pawn != null && len <= Settings.dotSize)
 				return false;
 
 			return true;
@@ -76,21 +53,21 @@ namespace CameraPlus
 
 		public static bool ShouldShowMarker(Pawn pawn, bool checkCellSize)
 		{
-			if (checkCellSize && FastUI.CurUICellSize > CameraPlusMain.Settings.dotSize)
+			if (checkCellSize && FastUI.CurUICellSize > Settings.dotSize)
 				return false;
-			if (pawn == null || (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize))
+			if (pawn == null || (Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize))
 				return false;
 			return shouldShowDotCache.Get(pawn);
 		}
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)
 		{
-			if (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
+			if (Settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
-			if (CameraPlusMain.Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
+			if (Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
 				return true;
 			if (pawn == null)
-				return FastUI.CurUICellSize > CameraPlusMain.Settings.hideThingLabelBelow;
+				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			return shouldShowLabelCache.Get(pawn);
 		}
 
@@ -239,7 +216,7 @@ namespace CameraPlus
 			}
 
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			var hideAnimalMarkers = CameraPlusMain.Settings.customNameStyle == LabelStyle.HideAnimals;
+			var hideAnimalMarkers = Settings.customNameStyle == LabelStyle.HideAnimals;
 			if (isAnimal && hideAnimalMarkers)
 			{
 				innerColor = default;
@@ -252,14 +229,14 @@ namespace CameraPlus
 			{
 				innerColor = GetMainColor(pawn) ?? Color.gray;
 				if (pawn.Faction == Faction.OfPlayer)
-					outerColor = colonistColor[selected];
+					outerColor = Settings.colonistColor[selected];
 				else
-					outerColor = Find.Selector.IsSelected(pawn) ? selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
+					outerColor = Find.Selector.IsSelected(pawn) ? Settings.selectedColor : PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
-			innerColor = pawn.IsPlayerControlled ? playerColor : uncontrollableColor;
-			outerColor = pawn.Downed ? downedColor[selected] : pawn.Drafted ? draftedColor[selected] : colonistColor[selected];
+			innerColor = pawn.IsPlayerControlled ? Settings.playerColor : Settings.uncontrollableColor;
+			outerColor = pawn.Downed ? Settings.downedColor[selected] : pawn.Drafted ? Settings.draftedColor[selected] : Settings.colonistColor[selected];
 			return true;
 		}
 
@@ -267,15 +244,15 @@ namespace CameraPlus
 		{
 			if (pawn.IsEntity)
 			{
-				innerTexture = innerEntityTexture;
-				outerTexture = outerEntityTexture;
+				innerTexture = Assets.innerEntityTexture;
+				outerTexture = Assets.outerEntityTexture;
 				return;
 			}
 
 			var isAnimal = pawn.RaceProps.Animal;
-			var customAnimalStyle = CameraPlusMain.Settings.customNameStyle == LabelStyle.AnimalsDifferent;
-			innerTexture = isAnimal && customAnimalStyle ? innerAnimalTexture : innerColonistTexture;
-			outerTexture = isAnimal && customAnimalStyle ? outerAnimalTexture : outerColonistTexture;
+			var customAnimalStyle = Settings.customNameStyle == LabelStyle.AnimalsDifferent;
+			innerTexture = isAnimal && customAnimalStyle ? Assets.innerAnimalTexture : Assets.innerColonistTexture;
+			outerTexture = isAnimal && customAnimalStyle ? Assets.outerAnimalTexture : Assets.outerColonistTexture;
 		}
 
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
@@ -306,39 +283,61 @@ namespace CameraPlus
 			return GenMath.LerpDouble(inFrom, inTo, outFrom, outTo, x);
 		}
 
+		static bool ArrayEquals<T>(T[] a, T[] b)
+		{
+			if (a.Length != b.Length)
+				return false;
+
+			for (int i = 0; i < a.Length; i++)
+				if (!a[i].Equals(b[i]))
+					return false;
+
+			return true;
+		}
+
+		public static void ScribeArrays<T>(ref T[] codes, string name, T[] defaults)
+		{
+			if (Scribe.mode == LoadSaveMode.Saving && ArrayEquals(codes, defaults))
+				return;
+			var list = codes.ToList();
+			Scribe_Collections.Look(ref list, name, LookMode.Value, []);
+			codes = list?.ToArray() ?? [];
+			if (codes.Length == 0) codes = defaults;
+		}
+
 		public static float LerpRootSize(float x)
 		{
-			var n = CameraPlusMain.Settings.exponentiality;
+			var n = Settings.exponentiality;
 			if (n == 0)
-				return LerpDoubleSafe(minRootInput, maxRootInput, minRootResult, maxRootResult, x);
+				return LerpDoubleSafe(CameraPlusSettings.minRootInput, CameraPlusSettings.maxRootInput, CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, x);
 
-			if (minRootResult == maxRootResult)
-				return minRootResult;
-			var factor = (maxRootResult - minRootResult) / Mathf.Pow(maxRootInput - minRootInput, 2 * n);
-			var y = minRootResult + Mathf.Pow(x - minRootInput, 2 * n) * factor;
+			if (CameraPlusSettings.minRootResult == CameraPlusSettings.maxRootResult)
+				return CameraPlusSettings.minRootResult;
+			var factor = (CameraPlusSettings.maxRootResult - CameraPlusSettings.minRootResult) / Mathf.Pow(CameraPlusSettings.maxRootInput - CameraPlusSettings.minRootInput, 2 * n);
+			var y = CameraPlusSettings.minRootResult + Mathf.Pow(x - CameraPlusSettings.minRootInput, 2 * n) * factor;
 			return (float)y;
 		}
 
 		public static float GetDollyRateKeys(float orthSize)
 		{
 			var f = GetScreenEdgeDollyFactor(orthSize);
-			var zoomedIn = CameraPlusMain.Settings.zoomedInDollyPercent * f / 9f;
-			var zoomedOut = CameraPlusMain.Settings.zoomedOutDollyPercent * f * 1.1f;
-			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			var zoomedIn = Settings.zoomedInDollyPercent * f / 9f;
+			var zoomedOut = Settings.zoomedOutDollyPercent * f * 1.1f;
+			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetScreenEdgeDollyFactor(float orthSize)
 		{
-			var zoomedIn = CameraPlusMain.Settings.zoomedInScreenEdgeDollyFactor * 30;
-			var zoomedOut = CameraPlusMain.Settings.zoomedOutScreenEdgeDollyFactor * 30;
-			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			var zoomedIn = Settings.zoomedInScreenEdgeDollyFactor * 30;
+			var zoomedOut = Settings.zoomedOutScreenEdgeDollyFactor * 30;
+			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetDollyRateMouse(float orthSize)
 		{
-			var zoomedIn = 1f * CameraPlusMain.Settings.zoomedInDollyPercent;
-			var zoomedOut = 10f * CameraPlusMain.Settings.zoomedOutDollyPercent;
-			return LerpDoubleSafe(minRootResult, maxRootResult, zoomedIn, zoomedOut, orthSize);
+			var zoomedIn = 1f * Settings.zoomedInDollyPercent;
+			var zoomedOut = 10f * Settings.zoomedOutDollyPercent;
+			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
 		public static float GetDollySpeedDecay(float orthSize)
@@ -347,7 +346,7 @@ namespace CameraPlus
 			//
 			var minVal = 1f - 0.15f;
 			var maxVal = 1f - 0.15f;
-			return LerpDoubleSafe(minRootResult, maxRootResult, minVal, maxVal, orthSize);
+			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, minVal, maxVal, orthSize);
 		}
 
 		public static string ToLabel(KeyCode code)

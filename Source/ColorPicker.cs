@@ -7,8 +7,7 @@ using Verse;
 
 namespace CameraPlus
 {
-	[StaticConstructorOnStartup]
-	public class ColorDialog : Window
+	public class ColorPicker : Window
 	{
 		enum Tracking
 		{
@@ -40,6 +39,7 @@ namespace CameraPlus
 
 		Tracking tracking = Tracking.Nothing;
 		readonly string title;
+		readonly Action<Color> callback;
 
 		float hue, sat, light;
 		Color _color;
@@ -48,16 +48,26 @@ namespace CameraPlus
 		int targetSwatch = -1;
 
 		bool IsDragging => draggedColor.HasValue;
-		Color CurrentColor { get => _color; set { _color = value; Color.RGBToHSV(value, out hue, out sat, out light); } }
+		public Color CurrentColor
+		{
+			get => _color;
+			set
+			{
+				_color = value;
+				Color.RGBToHSV(value, out hue, out sat, out light);
+				callback(value);
+			}
+		}
 
 		public override Vector2 InitialSize => new(
 			StandardMargin + hueSize + spacing + bedSize + spacing + swatchesWidth + StandardMargin,
 			StandardMargin + titleHeight + spacing + bedSize + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public ColorDialog(string title, Color color)
+		public ColorPicker(string title, Color color, Action<Color> callback)
 		{
 			this.title = title;
+			this.callback = callback;
 			CurrentColor = color;
 			doCloseButton = true;
 		}
@@ -109,7 +119,7 @@ namespace CameraPlus
 			var x = bedRect.xMin + bedRect.width * sat;
 			var y = bedRect.yMax - bedRect.height * light;
 			var cursorRect = new Rect(x - 4, y - 4, 8, 8);
-			GUI.DrawTexture(cursorRect, Tools.colorMarkerTexture, ScaleMode.ScaleToFit);
+			GUI.DrawTexture(cursorRect, Assets.colorMarkerTexture, ScaleMode.ScaleToFit);
 
 			list.End();
 
@@ -227,26 +237,28 @@ namespace CameraPlus
 			switch (tracking)
 			{
 				case Tracking.Hues:
-				{
-					hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
-					_color = Color.HSVToRGB(hue, sat, light);
-					if (targetSwatch > -1)
-						swatches[targetSwatch] = CurrentColor;
-					break;
-				}
+					{
+						hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
+						_color = Color.HSVToRGB(hue, sat, light);
+						callback(_color);
+						if (targetSwatch > -1)
+							swatches[targetSwatch] = CurrentColor;
+						break;
+					}
 				case Tracking.ColorBed:
-				{
-					sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
-					light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
-					_color = Color.HSVToRGB(hue, sat, light);
-					if (targetSwatch > -1)
-						swatches[targetSwatch] = CurrentColor;
-					break;
-				}
+					{
+						sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
+						light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
+						_color = Color.HSVToRGB(hue, sat, light);
+						callback(_color);
+						if (targetSwatch > -1)
+							swatches[targetSwatch] = CurrentColor;
+						break;
+					}
 				case Tracking.Swatch:
-				{
-					break;
-				}
+					{
+						break;
+					}
 				default:
 					break;
 			}

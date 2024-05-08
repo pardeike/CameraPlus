@@ -3,12 +3,13 @@ using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
 	[HarmonyPatch(typeof(DynamicDrawManager))]
 	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
-	static class DynamicDrawManager_DrawDynamicThings_Patch
+	static class DotTools
 	{
 		static readonly Mesh meshWest = MeshPool.GridPlaneFlip(Vector2.one);
 		static readonly Mesh meshEast = MeshPool.GridPlane(Vector2.one);
@@ -25,10 +26,10 @@ namespace CameraPlus
 			if (map == null)
 				return;
 
-			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale); // TODO remove 16f somehow?
-			var viewRect = RealViewRect(borderMarkerSize.x / 1.5f);
+			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
+			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 
-			var markersTreshold = FastUI.CurUICellSize <= CameraPlusMain.Settings.dotSize;
+			var markersTreshold = FastUI.CurUICellSize <= Settings.dotSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
 			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
 			{
@@ -42,7 +43,7 @@ namespace CameraPlus
 				if (materials == null)
 					return;
 
-				if (CameraPlusMain.Settings.edgeIndicators)
+				if (Settings.edgeIndicators)
 				{
 					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
 					if (clipped)
@@ -58,13 +59,13 @@ namespace CameraPlus
 					}
 				}
 
-				if (CameraPlusMain.Settings.dotStyle == DotStyle.VanillaDefault)
+				if (Settings.dotStyle == DotStyle.VanillaDefault)
 					return;
 
 				if (markersTreshold == false)
 					return;
 
-				var materialMarker = CameraPlusMain.Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
+				var materialMarker = Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
 				if (materialMarker != null)
 				{
 					materialMarker.SetColor("_FillColor", innerColor);
@@ -76,7 +77,7 @@ namespace CameraPlus
 
 		static Rect RealViewRect(float contract)
 		{
-			var p1 = UI.UIToMapPosition(contract, contract + 36); // TODO
+			var p1 = UI.UIToMapPosition(contract, contract + 36); // 36 is bottom bar
 			var wh = UI.UIToMapPosition(UI.screenWidth - contract, UI.screenHeight - contract) - p1;
 			return new Rect(p1.x, p1.z, wh.x, wh.z);
 		}
@@ -129,16 +130,16 @@ namespace CameraPlus
 			return (center + t * direction, true);
 		}
 
-		static void DrawClipped(Vector2 borderMarkerSize, float altitute, Vector2 vec, Material materialClipped)
+		static void DrawClipped(Vector2 size, float altitute, Vector2 vec, Material materialClipped)
 		{
 			var v2 = UI.MapToUIPosition(vec);
-			var rect = new Rect(v2.x - borderMarkerSize.x / 2, v2.y - borderMarkerSize.y / 2, borderMarkerSize.x, borderMarkerSize.y);
+			var rect = new Rect(v2.x - size.x / 2, v2.y - size.y / 2, size.x, size.y);
 			var p1 = UI.UIToMapPosition(new Vector2(rect.xMin, rect.yMin));
 			var p2 = UI.UIToMapPosition(new Vector2(rect.xMax, rect.yMax));
 			var scale = p2 - p1;
 			var pos = vec.ToVector3();
 			pos.y = altitute;
-			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * CameraPlusMain.Settings.clippedRelativeSize);
+			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize);
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
 		}
 
@@ -148,7 +149,7 @@ namespace CameraPlus
 			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
 			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var drawSize = (bodyNode.Graphic.drawSize.x + bodyNode.Graphic.drawSize.y) / 2;
-			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow(drawSize, 1 / markerSizeScaler) * markerScale * CameraPlusMain.Settings.dotRelativeSize);
+			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow(drawSize, 1 / markerSizeScaler) * markerScale * Settings.dotRelativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
 		}

@@ -3,19 +3,13 @@ using RimWorld;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public class Materials
-	{
-		public Material dot;
-		public Material silhouette;
-		public int refreshTick;
-	}
-
 	public class MarkerCache
 	{
-		static readonly Dictionary<Pawn, Materials> cache = [];
+		public static readonly Dictionary<Pawn, Materials> cache = [];
 
 		public static Materials MaterialFor(Pawn pawn)
 		{
@@ -29,7 +23,7 @@ namespace CameraPlus
 
 			var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
 			silhouette.SetTexture("_MainTex", GetTexture(pawn));
-			silhouette.SetFloat("_OutlineFactor", CameraPlusMain.Settings.outlineFactor);
+			silhouette.SetFloat("_OutlineFactor", Settings.outlineFactor);
 			silhouette.renderQueue = (int)RenderQueue.Overlay;
 
 			Material dot = null;
@@ -37,7 +31,7 @@ namespace CameraPlus
 			{
 				dot = MaterialAllocator.Create(Assets.BorderedShader);
 				dot.SetTexture("_MainTex", dotTexture);
-				dot.SetFloat("_OutlineFactor", CameraPlusMain.Settings.outlineFactor);
+				dot.SetFloat("_OutlineFactor", Settings.outlineFactor);
 				dot.renderQueue = (int)RenderQueue.Overlay;
 			}
 

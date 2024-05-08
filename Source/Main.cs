@@ -9,16 +9,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	[DefOf]
-	public static class Defs
-	{
-		public static SoundDef SnapBack;
-		public static SoundDef ApplySnap;
-	}
-
 	public class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
@@ -60,7 +54,7 @@ namespace CameraPlus
 				return;
 			}
 
-			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
+			if (Event.current.shift || Settings.zoomToMouse == false)
 			{
 				driver.rootSize = rootSize;
 				return;
@@ -78,7 +72,7 @@ namespace CameraPlus
 
 		public static void Prefix(CameraDriver __instance)
 		{
-			if (CameraPlusMain.Settings.disableCameraShake)
+			if (Settings.disableCameraShake)
 				__instance.shaker.curShakeMag = 0;
 		}
 
@@ -302,7 +296,7 @@ namespace CameraPlus
 			var pos = camera.transform.position;
 			var cameraSpan = CameraPlusSettings.maxRootOutput - CameraPlusSettings.minRootOutput;
 			var f = (pos.y - CameraPlusSettings.minRootOutput) / cameraSpan;
-			f *= 1 - CameraPlusMain.Settings.soundNearness;
+			f *= 1 - Settings.soundNearness;
 			pos.y = CameraPlusSettings.minRootOutput + f * cameraSpan;
 			camera.transform.position = pos;
 
