@@ -17,8 +17,6 @@ namespace CameraPlus
 			this.color = color;
 		}
 
-		public static OptionalColor Empty => new(null);
-
 		public void ExposeData()
 		{
 			if (Scribe.mode == LoadSaveMode.Saving)

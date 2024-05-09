@@ -43,10 +43,10 @@ namespace CameraPlus
 		public Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
 		public Color[] playerDownedOuterColors = [Color.gray, Color.white];
 		public Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
-		public OptionalColor[] defaultInnerColors = [OptionalColor.Empty, OptionalColor.Empty];
-		public OptionalColor[] defaultOuterColors = [OptionalColor.Empty, OptionalColor.Empty];
-		public OptionalColor[] customInnerColors = [OptionalColor.Empty, OptionalColor.Empty];
-		public OptionalColor[] customOuterColors = [OptionalColor.Empty, OptionalColor.Empty];
+		public OptionalColor[] defaultInnerColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] defaultOuterColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] customInnerColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] customOuterColors = [new OptionalColor(), new OptionalColor()];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;

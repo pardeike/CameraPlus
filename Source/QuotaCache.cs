@@ -5,10 +5,10 @@ namespace CameraPlus
 {
 	public class WeakQuotaCache<KEY, KEYID, VALUE>(int maxRetrievals, Func<KEY, KEYID> keyConverter, Func<KEY, VALUE> fetchCallback) where VALUE : class
 	{
-		private readonly Dictionary<KEYID, (WeakReference<VALUE> value, int count)> cache = [];
-		private readonly int maxRetrievals = maxRetrievals;
-		private readonly Func<KEY, KEYID> keyConverter = keyConverter;
-		private readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
+		readonly Dictionary<KEYID, (WeakReference<VALUE> value, int count)> cache = [];
+		readonly int maxRetrievals = maxRetrievals;
+		readonly Func<KEY, KEYID> keyConverter = keyConverter;
+		readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
 
 		public VALUE Get(KEY key)
 		{
@@ -34,10 +34,10 @@ namespace CameraPlus
 
 	public class QuotaCache<KEY, KEYID, VALUE>(int maxRetrievals, Func<KEY, KEYID> keyConverter, Func<KEY, VALUE> fetchCallback)
 	{
-		private readonly Dictionary<KEYID, (VALUE value, int count)> cache = [];
-		private readonly int maxRetrievals = maxRetrievals;
-		private readonly Func<KEY, KEYID> keyConverter = keyConverter;
-		private readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
+		readonly Dictionary<KEYID, (VALUE value, int count)> cache = [];
+		readonly int maxRetrievals = maxRetrievals;
+		readonly Func<KEY, KEYID> keyConverter = keyConverter;
+		readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
 
 		public VALUE Get(KEY key)
 		{

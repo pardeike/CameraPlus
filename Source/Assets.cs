@@ -17,10 +17,12 @@ namespace CameraPlus
 		public static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
 		public static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
 		public static readonly Texture2D colorMarkerTexture = ContentFinder<Texture2D>.Get("ColorMarker", true);
+		public static readonly Texture2D colorBackgroundPattern = ContentFinder<Texture2D>.Get("ColorBackgroundPattern", true);
+		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
 
-		public static bool initialized = false;
-		private static Material colorBedMaterial, huesMaterial;
-		private static Shader borderedShader;
+		static bool initialized = false;
+		static Material colorBedMaterial, huesMaterial;
+		static Shader borderedShader;
 
 		[HarmonyPatch(typeof(UIRoot_Entry), nameof(UIRoot_Entry.Init))]
 		[HarmonyPostfix]

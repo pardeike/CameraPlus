@@ -29,7 +29,7 @@ namespace CameraPlus
 		const int colorHeight = 60;
 		public const float spacing = 10f;
 
-		static Color[] swatches = new Color[swatchXCount * swatchYCount];
+		static Color?[] swatches = new Color?[swatchXCount * swatchYCount];
 
 		public static readonly Color borderEmptyColor = Color.white.ToTransparent(0.1f);
 		public static readonly Color borderFullColor = Color.white.ToTransparent(0.6f);
@@ -39,22 +39,23 @@ namespace CameraPlus
 
 		Tracking tracking = Tracking.Init;
 		readonly string title;
-		readonly Action<Color> callback;
+		readonly Action<Color?> callback;
 
 		float hue, sat, light;
-		Color _color;
+		Color? _color;
 		Color? draggedColor = null;
 		int draggedSwatch = -1;
 		int targetSwatch = -1;
 
 		bool IsDragging => draggedColor.HasValue;
-		public Color CurrentColor
+		public Color? CurrentColor
 		{
 			get => _color;
 			set
 			{
 				_color = value;
-				Color.RGBToHSV(value, out hue, out sat, out light);
+				if (value.HasValue)
+					Color.RGBToHSV(value.Value, out hue, out sat, out light);
 				callback(value);
 			}
 		}
@@ -64,7 +65,7 @@ namespace CameraPlus
 			StandardMargin + titleHeight + spacing + bedSize + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public Dialog_ColorPicker(string title, Color color, Action<Color> callback)
+		public Dialog_ColorPicker(string title, Color? color, Action<Color?> callback)
 		{
 			this.title = title;
 			this.callback = callback;
@@ -82,12 +83,6 @@ namespace CameraPlus
 		{
 			base.PreClose();
 			SaveSwatches();
-		}
-
-		public override void PostClose()
-		{
-			base.PostClose();
-			UnityEngine.Object.Destroy(Assets.dummyTexture);
 		}
 
 		public override void DoWindowContents(Rect inRect)
@@ -113,13 +108,13 @@ namespace CameraPlus
 			var hueRect = bedRect.LeftPartPixels(hueSize);
 			bedRect.x += spacing + hueSize;
 
-			var material = Assets.HuesMaterial;
-			material.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(hueRect, Assets.dummyTexture, material);
+			var hueMaterial = Assets.HuesMaterial;
+			hueMaterial.SetFloat("_Hue", hue);
+			GenUI.DrawTextureWithMaterial(hueRect, Assets.dummyTexture, hueMaterial);
 
-			material = Assets.ColorBedMaterial;
-			material.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(bedRect, Assets.dummyTexture, material);
+			var bedMaterial = Assets.ColorBedMaterial;
+			bedMaterial.SetFloat("_Hue", hue);
+			GenUI.DrawTextureWithMaterial(bedRect, Assets.dummyTexture, bedMaterial);
 
 			var x = bedRect.xMin + bedRect.width * sat;
 			var y = bedRect.yMax - bedRect.height * light;
@@ -133,7 +128,7 @@ namespace CameraPlus
 			list.curY += titleHeight + spacing;
 
 			var colorRect = list.GetRect(colorHeight);
-			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor, IsDragging ? Color.white : borderEmptyColor);
+			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor ?? Color.clear, IsDragging ? Color.white : borderEmptyColor);
 			if (LeftMouseDown && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing)
 				draggedColor = CurrentColor;
 
@@ -157,7 +152,7 @@ namespace CameraPlus
 			HandleTracking(originalInRect, bedRect, hueRect);
 		}
 
-		private void DoSwatch(Rect swatchesRect, int sx, int sy, ref int draggedTo)
+		void DoSwatch(Rect swatchesRect, int sx, int sy, ref int draggedTo)
 		{
 			var sw = (swatchesRect.width - (swatchXCount - 1) * swatchSpace) / swatchXCount;
 			var sh = (swatchesRect.height - (swatchYCount - 1) * swatchSpace) / swatchYCount;
@@ -168,35 +163,35 @@ namespace CameraPlus
 			var over = Mouse.IsOver(swatchRect) && tracking == Tracking.Nothing;
 			if (IsDragging && over)
 				draggedTo = n;
-			var borderColor = swatches[n].a == 0 ? borderEmptyColor : borderFullColor;
-			Widgets.DrawBoxSolidWithOutline(swatchRect, swatches[n], draggedTo == n ? Color.white : borderColor);
+			var borderColor = swatches[n].HasValue ? borderEmptyColor : borderFullColor;
+			Widgets.DrawBoxSolidWithOutline(swatchRect, swatches[n] ?? Color.clear, draggedTo == n ? Color.white : borderColor);
 			if (LeftMouseDown && IsDragging == false && over)
 			{
 				draggedColor = swatches[n];
 				draggedSwatch = n;
 			}
-			if (Widgets.ButtonInvisible(swatchRect) && swatches[n].a > 0)
+			if (Widgets.ButtonInvisible(swatchRect))
 				CurrentColor = swatches[n];
 			if (RightMouseDown && over)
-				swatches[n] = new Color(0, 0, 0, 0);
+				swatches[n] = null;
 		}
 
 		static void LoadSwatches()
 		{
-			Array.Fill(swatches, new Color(0, 0, 0, 0));
+			Array.Fill(swatches, null);
 			var path = Path.Combine(GenFilePaths.ConfigFolderPath, swatchesFileName);
 			if (File.Exists(path) == false)
 				return;
 			swatches = File.ReadAllText(path).Split('\n')
 				.Where(l => l.NullOrEmpty() == false)
-				.Select(l => l.Split(' ').Select(s => ParseHelper.ParseFloat(s)).ToArray())
-				.Select(p => new Color(p[0], p[1], p[2], p[3]))
+				.Select(l => l == "undefined" ? [] : l.Split(' ').Select(s => ParseHelper.ParseFloat(s)).ToArray())
+				.Select(p => p.Length == 0 ? (Color?)null : new Color(p[0], p[1], p[2], p[3]))
 				.ToArray();
 		}
 
 		static void SaveSwatches()
 		{
-			var text = swatches.Join(c => $"{c.r} {c.g} {c.b} {c.a}", "\n");
+			var text = swatches.Join(c => c.HasValue ? $"{c.Value.r} {c.Value.g} {c.Value.b} {c.Value.a}" : "undefined", "\n");
 			var path = Path.Combine(GenFilePaths.ConfigFolderPath, swatchesFileName);
 			File.WriteAllText(path, text);
 		}

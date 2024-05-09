@@ -39,10 +39,20 @@ namespace CameraPlus
 			Widgets.Label(labelRect, label); // CenteredLabel(labelRect, label);
 		}
 
-		static void ColorButton(Rect rect, string title, Color color, Action<Color> newColorCallback)
+		static void ColorButton(Rect rect, string title, bool canDelete, Color? color, Action<Color?> newColorCallback)
 		{
-			Widgets.DrawBoxSolidWithOutline(rect, color, borderColor);
-			if (Mouse.IsOver(rect) && Input.GetMouseButtonDown(0))
+			GUI.DrawTexture(rect, Assets.colorBackgroundPattern, ScaleMode.StretchToFill);
+			if (color.HasValue)
+				Widgets.DrawBoxSolidWithOutline(rect, color.Value, borderColor);
+			var deleteRect = rect.RightPartPixels(rect.height).ExpandedBy(-4);
+			if (canDelete && color.HasValue)
+			{
+				GUI.DrawTexture(deleteRect, Assets.deleteColorButton);
+				GUI.color = Color.white;
+				if (Widgets.ButtonInvisible(deleteRect))
+					newColorCallback(null);
+			}
+			if (Widgets.ButtonInvisible(rect))
 				Find.WindowStack.Add(new Dialog_ColorPicker(title, color, newColorCallback));
 		}
 
@@ -55,13 +65,13 @@ namespace CameraPlus
 				var outers = trv.Field(outerName).GetValue<Array>();
 				if (outers is OptionalColor[] optionals)
 				{
-					ColorButton(cRect1, label, optionals[0]?.color ?? Color.clear, c => outers.SetValue(new OptionalColor(c), 0));
-					ColorButton(cRect2, $"{label} selected", optionals[1]?.color ?? Color.clear, c => outers.SetValue(new OptionalColor(c), 1));
+					ColorButton(cRect1, $"{label} line", true, optionals[0]?.color, c => outers.SetValue(new OptionalColor(c), 0));
+					ColorButton(cRect2, $"{label} line selected", true, optionals[1]?.color, c => outers.SetValue(new OptionalColor(c), 1));
 				}
 				if (outers is Color[] colors)
 				{
-					ColorButton(cRect1, label, colors[0], c => outers.SetValue(c, 0));
-					ColorButton(cRect2, $"{label} selected", colors[1], c => outers.SetValue(c, 1));
+					ColorButton(cRect1, $"{label} line", false, colors[0], c => outers.SetValue(c ?? Color.clear, 0));
+					ColorButton(cRect2, $"{label} line selected", false, colors[1], c => outers.SetValue(c ?? Color.clear, 1));
 				}
 			}
 			if (innerName != "")
@@ -69,13 +79,13 @@ namespace CameraPlus
 				var inners = trv.Field(innerName).GetValue<Array>();
 				if (inners is OptionalColor[] optionals)
 				{
-					ColorButton(cRect3, label, optionals[0]?.color ?? Color.clear, c => inners.SetValue(new OptionalColor(c), 0));
-					ColorButton(cRect4, $"{label} selected", optionals[1]?.color ?? Color.clear, c => inners.SetValue(new OptionalColor(c), 1));
+					ColorButton(cRect3, $"{label} fill", true, optionals[0]?.color, c => inners.SetValue(new OptionalColor(c), 0));
+					ColorButton(cRect4, $"{label} fill selected", true, optionals[1]?.color, c => inners.SetValue(new OptionalColor(c), 1));
 				}
 				if (inners is Color[] colors)
 				{
-					ColorButton(cRect3, label, colors[0], c => inners.SetValue(c, 0));
-					ColorButton(cRect4, $"{label} selected", colors[1], c => inners.SetValue(c, 1));
+					ColorButton(cRect3, $"{label} fill", false, colors[0], c => inners.SetValue(c ?? Color.clear, 0));
+					ColorButton(cRect4, $"{label} fill selected", false, colors[1], c => inners.SetValue(c ?? Color.clear, 1));
 				}
 			}
 		}

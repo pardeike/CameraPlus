@@ -302,7 +302,7 @@ namespace CameraPlus
 			if (Scribe.mode == LoadSaveMode.Saving && ArrayEquals(codes, defaults))
 				return;
 			var list = codes.ToList();
-			Scribe_Collections.Look(ref list, name, typeof(T).IsSubclassOf(typeof(IExposable)) ? LookMode.Deep : LookMode.Value, []);
+			Scribe_Collections.Look(ref list, name, typeof(T) == typeof(OptionalColor) ? LookMode.Deep : LookMode.Value, []);
 			codes = list?.ToArray() ?? [];
 			if (codes.Length == 0)
 				codes = defaults;
