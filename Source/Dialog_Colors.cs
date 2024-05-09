@@ -13,7 +13,6 @@ namespace CameraPlus
 
 		static readonly Vector2 colorFieldSize = new(120, 30);
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
-		static Color[] emptyColors = [];
 
 		public Dialog_Colors()
 		{
