@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ColorBed
-  m_Shader: {fileID: 4800000, guid: ce2b5f687c49b4f78b0d0da71a2a6ae3, type: 3}
+  m_Shader: {fileID: 4800000, guid: ed24a6c95e4f61a40b1312b4f1a7bd67, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

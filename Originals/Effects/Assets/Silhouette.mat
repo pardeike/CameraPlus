@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Silhouette
-  m_Shader: {fileID: 4800000, guid: 09397cd602af04fabb15ab46cdd13379, type: 3}
+  m_Shader: {fileID: 4800000, guid: dbf4150f14c6e624389c22c6e9f92a3b, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -44,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: bf407ddc5c75f4b10813807a8afb722b, type: 3}
+        m_Texture: {fileID: 2800000, guid: ac4abc2c67b6ab1458d36e6f3142946f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -71,7 +71,7 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OutlineFactor: 0.075
+    - _OutlineFactor: 0.0533
     - _OutlineWidth: 1
     - _Parallax: 0.02
     - _Quality: 32
@@ -85,5 +85,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FillColor: {r: 0, g: 0, b: 0, a: 0}
+    - _FillColor: {r: 0, g: 0, b: 0, a: 0.9411765}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}

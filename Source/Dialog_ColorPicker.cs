@@ -152,7 +152,10 @@ namespace CameraPlus
 			GUI.DrawTexture(colorRect, Assets.editoBackgroundPattern, ScaleMode.StretchToFill);
 			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor ?? Color.clear, IsDragging ? Color.white : borderEmptyColor);
 			if (LeftMouseDown && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing)
+			{
 				draggedColor = CurrentColor;
+				Event.current.Use();
+			}
 
 			list.Gap(spacing);
 

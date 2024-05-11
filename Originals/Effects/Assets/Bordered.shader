@@ -64,8 +64,7 @@
                 if (baseUV.x >= 0 && baseUV.x <= 1 && baseUV.y >= 0 && baseUV.y <= 1)
                     mainCol = tex2D(_MainTex, baseUV);
 
-                if (_FillColor.a > 0)
-                   mainCol.rgb = _FillColor.rgb;
+                mainCol.rgb = lerp(mainCol.rgb, _FillColor.rgb, _FillColor.a);
                 if (_OutlineFactor == 0)
 						  return mainCol;
 
