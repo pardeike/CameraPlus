@@ -232,12 +232,31 @@ namespace CameraPlus
 			if (isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
 				innerColor = Settings.defaultInnerColors[selected].color ?? GetMainColor(pawn);
-				outerColor = pawn.Faction == Faction.OfPlayer ? Settings.playerNormalOuterColors[selected] : Settings.defaultOuterColors[selected].color ?? PawnNameColorUtility.PawnNameColorOf(pawn);
+				outerColor = pawn.Faction == Faction.OfPlayer ? Settings.playerNormalOuterColors[selected].Value : Settings.defaultOuterColors[selected].color ?? PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
-			innerColor = pawn.IsPlayerControlled ? Settings.playerInnerColors[selected] : Settings.playerMentalInnerColors[selected];
-			outerColor = pawn.Downed ? Settings.playerDownedOuterColors[selected] : pawn.Drafted ? Settings.playerDraftedOuterColors[selected] : Settings.playerNormalOuterColors[selected];
+			if (pawn.IsPlayerControlled == false)
+			{
+				outerColor = Settings.playerMentalOuterColors[selected].Value;
+				innerColor = Settings.playerMentalInnerColors[selected].Value;
+			}
+			else if (pawn.Downed)
+			{
+				outerColor = Settings.playerDownedOuterColors[selected].Value;
+				innerColor = Settings.playerDownedInnerColors[selected].Value;
+			}
+			else if (pawn.Drafted)
+			{
+				outerColor = Settings.playerDraftedOuterColors[selected].Value;
+				innerColor = Settings.playerDraftedInnerColors[selected].Value;
+			}
+			else
+			{
+				outerColor = Settings.playerNormalOuterColors[selected].Value;
+				innerColor = Settings.playerNormalInnerColors[selected].Value;
+			}
+
 			return true;
 		}
 

@@ -17,6 +17,9 @@ namespace CameraPlus
 			this.color = color;
 		}
 
+		public bool HasValue => color.HasValue;
+		public Color Value => color ?? Color.clear;
+
 		public void ExposeData()
 		{
 			if (Scribe.mode == LoadSaveMode.Saving)
@@ -32,7 +35,8 @@ namespace CameraPlus
 
 		public override bool Equals(object obj)
 		{
-			if (obj is not OptionalColor optionalColor) return false;
+			if (obj is not OptionalColor optionalColor)
+				return false;
 			return Equals(optionalColor);
 		}
 

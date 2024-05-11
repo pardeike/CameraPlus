@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Verse;
 
 namespace CameraPlus
@@ -20,7 +21,12 @@ namespace CameraPlus
 		public static readonly Texture2D colorBackgroundPattern = ContentFinder<Texture2D>.Get("ColorBackgroundPattern", true);
 		public static readonly Texture2D editoBackgroundPattern = ContentFinder<Texture2D>.Get("EditorBackgroundPattern", true);
 		public static readonly Texture2D swatchBackgroundPattern = ContentFinder<Texture2D>.Get("SwatchBackgroundPattern", true);
+		public static readonly Texture2D columnHeaderPreview = ContentFinder<Texture2D>.Get("ColumnHeaderPreview", true);
+		public static readonly Texture2D columnHeader = ContentFinder<Texture2D>.Get("ColumnHeader", true);
+		public static readonly Texture2D columnHeaderSelected = ContentFinder<Texture2D>.Get("ColumnHeaderSelected", true);
 		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
+
+		public static Material previewMaterial;
 
 		static bool initialized = false;
 		static Material colorBedMaterial, huesMaterial;
@@ -55,6 +61,11 @@ namespace CameraPlus
 			borderedShader = assets.LoadAsset<Shader>("Bordered");
 			if (borderedShader == null)
 				Log.Error("Cannot load Bordered shader from asset bundle.");
+
+			previewMaterial = MaterialAllocator.Create(BorderedShader);
+			previewMaterial.SetTexture("_MainTex", outerAnimalTexture);
+			previewMaterial.SetFloat("_OutlineFactor", 0.3f);
+			previewMaterial.renderQueue = (int)RenderQueue.Overlay;
 
 			initialized = true;
 		}

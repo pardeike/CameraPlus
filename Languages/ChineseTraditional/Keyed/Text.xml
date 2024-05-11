@@ -1,49 +1,52 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
-    <Zoom>縮放</Zoom>
-    <ZoomedInPercent>最大放大係數</ZoomedInPercent>
-    <ZoomedOutPercent>最大縮小係數</ZoomedOutPercent>
-    <ForZoomedInPercent>对于最高缩放系数</ForZoomedInPercent>
-    <ForZoomedOutPercent>對於最低縮放係數</ForZoomedOutPercent>
-    <Exponentiality>指數變焦速度</Exponentiality>
-    <SoundNearness>使拉進後的聲音更加接近</SoundNearness>
-    <HotKeys>鍵盤快捷鍵：</HotKeys>
-    <Colors>顏色</Colors>
-    <SettingsKey>顯示 Camera+ 設置</SettingsKey>
-    <LoadModifier>加載視角</LoadModifier>
-    <SaveModifier>保存視角</SaveModifier>
-    <DollyPercentLabel>滾動速度</DollyPercentLabel>
-    <ScreenEdgeDollyFrictionLabel>邊緣拖動靈敏度</ScreenEdgeDollyFrictionLabel>
-    <HideNamesWhenZoomedOut>縮小後隱藏名字</HideNamesWhenZoomedOut>
-    <Pixel>像素</Pixel>
-    <HidePawnLabelBelow>隱藏的小人標籤：</HidePawnLabelBelow>
-    <HideThingLabelBelow>隱藏的堆疊標籤：</HideThingLabelBelow>
-    <ShowMarkerBelow>顯示的標記：</ShowMarkerBelow>
-    <DotStyle>點樣式</DotStyle>
-    <VanillaDefault>原版默認</VanillaDefault>
-    <ClassicDots>Camera+ 點</ClassicDots>
-    <BetterSilhouettes>Camera+ 剪影</BetterSilhouettes>
-    <Animals>動物</Animals>
-    <IncludeAnimals>動物使用相同的標記</IncludeAnimals>
-    <AnimalsDifferent>動物使用不同的標記</AnimalsDifferent>
-    <HideAnimals>動物不使用標記</HideAnimals>
-    <IncludeNotTamedAnimals>包括未馴服的動物</IncludeNotTamedAnimals>
-    <ZoomToMouse>鼠標縮放</ZoomToMouse>
-    <DisableCameraShake>禁用相機震動</DisableCameraShake>
-    <MouseRevealsLabels>鼠標位置顯示名稱</MouseRevealsLabels>
-    <EdgeIndicators>邊緣指示器</EdgeIndicators>
-    <KeyLeftShift>左 Shift</KeyLeftShift>
-    <KeyLeftAlt>左 Alt</KeyLeftAlt>
-    <KeyLeftControl>左 Ctrl</KeyLeftControl>
-    <KeyLeftCommand>左 Cmd</KeyLeftCommand>
-    <KeyLeftWindows>左 Win</KeyLeftWindows>
-    <KeyRightShift>右 Shift</KeyRightShift>
-    <KeyRightAlt>右 Alt</KeyRightAlt>
-    <KeyRightControl>右 Ctrl</KeyRightControl>
-    <KeyRightCommand>右 Cmd</KeyRightCommand>
-    <KeyRightWindows>右 Win</KeyRightWindows>
-    <DotSilhouetteSize>點/剪影大小</DotSilhouetteSize>
-    <EdgeDotSize>邊緣點大小</EdgeDotSize>
-    <EdgeDistanceFactor>邊緣距離</EdgeDistanceFactor>
-    <OutlineSize>輪廓寬度</OutlineSize>
+	<Zoom>縮放</Zoom>
+	<ZoomedInPercent>最大放大係數</ZoomedInPercent>
+	<ZoomedOutPercent>最大縮小係數</ZoomedOutPercent>
+	<ForZoomedInPercent>对于最高缩放系数</ForZoomedInPercent>
+	<ForZoomedOutPercent>對於最低縮放係數</ForZoomedOutPercent>
+	<Exponentiality>指數變焦速度</Exponentiality>
+	<SoundNearness>使拉進後的聲音更加接近</SoundNearness>
+	<HotKeys>鍵盤快捷鍵：</HotKeys>
+	<Colors>顏色</Colors>
+	<SettingsKey>顯示 Camera+ 設置</SettingsKey>
+	<LoadModifier>加載視角</LoadModifier>
+	<SaveModifier>保存視角</SaveModifier>
+	<DollyPercentLabel>滾動速度</DollyPercentLabel>
+	<ScreenEdgeDollyFrictionLabel>邊緣拖動靈敏度</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>縮小後隱藏名字</HideNamesWhenZoomedOut>
+	<Pixel>像素</Pixel>
+	<HidePawnLabelBelow>隱藏的小人標籤：</HidePawnLabelBelow>
+	<HideThingLabelBelow>隱藏的堆疊標籤：</HideThingLabelBelow>
+	<ShowMarkerBelow>顯示的標記：</ShowMarkerBelow>
+	<DotStyle>點樣式</DotStyle>
+	<VanillaDefault>原版默認</VanillaDefault>
+	<ClassicDots>Camera+ 點</ClassicDots>
+	<BetterSilhouettes>Camera+ 剪影</BetterSilhouettes>
+	<Animals>動物</Animals>
+	<IncludeAnimals>動物使用相同的標記</IncludeAnimals>
+	<AnimalsDifferent>動物使用不同的標記</AnimalsDifferent>
+	<HideAnimals>動物不使用標記</HideAnimals>
+	<IncludeNotTamedAnimals>包括未馴服的動物</IncludeNotTamedAnimals>
+	<ZoomToMouse>鼠標縮放</ZoomToMouse>
+	<DisableCameraShake>禁用相機震動</DisableCameraShake>
+	<MouseRevealsLabels>鼠標位置顯示名稱</MouseRevealsLabels>
+	<EdgeIndicators>邊緣指示器</EdgeIndicators>
+	<KeyLeftShift>左 Shift</KeyLeftShift>
+	<KeyLeftAlt>左 Alt</KeyLeftAlt>
+	<KeyLeftControl>左 Ctrl</KeyLeftControl>
+	<KeyLeftCommand>左 Cmd</KeyLeftCommand>
+	<KeyLeftWindows>左 Win</KeyLeftWindows>
+	<KeyRightShift>右 Shift</KeyRightShift>
+	<KeyRightAlt>右 Alt</KeyRightAlt>
+	<KeyRightControl>右 Ctrl</KeyRightControl>
+	<KeyRightCommand>右 Cmd</KeyRightCommand>
+	<KeyRightWindows>右 Win</KeyRightWindows>
+	<DotSilhouetteSize>點/剪影大小</DotSilhouetteSize>
+	<EdgeDotSize>邊緣點大小</EdgeDotSize>
+	<EdgeDistanceFactor>邊緣距離</EdgeDistanceFactor>
+	<OutlineSize>輪廓寬度</OutlineSize>
+	<Line>線條</Line>
+	<Fill>填充</Fill>
+	<Player>玩家</Player>
 </LanguageData>

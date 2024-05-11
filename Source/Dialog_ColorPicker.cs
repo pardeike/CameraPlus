@@ -40,7 +40,7 @@ namespace CameraPlus
 
 		Tracking tracking = Tracking.Init;
 		readonly string title;
-		readonly Action<Color?> callback;
+		readonly Action<OptionalColor> callback;
 
 		float hue, sat, light;
 		Color? _color;
@@ -57,7 +57,7 @@ namespace CameraPlus
 				_color = value;
 				if (value.HasValue)
 					Color.RGBToHSV(value.Value, out hue, out sat, out light);
-				callback(value);
+				callback(new OptionalColor(value));
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace CameraPlus
 			var c = Color.HSVToRGB(hue, sat, light);
 			c.a = _color?.a ?? 1;
 			_color = c;
-			callback(_color);
+			callback(new OptionalColor(_color));
 		}
 
 		public override Vector2 InitialSize => new(
@@ -74,12 +74,13 @@ namespace CameraPlus
 			StandardMargin + titleHeight + spacing + bedSize + spacing + alphaSliderHeight + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public Dialog_ColorPicker(string title, Color? color, Action<Color?> callback)
+		public Dialog_ColorPicker(string title, OptionalColor color, Action<OptionalColor> callback)
 		{
 			this.title = title;
 			this.callback = callback;
-			CurrentColor = color;
+			CurrentColor = color.color;
 			doCloseButton = true;
+			draggable = true;
 		}
 
 		public override void PreOpen()
@@ -262,22 +263,22 @@ namespace CameraPlus
 			switch (tracking)
 			{
 				case Tracking.Hues:
-					{
-						hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
-						UpdateHSL(hue, sat, light);
-						if (targetSwatch > -1)
-							swatches[targetSwatch] = CurrentColor;
-						break;
-					}
+				{
+					hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
+					UpdateHSL(hue, sat, light);
+					if (targetSwatch > -1)
+						swatches[targetSwatch] = CurrentColor;
+					break;
+				}
 				case Tracking.ColorBed:
-					{
-						sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
-						light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
-						UpdateHSL(hue, sat, light);
-						if (targetSwatch > -1)
-							swatches[targetSwatch] = CurrentColor;
-						break;
-					}
+				{
+					sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
+					light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
+					UpdateHSL(hue, sat, light);
+					if (targetSwatch > -1)
+						swatches[targetSwatch] = CurrentColor;
+					break;
+				}
 			}
 		}
 	}

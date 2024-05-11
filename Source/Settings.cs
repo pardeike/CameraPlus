@@ -29,8 +29,8 @@ namespace CameraPlus
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
 		public float dotRelativeSize = 1.25f;
-		public float clippedRelativeSize = 0.4f;
-		public float clippedBorderDistanceFactor = 0.2f;
+		public float clippedRelativeSize = 0.75f;
+		public float clippedBorderDistanceFactor = 0.4f;
 		public float outlineFactor = 0.1f;
 
 		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
@@ -38,15 +38,23 @@ namespace CameraPlus
 		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
 
-		public Color[] playerInnerColors = [Color.white, Color.white];
-		public Color[] playerNormalOuterColors = [Color.black, Color.white];
-		public Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
-		public Color[] playerDownedOuterColors = [Color.gray, Color.white];
-		public Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
-		public OptionalColor[] defaultInnerColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] playerNormalOuterColors = [new OptionalColor(Color.black), new OptionalColor(Color.white)];
+		public OptionalColor[] playerNormalInnerColors = [new OptionalColor(Color.white), new OptionalColor(Color.white)];
+
+		public OptionalColor[] playerDraftedOuterColors = [new OptionalColor(new(0f, 0.5f, 0f)), new OptionalColor(new(0.25f, 0.75f, 0.25f))];
+		public OptionalColor[] playerDraftedInnerColors = [new OptionalColor(Color.white), new OptionalColor(Color.white)];
+
+		public OptionalColor[] playerDownedOuterColors = [new OptionalColor(Color.gray), new OptionalColor(Color.white)];
+		public OptionalColor[] playerDownedInnerColors = [new OptionalColor(Color.gray), new OptionalColor(Color.gray)];
+
+		public OptionalColor[] playerMentalOuterColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(Color.white)];
+		public OptionalColor[] playerMentalInnerColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(new(0.5f, 0f, 0f))];
+
 		public OptionalColor[] defaultOuterColors = [new OptionalColor(), new OptionalColor()];
-		public OptionalColor[] customInnerColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] defaultInnerColors = [new OptionalColor(), new OptionalColor()];
+
 		public OptionalColor[] customOuterColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] customInnerColors = [new OptionalColor(), new OptionalColor()];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -88,19 +96,25 @@ namespace CameraPlus
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", defaults.cameraSettingsKey);
 			Tools.ScribeArrays(ref cameraSettingsLoad, "cameraSettingsLoad", defaults.cameraSettingsLoad);
 			Tools.ScribeArrays(ref cameraSettingsSave, "cameraSettingsSave", defaults.cameraSettingsSave);
-			Tools.ScribeArrays(ref playerInnerColors, "playerInnerColors", defaults.playerInnerColors);
 			Tools.ScribeArrays(ref playerNormalOuterColors, "playerNormalOuterColors", defaults.playerNormalOuterColors);
+			Tools.ScribeArrays(ref playerNormalInnerColors, "playerNormalInnerColors", defaults.playerNormalInnerColors);
 			Tools.ScribeArrays(ref playerDraftedOuterColors, "playerDraftedOuterColors", defaults.playerDraftedOuterColors);
+			Tools.ScribeArrays(ref playerDraftedInnerColors, "playerDraftedInnerColors", defaults.playerDraftedInnerColors);
 			Tools.ScribeArrays(ref playerDownedOuterColors, "playerDownedOuterColors", defaults.playerDownedOuterColors);
+			Tools.ScribeArrays(ref playerDownedInnerColors, "playerDownedInnerColors", defaults.playerDownedInnerColors);
+			Tools.ScribeArrays(ref playerMentalOuterColors, "playerMentalOuterColors", defaults.playerMentalOuterColors);
 			Tools.ScribeArrays(ref playerMentalInnerColors, "playerMentalInnerColors", defaults.playerMentalInnerColors);
-			Tools.ScribeArrays(ref defaultInnerColors, "defaultInnerColors", defaults.defaultInnerColors);
 			Tools.ScribeArrays(ref defaultOuterColors, "defaultOuterColors", defaults.defaultOuterColors);
-			Tools.ScribeArrays(ref customInnerColors, "customInnerColors", defaults.customInnerColors);
+			Tools.ScribeArrays(ref defaultInnerColors, "defaultInnerColors", defaults.defaultInnerColors);
 			Tools.ScribeArrays(ref customOuterColors, "customOuterColors", defaults.customOuterColors);
+			Tools.ScribeArrays(ref customInnerColors, "customInnerColors", defaults.customInnerColors);
 		}
 
 		public void DoWindowContents(Rect inRect)
 		{
+			if (Find.WindowStack.currentlyDrawnWindow.draggable == false)
+				Find.WindowStack.currentlyDrawnWindow.draggable = true;
+
 			var restoreText = "RestoreToDefaultSettings".Translate();
 			var restoreLen = restoreText.GetWidthCached() + 12f;
 			var rect = new Rect(inRect.width - restoreLen, inRect.yMin - 30f, restoreLen, 30f);
@@ -220,6 +234,8 @@ namespace CameraPlus
 				_ = list.Label("Animals".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
+					if (dotStyle == DotStyle.BetterSilhouettes && label == LabelStyle.AnimalsDifferent.ToString())
+						continue;
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f))
 						customNameStyle = val;
@@ -230,7 +246,7 @@ namespace CameraPlus
 
 			list.Gap(16f);
 
-			list.Slider(ref dotRelativeSize, 0f, 2f, () => "DotSilhouetteSize".Translate() + ": " + Math.Round(dotRelativeSize * 100, 0) + "%");
+			list.Slider(ref dotRelativeSize, 0f, 4f, () => "DotSilhouetteSize".Translate() + ": " + Math.Round(dotRelativeSize * 100, 0) + "%");
 			list.Slider(ref clippedRelativeSize, 0f, 2f, () => "EdgeDotSize".Translate() + ": " + Math.Round(clippedRelativeSize * 100, 0) + "%");
 			list.Slider(ref clippedBorderDistanceFactor, 0f, 2f, () => "EdgeDistanceFactor".Translate() + ": " + Math.Round(clippedBorderDistanceFactor * 100, 0) + "%");
 			var oldOutlineFactor = outlineFactor;
