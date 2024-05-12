@@ -9,6 +9,7 @@ namespace CameraPlus
 {
 	public class CameraPlusSettings : ModSettings
 	{
+		public int currentVersion = 3;
 		public float zoomedOutPercent = 65;
 		public float zoomedInPercent = 1;
 		public float exponentiality = 0.5f;
@@ -69,6 +70,7 @@ namespace CameraPlus
 		{
 			base.ExposeData();
 			var defaults = new CameraPlusSettings();
+			Scribe_Values.Look(ref currentVersion, "currentVersion", 0);
 			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", defaults.zoomedOutPercent);
 			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", defaults.zoomedInPercent);
 			Scribe_Values.Look(ref exponentiality, "exponentiality", defaults.exponentiality);

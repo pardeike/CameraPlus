@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+	<CameraPlus3>Bienvenido a la nueva versión de Camera+! Explora las opciones mejoradas de siluetas personalizadas en el menú de configuración para mejorar tu experiencia.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Factor máximo de acercamiento (zoom in)</ZoomedInPercent>
 	<ZoomedOutPercent>Factor máximo de alejamiento (zoom out)</ZoomedOutPercent>

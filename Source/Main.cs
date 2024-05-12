@@ -91,8 +91,8 @@ namespace CameraPlus
 	{
 		public static void Postfix(ref Vector2 __result)
 		{
-			if (CameraPlusMain.orthographicSize != -1f)
-				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
+			if (orthographicSize != -1f)
+				__result *= Tools.GetScreenEdgeDollyFactor(orthographicSize);
 		}
 	}
 
@@ -102,10 +102,10 @@ namespace CameraPlus
 	{
 		public static bool Prefix(Vector3 loc)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
-			var settings = CameraPlusMain.Settings;
+			var settings = Settings;
 
 			if (settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
@@ -127,7 +127,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
@@ -151,7 +151,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
 			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
@@ -196,7 +196,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
 			if (truncateToWidth != 9999f)
@@ -230,7 +230,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Vector2 screenPos)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
 			return Tools.ShouldShowLabel(null, screenPos);
@@ -305,7 +305,7 @@ namespace CameraPlus
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(orthSize);
 			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(orthSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(orthSize);
-			CameraPlusMain.orthographicSize = orthSize;
+			orthographicSize = orthSize;
 		}
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

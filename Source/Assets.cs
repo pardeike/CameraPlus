@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
@@ -68,6 +69,14 @@ namespace CameraPlus
 				previewMaterials[i] = MaterialAllocator.Create(borderedShader);
 				previewMaterials[i].SetTexture("_MainTex", i == 0 ? outerColonistTexture : outerAnimalTexture);
 				previewMaterials[i].renderQueue = (int)RenderQueue.Overlay;
+			}
+
+			var newestVersion = new CameraPlusSettings().currentVersion;
+			if (Settings.currentVersion < newestVersion)
+			{
+				Find.WindowStack.Add(new Dialog_NewVersion());
+				Settings.currentVersion = newestVersion;
+				LongEventHandler.ExecuteWhenFinished(Settings.Write);
 			}
 
 			initialized = true;
