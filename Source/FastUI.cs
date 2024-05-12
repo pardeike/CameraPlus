@@ -5,12 +5,12 @@ namespace CameraPlus
 {
 	static class FastUI
 	{
-		private static int lastUpdateFrameForCurUICellSize = -1;
-		private static int lastUpdateFrameForMouseMapPosition = -1;
-		private static int lastUpdateFrameForMousePositionOnUIInverted = -1;
-		private static float curUICellSize = 0f;
-		private static Vector3 mouseMapPosition = Vector3.zero;
-		private static Vector2 mousePositionOnUIInverted = Vector2.zero;
+		static int lastUpdateFrameForCurUICellSize = -1;
+		static int lastUpdateFrameForMouseMapPosition = -1;
+		static int lastUpdateFrameForMousePositionOnUIInverted = -1;
+		static float curUICellSize = 0f;
+		static Vector3 mouseMapPosition = Vector3.zero;
+		static Vector2 mousePositionOnUIInverted = Vector2.zero;
 
 		public static float CurUICellSize
 		{

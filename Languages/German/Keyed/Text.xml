@@ -1,13 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+	<CameraPlus3>Willkommen zur neuen Version von Camera+! Entdecken Sie verbesserte Optionen für benutzerdefinierte Silhouetten im Einstellungsmenü, um Ihr Erlebnis zu verbessern.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Höchster Zoomfaktor</ZoomedInPercent>
 	<ZoomedOutPercent>Niedrigster Zoomfaktor</ZoomedOutPercent>
 	<ForZoomedInPercent>Für höchsten Zoomfaktor</ForZoomedInPercent>
 	<ForZoomedOutPercent>Für niedrigsten Zoomfaktor</ForZoomedOutPercent>
-	<Exponentiality>Exponentielle Skalierung:</Exponentiality>
+	<Exponentiality>Exponentielle Zoomgeschwindigkeit</Exponentiality>
 	<SoundNearness>Lokale Geräusche näher bringen</SoundNearness>
-	<HotKeys>Tastenkürzel:</HotKeys>
+	<HotKeys>Tastenkürzel</HotKeys>
+	<Colors>Farben</Colors>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
 	<LoadModifier>Ansicht laden</LoadModifier>
 	<SaveModifier>Ansicht speichern</SaveModifier>
@@ -18,6 +20,11 @@
 	<HidePawnLabelBelow>Labels von Spielfiguren verstecken, wenn kleiner als: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Labels von Objekten verstecken, wenn kleiner als: </HideThingLabelBelow>
 	<ShowMarkerBelow>Spielfiguren als Marker darstellen, wenn kleiner als: </ShowMarkerBelow>
+	<DotStyle>Punktstil</DotStyle>
+	<VanillaDefault>Vanilla-Standard</VanillaDefault>
+	<ClassicDots>Camera+ Punkte</ClassicDots>
+	<BetterSilhouettes>Camera+ Silhouetten</BetterSilhouettes>
+	<Animals>Tiere</Animals>
 	<IncludeAnimals>Tiere haben den gleichen Marker</IncludeAnimals>
 	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
@@ -25,6 +32,7 @@
 	<ZoomToMouse>Beim Mauszeiger zoomen</ZoomToMouse>
 	<DisableCameraShake>Kameraverwacklung deaktivieren</DisableCameraShake>
 	<MouseRevealsLabels>Mauszeiger enthüllt Labels</MouseRevealsLabels>
+	<EdgeIndicators>Randindikatoren</EdgeIndicators>
 	<KeyLeftShift>L-Umschalt</KeyLeftShift>
 	<KeyLeftAlt>L-Alt</KeyLeftAlt>
 	<KeyLeftControl>L-Strg</KeyLeftControl>
@@ -35,4 +43,11 @@
 	<KeyRightControl>R-Strg</KeyRightControl>
 	<KeyRightCommand>R-Cmd</KeyRightCommand>
 	<KeyRightWindows>R-Win</KeyRightWindows>
+	<DotSilhouetteSize>Punkt-/Silhouettengröße</DotSilhouetteSize>
+	<EdgeDotSize>Kantenpunktgröße</EdgeDotSize>
+	<EdgeDistanceFactor>Kantenabstand</EdgeDistanceFactor>
+	<OutlineSize>Konturweite</OutlineSize>
+	<Line>Linie</Line>
+	<Fill>Füllung</Fill>
+	<Player>Spieler</Player>
 </LanguageData>

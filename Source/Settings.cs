@@ -1,33 +1,18 @@
 ﻿using System;
-using System.Linq;
+using HarmonyLib;
+using RimWorld;
 using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	public enum LabelStyle
-	{
-		IncludeAnimals = 0,
-		AnimalsDifferent = 1,
-		HideAnimals = 2
-	}
-
-	public class SavedViews(Map map) : MapComponent(map)
-	{
-		public RememberedCameraPos[] views = new RememberedCameraPos[9];
-
-		public override void ExposeData()
-		{
-			for (var i = 0; i < 9; i++)
-				Scribe_Deep.Look(ref views[i], "view" + (i + 1), [map]);
-		}
-	}
-
 	public class CameraPlusSettings : ModSettings
 	{
+		public int currentVersion = 3;
 		public float zoomedOutPercent = 65;
 		public float zoomedInPercent = 1;
-		public int exponentiality = 1;
+		public float exponentiality = 0.5f;
 		public float zoomedOutDollyPercent = 1;
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutScreenEdgeDollyFactor = 0.5f;
@@ -36,18 +21,41 @@ namespace CameraPlus
 		public bool zoomToMouse = true;
 		public bool disableCameraShake = false;
 		public float soundNearness = 0;
-		public bool hideNamesWhenZoomedOut = true;
+		public DotStyle dotStyle = DotStyle.BetterSilhouettes;
 		public int dotSize = 9;
 		public int hidePawnLabelBelow = 9;
 		public int hideThingLabelBelow = 32;
 		public bool mouseOverShowsLabels = true;
+		public bool edgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
+		public float dotRelativeSize = 1.25f;
+		public float clippedRelativeSize = 0.75f;
+		public float clippedBorderDistanceFactor = 0.4f;
+		public float outlineFactor = 0.1f;
 
 		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
 		public KeyCode[] cameraSettingsLoad = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode[] cameraSettingsSave = [KeyCode.LeftAlt, KeyCode.None];
+
+		public OptionalColor[] playerNormalOuterColors = [new OptionalColor(Color.black), new OptionalColor(Color.white)];
+		public OptionalColor[] playerNormalInnerColors = [new OptionalColor(Color.white), new OptionalColor(Color.white)];
+
+		public OptionalColor[] playerDraftedOuterColors = [new OptionalColor(new(0f, 0.5f, 0f)), new OptionalColor(new(0.25f, 0.75f, 0.25f))];
+		public OptionalColor[] playerDraftedInnerColors = [new OptionalColor(Color.white), new OptionalColor(Color.white)];
+
+		public OptionalColor[] playerDownedOuterColors = [new OptionalColor(Color.gray), new OptionalColor(Color.white)];
+		public OptionalColor[] playerDownedInnerColors = [new OptionalColor(Color.gray), new OptionalColor(Color.gray)];
+
+		public OptionalColor[] playerMentalOuterColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(Color.white)];
+		public OptionalColor[] playerMentalInnerColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(new(0.5f, 0f, 0f))];
+
+		public OptionalColor[] defaultOuterColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] defaultInnerColors = [new OptionalColor(), new OptionalColor()];
+
+		public OptionalColor[] customOuterColors = [new OptionalColor(), new OptionalColor()];
+		public OptionalColor[] customInnerColors = [new OptionalColor(), new OptionalColor()];
 
 		public static float minRootResult = 2;
 		public static float maxRootResult = 130;
@@ -58,52 +66,65 @@ namespace CameraPlus
 		public static readonly float minRootOutput = 15;
 		public static readonly float maxRootOutput = 65;
 
-		public static readonly float nearestHeight = 32;
-		public static readonly float farOutHeight = 256;
-
 		public override void ExposeData()
 		{
 			base.ExposeData();
-			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", 65);
-			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", 1);
-			Scribe_Values.Look(ref exponentiality, "exponentiality", 1);
-			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", 1);
-			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", 1);
-			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", 0.5f);
-			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", 0.5f);
-			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", false);
-			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", true);
-			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", false);
-			Scribe_Values.Look(ref soundNearness, "soundNearness", 0);
-			Scribe_Values.Look(ref hideNamesWhenZoomedOut, "hideNamesWhenZoomedOut", true);
-			Scribe_Values.Look(ref dotSize, "dotSize", 9);
-			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", 0);
-			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", 32);
-			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", true);
-			Scribe_Values.Look(ref customNameStyle, "customNameStyle", LabelStyle.AnimalsDifferent);
-			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", true);
-			Scribe_Values.Look(ref cameraSettingsMod[0], "cameraSettingsMod1", KeyCode.LeftShift);
-			Scribe_Values.Look(ref cameraSettingsMod[1], "cameraSettingsMod2", KeyCode.None);
-			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", KeyCode.Tab);
-			Scribe_Values.Look(ref cameraSettingsLoad[0], "cameraSettingsLoad1", KeyCode.LeftShift);
-			Scribe_Values.Look(ref cameraSettingsLoad[1], "cameraSettingsLoad2", KeyCode.None);
-			Scribe_Values.Look(ref cameraSettingsSave[0], "cameraSettingsSave1", KeyCode.LeftAlt);
-			Scribe_Values.Look(ref cameraSettingsSave[1], "cameraSettingsSave2", KeyCode.None);
-
-			if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
-			{
-				minRootResult = zoomedInPercent * 2;
-				maxRootResult = zoomedOutPercent * 2;
-			}
+			var defaults = new CameraPlusSettings();
+			Scribe_Values.Look(ref currentVersion, "currentVersion", 0);
+			Scribe_Values.Look(ref zoomedOutPercent, "zoomedOutPercent", defaults.zoomedOutPercent);
+			Scribe_Values.Look(ref zoomedInPercent, "zoomedInPercent", defaults.zoomedInPercent);
+			Scribe_Values.Look(ref exponentiality, "exponentiality", defaults.exponentiality);
+			Scribe_Values.Look(ref zoomedOutDollyPercent, "zoomedOutDollyPercent", defaults.zoomedOutDollyPercent);
+			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", defaults.zoomedInDollyPercent);
+			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", defaults.zoomedOutScreenEdgeDollyFactor);
+			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", defaults.zoomedInScreenEdgeDollyFactor);
+			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", defaults.stickyMiddleMouse);
+			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", defaults.zoomToMouse);
+			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", defaults.disableCameraShake);
+			Scribe_Values.Look(ref soundNearness, "soundNearness", defaults.soundNearness);
+			Scribe_Values.Look(ref dotStyle, "dotStyle", defaults.dotStyle);
+			Scribe_Values.Look(ref dotSize, "dotSize", defaults.dotSize);
+			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", defaults.hidePawnLabelBelow);
+			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", defaults.hideThingLabelBelow);
+			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
+			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
+			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
+			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", defaults.includeNotTamedAnimals);
+			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", defaults.dotRelativeSize);
+			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", defaults.clippedRelativeSize);
+			Scribe_Values.Look(ref clippedBorderDistanceFactor, "clippedBorderDistanceFactor", defaults.clippedBorderDistanceFactor);
+			Scribe_Values.Look(ref outlineFactor, "outlineFactor", defaults.outlineFactor);
+			Tools.ScribeArrays(ref cameraSettingsMod, "cameraSettingsMod", defaults.cameraSettingsMod);
+			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", defaults.cameraSettingsKey);
+			Tools.ScribeArrays(ref cameraSettingsLoad, "cameraSettingsLoad", defaults.cameraSettingsLoad);
+			Tools.ScribeArrays(ref cameraSettingsSave, "cameraSettingsSave", defaults.cameraSettingsSave);
+			Tools.ScribeArrays(ref playerNormalOuterColors, "playerNormalOuterColors", defaults.playerNormalOuterColors);
+			Tools.ScribeArrays(ref playerNormalInnerColors, "playerNormalInnerColors", defaults.playerNormalInnerColors);
+			Tools.ScribeArrays(ref playerDraftedOuterColors, "playerDraftedOuterColors", defaults.playerDraftedOuterColors);
+			Tools.ScribeArrays(ref playerDraftedInnerColors, "playerDraftedInnerColors", defaults.playerDraftedInnerColors);
+			Tools.ScribeArrays(ref playerDownedOuterColors, "playerDownedOuterColors", defaults.playerDownedOuterColors);
+			Tools.ScribeArrays(ref playerDownedInnerColors, "playerDownedInnerColors", defaults.playerDownedInnerColors);
+			Tools.ScribeArrays(ref playerMentalOuterColors, "playerMentalOuterColors", defaults.playerMentalOuterColors);
+			Tools.ScribeArrays(ref playerMentalInnerColors, "playerMentalInnerColors", defaults.playerMentalInnerColors);
+			Tools.ScribeArrays(ref defaultOuterColors, "defaultOuterColors", defaults.defaultOuterColors);
+			Tools.ScribeArrays(ref defaultInnerColors, "defaultInnerColors", defaults.defaultInnerColors);
+			Tools.ScribeArrays(ref customOuterColors, "customOuterColors", defaults.customOuterColors);
+			Tools.ScribeArrays(ref customInnerColors, "customInnerColors", defaults.customInnerColors);
 		}
 
 		public void DoWindowContents(Rect inRect)
 		{
+			if (Find.WindowStack.currentlyDrawnWindow.draggable == false)
+				Find.WindowStack.currentlyDrawnWindow.draggable = true;
+
+			var restoreText = "RestoreToDefaultSettings".Translate();
+			var restoreLen = restoreText.GetWidthCached() + 12f;
+			var rect = new Rect(inRect.width - restoreLen, inRect.yMin - 30f, restoreLen, 30f);
+			if (Widgets.ButtonText(rect, restoreText))
+				Traverse.IterateFields(new CameraPlusSettings(), Settings, (t1, t2) => t2.SetValue(t1.GetValue()));
+
 			float previous;
-			Rect rect;
 			var map = Current.Game?.CurrentMap;
-			const float buttonWidth = 80f;
-			const float buttonSpace = 4f;
 
 			var list = new Listing_Standard { ColumnWidth = (inRect.width - 34f) / 2f };
 			list.Begin(inRect);
@@ -134,101 +155,72 @@ namespace CameraPlus
 					Current.cameraDriverInt.SetRootPosAndSize(map.rememberedCameraPos.rootPos, maxRootInput);
 			}
 
-			list.Gap(12f);
+			exponentiality = Mathf.Floor(exponentiality * 100) / 100f;
+			list.Slider(ref exponentiality, 0f, 3f, () => $"{"Exponentiality".Translate()}: " + (exponentiality == 0 ? "Off".Translate() : $"{Mathf.Round(exponentiality * 100)} %"));
 
-			if (list.ButtonTextLabeled("Exponentiality".Translate(), exponentiality == 0 ? "Off".Translate() : new TaggedString($"{exponentiality}x")))
-			{
-				var options = new[] { 0, 1, 2, 3 }.Select(n => new FloatMenuOption(n == 0 ? "Off".Translate() : new TaggedString($"{n}x"), () => exponentiality = n,
-					MenuOptionPriority.Default, null, null, 0f, null, null, true, 0)).ToList();
-				Find.WindowStack.Add(new FloatMenu(options));
-			}
-
-			list.Gap(16f);
-
-			_ = list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 1) + "%");
-			list.Slider(ref soundNearness, 0f, 1f, null);
-
-			list.Gap(2f);
-
-			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
-			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
-
-			list.Gap(20f);
-
-			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
-
-			list.Gap(20f);
-
-			_ = list.Label("HotKeys".Translate());
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "SettingsKey".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			Tools.KeySettingsButton(rect, true, cameraSettingsKey, KeyCode.Tab, code => cameraSettingsKey = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod[1], KeyCode.None, code => cameraSettingsMod[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsMod[0], KeyCode.None, code => cameraSettingsMod[0] = code);
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "LoadModifier".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
-			Widgets.Label(rect, "1 - 9");
-			GenUI.ResetLabelAlign();
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[1], KeyCode.None, code => cameraSettingsLoad[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsLoad[0], KeyCode.LeftShift, code => cameraSettingsLoad[0] = code);
-			list.Gap(6f);
-
-			rect = list.GetRect(28f);
-			GenUI.SetLabelAlign(TextAnchor.MiddleLeft);
-			Widgets.Label(rect, "SaveModifier".Translate());
-			GenUI.ResetLabelAlign();
-			rect.xMin = rect.xMax - buttonWidth;
-			GenUI.SetLabelAlign(TextAnchor.MiddleCenter);
-			Widgets.Label(rect, "1 - 9");
-			GenUI.ResetLabelAlign();
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsSave[1], KeyCode.None, code => cameraSettingsSave[1] = code);
-			rect.xMin -= buttonWidth + buttonSpace;
-			rect.xMax = rect.xMin + buttonWidth;
-			Tools.KeySettingsButton(rect, false, cameraSettingsSave[0], KeyCode.LeftAlt, code => cameraSettingsSave[0] = code);
-			list.Gap(6f);
-
-			list.NewColumn();
 			list.Gap(16f);
 
 			_ = list.Label("DollyPercentLabel".Translate());
-			list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%");
-			list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ");
+			list.TwoColumns(
+				() => list.Slider(ref zoomedInDollyPercent, 0f, 4f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInDollyPercent * 100, 1) + "%"),
+				() => list.Slider(ref zoomedOutDollyPercent, 0f, 4f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutDollyPercent * 100, 1) + " % ")
+			);
 
-			list.Gap(12f);
+			list.Gap(16f);
 
 			_ = list.Label("ScreenEdgeDollyFrictionLabel".Translate());
 			zoomedInScreenEdgeDollyFactor *= 2f;
 			zoomedOutScreenEdgeDollyFactor *= 2f;
-			list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x");
-			list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x");
+			list.TwoColumns(
+				() => list.Slider(ref zoomedInScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedInPercent".Translate() + ": " + Math.Round(zoomedInScreenEdgeDollyFactor, 2) + "x"),
+				() => list.Slider(ref zoomedOutScreenEdgeDollyFactor, 0f, 2f, () => "ForZoomedOutPercent".Translate() + ": " + Math.Round(zoomedOutScreenEdgeDollyFactor, 2) + "x")
+			);
 			zoomedInScreenEdgeDollyFactor /= 2f;
 			zoomedOutScreenEdgeDollyFactor /= 2f;
 
+			list.Gap(16f);
+
+			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
+			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
+			list.CheckboxLabeled("EdgeIndicators".Translate(), ref edgeIndicators);
+			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
+
+			list.Gap(16f);
+
+			_ = list.Label("SoundNearness".Translate() + ": " + Math.Round(soundNearness * 100, 0) + "%");
+			list.Slider(ref soundNearness, 0f, 1f, null);
+
+			list.Gap(4f);
+
+			list.TwoColumns(
+				() =>
+				{
+					if (list.ButtonText("HotKeys".Translate()))
+						Find.WindowStack.Add(new Dialog_Shortcuts());
+				},
+				() =>
+				{
+					if (list.ButtonText("Colors".Translate()))
+						Find.WindowStack.Add(new Dialog_Colors());
+				}
+			);
+
+			list.NewColumn(); // -----------------------------------------------------------------------------------------------
+			list.curX += 17;
+			list.Gap(16f);
+
+			_ = list.Label("DotStyle".Translate());
+			var oldDotStyle = dotStyle;
+			foreach (var label in Enum.GetNames(typeof(DotStyle)))
+			{
+				var val = (DotStyle)Enum.Parse(typeof(DotStyle), label);
+				if (list.RadioButton(label.Translate(), dotStyle == val, 8f))
+					dotStyle = val;
+			}
+
 			list.Gap(12f);
 
-			list.CheckboxLabeled("HideNamesWhenZoomedOut".Translate(), ref hideNamesWhenZoomedOut);
-			if (hideNamesWhenZoomedOut)
+			if (dotStyle != DotStyle.VanillaDefault)
 			{
 				list.Gap(4f);
 
@@ -238,45 +230,31 @@ namespace CameraPlus
 				var label2 = "HideThingLabelBelow".Translate();
 				list.Slider(ref hideThingLabelBelow, 0, 128, () => label2 + (hideThingLabelBelow == 0 ? "Never".Translate() : hideThingLabelBelow + " " + pixel));
 				list.Slider(ref dotSize, 1, 32, () => "ShowMarkerBelow".Translate() + dotSize + " " + "Pixel".Translate());
+
+				list.Gap(12f);
+
+				_ = list.Label("Animals".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
+					if (dotStyle == DotStyle.BetterSilhouettes && label == LabelStyle.AnimalsDifferent.ToString())
+						continue;
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
-					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f)) customNameStyle = val;
+					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f))
+						customNameStyle = val;
 				}
 				list.Gap(4f);
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
 			}
 
-			list.Gap(28f);
+			list.Gap(16f);
 
-			if (list.ButtonText("RestoreToDefaultSettings".Translate()))
-			{
-				zoomedOutPercent = 65;
-				zoomedInPercent = 1;
-				exponentiality = 1;
-				zoomedOutDollyPercent = 1;
-				zoomedInDollyPercent = 1;
-				zoomedOutScreenEdgeDollyFactor = 0.5f;
-				zoomedInScreenEdgeDollyFactor = 0.5f;
-				stickyMiddleMouse = false;
-				zoomToMouse = true;
-				disableCameraShake = false;
-				soundNearness = 0;
-				hideNamesWhenZoomedOut = true;
-				dotSize = 9;
-				hidePawnLabelBelow = 9;
-				hideThingLabelBelow = 32;
-				mouseOverShowsLabels = true;
-				customNameStyle = LabelStyle.AnimalsDifferent;
-				includeNotTamedAnimals = true;
-				cameraSettingsMod[0] = KeyCode.LeftShift;
-				cameraSettingsMod[1] = KeyCode.None;
-				cameraSettingsKey = KeyCode.Tab;
-				cameraSettingsLoad[0] = KeyCode.LeftShift;
-				cameraSettingsLoad[1] = KeyCode.None;
-				cameraSettingsSave[0] = KeyCode.LeftAlt;
-				cameraSettingsSave[1] = KeyCode.None;
-			}
+			list.Slider(ref dotRelativeSize, 0f, 4f, () => "DotSilhouetteSize".Translate() + ": " + Math.Round(dotRelativeSize * 100, 0) + "%");
+			list.Slider(ref clippedRelativeSize, 0f, 2f, () => "EdgeDotSize".Translate() + ": " + Math.Round(clippedRelativeSize * 100, 0) + "%");
+			list.Slider(ref clippedBorderDistanceFactor, 0f, 2f, () => "EdgeDistanceFactor".Translate() + ": " + Math.Round(clippedBorderDistanceFactor * 100, 0) + "%");
+			var oldOutlineFactor = outlineFactor;
+			list.Slider(ref outlineFactor, 0f, 0.4f, () => "OutlineSize".Translate() + ": " + Math.Round(outlineFactor * 100, 0) + "%");
+			if (oldOutlineFactor != outlineFactor)
+				MarkerCache.cache.Clear();
 
 			list.End();
 		}

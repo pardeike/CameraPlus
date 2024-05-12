@@ -1,13 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+	<CameraPlus3>Bienvenido a la nueva versión de Camera+! Explora las opciones mejoradas de siluetas personalizadas en el menú de configuración para mejorar tu experiencia.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Factor máximo de acercamiento (zoom in)</ZoomedInPercent>
 	<ZoomedOutPercent>Factor máximo de alejamiento (zoom out)</ZoomedOutPercent>
 	<ForZoomedInPercent>Para el factor de zoom más alto</ForZoomedInPercent>
 	<ForZoomedOutPercent>Para el factor de zoom más bajo</ForZoomedOutPercent>
-	<Exponentiality>Escalado exponencial:</Exponentiality>
+	<Exponentiality>Velocidad de zoom exponencial</Exponentiality>
 	<SoundNearness>Acercar los sonidos locales</SoundNearness>
-	<HotKeys>Atajos de teclado:</HotKeys>
+	<HotKeys>Atajos de teclado</HotKeys>
+	<Colors>Colores</Colors>
 	<SettingsKey>Configuraciones</SettingsKey>
 	<LoadModifier>Restaurar vista</LoadModifier>
 	<SaveModifier>Guardar vista</SaveModifier>
@@ -19,6 +21,12 @@
 	<HidePawnLabelBelow>Ocultar las etiquetas de los peones a continuación: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Ocultar cosa etiquetas a continuación: </HideThingLabelBelow>
 	<ShowMarkerBelow>Mostrar como círculo a continuación: </ShowMarkerBelow>
+	<DotStyle>Estilo de punto</DotStyle>
+	<VanillaDefault>Por defecto de vainilla</VanillaDefault>
+	<ClassicDots>Puntos de Camera+</ClassicDots>
+	<BetterSilhouettes>Siluetas de Camera+</BetterSilhouettes>
+	\
+	<Animals>Animales</Animals>
 	<IncludeAnimals>Los animales tienen el mismo marcador</IncludeAnimals>
 	<AnimalsDifferent>Los animales tienen un marcador diferente</AnimalsDifferent>
 	<HideAnimals>Los animales no tienen marcador</HideAnimals>
@@ -26,6 +34,7 @@
 	<ZoomToMouse>Acercar al mouse</ZoomToMouse>
 	<DisableCameraShake>Desactivar el movimiento de la cámara</DisableCameraShake>
 	<MouseRevealsLabels>El mouse revela etiquetas</MouseRevealsLabels>
+	<EdgeIndicators>Indicadores de borde</EdgeIndicators>
 	<KeyLeftShift>Left Shift</KeyLeftShift>
 	<KeyLeftAlt>Left Alt</KeyLeftAlt>
 	<KeyLeftControl>Left Ctrl</KeyLeftControl>
@@ -36,4 +45,11 @@
 	<KeyRightControl>Right Ctrl</KeyRightControl>
 	<KeyRightCommand>Right Cmd</KeyRightCommand>
 	<KeyRightWindows>Right Win</KeyRightWindows>
+	<DotSilhouetteSize>Tamaño de punto/silueta</DotSilhouetteSize>
+	<EdgeDotSize>Tamaño del punto de borde</EdgeDotSize>
+	<EdgeDistanceFactor>Factor de distancia de borde</EdgeDistanceFactor>
+	<OutlineSize>Ancho del contorno</OutlineSize>
+	<Line>Línea</Line>
+	<Fill>Relleno</Fill>
+	<Player>Jugador</Player>
 </LanguageData>

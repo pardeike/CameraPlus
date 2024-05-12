@@ -9,16 +9,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	[DefOf]
-	public static class Defs
-	{
-		public static SoundDef SnapBack;
-		public static SoundDef ApplySnap;
-	}
-
 	public class CameraPlusMain : Mod
 	{
 		public static CameraPlusSettings Settings;
@@ -38,14 +32,9 @@ namespace CameraPlus
 		}
 
 		public override void DoSettingsWindowContents(Rect inRect)
-		{
-			Settings.DoWindowContents(inRect);
-		}
+			=> Settings.DoWindowContents(inRect);
 
-		public override string SettingsCategory()
-		{
-			return "Camera+";
-		}
+		public override string SettingsCategory() => "Camera+";
 	}
 
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.Update))]
@@ -65,7 +54,7 @@ namespace CameraPlus
 				return;
 			}
 
-			if (Event.current.shift || CameraPlusMain.Settings.zoomToMouse == false)
+			if (Event.current.shift || Settings.zoomToMouse == false)
 			{
 				driver.rootSize = rootSize;
 				return;
@@ -83,23 +72,18 @@ namespace CameraPlus
 
 		public static void Prefix(CameraDriver __instance)
 		{
-			if (CameraPlusMain.Settings.disableCameraShake)
+			if (Settings.disableCameraShake)
 				__instance.shaker.curShakeMag = 0;
 		}
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			return instructions.MethodReplacer(m_SetRootSizeOriginal, m_SetRootSize);
-		}
+			=> instructions.MethodReplacer(m_SetRootSizeOriginal, m_SetRootSize);
 	}
 
 	[HarmonyPatch(typeof(TimeControls), nameof(TimeControls.DoTimeControlsGUI))]
 	static class TimeControls_DoTimeControlsGUI_Patch
 	{
-		public static void Prefix()
-		{
-			Tools.HandleHotkeys();
-		}
+		public static void Prefix() => Tools.HandleHotkeys();
 	}
 
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CalculateCurInputDollyVect))]
@@ -107,30 +91,30 @@ namespace CameraPlus
 	{
 		public static void Postfix(ref Vector2 __result)
 		{
-			if (CameraPlusMain.orthographicSize != -1f)
-				__result *= Tools.GetScreenEdgeDollyFactor(CameraPlusMain.orthographicSize);
+			if (orthographicSize != -1f)
+				__result *= Tools.GetScreenEdgeDollyFactor(orthographicSize);
 		}
 	}
 
 	[HarmonyPatch(typeof(MoteMaker), nameof(MoteMaker.ThrowText))]
-	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float) })]
+	[HarmonyPatch([typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float)])]
 	static class MoteMaker_ThrowText_Patch
 	{
 		public static bool Prefix(Vector3 loc)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
-			var settings = CameraPlusMain.Settings;
+			var settings = Settings;
 
-			if (settings.hideNamesWhenZoomedOut == false)
+			if (settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
 
 			if (Current.cameraDriverInt.CurrentZoom == CameraZoomRange.Closest)
 				return true;
 
 			if (settings.mouseOverShowsLabels)
-				return Tools.MouseDistanceSquared(loc, true) <= 2.25f;
+				return Tools.MouseDistanceSquared(loc, true) <= 2.25f; // TODO
 
 			return false;
 		}
@@ -143,65 +127,37 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
-
-			return Tools.ShouldShowDot(___pawn) == false;
+			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
+	}
 
+	[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
+	static class SelectionDrawer_DrawSelectionBracketFor_Patch
+	{
 		[HarmonyPriority(10000)]
-		public static void Postfix(Pawn ___pawn)
+		public static bool Prefix(object obj)
 		{
-			if (CameraPlusMain.Settings.hideNamesWhenZoomedOut && CameraPlusMain.Settings.customNameStyle != LabelStyle.HideAnimals)
-				_ = Tools.GetMainColor(___pawn); // trigger caching
+			if (obj is not Pawn pawn)
+				return true;
+			return Tools.ShouldShowMarker(pawn, true) == false;
 		}
 	}
 
 	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
-		// fake everything being humanlike so Prefs.AnimalNameMode is ignored (we handle it ourselves)
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			var mHumanlike = AccessTools.PropertyGetter(typeof(RaceProperties), nameof(RaceProperties.Humanlike));
-			foreach (var code in instructions)
-			{
-				yield return code;
-				if (code.Calls(mHumanlike))
-				{
-					yield return new CodeInstruction(OpCodes.Pop);
-					yield return new CodeInstruction(OpCodes.Ldc_I4_1);
-				}
-			}
-		}
-
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn ___pawn)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
-			if (!___pawn.Spawned || ___pawn.Map.fogGrid.IsFogged(___pawn.Position))
+			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
 				return true;
 
-			if (___pawn.IsEntity == false)
-			{
-				if (___pawn.RaceProps.Humanlike)
-					return true;
-				if (___pawn.Name != null)
-					return true;
-			}
-
-			var useMarkers = Tools.GetMarkerColors(___pawn, out var innerColor, out var outerColor);
-			if (useMarkers == false)
-				return true; // use label
-
-			if (Tools.ShouldShowDot(___pawn))
-			{
-				Tools.DrawDot(___pawn, innerColor, outerColor);
-				return false;
-			}
-			return Tools.CorrectLabelRendering(___pawn);
+			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
 	}
 	//
@@ -224,7 +180,7 @@ namespace CameraPlus
 	{
 		static bool Prefix(Thing thing, ref bool __result)
 		{
-			if (thing is Pawn pawn && Tools.ShouldShowDot(pawn))
+			if (thing is Pawn pawn && Tools.ShouldShowMarker(pawn, true))
 			{
 				__result = false;
 				return false;
@@ -240,25 +196,14 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Pawn pawn, float truncateToWidth)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
 			if (truncateToWidth != 9999f)
 				return true;
 
-			if (Tools.ShouldShowDot(pawn))
-			{
-				var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
-				if (useMarkers == false)
-					return Tools.CorrectLabelRendering(pawn);
-
-				Tools.DrawDot(pawn, innerColor, outerColor);
-				return false;
-			}
-
-			// we fake "show all" so we need to skip if original could would not render labels
-			if (ReversePatches.PerformsDrawPawnGUIOverlay(pawn.Drawer.ui) == false)
-				return false;
+			if (Tools.ShouldShowMarker(pawn, true))
+				return Tools.GetMarkerColors(pawn, out _, out _) == false;
 
 			return Tools.ShouldShowLabel(pawn);
 		}
@@ -275,9 +220,9 @@ namespace CameraPlus
 
 		static GameFont GetAdaptedGameFont(float rootSize)
 		{
-			if (rootSize < 11f)
+			if (rootSize < 11f) // TODO
 				return GameFont.Medium;
-			if (rootSize < 15f)
+			if (rootSize < 15f) // TODO
 				return GameFont.Small;
 			return GameFont.Tiny;
 		}
@@ -285,7 +230,7 @@ namespace CameraPlus
 		[HarmonyPriority(10000)]
 		public static bool Prefix(Vector2 screenPos)
 		{
-			if (CameraPlusMain.skipCustomRendering)
+			if (skipCustomRendering)
 				return true;
 
 			return Tools.ShouldShowLabel(null, screenPos);
@@ -351,7 +296,7 @@ namespace CameraPlus
 			var pos = camera.transform.position;
 			var cameraSpan = CameraPlusSettings.maxRootOutput - CameraPlusSettings.minRootOutput;
 			var f = (pos.y - CameraPlusSettings.minRootOutput) / cameraSpan;
-			f *= 1 - CameraPlusMain.Settings.soundNearness;
+			f *= 1 - Settings.soundNearness;
 			pos.y = CameraPlusSettings.minRootOutput + f * cameraSpan;
 			camera.transform.position = pos;
 
@@ -360,7 +305,7 @@ namespace CameraPlus
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(orthSize);
 			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(orthSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(orthSize);
-			CameraPlusMain.orthographicSize = orthSize;
+			orthographicSize = orthSize;
 		}
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -541,10 +486,7 @@ namespace CameraPlus
 	[HarmonyPatch(nameof(Root.OnGUI))]
 	static class Root_OnGUI_Patch
 	{
-		public static void Postfix()
-		{
-			KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
-		}
+		public static void Postfix() => KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
 	}
 
 	[HarmonyPatch(typeof(Game))]
@@ -553,6 +495,8 @@ namespace CameraPlus
 	{
 		static DateTime lastChange = DateTime.MinValue;
 		static bool eventFired = false;
+
+		// TODO make snapback configurable
 
 		public static void Postfix()
 		{
@@ -593,10 +537,7 @@ namespace CameraPlus
 	[HarmonyPatch(nameof(MainTabWindow_Menu.PreOpen))]
 	static class MainTabWindow_Menu_PreOpen_Patch
 	{
-		public static void Postfix()
-		{
-			Tools.ResetSnapback();
-		}
+		public static void Postfix() => Tools.ResetSnapback();
 	}
 
 	[HarmonyPatch(typeof(UIRoot_Play))]

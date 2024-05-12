@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
+	<CameraPlus3>Camera+の新バージョンへようこそ！設定メニューのカスタムシルエットオプションを探索して、体験を向上させましょう。</CameraPlus3>
 	<Zoom>ズーム</Zoom>
 	<ZoomedInPercent>最大ズームイン倍率</ZoomedInPercent>
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
 	<ForZoomedInPercent>最高のズーム率の場合</ForZoomedInPercent>
 	<ForZoomedOutPercent>ズーム率を最小にするには</ForZoomedOutPercent>
-	<Exponentiality>指数関数スケーリング:</Exponentiality>
+	<Exponentiality>指数ズーム速度</Exponentiality>
 	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
-	<HotKeys>ホットキー:</HotKeys>
+	<HotKeys>ホットキー</HotKeys>
+	<Colors>色</Colors>
 	<SettingsKey>Camera+の設定</SettingsKey>
 	<LoadModifier>ビューを復元</LoadModifier>
 	<SaveModifier>ビューを保存</SaveModifier>
@@ -18,6 +20,11 @@
 	<HidePawnLabelBelow>以下にポーン名を非表示にします： </HidePawnLabelBelow>
 	<HideThingLabelBelow>以下にモノのラベルを非表示にします： </HideThingLabelBelow>
 	<ShowMarkerBelow>マーカーとして表示： </ShowMarkerBelow>
+	<DotStyle>ドットスタイル</DotStyle>
+	<VanillaDefault>バニラデフォルト</VanillaDefault>
+	<ClassicDots>Camera+ ドット</ClassicDots>
+	<BetterSilhouettes>Camera+ シルエット</BetterSilhouettes>
+	<Animals>動物</Animals>
 	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
 	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
 	<HideAnimals>動物にはマーカーがありません</HideAnimals>
@@ -25,6 +32,7 @@
 	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
 	<DisableCameraShake>カメラの揺れを無効にします</DisableCameraShake>
 	<MouseRevealsLabels>マウスでラベルを表示</MouseRevealsLabels>
+	<EdgeIndicators>エッジインジケーター</EdgeIndicators>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>
@@ -35,5 +43,11 @@
 	<KeyRightControl>右Ctrl</KeyRightControl>
 	<KeyRightCommand>右Cmd</KeyRightCommand>
 	<KeyRightWindows>右Win</KeyRightWindows>
-
+	<DotSilhouetteSize>点/シルエットのサイズ</DotSilhouetteSize>
+	<EdgeDotSize>エッジの点のサイズ</EdgeDotSize>
+	<EdgeDistanceFactor>エッジ距離</EdgeDistanceFactor>
+	<OutlineSize>アウトラインの幅</OutlineSize>
+	<Line>ライン</Line>
+	<Fill>塗りつぶし</Fill>
+	<Player>プレイヤー</Player>
 </LanguageData>

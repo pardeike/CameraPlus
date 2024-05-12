@@ -18,7 +18,7 @@ namespace CameraPlus
 		{
 			var rect = list.GetRect(22f);
 			var h = HorizontalSlider(rect, ref value, min, max, label == null ? null : label(), roundTo);
-			list.Gap(h);
+			list.Gap(h - 4);
 		}
 
 		public static float HorizontalSlider(Rect rect, ref float value, float leftValue, float rightValue, string label = null, float roundTo = -1f)
@@ -38,6 +38,20 @@ namespace CameraPlus
 			if (roundTo > 0f)
 				value = Mathf.RoundToInt(value / roundTo) * roundTo;
 			return 4f + label != null ? 18f : 0f;
+		}
+
+		public static void TwoColumns(this Listing_Standard list, Action left, Action right)
+		{
+			var cWidth = list.ColumnWidth;
+			var halfWidth = (cWidth - 12f) / 2f;
+			list.ColumnWidth = halfWidth;
+			var (x, y) = (list.curX, list.curY);
+			left();
+			list.curY = y;
+			list.curX += halfWidth + 12f;
+			right();
+			list.ColumnWidth = cWidth;
+			list.curX = x;
 		}
 	}
 }
