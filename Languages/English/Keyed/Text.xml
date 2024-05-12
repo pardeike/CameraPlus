@@ -19,6 +19,7 @@
 	<Pixel>Pixel</Pixel>
 	<HidePawnLabelBelow>Hide pawn labels below: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
+	<HideDeadPawnsBelow>Hide dead pawns below: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>Show as marker below: </ShowMarkerBelow>
 	<DotStyle>Dot Style</DotStyle>
 	<VanillaDefault>Vanilla default</VanillaDefault>

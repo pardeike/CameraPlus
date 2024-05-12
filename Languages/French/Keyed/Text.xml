@@ -20,6 +20,7 @@
 	<Pixel>Pixel</Pixel>
 	<HidePawnLabelBelow>Masquer les étiquettes de personnages ci-dessous: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Masquer les étiquettes de stockage ci-dessous: </HideThingLabelBelow>
+	<HideDeadPawnsBelow>Masquer les pions morts ci-dessous : </HideDeadPawnsBelow>
 	<ShowMarkerBelow>Afficher comme marqueur ci-dessous: </ShowMarkerBelow>
 	<DotStyle>Style de point</DotStyle>
 	<VanillaDefault>Défaut vanille</VanillaDefault>

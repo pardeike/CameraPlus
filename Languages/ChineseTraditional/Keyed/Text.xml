@@ -19,6 +19,7 @@
 	<Pixel>像素</Pixel>
 	<HidePawnLabelBelow>隱藏的小人標籤：</HidePawnLabelBelow>
 	<HideThingLabelBelow>隱藏的堆疊標籤：</HideThingLabelBelow>
+	<HideDeadPawnsBelow>隱藏下方的死亡棋子: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>顯示的標記：</ShowMarkerBelow>
 	<DotStyle>點樣式</DotStyle>
 	<VanillaDefault>原版默認</VanillaDefault>

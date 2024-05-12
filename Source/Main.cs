@@ -129,6 +129,10 @@ namespace CameraPlus
 		{
 			if (skipCustomRendering)
 				return true;
+
+			if (___pawn.Dead)
+				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+
 			return Tools.ShouldShowMarker(___pawn, true) == false;
 		}
 	}
@@ -145,6 +149,18 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(OverlayDrawer), nameof(OverlayDrawer.RenderForbiddenOverlay))]
+	static class DrawAllOverlaysPatch
+	{
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Thing t)
+		{
+			if (t is not Corpse)
+				return true;
+			return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+		}
+	}
+
 	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
 	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
 	{
@@ -153,6 +169,9 @@ namespace CameraPlus
 		{
 			if (skipCustomRendering)
 				return true;
+
+			if (___pawn.Dead)
+				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
 
 			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
 				return true;

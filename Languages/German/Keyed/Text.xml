@@ -19,6 +19,7 @@
 	<Pixel>Pixel</Pixel>
 	<HidePawnLabelBelow>Labels von Spielfiguren verstecken, wenn kleiner als: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Labels von Objekten verstecken, wenn kleiner als: </HideThingLabelBelow>
+	<HideDeadPawnsBelow>Verstecke tote Spielfiguren unten: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>Spielfiguren als Marker darstellen, wenn kleiner als: </ShowMarkerBelow>
 	<DotStyle>Punktstil</DotStyle>
 	<VanillaDefault>Vanilla-Standard</VanillaDefault>

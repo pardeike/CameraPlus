@@ -19,6 +19,7 @@
 	<Pixel>Пиксель</Pixel>
 	<HidePawnLabelBelow>Скрыть метки пешек ниже:</HidePawnLabelBelow>
 	<HideThingLabelBelow>Скрыть метки стека ниже:</HideThingLabelBelow>
+	<HideDeadPawnsBelow>Скрыть мертвые пешки ниже: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>Показать как маркер ниже:</ShowMarkerBelow>
 	<DotStyle>Стиль точек</DotStyle>
 	<VanillaDefault>Стандарт Vanilla</VanillaDefault>

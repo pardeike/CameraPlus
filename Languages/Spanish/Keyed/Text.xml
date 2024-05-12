@@ -20,6 +20,7 @@
 	<Pixel>Píxel</Pixel>
 	<HidePawnLabelBelow>Ocultar las etiquetas de los peones a continuación: </HidePawnLabelBelow>
 	<HideThingLabelBelow>Ocultar cosa etiquetas a continuación: </HideThingLabelBelow>
+	<HideDeadPawnsBelow>Ocultar peones muertos debajo: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>Mostrar como círculo a continuación: </ShowMarkerBelow>
 	<DotStyle>Estilo de punto</DotStyle>
 	<VanillaDefault>Por defecto de vainilla</VanillaDefault>

@@ -19,6 +19,7 @@
 	<Pixel>ピクセル</Pixel>
 	<HidePawnLabelBelow>以下にポーン名を非表示にします： </HidePawnLabelBelow>
 	<HideThingLabelBelow>以下にモノのラベルを非表示にします： </HideThingLabelBelow>
+	<HideDeadPawnsBelow>以下の死んだポーンを隠す: </HideDeadPawnsBelow>
 	<ShowMarkerBelow>マーカーとして表示： </ShowMarkerBelow>
 	<DotStyle>ドットスタイル</DotStyle>
 	<VanillaDefault>バニラデフォルト</VanillaDefault>

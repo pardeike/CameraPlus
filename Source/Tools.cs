@@ -154,9 +154,14 @@ namespace CameraPlus
 					.OrderByDescending(group => group.Count())
 					.Select(group => (color: group.Key, hsl: HSL(group.Key), count: group.Count()))
 					.ToArray();
+				if (combinedColors.Length == 0)
+				{
+					color = Color.clear;
+					goto SET_COLOR;
+				}
 
 				var colorIndex = combinedColors.FirstIndexOf(tuple => tuple.hsl.s > 0.2 && tuple.hsl.l < 0.8 && tuple.hsl.l > 0.2);
-				if (colorIndex == 1 && combinedColors[0].hsl.s < 0.2)
+				if (combinedColors.Length > 0 && colorIndex == 1 && combinedColors[0].hsl.s < 0.2)
 					color = combinedColors[1].color;
 				else
 					color = combinedColors[0].color;

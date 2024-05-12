@@ -25,6 +25,7 @@ namespace CameraPlus
 		public int dotSize = 9;
 		public int hidePawnLabelBelow = 9;
 		public int hideThingLabelBelow = 32;
+		public int hideDeadPawnsBelow = 9;
 		public bool mouseOverShowsLabels = true;
 		public bool edgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
@@ -86,6 +87,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref dotSize, "dotSize", defaults.dotSize);
 			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", defaults.hidePawnLabelBelow);
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", defaults.hideThingLabelBelow);
+			Scribe_Values.Look(ref hideDeadPawnsBelow, "hideDeadPawnsBelow", defaults.hideDeadPawnsBelow);
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
 			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
@@ -225,11 +227,10 @@ namespace CameraPlus
 				list.Gap(4f);
 
 				var pixel = "Pixel".Translate();
-				var label1 = "HidePawnLabelBelow".Translate();
-				list.Slider(ref hidePawnLabelBelow, 0, 128, () => label1 + (hidePawnLabelBelow == 0 ? "Never".Translate() : hidePawnLabelBelow + " " + pixel));
-				var label2 = "HideThingLabelBelow".Translate();
-				list.Slider(ref hideThingLabelBelow, 0, 128, () => label2 + (hideThingLabelBelow == 0 ? "Never".Translate() : hideThingLabelBelow + " " + pixel));
-				list.Slider(ref dotSize, 1, 32, () => "ShowMarkerBelow".Translate() + dotSize + " " + "Pixel".Translate());
+				list.Slider(ref hidePawnLabelBelow, 0, 64, () => "HidePawnLabelBelow".Translate() + (hidePawnLabelBelow == 0 ? "Never".Translate() : hidePawnLabelBelow + " " + pixel));
+				list.Slider(ref hideThingLabelBelow, 0, 64, () => "HideThingLabelBelow".Translate() + (hideThingLabelBelow == 0 ? "Never".Translate() : hideThingLabelBelow + " " + pixel));
+				list.Slider(ref hideDeadPawnsBelow, 0, 64, () => "HideDeadPawnsBelow".Translate() + (hideDeadPawnsBelow == 0 ? "Never".Translate() : hideDeadPawnsBelow + " " + pixel));
+				list.Slider(ref dotSize, 1, 64, () => "ShowMarkerBelow".Translate() + dotSize + " " + "Pixel".Translate());
 
 				list.Gap(12f);
 
