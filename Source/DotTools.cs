@@ -31,7 +31,7 @@ namespace CameraPlus
 
 			var markersTreshold = FastUI.CurUICellSize <= Settings.dotSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
-			map.mapPawns.AllPawnsSpawned.OrderBy(pawn => pawn.thingIDNumber).DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
+			map.mapPawns.AllPawnsSpawned.DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
 			{
 				altitute -= 0.0001f;
 
@@ -148,7 +148,9 @@ namespace CameraPlus
 			var q = pawn.Downed ? downedRotation : Quaternion.identity;
 			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
 			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
-			var size = (bodyNode?.Graphic ?? pawn.Graphic)?.drawSize ?? pawn.DrawSize;
+			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
+			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
+			var size = miscPlayer ? 1.5f * Vector2.one : (bodyNode?.Graphic ?? pawn.Graphic)?.drawSize ?? pawn.DrawSize;
 			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * Settings.dotRelativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);

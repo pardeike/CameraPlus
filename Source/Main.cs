@@ -137,6 +137,25 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch]
+	static class VehicleRenderer_RenderPawnAt_Patch
+	{
+		public static bool Prepare() => TargetMethod() != null;
+		public static MethodBase TargetMethod() => AccessTools.Method("Vehicles.VehicleRenderer:RenderPawnAt");
+
+		[HarmonyPriority(10000)]
+		public static bool Prefix(Pawn ___vehicle)
+		{
+			if (skipCustomRendering)
+				return true;
+
+			if (___vehicle.Dead)
+				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+
+			return Tools.ShouldShowMarker(___vehicle, true) == false;
+		}
+	}
+
 	[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
 	static class SelectionDrawer_DrawSelectionBracketFor_Patch
 	{

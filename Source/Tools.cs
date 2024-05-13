@@ -13,6 +13,8 @@ namespace CameraPlus
 {
 	class Tools
 	{
+		static readonly Type vehicleType = AccessTools.TypeByName("Vehicles.VehiclePawn");
+
 		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
 			if (Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
@@ -241,7 +243,12 @@ namespace CameraPlus
 				return true;
 			}
 
-			if (pawn.IsPlayerControlled == false)
+			if (pawn.IsColonistPlayerControlled == false)
+			{
+				outerColor = Settings.playerNormalOuterColors[selected].Value;
+				innerColor = Settings.playerNormalInnerColors[selected].Value;
+			}
+			else if (pawn.IsPlayerControlled == false)
 			{
 				outerColor = Settings.playerMentalOuterColors[selected].Value;
 				innerColor = Settings.playerMentalInnerColors[selected].Value;
@@ -271,6 +278,13 @@ namespace CameraPlus
 			{
 				innerTexture = Assets.innerEntityTexture;
 				outerTexture = Assets.outerEntityTexture;
+				return;
+			}
+
+			if (pawn.IsColonistPlayerControlled == false)
+			{
+				innerTexture = Assets.innerColonistTexture;
+				outerTexture = Assets.outerColonistTexture;
 				return;
 			}
 
