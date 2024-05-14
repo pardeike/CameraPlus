@@ -112,6 +112,14 @@ namespace CameraPlus
 			Tools.ScribeArrays(ref defaultInnerColors, "defaultInnerColors", defaults.defaultInnerColors);
 			Tools.ScribeArrays(ref customOuterColors, "customOuterColors", defaults.customOuterColors);
 			Tools.ScribeArrays(ref customInnerColors, "customInnerColors", defaults.customInnerColors);
+
+			ApplyCalculatedValues();
+		}
+
+		void ApplyCalculatedValues()
+		{
+			minRootResult = zoomedInPercent * 2;
+			maxRootResult = zoomedOutPercent * 2;
 		}
 
 		public void DoWindowContents(Rect inRect)
@@ -123,7 +131,10 @@ namespace CameraPlus
 			var restoreLen = restoreText.GetWidthCached() + 12f;
 			var rect = new Rect(inRect.width - restoreLen, inRect.yMin - 30f, restoreLen, 30f);
 			if (Widgets.ButtonText(rect, restoreText))
+			{
 				Traverse.IterateFields(new CameraPlusSettings(), Settings, (t1, t2) => t2.SetValue(t1.GetValue()));
+				ApplyCalculatedValues();
+			}
 
 			float previous;
 			var map = Current.Game?.CurrentMap;
