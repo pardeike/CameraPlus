@@ -25,6 +25,7 @@ namespace CameraPlus
 		public static readonly Texture2D columnHeaderPreview = ContentFinder<Texture2D>.Get("ColumnHeaderPreview", true);
 		public static readonly Texture2D columnHeader = ContentFinder<Texture2D>.Get("ColumnHeader", true);
 		public static readonly Texture2D columnHeaderSelected = ContentFinder<Texture2D>.Get("ColumnHeaderSelected", true);
+		public static readonly Texture2D deleteTagButton = ContentFinder<Texture2D>.Get("TagDelete", true);
 		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
 
 		public static Material[] previewMaterials;

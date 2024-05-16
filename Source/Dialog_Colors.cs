@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -8,16 +9,21 @@ namespace CameraPlus
 {
 	public class Dialog_Colors : Window
 	{
-		public override Vector2 InitialSize => new(730, 420);
+		public override Vector2 InitialSize => new(950, 420);
 
 		static readonly Vector2 previewSize = new(100, 30);
 		static readonly Vector2 colorFieldSize = new(100, 30);
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
 
+		static readonly List<ConditionTag>[] tags = new List<ConditionTag>[6];
+
 		public Dialog_Colors()
 		{
 			doCloseButton = true;
 			draggable = true;
+
+			for (var i = 0; i < tags.Length; i++)
+				tags[i] = ConditionTag.AllTags.InRandomOrder().Take(Rand.RangeInclusive(1, 4)).Select(t => { t.Negated = Rand.Bool; return t.Clone(); }).ToList();
 		}
 
 		static void ColumnLabel(Rect labelRect, TaggedString label, bool center)
@@ -27,7 +33,7 @@ namespace CameraPlus
 			Text.Anchor = TextAnchor.UpperLeft;
 		}
 
-		static void PrepareRow(Listing_Standard list, TaggedString label, out Rect previewRect, out Rect cRect1, out Rect cRect2, out Rect cRect3, out Rect cRect4)
+		static void PrepareRow(Listing_Standard list, int idx, TaggedString label, out Rect previewRect, out Rect cRect1, out Rect cRect2, out Rect cRect3, out Rect cRect4)
 		{
 			var h = colorFieldSize.y;
 			var rect = list.GetRect(h + 10);
@@ -39,7 +45,23 @@ namespace CameraPlus
 			cRect3 = new Rect(cRect2.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
 			cRect4 = new Rect(cRect3.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
 
-			ColumnLabel(labelRect.TopPartPixels(h), label, false);
+			if (idx < 0)
+				ColumnLabel(labelRect.TopPartPixels(h), label, false);
+			else
+			{
+				var font = Text.Font;
+				Text.Font = GameFont.Tiny;
+				var currentTags = tags[idx].Union([new TagAddButton()]).ToList();
+				GenUI.DrawElementStack(labelRect, Text.LineHeightOf(GameFont.Tiny), currentTags, (rect, tag) => tag.Draw(rect, delegate ()
+				{
+					if (tag is TagAddButton)
+						tags[idx].Add(ConditionTag.AllTags.RandomElement().Clone());
+					else
+						LongEventHandler.ExecuteWhenFinished(() => tags[idx].RemoveWhere(t => t == tag));
+				}),
+				ConditionTag.WidthGetter, 4, 5, false);
+				Text.Font = font;
+			}
 		}
 
 		static void ColorButton(Rect rect, string title, OptionalColor color, Action<OptionalColor> newColorCallback, Action defaultCallback)
@@ -75,9 +97,9 @@ namespace CameraPlus
 			GenUI.DrawTextureWithMaterial(rect.ContractedBy(4).Rounded(), Assets.dummyTexture, material);
 		}
 
-		void ColorEditorRow(Listing_Standard list, TaggedString label, bool isAnimal, bool indicateDefault, OptionalColor[] outers, OptionalColor[] inners, OptionalColor[] outerDefaults, OptionalColor[] innerDefaults)
+		void ColorEditorRow(Listing_Standard list, int idx, TaggedString label, bool isAnimal, bool indicateDefault, OptionalColor[] outers, OptionalColor[] inners, OptionalColor[] outerDefaults, OptionalColor[] innerDefaults)
 		{
-			PrepareRow(list, label, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			PrepareRow(list, idx, label, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
 
 			var notDefault = indicateDefault == false || outers[0].HasValue || outers[1].HasValue || inners[0].HasValue || inners[1].HasValue;
 			if (notDefault)
@@ -98,12 +120,17 @@ namespace CameraPlus
 			ColorButton(cRect4, $"{label} {"Fill".Translate()} {selected}", inners[1], c => inners[1] = c, () => { inners[1] = innerDefaults[1]; });
 		}
 
+		public void ConditionTags()
+		{
+
+		}
+
 		public override void DoWindowContents(Rect inRect)
 		{
 			var list = new Listing_Standard();
 			list.Begin(inRect);
 
-			PrepareRow(list, "", out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			PrepareRow(list, -1, "", out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
 
 			Widgets.DrawTextureFitted(previewRect, Assets.columnHeaderPreview, 1);
 			Widgets.DrawTextureFitted(cRect1.Union(cRect2), Assets.columnHeader, 1);
@@ -112,16 +139,16 @@ namespace CameraPlus
 			var defaults = new CameraPlusSettings();
 
 			var colony = "Player".Translate();
-			ColorEditorRow(list, $"{colony} {"PlanetTemperature_Normal".Translate()}", false, false, Settings.playerNormalOuterColors, Settings.playerNormalInnerColors, defaults.playerNormalOuterColors, defaults.playerNormalInnerColors);
-			ColorEditorRow(list, $"{colony} {"CommandDraftLabel".Translate()}", false, false, Settings.playerDraftedOuterColors, Settings.playerDraftedInnerColors, defaults.playerDraftedOuterColors, defaults.playerDraftedInnerColors);
-			ColorEditorRow(list, $"{colony} {"DownedLower".Translate().CapitalizeFirst()}", false, false, Settings.playerDownedOuterColors, Settings.playerDownedInnerColors, defaults.playerDownedOuterColors, defaults.playerDownedInnerColors);
-			ColorEditorRow(list, $"{colony} {"BrokenDown".Translate()}", false, false, Settings.playerMentalOuterColors, Settings.playerMentalInnerColors, defaults.playerMentalOuterColors, defaults.playerMentalInnerColors);
+			ColorEditorRow(list, 0, $"{colony} {"PlanetTemperature_Normal".Translate()}", false, false, Settings.playerNormalOuterColors, Settings.playerNormalInnerColors, defaults.playerNormalOuterColors, defaults.playerNormalInnerColors);
+			ColorEditorRow(list, 1, $"{colony} {"CommandDraftLabel".Translate()}", false, false, Settings.playerDraftedOuterColors, Settings.playerDraftedInnerColors, defaults.playerDraftedOuterColors, defaults.playerDraftedInnerColors);
+			ColorEditorRow(list, 2, $"{colony} {"DownedLower".Translate().CapitalizeFirst()}", false, false, Settings.playerDownedOuterColors, Settings.playerDownedInnerColors, defaults.playerDownedOuterColors, defaults.playerDownedInnerColors);
+			ColorEditorRow(list, 3, $"{colony} {"BrokenDown".Translate()}", false, false, Settings.playerMentalOuterColors, Settings.playerMentalInnerColors, defaults.playerMentalOuterColors, defaults.playerMentalInnerColors);
 
 			list.Gap(20);
-			ColorEditorRow(list, $"{"AnimalsSection".Translate()} / {"AutoSlaugtherHeaderColOther".Translate()}", true, true, Settings.defaultOuterColors, Settings.defaultInnerColors, defaults.defaultOuterColors, defaults.defaultInnerColors);
+			ColorEditorRow(list, 4, $"{"AnimalsSection".Translate()} / {"AutoSlaugtherHeaderColOther".Translate()}", true, true, Settings.defaultOuterColors, Settings.defaultInnerColors, defaults.defaultOuterColors, defaults.defaultInnerColors);
 
 			list.Gap(20);
-			ColorEditorRow(list, $"{"ScenariosCustom".Translate()} / {"Mods".Translate()}", false, true, Settings.customOuterColors, Settings.customInnerColors, defaults.customOuterColors, defaults.customInnerColors);
+			ColorEditorRow(list, 5, $"{"ScenariosCustom".Translate()} / {"Mods".Translate()}", false, true, Settings.customOuterColors, Settings.customInnerColors, defaults.customOuterColors, defaults.customInnerColors);
 
 			list.End();
 		}

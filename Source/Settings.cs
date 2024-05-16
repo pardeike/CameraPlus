@@ -52,9 +52,13 @@ namespace CameraPlus
 		public OptionalColor[] playerMentalOuterColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(Color.white)];
 		public OptionalColor[] playerMentalInnerColors = [new OptionalColor(new(0.5f, 0f, 0f)), new OptionalColor(new(0.5f, 0f, 0f))];
 
+		public CustomColor[] customColors =
+		[
+			new CustomColor([new AnimalTag()], [new OptionalColor(), new OptionalColor()])
+		];
+
 		public OptionalColor[] defaultOuterColors = [new OptionalColor(), new OptionalColor()];
 		public OptionalColor[] defaultInnerColors = [new OptionalColor(), new OptionalColor()];
-
 		public OptionalColor[] customOuterColors = [new OptionalColor(), new OptionalColor()];
 		public OptionalColor[] customInnerColors = [new OptionalColor(), new OptionalColor()];
 
