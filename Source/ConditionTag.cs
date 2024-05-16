@@ -10,7 +10,7 @@ namespace CameraPlus
 	{
 		public const float padding = 5;
 
-		public static ConditionTag[] AllTags =
+		public static readonly ConditionTag[] AllTypeTags =
 		[
 			new AncientTag(),
 			new AnimalTag(),
@@ -29,7 +29,9 @@ namespace CameraPlus
 			new ShamblerTag(),
 			new SlaveTag(),
 			new VehicleTag(),
-			//
+		];
+		public static readonly ConditionTag[] AllAttributeTags =
+		[
 			new AdultTag(),
 			new AttackingTag(),
 			new AwakeTag(),
@@ -40,6 +42,7 @@ namespace CameraPlus
 			new CrawlingTag(),
 			new DeadTag(),
 			new DownedTag(),
+			new DraftedTag(),
 			new ExitingMapTag(),
 			new FemaleTag(),
 			new FreeTag(),
@@ -56,7 +59,10 @@ namespace CameraPlus
 			new PredatorHuntTag(),
 			new SelfShutdownTag(),
 			new TameTag(),
-			//
+		];
+
+		public static readonly ConditionTag[] AllTextTags =
+		[
 			new KindDefTag(),
 			new FactionNameTag(),
 			new PawnNameTag(),
@@ -91,7 +97,7 @@ namespace CameraPlus
 			}
 		}
 
-		public abstract bool Matches(Pawn pawn);
+		public virtual bool Matches(Pawn pawn) => false;
 
 		public static GenUI.StackElementWidthGetter<ConditionTag> WidthGetter = delegate (ConditionTag tag)
 		{
@@ -100,8 +106,14 @@ namespace CameraPlus
 				return width + 2 * padding;
 			if (tag.labelWidth == 0)
 				tag.labelWidth = Text.CalcSize(tag.Label).x;
-			return tag.labelWidth + 3 * padding + Assets.deleteTagButton.width;
+			return tag.labelWidth + (tag is TagAddButton ? 2 * padding : 3 * padding + Assets.deleteTagButton.width);
 		};
+
+		internal void DrawButton(Rect rect, Action action)
+		{
+			if (Widgets.ButtonText(rect, Label))
+				action();
+		}
 
 		public virtual void Draw(Rect rect, Action action)
 		{
@@ -123,22 +135,16 @@ namespace CameraPlus
 
 	public class TagAddButton : ConditionTag
 	{
-		public override string Label => $"...";
-		public override float CustomWidth => Text.CalcSize(Label).x;
-		public override bool Matches(Pawn pawn) => false;
+		public override string Label => $"NewPolicy".TranslateSimple();
+		public override void Draw(Rect rect, Action action) => DrawButton(rect, action);
+	}
 
-		public override void Draw(Rect rect, Action action)
-		{
-			GUI.color = CharacterCardUtility.StackElementBackground;
-			GUI.DrawTexture(rect, BaseContent.WhiteTex);
-			GUI.color = Mouse.IsOver(rect) ? GenUI.MouseoverColor : Color.white;
-			Text.Anchor = TextAnchor.MiddleCenter;
-			Widgets.Label(rect, Label);
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			if (Widgets.ButtonInvisible(rect))
-				action();
-		}
+	public class TagChooseButton(ConditionTag tag) : ConditionTag
+	{
+		private readonly ConditionTag tag = tag;
+		public ConditionTag ClonedTag => tag.Clone();
+		public override string Label => tag.Label;
+		public override void Draw(Rect rect, Action action) => DrawButton(rect, action);
 	}
 
 	public abstract class BoolTag : ConditionTag

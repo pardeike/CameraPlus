@@ -1,150 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	
-    <!-- types -->
-    <AncientTag>Ancient</AncientTag>
-    <NotAncientTag>Not an ancient</NotAncientTag>
-	
-    <AnimalTag>Animal</AnimalTag>
-    <NotAnimalTag>Not an animal</NotAnimalTag>
 
-    <CreepJoinerTag>Creep joiner</CreepJoinerTag>
-    <NotCreepJoinerTag>Not a creep joiner</NotCreepJoinerTag>
+	<!-- types -->
+	<AncientTag>Ancient</AncientTag>
+	<NotAncientTag>Not an ancient</NotAncientTag>
 
-    <EmpireTag>From the empire</EmpireTag>
-    <NotEmpireTag>Not from the Empire</NotEmpireTag>
+	<AnimalTag>Animal</AnimalTag>
+	<NotAnimalTag>Not an animal</NotAnimalTag>
 
-    <EntityTag>Entity</EntityTag>
-    <NotEntityTag>Not an entity</NotEntityTag>
+	<CreepJoinerTag>Creep joiner</CreepJoinerTag>
+	<NotCreepJoinerTag>Not a creep joiner</NotCreepJoinerTag>
 
-    <GhoulTag>Ghoul</GhoulTag>
-    <NotGhoulTag>Not a ghoul</NotGhoulTag>
+	<EmpireTag>From the empire</EmpireTag>
+	<NotEmpireTag>Not from the Empire</NotEmpireTag>
 
-    <HoraxCultTag>Cultist</HoraxCultTag>
-    <NotHoraxCultTag>Not a cultist</NotHoraxCultTag>
+	<EntityTag>Entity</EntityTag>
+	<NotEntityTag>Not an entity</NotEntityTag>
 
-    <HumanTag>Human</HumanTag>
-    <NotHumanTag>Not a human</NotHumanTag>
+	<GhoulTag>Ghoul</GhoulTag>
+	<NotGhoulTag>Not a ghoul</NotGhoulTag>
 
-    <InsectTag>Insect</InsectTag>
-    <NotInsectTag>Not an insect</NotInsectTag>
+	<HoraxCultTag>Cultist</HoraxCultTag>
+	<NotHoraxCultTag>Not a cultist</NotHoraxCultTag>
 
-    <MechanoidTag>Mechanoid</MechanoidTag>
-    <NotMechanoidTag>Not a mechanoid</NotMechanoidTag>
+	<HumanTag>Human</HumanTag>
+	<NotHumanTag>Not a human</NotHumanTag>
 
-    <Mechanitor>Mechanitor</Mechanitor>
-    <NotMechanitor>Not a mechanitor</NotMechanitor>
+	<InsectTag>Insect</InsectTag>
+	<NotInsectTag>Not an insect</NotInsectTag>
 
-    <MutantTag>Mutant</MutantTag>
-    <NotMutantTag>Not a mutant</NotMutantTag>
+	<MechanoidTag>Mechanoid</MechanoidTag>
+	<NotMechanoidTag>Not a mechanoid</NotMechanoidTag>
 
-    <PirateTag>Pirate</PirateTag>
-    <NotPirateTag>Not a pirate</NotPirateTag>
+	<Mechanitor>Mechanitor</Mechanitor>
+	<NotMechanitor>Not a mechanitor</NotMechanitor>
 
-    <PrisonerTag>Prisoner</PrisonerTag>
-    <NotPrisonerTag>Not a prisoner</NotPrisonerTag>
+	<MutantTag>Mutant</MutantTag>
+	<NotMutantTag>Not a mutant</NotMutantTag>
 
-    <ShamblerTag>Shambler</ShamblerTag>
-    <NotShamblerTag>Not a shambler</NotShamblerTag>
+	<PirateTag>Pirate</PirateTag>
+	<NotPirateTag>Not a pirate</NotPirateTag>
 
-    <SlaveTag>Slave</SlaveTag>
-    <NotSlaveTag>Not a slave</NotSlaveTag>
+	<PrisonerTag>Prisoner</PrisonerTag>
+	<NotPrisonerTag>Not a prisoner</NotPrisonerTag>
 
-    <VehicleTag>Vehicle</VehicleTag>
-    <NotVehicleTag>Not a vehicle</NotVehicleTag>
+	<ShamblerTag>Shambler</ShamblerTag>
+	<NotShamblerTag>Not a shambler</NotShamblerTag>
 
-   
+	<SlaveTag>Slave</SlaveTag>
+	<NotSlaveTag>Not a slave</NotSlaveTag>
+
+	<VehicleTag>Vehicle</VehicleTag>
+	<NotVehicleTag>Not a vehicle</NotVehicleTag>
+
+
 	<!-- properties -->
-    <AdultTag>Adult</AdultTag>
-    <NotAdultTag>Not an adult</NotAdultTag>
+	<AdultTag>Adult</AdultTag>
+	<NotAdultTag>Not an adult</NotAdultTag>
 
-    <AttackingTag>Attacking</AttackingTag>
-    <NotAttackingTag>Not attacking</NotAttackingTag>
+	<AttackingTag>Attacking</AttackingTag>
+	<NotAttackingTag>Not attacking</NotAttackingTag>
 
-    <AwakeTag>Awake</AwakeTag>
-    <NotAwakeTag>Asleep</NotAwakeTag>
+	<AwakeTag>Awake</AwakeTag>
+	<NotAwakeTag>Asleep</NotAwakeTag>
 
-    <AwokenCorpseTag>Awoken corpse</AwokenCorpseTag>
-    <NotAwokenCorpseTag>Not an awoken corpse</NotAwokenCorpseTag>
+	<AwokenCorpseTag>Awoken corpse</AwokenCorpseTag>
+	<NotAwokenCorpseTag>Not an awoken corpse</NotAwokenCorpseTag>
 
-    <CanCastTag>Can cast</CanCastTag>
-    <NotCanCastTag>Cannot cast</NotCanCastTag>
+	<CanCastTag>Can cast</CanCastTag>
+	<NotCanCastTag>Cannot cast</NotCanCastTag>
 
-    <ColonistTag>Colonist</ColonistTag>
-    <NotColonistTag>Not a colonist</NotColonistTag>
+	<ColonistTag>Colonist</ColonistTag>
+	<NotColonistTag>Not a colonist</NotColonistTag>
 
-    <ControllableTag>Controllable</ControllableTag>
-    <NotControllableTag>Not controllable</NotControllableTag>
+	<ControllableTag>Controllable</ControllableTag>
+	<NotControllableTag>Not controllable</NotControllableTag>
 
-    <CrawlingTag>Crawling</CrawlingTag>
-    <NotCrawlingTag>Not crawling</NotCrawlingTag>
+	<CrawlingTag>Crawling</CrawlingTag>
+	<NotCrawlingTag>Not crawling</NotCrawlingTag>
 
-    <DeadTag>Dead</DeadTag>
-    <NotDeadTag>Alive</NotDeadTag>
+	<DeadTag>Dead</DeadTag>
+	<NotDeadTag>Alive</NotDeadTag>
 
-    <DownedTag>Downed</DownedTag>
-    <NotDownedTag>Not downed</NotDownedTag>
+	<DownedTag>Downed</DownedTag>
+	<NotDownedTag>Not downed</NotDownedTag>
 
-    <ExitingMapTag>Exiting map</ExitingMapTag>
-    <NotExitingMapTag>Not exiting map</NotExitingMapTag>
+	<DraftedTag>Drafted</DraftedTag>
+	<NotDraftedTag>Not drafted</NotDraftedTag>
 
-    <FemaleTag>Female</FemaleTag>
-    <NotFemaleTag>Not female</NotFemaleTag>
+	<ExitingMapTag>Exiting map</ExitingMapTag>
+	<NotExitingMapTag>Not exiting map</NotExitingMapTag>
 
-    <FreeTag>Free</FreeTag>
-    <NotFreeTag>Not free</NotFreeTag>
+	<FemaleTag>Female</FemaleTag>
+	<NotFemaleTag>Not female</NotFemaleTag>
 
-    <HostileTag>Hostile</HostileTag>
-    <NotHostileTag>Friendly</NotHostileTag>
+	<FreeTag>Free</FreeTag>
+	<NotFreeTag>Not free</NotFreeTag>
 
-    <IdleTag>Idle</IdleTag>
-    <NotIdleTag>Not idle</NotIdleTag>
+	<HostileTag>Hostile</HostileTag>
+	<NotHostileTag>Friendly</NotHostileTag>
 
-    <InjuredTag>Injured</InjuredTag>
-    <NotInjuredTag>Not injured</NotInjuredTag>
+	<IdleTag>Idle</IdleTag>
+	<NotIdleTag>Not idle</NotIdleTag>
 
-    <MaleTag>Male</MaleTag>
-    <NotMaleTag>Not male</NotMaleTag>
+	<InjuredTag>Injured</InjuredTag>
+	<NotInjuredTag>Not injured</NotInjuredTag>
 
-    <ManhunterTag>Manhunter</ManhunterTag>
-    <NotManhunterTag>Not manhunter</NotManhunterTag>
+	<MaleTag>Male</MaleTag>
+	<NotMaleTag>Not male</NotMaleTag>
 
-    <MeleeTag>Is melee</MeleeTag>
-    <NotMeleeTag>Not melee</NotMeleeTag>
+	<ManhunterTag>Manhunter</ManhunterTag>
+	<NotManhunterTag>Not manhunter</NotManhunterTag>
 
-    <MentalTag>In mental break</MentalTag>
-    <NotMentalTag>Not in mental break</NotMentalTag>
+	<MeleeTag>Is melee</MeleeTag>
+	<NotMeleeTag>Not melee</NotMeleeTag>
 
-    <ModdedTag>From mod</ModdedTag>
-    <NotModdedTag>Vanilla</NotModdedTag>
+	<MentalTag>In mental break</MentalTag>
+	<NotMentalTag>Not in mental break</NotMentalTag>
 
-    <OverseenTag>Overseen</OverseenTag>
-    <NotOverseenTag>Not being overseen</NotOverseenTag>
+	<ModdedTag>From mod</ModdedTag>
+	<NotModdedTag>Vanilla</NotModdedTag>
 
-    <PlayerFactionTag>Player faction</PlayerFactionTag>
-    <NotPlayerFactionTag>Not player faction</NotPlayerFactionTag>
+	<OverseenTag>Overseen</OverseenTag>
+	<NotOverseenTag>Not being overseen</NotOverseenTag>
 
-    <PredatorHuntTag>Hunting as predator</PredatorHuntTag>
-    <NotPredatorHuntTag>Not hunting as pedator</NotPredatorHuntTag>
+	<PlayerFactionTag>Player faction</PlayerFactionTag>
+	<NotPlayerFactionTag>Not player faction</NotPlayerFactionTag>
 
-    <SelfShutdownTag>Shutdown</SelfShutdownTag>
-    <NotSelfShutdownTag>Not shutdown</NotSelfShutdownTag>
+	<PredatorHuntTag>Hunting as predator</PredatorHuntTag>
+	<NotPredatorHuntTag>Not hunting as pedator</NotPredatorHuntTag>
 
-    <TameTag>Tamed</TameTag>
-    <NotTameTag>Untamed</NotTameTag>
+	<SelfShutdownTag>Shutdown</SelfShutdownTag>
+	<NotSelfShutdownTag>Not shutdown</NotSelfShutdownTag>
 
-	
-    <!-- names -->
-    <KindDefTag>Kind</KindDefTag>
-    <NotKindDefTag>Not of kind</NotKindDefTag>
+	<TameTag>Tamed</TameTag>
+	<NotTameTag>Untamed</NotTameTag>
 
-    <FactionNameTag>Faction</FactionNameTag>
-    <NotFactionNameTag>Not faction</NotFactionNameTag>
+	<!-- names -->
+	<KindDefTag>Kind</KindDefTag>
+	<NotKindDefTag>Not of kind</NotKindDefTag>
 
-    <PawnNameTag>Named</PawnNameTag>
-    <NotPawnNameTag>Not named</NotPawnNameTag>
+	<FactionNameTag>Faction</FactionNameTag>
+	<NotFactionNameTag>Not faction</NotFactionNameTag>
 
-    <HediffTag>Hediff</HediffTag>
-    <NotHediffTag>Not hediff</NotHediffTag>
+	<PawnNameTag>Named</PawnNameTag>
+	<NotPawnNameTag>Not named</NotPawnNameTag>
+
+	<HediffTag>Hediff</HediffTag>
+	<NotHediffTag>Not hediff</NotHediffTag>
 
 </LanguageData>

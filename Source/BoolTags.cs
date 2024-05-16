@@ -151,6 +151,11 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.Downed;
 	}
 
+	public class DraftedTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.Drafted;
+	}
+
 	public class ExitingMapTag : BoolTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ PawnUtility.IsExitingMap(pawn);

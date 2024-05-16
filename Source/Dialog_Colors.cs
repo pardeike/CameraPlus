@@ -15,15 +15,12 @@ namespace CameraPlus
 		static readonly Vector2 colorFieldSize = new(100, 30);
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
 
-		static readonly List<ConditionTag>[] tags = new List<ConditionTag>[6];
+		static readonly List<ConditionTag>[] tags = [[], []];
 
 		public Dialog_Colors()
 		{
 			doCloseButton = true;
 			draggable = true;
-
-			for (var i = 0; i < tags.Length; i++)
-				tags[i] = ConditionTag.AllTags.InRandomOrder().Take(Rand.RangeInclusive(1, 4)).Select(t => { t.Negated = Rand.Bool; return t.Clone(); }).ToList();
 		}
 
 		static void ColumnLabel(Rect labelRect, TaggedString label, bool center)
@@ -55,7 +52,7 @@ namespace CameraPlus
 				GenUI.DrawElementStack(labelRect, Text.LineHeightOf(GameFont.Tiny), currentTags, (rect, tag) => tag.Draw(rect, delegate ()
 				{
 					if (tag is TagAddButton)
-						tags[idx].Add(ConditionTag.AllTags.RandomElement().Clone());
+						Find.WindowStack.Add(new Dialog_AddTag(newTag => tags[idx].Add(newTag.Clone())));
 					else
 						LongEventHandler.ExecuteWhenFinished(() => tags[idx].RemoveWhere(t => t == tag));
 				}),
@@ -139,16 +136,16 @@ namespace CameraPlus
 			var defaults = new CameraPlusSettings();
 
 			var colony = "Player".Translate();
-			ColorEditorRow(list, 0, $"{colony} {"PlanetTemperature_Normal".Translate()}", false, false, Settings.playerNormalOuterColors, Settings.playerNormalInnerColors, defaults.playerNormalOuterColors, defaults.playerNormalInnerColors);
-			ColorEditorRow(list, 1, $"{colony} {"CommandDraftLabel".Translate()}", false, false, Settings.playerDraftedOuterColors, Settings.playerDraftedInnerColors, defaults.playerDraftedOuterColors, defaults.playerDraftedInnerColors);
-			ColorEditorRow(list, 2, $"{colony} {"DownedLower".Translate().CapitalizeFirst()}", false, false, Settings.playerDownedOuterColors, Settings.playerDownedInnerColors, defaults.playerDownedOuterColors, defaults.playerDownedInnerColors);
-			ColorEditorRow(list, 3, $"{colony} {"BrokenDown".Translate()}", false, false, Settings.playerMentalOuterColors, Settings.playerMentalInnerColors, defaults.playerMentalOuterColors, defaults.playerMentalInnerColors);
+			ColorEditorRow(list, -1, $"{colony} {"PlanetTemperature_Normal".Translate()}", false, false, Settings.playerNormalOuterColors, Settings.playerNormalInnerColors, defaults.playerNormalOuterColors, defaults.playerNormalInnerColors);
+			ColorEditorRow(list, -1, $"{colony} {"CommandDraftLabel".Translate()}", false, false, Settings.playerDraftedOuterColors, Settings.playerDraftedInnerColors, defaults.playerDraftedOuterColors, defaults.playerDraftedInnerColors);
+			ColorEditorRow(list, -1, $"{colony} {"DownedLower".Translate().CapitalizeFirst()}", false, false, Settings.playerDownedOuterColors, Settings.playerDownedInnerColors, defaults.playerDownedOuterColors, defaults.playerDownedInnerColors);
+			ColorEditorRow(list, -1, $"{colony} {"BrokenDown".Translate()}", false, false, Settings.playerMentalOuterColors, Settings.playerMentalInnerColors, defaults.playerMentalOuterColors, defaults.playerMentalInnerColors);
 
 			list.Gap(20);
-			ColorEditorRow(list, 4, $"{"AnimalsSection".Translate()} / {"AutoSlaugtherHeaderColOther".Translate()}", true, true, Settings.defaultOuterColors, Settings.defaultInnerColors, defaults.defaultOuterColors, defaults.defaultInnerColors);
+			ColorEditorRow(list, 0, $"{"AnimalsSection".Translate()} / {"AutoSlaugtherHeaderColOther".Translate()}", true, true, Settings.defaultOuterColors, Settings.defaultInnerColors, defaults.defaultOuterColors, defaults.defaultInnerColors);
 
 			list.Gap(20);
-			ColorEditorRow(list, 5, $"{"ScenariosCustom".Translate()} / {"Mods".Translate()}", false, true, Settings.customOuterColors, Settings.customInnerColors, defaults.customOuterColors, defaults.customInnerColors);
+			ColorEditorRow(list, 1, $"{"ScenariosCustom".Translate()} / {"Mods".Translate()}", false, true, Settings.customOuterColors, Settings.customInnerColors, defaults.customOuterColors, defaults.customInnerColors);
 
 			list.End();
 		}
