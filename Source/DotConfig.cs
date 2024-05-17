@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
 using UnityEngine;
 using Verse;
 
@@ -13,9 +15,10 @@ namespace CameraPlus
 
 	public class DotConfig : IExposable
 	{
+		public string name = "";
 		public List<ConditionTag> conditions = [];
 
-		public DotMode mode = DotMode.Off;
+		public DotMode mode = DotMode.Silhouette;
 		public int showBelowPixels = -1;
 		public bool useInside = true;
 		public bool useEdge = true;
@@ -27,8 +30,35 @@ namespace CameraPlus
 		public float lineWidth = 1;
 		public bool hideOnMouseover = true;
 
+		public DotConfig()
+		{
+			name = "";
+			conditions = [];
+			mode = DotMode.Silhouette;
+			showBelowPixels = -1;
+			useInside = true;
+			useEdge = true;
+			lineColor = Color.black;
+			fillColor = Color.white;
+			lineSelectedColor = Color.white;
+			fillSelectedColor = Color.white;
+			relativeSize = 1;
+			lineWidth = 1;
+			hideOnMouseover = true;
+		}
+
+		public DotConfig(params object[] args) : base()
+		{
+			if (args == null)
+				Log.Warning($"### used wrorng constructor: null");
+			else
+				Log.Warning($"### used wrorng constructor: {args.Length} [{args.Join(a => $"{a}")}]");
+		}
+
 		public void ExposeData()
 		{
+			Scribe_Values.Look(ref name, "name", "");
+
 			Scribe_Collections.Look(ref conditions, "conditions", LookMode.Deep);
 			conditions ??= [];
 

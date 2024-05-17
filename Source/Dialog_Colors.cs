@@ -77,12 +77,12 @@ namespace CameraPlus
 			DrawPreview(previewRect, false, dotConfig.lineColor, dotConfig.fillColor);
 			DrawPreview(previewRect, true, dotConfig.lineSelectedColor, dotConfig.fillSelectedColor);
 
-			ColorButton(cRect1, $"{"Line".Translate()}", dotConfig.lineColor, c => dotConfig.lineColor = c);
-			ColorButton(cRect2, $"{"Fill".Translate()}", dotConfig.fillColor, c => dotConfig.fillColor = c);
+			ColorButton(cRect1, $"{dotConfig.name} {"Line".Translate()}", dotConfig.lineColor, c => dotConfig.lineColor = c);
+			ColorButton(cRect2, $"{dotConfig.name} {"Fill".Translate()}", dotConfig.fillColor, c => dotConfig.fillColor = c);
 
 			var selected = "Selected".Translate();
-			ColorButton(cRect3, $"{"Line".Translate()} {selected}", dotConfig.lineSelectedColor, c => dotConfig.lineSelectedColor = c);
-			ColorButton(cRect4, $"{"Fill".Translate()} {selected}", dotConfig.fillSelectedColor, c => dotConfig.fillSelectedColor = c);
+			ColorButton(cRect3, $"{dotConfig.name} {"Line".Translate()} {selected}", dotConfig.lineSelectedColor, c => dotConfig.lineSelectedColor = c);
+			ColorButton(cRect4, $"{dotConfig.name} {"Fill".Translate()} {selected}", dotConfig.fillSelectedColor, c => dotConfig.fillSelectedColor = c);
 		}
 
 		public override void DoWindowContents(Rect inRect)
@@ -96,13 +96,7 @@ namespace CameraPlus
 			Widgets.DrawTextureFitted(cRect1.Union(cRect2), Assets.columnHeader, 1);
 			Widgets.DrawTextureFitted(cRect3.Union(cRect4), Assets.columnHeaderSelected, 1);
 
-			var worldComponent = Find.World.GetComponent<CameraSettings>();
-			var dotConfigs = worldComponent.dotConfigs;
-			if (dotConfigs == null)
-			{
-				dotConfigs = [];
-				worldComponent.dotConfigs = dotConfigs;
-			}
+			var dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			foreach (var dotConfig in dotConfigs)
 			{
 				ColorEditorRow(list, dotConfig);
