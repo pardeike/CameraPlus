@@ -40,33 +40,32 @@ namespace CameraPlus
 
 		Tracking tracking = Tracking.Init;
 		readonly string title;
-		readonly Action<OptionalColor> callback;
+		readonly Action<Color> callback;
 
 		float hue, sat, light;
-		Color? _color;
+		Color _color;
 		Color? draggedColor = null;
 		int draggedSwatch = -1;
 		int targetSwatch = -1;
 
 		bool IsDragging => draggedColor.HasValue;
-		public Color? CurrentColor
+		public Color CurrentColor
 		{
 			get => _color;
 			set
 			{
 				_color = value;
-				if (value.HasValue)
-					Color.RGBToHSV(value.Value, out hue, out sat, out light);
-				callback(new OptionalColor(value));
+				Color.RGBToHSV(value, out hue, out sat, out light);
+				callback(value);
 			}
 		}
 
 		void UpdateHSL(float hue, float sat, float light)
 		{
 			var c = Color.HSVToRGB(hue, sat, light);
-			c.a = _color?.a ?? 1;
+			c.a = _color.a;
 			_color = c;
-			callback(new OptionalColor(_color));
+			callback(_color);
 		}
 
 		public override Vector2 InitialSize => new(
@@ -74,11 +73,11 @@ namespace CameraPlus
 			StandardMargin + titleHeight + spacing + bedSize + spacing + alphaSliderHeight + spacing + CloseButSize.y + StandardMargin
 		);
 
-		public Dialog_ColorPicker(string title, OptionalColor color, Action<OptionalColor> callback)
+		public Dialog_ColorPicker(string title, Color color, Action<Color> callback)
 		{
 			this.title = title;
 			this.callback = callback;
-			CurrentColor = color.color;
+			CurrentColor = color;
 			doCloseButton = true;
 			draggable = true;
 		}
@@ -133,11 +132,11 @@ namespace CameraPlus
 			var cursorRect = new Rect(x - 4, y - 4, 8, 8);
 			GUI.DrawTexture(cursorRect, Assets.colorMarkerTexture, ScaleMode.ScaleToFit);
 
-			var oldAlpha = _color?.a ?? 0;
+			var oldAlpha = _color.a;
 			var alpha = Widgets.HorizontalSlider(alphaRect, oldAlpha, 0, 1, true);
 			if (oldAlpha != alpha)
 			{
-				var newColor = _color ?? Color.clear;
+				var newColor = _color;
 				newColor.a = alpha;
 				CurrentColor = newColor;
 			}
@@ -150,7 +149,7 @@ namespace CameraPlus
 
 			var colorRect = list.GetRect(colorHeight);
 			GUI.DrawTexture(colorRect, Assets.editoBackgroundPattern, ScaleMode.StretchToFill);
-			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor ?? Color.clear, IsDragging ? Color.white : borderEmptyColor);
+			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor, IsDragging ? Color.white : borderEmptyColor);
 			if (LeftMouseDown && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing)
 			{
 				draggedColor = CurrentColor;
@@ -199,7 +198,7 @@ namespace CameraPlus
 			if (RightMouseDown && over)
 				swatches[n] = null;
 			if (Widgets.ButtonInvisible(swatchRect) && swatches[n].HasValue && RightMouseDown == false)
-				CurrentColor = swatches[n];
+				CurrentColor = swatches[n].Value;
 		}
 
 		static void LoadSwatches()

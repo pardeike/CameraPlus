@@ -6,7 +6,7 @@ using Verse;
 
 namespace CameraPlus
 {
-	public abstract class ConditionTag
+	public abstract class ConditionTag : IExposable
 	{
 		public const float padding = 5;
 
@@ -131,6 +131,11 @@ namespace CameraPlus
 			if (Widgets.ButtonInvisible(rect))
 				Find.WindowStack.Add(new Dialog_TagEdit(this));
 		}
+
+		public virtual void ExposeData()
+		{
+			Scribe_Values.Look(ref _negated, "negated", false);
+		}
 	}
 
 	public class TagAddButton : ConditionTag
@@ -168,5 +173,11 @@ namespace CameraPlus
 		}
 
 		public override string Label => $"{MinimalLabel}: {Text}";
+
+		public override void ExposeData()
+		{
+			base.ExposeData();
+			Scribe_Values.Look(ref _text, "text", "");
+		}
 	}
 }

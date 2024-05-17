@@ -28,7 +28,7 @@ namespace CameraPlus
 		public static readonly Texture2D deleteTagButton = ContentFinder<Texture2D>.Get("TagDelete", true);
 		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
 
-		public static Material[] previewMaterials;
+		public static Material previewMaterial;
 
 		static bool initialized = false;
 		static Material colorBedMaterial, huesMaterial;
@@ -64,13 +64,9 @@ namespace CameraPlus
 			if (borderedShader == null)
 				Log.Error("Cannot load Bordered shader from asset bundle.");
 
-			previewMaterials = new Material[2];
-			for (var i = 0; i < previewMaterials.Length; i++)
-			{
-				previewMaterials[i] = MaterialAllocator.Create(borderedShader);
-				previewMaterials[i].SetTexture("_MainTex", i == 0 ? outerColonistTexture : outerAnimalTexture);
-				previewMaterials[i].renderQueue = (int)RenderQueue.Overlay;
-			}
+			previewMaterial = MaterialAllocator.Create(borderedShader);
+			previewMaterial.SetTexture("_MainTex", outerColonistTexture);
+			previewMaterial.renderQueue = (int)RenderQueue.Overlay;
 
 			var newestVersion = new CameraPlusSettings().currentVersion;
 			if (Settings.currentVersion < newestVersion)
