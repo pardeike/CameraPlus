@@ -11,8 +11,10 @@ namespace CameraPlus
 		public override Vector2 InitialSize => new(950, 640);
 		private Vector2 scrollPosition = Vector2.zero;
 
-		const float rowHeight = 30f;
-		const float rowSpacing = 10f;
+		const float rowHeight = 60f;
+		const float rowSpacing = 20f;
+		const float scrollbarWidth = 16f;
+
 		static readonly Vector2 previewSize = new(100, 30);
 		static readonly Vector2 colorFieldSize = new(100, rowHeight);
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
@@ -23,7 +25,7 @@ namespace CameraPlus
 			draggable = true;
 		}
 
-		static void PrepareRow(Listing_Standard list, bool first, List<ConditionTag> tags, out Rect previewRect, out Rect cRect1, out Rect cRect2, out Rect cRect3, out Rect cRect4)
+		static void PrepareRow(Listing_Standard list, bool header, bool first, List<ConditionTag> tags, out Rect previewRect, out Rect cRect1, out Rect cRect2, out Rect cRect3, out Rect cRect4)
 		{
 			if (first == false)
 				list.Gap(rowSpacing);
@@ -31,12 +33,12 @@ namespace CameraPlus
 			var h = colorFieldSize.y;
 			var rect = list.GetRect(h);
 
-			var labelRect = rect.LeftPartPixels(rect.width - 4 * (Dialog_ColorPicker.spacing + colorFieldSize.x) - Dialog_ColorPicker.spacing - previewSize.x);
-			previewRect = new Rect(labelRect.xMax + Dialog_ColorPicker.spacing, labelRect.y, previewSize.x, h).Rounded();
-			cRect1 = new Rect(previewRect.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
-			cRect2 = new Rect(cRect1.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
-			cRect3 = new Rect(cRect2.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
-			cRect4 = new Rect(cRect3.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).Rounded();
+			var labelRect = rect.LeftPartPixels(rect.width - 4 * (Dialog_ColorPicker.spacing + colorFieldSize.x) - Dialog_ColorPicker.spacing - previewSize.x - (header ? scrollbarWidth : 0));
+			previewRect = new Rect(labelRect.xMax + Dialog_ColorPicker.spacing, labelRect.y, previewSize.x, h).RoundedCeil();
+			cRect1 = new Rect(previewRect.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).RoundedCeil();
+			cRect2 = new Rect(cRect1.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).RoundedCeil();
+			cRect3 = new Rect(cRect2.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).RoundedCeil();
+			cRect4 = new Rect(cRect3.xMax + Dialog_ColorPicker.spacing, labelRect.y, colorFieldSize.x, h).RoundedCeil();
 
 			if (tags != null)
 			{
@@ -50,14 +52,14 @@ namespace CameraPlus
 					else
 						LongEventHandler.ExecuteWhenFinished(() => tags.RemoveWhere(t => t == tag));
 				}),
-				ConditionTag.WidthGetter, 4, 5, false);
+				ConditionTag.WidthGetter, 2, 2, false);
 				Text.Font = font;
 			}
 		}
 
 		static void ColorButton(Rect rect, string title, Color color, Action<Color> newColorCallback)
 		{
-			GUI.DrawTexture(rect, Assets.colorBackgroundPattern, ScaleMode.StretchToFill);
+			//GUI.DrawTexture(rect, Assets.colorBackgroundPattern, ScaleMode.StretchToFill);
 			Widgets.DrawBoxSolidWithOutline(rect, color, borderColor, 2);
 			var deleteRect = rect.RightPartPixels(rect.height).ExpandedBy(-4);
 			GUI.color = Color.white;
@@ -78,7 +80,7 @@ namespace CameraPlus
 
 		void ColorEditorRow(Listing_Standard list, bool first, DotConfig dotConfig)
 		{
-			PrepareRow(list, first, dotConfig.conditions, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			PrepareRow(list, false, first, dotConfig.conditions, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
 
 			DrawPreview(previewRect, false, dotConfig.lineColor, dotConfig.fillColor);
 			DrawPreview(previewRect, true, dotConfig.lineSelectedColor, dotConfig.fillSelectedColor);
@@ -98,7 +100,7 @@ namespace CameraPlus
 			var list = new Listing_Standard();
 			list.Begin(inRect);
 
-			PrepareRow(list, true, null, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
+			PrepareRow(list, true, true, null, out var previewRect, out var cRect1, out var cRect2, out var cRect3, out var cRect4);
 			Widgets.DrawTextureFitted(previewRect, Assets.columnHeaderPreview, 1);
 			Widgets.DrawTextureFitted(cRect1.Union(cRect2), Assets.columnHeader, 1);
 			Widgets.DrawTextureFitted(cRect3.Union(cRect4), Assets.columnHeaderSelected, 1);
@@ -107,7 +109,7 @@ namespace CameraPlus
 
 			var dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			var configCount = dotConfigs.Count;
-			var viewRect = new Rect(0, 0, inRect.width - 16, rowHeight * configCount + rowSpacing * (configCount - 1));
+			var viewRect = new Rect(0, 0, inRect.width - scrollbarWidth, rowHeight * configCount + rowSpacing * (configCount - 1));
 			Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
 			var innerList = new Listing_Standard();
 			innerList.Begin(viewRect);

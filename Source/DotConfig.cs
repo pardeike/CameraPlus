@@ -9,8 +9,10 @@ namespace CameraPlus
 	public enum DotMode
 	{
 		Off,
-		Dot,
-		Silhouette
+		VanillaDot,
+		VanillaSilhouette,
+		CameraPlusDot,
+		CameraPlusSilhouette
 	}
 
 	public class DotConfig : IExposable
@@ -18,7 +20,7 @@ namespace CameraPlus
 		public string name = "";
 		public List<ConditionTag> conditions = [];
 
-		public DotMode mode = DotMode.Silhouette;
+		public DotMode mode = DotMode.CameraPlusSilhouette;
 		public int showBelowPixels = -1;
 		public bool useInside = true;
 		public bool useEdge = true;
@@ -34,7 +36,7 @@ namespace CameraPlus
 		{
 			name = "";
 			conditions = [];
-			mode = DotMode.Silhouette;
+			mode = DotMode.CameraPlusSilhouette;
 			showBelowPixels = -1;
 			useInside = true;
 			useEdge = true;
