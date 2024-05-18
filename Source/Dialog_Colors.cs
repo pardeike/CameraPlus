@@ -173,11 +173,11 @@ namespace CameraPlus
 			var color2 = new Rect(h + 2 * spacing + w, 0, w, h);
 			var color3 = new Rect(h + spacing, spacing + h, w, h);
 			var color4 = new Rect(h + 2 * spacing + w, spacing + h, w, h);
-			DrawColorButton(color1, $"{dotConfig.name}, {"Outline".Translate()}", dotConfig.lineColor, c => dotConfig.lineColor = c);
-			DrawColorButton(color2, $"{dotConfig.name}, {"Fill".Translate()}", dotConfig.fillColor, c => dotConfig.fillColor = c);
+			DrawColorButton(color1, $"{"Outline".Translate()}", dotConfig.lineColor, c => dotConfig.lineColor = c);
+			DrawColorButton(color2, $"{"Fill".Translate()}", dotConfig.fillColor, c => dotConfig.fillColor = c);
 			var selected = "Selected".Translate();
-			DrawColorButton(color3, $"{dotConfig.name}, {"Outline".Translate()}, {selected}", dotConfig.lineSelectedColor, c => dotConfig.lineSelectedColor = c);
-			DrawColorButton(color4, $"{dotConfig.name}, {"Fill".Translate()}, {selected}", dotConfig.fillSelectedColor, c => dotConfig.fillSelectedColor = c);
+			DrawColorButton(color3, $"{"Outline".Translate()}, {selected}", dotConfig.lineSelectedColor, c => dotConfig.lineSelectedColor = c);
+			DrawColorButton(color4, $"{"Fill".Translate()}, {selected}", dotConfig.fillSelectedColor, c => dotConfig.fillSelectedColor = c);
 			GUI.EndGroup();
 		}
 

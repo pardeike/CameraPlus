@@ -17,7 +17,6 @@ namespace CameraPlus
 
 	public class DotConfig : IExposable
 	{
-		public string name = "Untitled".TranslateSimple();
 		public List<ConditionTag> conditions = [];
 
 		public DotMode mode = DotMode.CameraPlusSilhouette;
@@ -34,7 +33,6 @@ namespace CameraPlus
 
 		public DotConfig()
 		{
-			name = "Untitled".TranslateSimple();
 			conditions = [];
 			mode = DotMode.CameraPlusSilhouette;
 			showBelowPixels = -1;
@@ -59,8 +57,6 @@ namespace CameraPlus
 
 		public void ExposeData()
 		{
-			Scribe_Values.Look(ref name, "name", "");
-
 			Scribe_Collections.Look(ref conditions, "conditions", LookMode.Deep);
 			conditions ??= [];
 
