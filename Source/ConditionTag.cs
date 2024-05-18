@@ -140,8 +140,17 @@ namespace CameraPlus
 
 	public class TagAddButton : ConditionTag
 	{
-		public override string Label => $"NewPolicy".TranslateSimple();
-		public override void Draw(Rect rect, Action action) => DrawButton(rect, action);
+		public TagAddButton() : base()
+		{
+			labelWidth = 24f;
+		}
+
+		public override string Label => " ";
+		public override void Draw(Rect rect, Action action)
+		{
+			if (Widgets.ButtonImageFitted(rect, TexButton.Plus))
+				action();
+		}
 	}
 
 	public class TagChooseButton(ConditionTag tag) : ConditionTag

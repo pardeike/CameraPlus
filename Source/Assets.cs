@@ -22,6 +22,8 @@ namespace CameraPlus
 		public static readonly Texture2D colorBackgroundPattern = ContentFinder<Texture2D>.Get("ColorBackgroundPattern", true);
 		public static readonly Texture2D editoBackgroundPattern = ContentFinder<Texture2D>.Get("EditorBackgroundPattern", true);
 		public static readonly Texture2D swatchBackgroundPattern = ContentFinder<Texture2D>.Get("SwatchBackgroundPattern", true);
+		public static readonly Texture2D[] steppers = [ContentFinder<Texture2D>.Get("StepperUp", true), ContentFinder<Texture2D>.Get("StepperDown", true)];
+		public static readonly Texture2D bracket = ContentFinder<Texture2D>.Get("Bracket", true);
 		public static readonly Texture2D columnHeaderPreview = ContentFinder<Texture2D>.Get("ColumnHeaderPreview", true);
 		public static readonly Texture2D columnHeader = ContentFinder<Texture2D>.Get("ColumnHeader", true);
 		public static readonly Texture2D columnHeaderSelected = ContentFinder<Texture2D>.Get("ColumnHeaderSelected", true);

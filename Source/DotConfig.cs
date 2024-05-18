@@ -17,7 +17,7 @@ namespace CameraPlus
 
 	public class DotConfig : IExposable
 	{
-		public string name = "";
+		public string name = "Untitled".TranslateSimple();
 		public List<ConditionTag> conditions = [];
 
 		public DotMode mode = DotMode.CameraPlusSilhouette;
@@ -29,12 +29,12 @@ namespace CameraPlus
 		public Color lineSelectedColor = Color.white;
 		public Color fillSelectedColor = Color.white;
 		public float relativeSize = 1;
-		public float lineWidth = 1;
+		public float outlineFactor = 0.1f;
 		public bool hideOnMouseover = true;
 
 		public DotConfig()
 		{
-			name = "";
+			name = "Untitled".TranslateSimple();
 			conditions = [];
 			mode = DotMode.CameraPlusSilhouette;
 			showBelowPixels = -1;
@@ -45,16 +45,16 @@ namespace CameraPlus
 			lineSelectedColor = Color.white;
 			fillSelectedColor = Color.white;
 			relativeSize = 1;
-			lineWidth = 1;
+			outlineFactor = 0.1f;
 			hideOnMouseover = true;
 		}
 
 		public DotConfig(params object[] args) : base()
 		{
-			if (args == null)
-				Log.Warning($"### used wrorng constructor: null");
-			else
-				Log.Warning($"### used wrorng constructor: {args.Length} [{args.Join(a => $"{a}")}]");
+			//if (args == null)
+			//	Log.Warning($"### used wrorng constructor: null");
+			//else
+			//	Log.Warning($"### used wrorng constructor: {args.Length} [{args.Join(a => $"{a}")}]");
 		}
 
 		public void ExposeData()
@@ -73,7 +73,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref lineSelectedColor, "lineSelectedColor", Color.clear);
 			Scribe_Values.Look(ref fillSelectedColor, "fillSelectedColor", Color.clear);
 			Scribe_Values.Look(ref relativeSize, "relativeSize", 1);
-			Scribe_Values.Look(ref lineWidth, "lineWidth", 1);
+			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1);
 			Scribe_Values.Look(ref hideOnMouseover, "hideOnMouseover", true);
 		}
 	}
