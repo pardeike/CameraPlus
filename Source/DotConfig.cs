@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib;
 using UnityEngine;
 using Verse;
 
@@ -47,12 +45,9 @@ namespace CameraPlus
 			hideOnMouseover = true;
 		}
 
+		// keep
 		public DotConfig(params object[] args) : base()
 		{
-			//if (args == null)
-			//	Log.Warning($"### used wrorng constructor: null");
-			//else
-			//	Log.Warning($"### used wrorng constructor: {args.Length} [{args.Join(a => $"{a}")}]");
 		}
 
 		public void ExposeData()

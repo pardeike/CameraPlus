@@ -51,10 +51,14 @@
     <Outline>outline</Outline>
     <Fill>fill</Fill>
     <Selected>selected</Selected>
-    <Player>Player</Player>
+    <NewCondition>Add new condition</NewCondition>
     <DotModeOff>Off</DotModeOff>
     <DotModeVanillaDot>Vanilla Dot</DotModeVanillaDot>
     <DotModeVanillaSilhouette>Vanilla Silhouette</DotModeVanillaSilhouette>
     <DotModeCameraPlusDot>Camera+ Dot</DotModeCameraPlusDot>
     <DotModeCameraPlusSilhouette>Camera+ Silhouette</DotModeCameraPlusSilhouette>
+    <Opposite>Opposite</Opposite>
+    <TagCategoryType>Types</TagCategoryType>
+    <TagCategoryAttribute>Attributes</TagCategoryAttribute>
+    <TagCategoryText>Naming</TagCategoryText>
 </LanguageData>

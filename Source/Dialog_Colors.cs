@@ -29,6 +29,7 @@ namespace CameraPlus
 		static readonly string[] columnHeaders = ["Conditions", "Mode", "Colors", "Map", "Edge", "Mouse hide", "Show below", "Size", "Border"];
 
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
+		private readonly int observerId;
 		private static List<DotConfig> dotConfigs;
 		private static Vector2 scrollPosition = Vector2.zero;
 		private static ValueChanger valueChanger = null;
@@ -36,17 +37,40 @@ namespace CameraPlus
 		private static int rowDragged = -1;
 		private static int rowInsert = -1;
 
+		private static Window currentWindow;
+		static bool Draggable
+		{
+			get => currentWindow.draggable;
+			set => currentWindow.draggable = value;
+		}
+
 		public Dialog_Colors()
 		{
 			dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			doCloseButton = true;
-			// draggable = true;
+			draggable = true;
+			currentWindow = this;
+			observerId = CheckBoxPaintingObserver.Register(checkboxPainting => draggable = checkboxPainting == false);
+		}
+
+		public override void PreClose()
+		{
+			base.PreClose();
+			CheckBoxPaintingObserver.Unregister(observerId);
+		}
+
+		static void DrawMouseAttachment(Texture2D icon)
+		{
+			var mousePosition = UI.MousePositionOnUIInverted;
+			var mouseRect = new Rect(mousePosition.x + 4f, mousePosition.y + 4f, 32f, 32f);
+			Find.WindowStack.ImmediateWindow(34003428, mouseRect, WindowLayer.Super, () => GUI.DrawTexture(mouseRect.AtZero(), icon), false, false, 0f, null);
 		}
 
 		public void Tick()
 		{
 			if (Input.GetMouseButton(0) == false)
 			{
+				Draggable = true;
 				valueChanger = null;
 
 				if (rowInsert > -1)
@@ -69,7 +93,14 @@ namespace CameraPlus
 				rowToDelete = -1;
 			}
 
-			valueChanger?.Tick();
+			if (rowDragged != -1)
+				DrawMouseAttachment(Assets.rowDragMouseAttachment);
+
+			if (valueChanger != null)
+			{
+				valueChanger.Tick();
+				DrawMouseAttachment(Assets.valueChangerMouseAttachment);
+			}
 		}
 
 		static bool ShouldInsert(float curY, int row)
@@ -110,24 +141,23 @@ namespace CameraPlus
 			actionButtons = new Rect(rect.width - actionButtonsWidth, rect.y, actionButtonsWidth, rect.height);
 		}
 
-		static void DrawConditionTags(Rect rect, List<ConditionTag> tags)
+		static void DrawConditionTags(Rect rect, int pos, List<ConditionTag> tags)
 		{
 			var font = Text.Font;
 			Text.Font = GameFont.Tiny;
-			var allTags = tags.Union([new TagAddButton()]).ToList();
-			GenUI.DrawElementStack(rect, Text.LineHeightOf(GameFont.Tiny), allTags, (rect, tag) => tag.Draw(rect, delegate ()
-			{
-				if (tag is TagAddButton)
-					Find.WindowStack.Add(new Dialog_AddTag(newTag => tags.Add(newTag.Clone())));
-				else
-					LongEventHandler.ExecuteWhenFinished(() => tags.RemoveWhere(t => t == tag));
-			}),
+			ConditionTag[] idx = [new NumberIndexButton(pos)];
+			var allTags = idx.Union(tags.Union([new TagAddButton()])).ToList();
+			GenUI.DrawElementStack(rect, Text.LineHeightOf(GameFont.Tiny), allTags, (rect, tag) => tag.Draw(rect,
+				() => Find.WindowStack.Add(tag is TagAddButton ? new Dialog_AddTag(newTag => tags.Add(newTag)) : new Dialog_TagEdit(tag)),
+				() => LongEventHandler.ExecuteWhenFinished(() => tags.RemoveWhere(t => t == tag))
+			),
 			ConditionTag.WidthGetter, 2, 2, false);
 			Text.Font = font;
 		}
 
 		static void DrawColorButton(Rect rect, string title, Color color, Action<Color> newColorCallback)
 		{
+			GUI.DrawTexture(rect, Assets.colorBackgroundPattern, ScaleMode.ScaleAndCrop);
 			Widgets.DrawBoxSolidWithOutline(rect, color, borderColor, 2);
 			var deleteRect = rect.RightPartPixels(rect.height).ExpandedBy(-4);
 			GUI.color = Color.white;
@@ -215,6 +245,7 @@ namespace CameraPlus
 			if (Mouse.IsOver(textRect) && Event.current.type == EventType.MouseDown && Input.GetMouseButtonDown(0))
 			{
 				valueChanger = new ValueChanger(value, 10, deltaCallback);
+				Draggable = false;
 				Event.current.Use();
 			}
 			var up = new Rect(rect.width - dx - sw, dh, sw, sh);
@@ -238,7 +269,7 @@ namespace CameraPlus
 			if (rowDragged == row)
 				Widgets.DrawBoxSolid(columnRects[0].Union(columnRects[8]), dragColor.ToTransparent(0.2f));
 
-			DrawConditionTags(columnRects[0], dotConfig.conditions);
+			DrawConditionTags(columnRects[0], row + 1, dotConfig.conditions);
 			DrawMode(columnRects[1], dotConfig);
 			DrawColors(columnRects[2], dotConfig);
 			DrawCheckbox(columnRects[3], ref dotConfig.useInside);
@@ -256,6 +287,7 @@ namespace CameraPlus
 			if (mouseOver && Event.current.type == EventType.MouseDown && Input.GetMouseButtonDown(0))
 			{
 				rowDragged = row;
+				Draggable = false;
 				Event.current.Use();
 			}
 
@@ -303,7 +335,7 @@ namespace CameraPlus
 			}
 
 			list.Gap(rowSpacing);
-			if (list.ButtonText("New".TranslateSimple(), null, 0.2f))
+			if (list.ButtonText("NewCondition".TranslateSimple(), null, 0.2f))
 				dotConfigs.Add(new DotConfig());
 
 			list.End();

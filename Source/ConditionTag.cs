@@ -76,6 +76,7 @@ namespace CameraPlus
 			return copy;
 		}
 
+		public virtual bool HasDelete => true;
 		public string BaseLabel => GetType().Name.TranslateSimple();
 		public string MinimalLabel => Negated ? $"Not{GetType().Name}".TranslateSimple() : BaseLabel;
 		public virtual string Label => MinimalLabel;
@@ -83,8 +84,8 @@ namespace CameraPlus
 
 		public virtual float CustomWidth => 0;
 
-		private bool _negated = false;
-		public bool Negated
+		internal bool _negated = false;
+		public virtual bool Negated
 		{
 			get => _negated;
 			set
@@ -106,30 +107,26 @@ namespace CameraPlus
 				return width + 2 * padding;
 			if (tag.labelWidth == 0)
 				tag.labelWidth = Text.CalcSize(tag.Label).x;
-			return tag.labelWidth + (tag is TagAddButton ? 2 * padding : 3 * padding + Assets.deleteTagButton.width);
+			var extraWidth = tag.HasDelete ? padding + Assets.deleteTagButton.width : 0;
+			return tag.labelWidth + 2 * padding + extraWidth;
 		};
 
-		internal void DrawButton(Rect rect, Action action)
-		{
-			if (Widgets.ButtonText(rect, Label))
-				action();
-		}
-
-		public virtual void Draw(Rect rect, Action action)
+		public virtual void Draw(Rect rect, Action selectAction, Action deleteAction)
 		{
 			GUI.color = CharacterCardUtility.StackElementBackground;
 			GUI.DrawTexture(rect, BaseContent.WhiteTex);
 			GUI.color = Mouse.IsOver(rect) ? GenUI.MouseoverColor : Color.white;
-			Widgets.Label(new Rect(rect.x + padding, rect.y, rect.width - 2 * padding - Assets.deleteTagButton.width, rect.height), Label);
+			var extraWidth = HasDelete ? padding + Assets.deleteTagButton.width : 0;
+			Widgets.Label(new Rect(rect.x + padding, rect.y, rect.width - padding - extraWidth, rect.height), Label);
 			GUI.color = Color.white;
-			var deleteRect = rect.RightPartPixels(padding + Assets.deleteTagButton.width).LeftPartPixels(Assets.deleteTagButton.width).ContractedBy(0, (rect.height - Assets.deleteTagButton.height) / 2);
-			if (Widgets.ButtonImage(deleteRect, Assets.deleteTagButton))
+			if (HasDelete)
 			{
-				action();
-				Event.current.Use();
+				var deleteRect = rect.RightPartPixels(padding + Assets.deleteTagButton.width).LeftPartPixels(Assets.deleteTagButton.width).ContractedBy(0, (rect.height - Assets.deleteTagButton.height) / 2);
+				if (Widgets.ButtonImage(deleteRect, Assets.deleteTagButton))
+					deleteAction();
 			}
 			if (Widgets.ButtonInvisible(rect))
-				Find.WindowStack.Add(new Dialog_TagEdit(this));
+				selectAction();
 		}
 
 		public virtual void ExposeData()
@@ -138,27 +135,40 @@ namespace CameraPlus
 		}
 	}
 
-	public class TagAddButton : ConditionTag
+	public class NumberIndexButton(int n) : ConditionTag
 	{
-		public TagAddButton() : base()
-		{
-			labelWidth = 24f;
-		}
+		private readonly int n = n;
+		public override string Label => $"{n}.";
+		public override float CustomWidth => Text.CalcSize(Label).x;
+		public override void Draw(Rect rect, Action selectAction, Action deleteAction) => Widgets.Label(rect, Label);
+	}
 
-		public override string Label => " ";
-		public override void Draw(Rect rect, Action action)
+	public class ChooseTag(ConditionTag tag) : ConditionTag
+	{
+		private readonly ConditionTag tag = tag;
+
+		public override string Label => tag.Label;
+		public override bool HasDelete => false;
+		public ConditionTag ClonedTag => tag.Clone();
+		public override bool Negated
 		{
-			if (Widgets.ButtonImageFitted(rect, TexButton.Plus))
-				action();
+			get => tag.Negated;
+			set
+			{
+				tag.Negated = value;
+				labelWidth = 0;
+			}
 		}
 	}
 
-	public class TagChooseButton(ConditionTag tag) : ConditionTag
+	public class TagAddButton : ConditionTag
 	{
-		private readonly ConditionTag tag = tag;
-		public ConditionTag ClonedTag => tag.Clone();
-		public override string Label => tag.Label;
-		public override void Draw(Rect rect, Action action) => DrawButton(rect, action);
+		public override float CustomWidth => 24;
+		public override void Draw(Rect rect, Action selectAction, Action deleteAction)
+		{
+			if (Widgets.ButtonImageFitted(rect, TexButton.Plus))
+				selectAction();
+		}
 	}
 
 	public abstract class BoolTag : ConditionTag

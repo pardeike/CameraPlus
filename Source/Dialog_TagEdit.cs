@@ -8,7 +8,7 @@ namespace CameraPlus
 		private readonly ConditionTag tag;
 		private bool focusedNameField;
 
-		public override Vector2 InitialSize => new(240f, 130f);
+		public override Vector2 InitialSize => new(240f, 142f);
 
 		public Dialog_TagEdit(ConditionTag tag)
 		{
@@ -37,9 +37,10 @@ namespace CameraPlus
 				GUI.SetNextControlName("NameField");
 				textTag.Text = list.TextEntry(textTag.Text);
 			}
+			list.Gap();
 
 			var negated = tag.Negated;
-			list.CheckboxLabeled("InvertArea".Translate(), ref negated);
+			list.CheckboxLabeled("Opposite".Translate(), ref negated);
 			tag.Negated = negated;
 
 			list.End();
