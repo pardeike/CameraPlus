@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -44,6 +45,22 @@ namespace CameraPlus
 			outlineFactor = 0.1f;
 			hideOnMouseover = true;
 		}
+
+		public DotConfig Clone() => new()
+		{
+			conditions = conditions.Select(condition => condition.Clone()).ToList(),
+			mode = mode,
+			showBelowPixels = showBelowPixels,
+			useInside = useInside,
+			useEdge = useEdge,
+			lineColor = lineColor,
+			fillColor = fillColor,
+			lineSelectedColor = lineSelectedColor,
+			fillSelectedColor = fillSelectedColor,
+			relativeSize = relativeSize,
+			outlineFactor = outlineFactor,
+			hideOnMouseover = hideOnMouseover
+		};
 
 		// keep
 		public DotConfig(params object[] args) : base()

@@ -13,7 +13,7 @@ namespace CameraPlus
 {
 	class Tools
 	{
-		static readonly Type vehicleType = AccessTools.TypeByName("Vehicles.VehiclePawn");
+		public static readonly QuotaCache<Pawn, int, DotConfig> dotConfigCache = new(60, pawn => pawn.thingIDNumber, pawn => pawn.GetDotConfig());
 
 		static readonly QuotaCache<Pawn, int, bool> shouldShowDotCache = new(60, pawn => pawn.thingIDNumber, pawn =>
 		{
@@ -56,6 +56,22 @@ namespace CameraPlus
 
 		public static bool ShouldShowMarker(Pawn pawn, bool checkCellSize)
 		{
+			var dotConfig = dotConfigCache.Get(pawn);
+			if (dotConfig != null)
+			{
+				if (checkCellSize && dotConfig.showBelowPixels != -1 && FastUI.CurUICellSize > dotConfig.showBelowPixels)
+					return false;
+				if (pawn == null || (dotConfig.mode < DotMode.CameraPlusDot && checkCellSize))
+					return false;
+				if (dotConfig.hideOnMouseover && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
+					return false;
+				if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
+					return false;
+				if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
+					return false;
+				return dotConfig.useInside;
+			}
+
 			if (checkCellSize && FastUI.CurUICellSize > Settings.dotSize)
 				return false;
 			if (pawn == null || (Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize))
@@ -179,8 +195,8 @@ namespace CameraPlus
 			if (mapCoordinates)
 			{
 				var mouse = FastUI.MouseMapPosition;
-				var dx1 = (mouse.x - pos.x);
-				var dz = (mouse.z - pos.z);
+				var dx1 = mouse.x - pos.x;
+				var dz = mouse.z - pos.z;
 				return dx1 * dx1 + dz * dz;
 			}
 			else
@@ -188,8 +204,8 @@ namespace CameraPlus
 				var mouse = FastUI.MousePositionOnUIInverted;
 				var len = FastUI.CurUICellSize;
 				mouse.y += len / 2;
-				var dx2 = (mouse.x - pos.x);
-				var dy = (mouse.y - pos.y);
+				var dx2 = mouse.x - pos.x;
+				var dy = mouse.y - pos.y;
 				var delta = dx2 * dx2 + dy * dy;
 				return delta / len / len;
 			}
@@ -211,6 +227,14 @@ namespace CameraPlus
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 		{
 			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
+
+			var dotConfig = dotConfigCache.Get(pawn);
+			if (dotConfig != null)
+			{
+				innerColor = selected == 1 ? dotConfig.fillSelectedColor : dotConfig.fillColor;
+				outerColor = selected == 1 ? dotConfig.lineSelectedColor : dotConfig.lineColor;
+				return true;
+			}
 
 			var cameraDelegate = GetCachedCameraDelegate(pawn);
 			if (cameraDelegate.GetCameraColors != null)

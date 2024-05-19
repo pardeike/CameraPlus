@@ -32,7 +32,6 @@ namespace CameraPlus
 
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
 		private readonly int observerId;
-		private static List<DotConfig> dotConfigs;
 		private static Vector2 scrollPosition = Vector2.zero;
 		private static ValueChanger valueChanger = null;
 		private static int rowToDelete = -1;
@@ -40,6 +39,8 @@ namespace CameraPlus
 		private static int rowInsert = -1;
 		private static string draggedColor;
 		private static Color draggedColorValue;
+		private static string colorClipboard = null;
+		private static DotConfig rowClipboard = null;
 
 		private static Dialog_Customization currentWindow;
 		static bool Draggable
@@ -50,7 +51,6 @@ namespace CameraPlus
 
 		public Dialog_Customization()
 		{
-			dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			doCloseButton = true;
 			draggable = true;
 			resizeable = true;
@@ -78,6 +78,8 @@ namespace CameraPlus
 
 		public void Tick()
 		{
+			Tools.dotConfigCache.Clear();
+
 			if (Input.GetMouseButton(0) == false)
 			{
 				Draggable = true;
@@ -88,6 +90,7 @@ namespace CameraPlus
 
 				if (rowInsert > -1)
 				{
+					var dotConfigs = CameraSettings.settings.dotConfigs;
 					var dotConfig = dotConfigs[rowDragged];
 					dotConfigs.RemoveAt(rowDragged);
 					if (rowInsert >= rowDragged) rowInsert--;
@@ -102,7 +105,7 @@ namespace CameraPlus
 
 			if (rowToDelete > -1)
 			{
-				dotConfigs.RemoveAt(rowToDelete);
+				CameraSettings.settings.dotConfigs.RemoveAt(rowToDelete);
 				rowToDelete = -1;
 			}
 
@@ -180,6 +183,18 @@ namespace CameraPlus
 			var current = Event.current;
 			if (Mouse.IsOver(rect))
 			{
+				if (Input.GetMouseButton(1))
+				{
+					List<FloatMenuOption> options = [new("Copy".TranslateSimple(), () => colorClipboard = color.ToHex())];
+					if (colorClipboard != null)
+					{
+						var option = new FloatMenuOption("Paste".TranslateSimple(), () => newColorCallback(colorClipboard.ToColor()));
+						options.Add(option);
+					}
+					var floatMenu = new FloatMenu(options);
+					Find.WindowStack.Add(floatMenu);
+				}
+
 				if (draggedColor == title)
 					newColorCallback(draggedColorValue);
 				if (Event.current.type == EventType.MouseDown)
@@ -310,21 +325,31 @@ namespace CameraPlus
 			GUI.color = mouseOver ? GenUI.MouseoverColor : Color.white;
 			GUI.DrawTexture(dragStartRect, TexButton.DragHash);
 			GUI.color = Color.white;
-			if (mouseOver && Event.current.type == EventType.MouseDown && Input.GetMouseButtonDown(0))
+			if (mouseOver && Event.current.type == EventType.MouseDown)
 			{
-				rowDragged = row;
-				Draggable = false;
-				Event.current.Use();
+				if (Input.GetMouseButton(0))
+				{
+					rowDragged = row;
+					Draggable = false;
+					Event.current.Use();
+				}
+
+				if (Input.GetMouseButton(1))
+				{
+					var dotConfigs = CameraSettings.settings.dotConfigs;
+					List<FloatMenuOption> options = [new("Copy".TranslateSimple(), () => rowClipboard = dotConfigs[row])];
+					if (rowClipboard != null)
+					{
+						var option = new FloatMenuOption("Paste".TranslateSimple(), () => dotConfigs[row] = rowClipboard.Clone());
+						options.Add(option);
+					}
+					var floatMenu = new FloatMenu(options);
+					Find.WindowStack.Add(floatMenu);
+				}
 			}
 
 			if (Widgets.ButtonImage(actionButtons.BottomPartPixels(actionButtonsWidth), TexButton.Delete))
 				rowToDelete = row;
-		}
-
-		string GetSettingsFilePath()
-		{
-			string tempPath = Application.temporaryCachePath;
-			return Path.Combine(tempPath, "settings.xml");
 		}
 
 		public override void DoWindowContents(Rect inRect)
@@ -342,6 +367,7 @@ namespace CameraPlus
 			list.Gap(rowSpacing);
 			var outRect = list.GetRect(inRect.height - list.curY - 2 * rowSpacing - bottomRowHeight);
 
+			var dotConfigs = CameraSettings.settings.dotConfigs;
 			var configCount = dotConfigs.Count;
 			var viewRect = new Rect(0, 0, inRect.width - scrollbarWidth, rowHeight * configCount + rowSpacing * configCount);
 			Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);

@@ -1,12 +1,24 @@
-﻿using RimWorld.Planet;
+﻿using HarmonyLib;
+using RimWorld.Planet;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
+	[HarmonyPatch(typeof(World))]
+	[HarmonyPatch(nameof(World.FinalizeInit))]
+	static class World_FinalizeInit_Patch
+	{
+		public static void Postfix(World __instance)
+		{
+			CameraSettings.settings = __instance.GetComponent<CameraSettings>();
+		}
+	}
+
 	public class CameraSettings(World world) : WorldComponent(world)
 	{
+		public static CameraSettings settings;
 		public List<DotConfig> dotConfigs = [.. defaultConfig];
 
 		static readonly List<DotConfig> defaultConfig = [

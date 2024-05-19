@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -90,6 +91,46 @@ namespace CameraPlus
 			}
 			list.Gap(list.verticalSpacing);
 			return flag;
+		}
+
+		public static DotConfig GetDotConfig(this Pawn pawn) =>
+			CameraSettings.settings.dotConfigs.FirstOrDefault(dotConfig => dotConfig.conditions.All(condition => condition.Matches(pawn)));
+
+		public static string ToHex(this Color color)
+		{
+			Color32 color32 = color;
+			if (color32.a == 255)
+				return $"{color32.r:X2}{color32.g:X2}{color32.b:X2}";
+			else
+				return $"{color32.r:X2}{color32.g:X2}{color32.b:X2}{color32.a:X2}";
+		}
+
+		public static Color ToColor(this string hex)
+		{
+			if (hex.Length == 6)
+			{
+				var r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+				var g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+				var b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+				return new Color32(r, g, b, 255);
+			}
+			else if (hex.Length == 8)
+			{
+				var r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+				var g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+				var b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+				var a = byte.Parse(hex.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+				return new Color32(r, g, b, a);
+			}
+			else if (hex.Length == 3)
+			{
+				var r = byte.Parse(hex[0].ToString() + hex[0], System.Globalization.NumberStyles.HexNumber);
+				var g = byte.Parse(hex[1].ToString() + hex[1], System.Globalization.NumberStyles.HexNumber);
+				var b = byte.Parse(hex[2].ToString() + hex[2], System.Globalization.NumberStyles.HexNumber);
+				return new Color32(r, g, b, 255);
+			}
+
+			return Color.clear;
 		}
 	}
 }

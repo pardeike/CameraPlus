@@ -28,7 +28,7 @@ namespace CameraPlus
 			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 
-			var markersTreshold = FastUI.CurUICellSize <= Settings.dotSize;
+			var cellSize = FastUI.CurUICellSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
 			map.mapPawns.AllPawnsSpawned.DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
 			{
@@ -42,7 +42,9 @@ namespace CameraPlus
 				if (materials == null)
 					return;
 
-				if (Settings.edgeIndicators)
+				var dotConfig = pawn.GetDotConfig();
+
+				if (Settings.edgeIndicators && (dotConfig?.useEdge ?? true))
 				{
 					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
 					if (clipped)
@@ -52,7 +54,7 @@ namespace CameraPlus
 						{
 							materialClipped.SetColor("_FillColor", innerColor);
 							materialClipped.SetColor("_OutlineColor", outerColor);
-							DrawClipped(borderMarkerSize, altitute, vec, materialClipped);
+							DrawClipped(borderMarkerSize, dotConfig, altitute, vec, materialClipped);
 						}
 						return;
 					}
@@ -61,15 +63,43 @@ namespace CameraPlus
 				if (Settings.dotStyle == DotStyle.VanillaDefault)
 					return;
 
-				if (markersTreshold == false)
-					return;
+				if (dotConfig != null)
+				{
+					var dotSize = dotConfig.showBelowPixels;
+					if (cellSize > (dotSize == -1 ? Settings.dotSize : dotSize))
+						return;
+				}
+				else
+				{
+					if (cellSize > Settings.dotSize)
+						return;
+				}
 
-				var materialMarker = Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
+				Material materialMarker = null;
+				if (dotConfig == null || dotConfig.mode == DotMode.Default)
+					materialMarker = Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
+				else
+					switch (dotConfig.mode)
+					{
+						case DotMode.VanillaDot:
+							materialMarker = materials.dot; // TODO use vanilla
+							break;
+						case DotMode.VanillaSilhouette:
+							materialMarker = materials.silhouette; // TODO use vanilla
+							break;
+						case DotMode.CameraPlusDot:
+							materialMarker = materials.dot;
+							break;
+						case DotMode.CameraPlusSilhouette:
+							materialMarker = materials.silhouette;
+							break;
+					}
+
 				if (materialMarker != null)
 				{
 					materialMarker.SetColor("_FillColor", innerColor);
 					materialMarker.SetColor("_OutlineColor", outerColor);
-					DrawMarker(pawn, materialMarker);
+					DrawMarker(pawn, dotConfig, materialMarker);
 				}
 			});
 		}
@@ -129,7 +159,7 @@ namespace CameraPlus
 			return (center + t * direction, true);
 		}
 
-		static void DrawClipped(Vector2 size, float altitute, Vector2 vec, Material materialClipped)
+		static void DrawClipped(Vector2 size, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
 		{
 			var v2 = UI.MapToUIPosition(vec);
 			var rect = new Rect(v2.x - size.x / 2, v2.y - size.y / 2, size.x, size.y);
@@ -138,11 +168,11 @@ namespace CameraPlus
 			var scale = p2 - p1;
 			var pos = vec.ToVector3();
 			pos.y = altitute;
-			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize);
+			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
 		}
 
-		static void DrawMarker(Pawn pawn, Material materialMarker)
+		static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)
 		{
 			var q = pawn.Downed ? downedRotation : Quaternion.identity;
 			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
@@ -150,7 +180,8 @@ namespace CameraPlus
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
 			var size = miscPlayer ? 1.5f * Vector2.one : (bodyNode?.Graphic ?? pawn.Graphic)?.drawSize ?? pawn.DrawSize;
-			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * Settings.dotRelativeSize);
+			var relativeSize = Settings.dotRelativeSize * (dotConfig?.relativeSize ?? 1f);
+			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
 		}

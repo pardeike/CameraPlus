@@ -14,7 +14,7 @@ namespace CameraPlus
 
 	public class PawnNameTag : TextTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.LabelCap.Contains(Text);
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.Label.Contains(Text);
 	}
 
 	public class HediffTag : TextTag
