@@ -32,7 +32,7 @@ namespace CameraPlus
 		public DotConfig()
 		{
 			conditions = [];
-			mode = DotMode.CameraPlusSilhouette;
+			mode = DotMode.Default;
 			showBelowPixels = -1;
 			useInside = true;
 			useEdge = true;

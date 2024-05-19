@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using Verse;
 
 namespace CameraPlus
 {
-	public class Dialog_Colors : Window
+	public class Dialog_Customization : Window
 	{
 		const float spacing = 4;
 
@@ -15,6 +16,7 @@ namespace CameraPlus
 		const float headerHeight = 30;
 		const float rowHeight = 50;
 		const float rowSpacing = 20;
+		const float bottomRowHeight = 30;
 		const float columnSpacing = 10;
 		const float scrollbarWidth = 20f;
 		const float actionButtonsWidth = 24f;
@@ -39,14 +41,14 @@ namespace CameraPlus
 		private static string draggedColor;
 		private static Color draggedColorValue;
 
-		private static Dialog_Colors currentWindow;
+		private static Dialog_Customization currentWindow;
 		static bool Draggable
 		{
 			get => currentWindow.draggable;
 			set => currentWindow.draggable = value;
 		}
 
-		public Dialog_Colors()
+		public Dialog_Customization()
 		{
 			dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			doCloseButton = true;
@@ -319,6 +321,12 @@ namespace CameraPlus
 				rowToDelete = row;
 		}
 
+		string GetSettingsFilePath()
+		{
+			string tempPath = Application.temporaryCachePath;
+			return Path.Combine(tempPath, "settings.xml");
+		}
+
 		public override void DoWindowContents(Rect inRect)
 		{
 			Tick();
@@ -332,7 +340,7 @@ namespace CameraPlus
 			for (var i = 0; i < columnHeaders.Length; i++)
 				DrawLabel(columnRects[i], columnHeaders[i]);
 			list.Gap(rowSpacing);
-			var outRect = list.GetRect(inRect.height - list.curY - rowSpacing - 30);
+			var outRect = list.GetRect(inRect.height - list.curY - 2 * rowSpacing - bottomRowHeight);
 
 			var configCount = dotConfigs.Count;
 			var viewRect = new Rect(0, 0, inRect.width - scrollbarWidth, rowHeight * configCount + rowSpacing * configCount);
@@ -358,9 +366,22 @@ namespace CameraPlus
 				Widgets.DrawBoxSolid(line, dragColor);
 			}
 
-			list.Gap(rowSpacing);
-			if (list.ButtonText("NewCondition".TranslateSimple(), null, 0.2f))
+			list.End();
+
+			list = new Listing_Standard() { ColumnWidth = (inRect.width - 3 * columnSpacing) / 4 };
+			list.Begin(inRect.BottomPartPixels(bottomRowHeight + rowSpacing));
+
+			if (list.ButtonText("NewCondition".TranslateSimple()))
 				dotConfigs.Add(new DotConfig());
+			list.NewColumn();
+			list.NewColumn();
+
+			if (list.ButtonText("LoadCustomization".TranslateSimple()))
+				Find.WindowStack.Add(new Dialog_CustomizationList_Load());
+			list.NewColumn();
+
+			if (list.ButtonText("SaveCustomization".TranslateSimple()))
+				Find.WindowStack.Add(new Dialog_CustomizationList_Save());
 
 			list.End();
 		}

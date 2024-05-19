@@ -218,7 +218,7 @@ namespace CameraPlus
 				() =>
 				{
 					if (list.ButtonText("Colors".Translate(), Current.Game != null))
-						Find.WindowStack.Add(new Dialog_Colors());
+						Find.WindowStack.Add(new Dialog_Customization());
 				},
 				0.4f
 			);

@@ -52,6 +52,8 @@
     <Fill>fill</Fill>
     <Selected>selected</Selected>
     <NewCondition>Add new condition</NewCondition>
+    <LoadCustomization>Load customization</LoadCustomization>
+    <SaveCustomization>Save customization</SaveCustomization>
     <DotModeDefault>Default</DotModeDefault>
     <DotModeVanillaDot>Vanilla Dot</DotModeVanillaDot>
     <DotModeVanillaSilhouette>Vanilla Silhouette</DotModeVanillaSilhouette>
