@@ -21,12 +21,12 @@ namespace CameraPlus
 
 		static readonly float[] columnRatios = [4f, 1f, 1.5f, 0.5f, 0.5f, 0.5f, 1f, 1f, 1f];
 		static readonly float ratioSum = columnRatios.Sum();
-		static readonly float columnAvailableSpace = dialogWidth - 2 * 18f - scrollbarWidth - columnRatios.Length * columnSpacing - actionButtonsWidth;
-		static readonly float[] columnWidths = columnRatios.Select(f => columnAvailableSpace * f / ratioSum).ToArray();
+		float ColumnAvailableSpace => windowRect.width - 2 * 18f - scrollbarWidth - columnRatios.Length * columnSpacing - actionButtonsWidth;
+		public float[] ColumnWidths => columnRatios.Select(f => ColumnAvailableSpace * f / ratioSum).ToArray();
 
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
 		static readonly Color dragColor = new(1f, 220f / 255, 56f / 255);
-		static readonly string[] columnHeaders = ["Conditions", "Mode", "Colors", "Map", "Edge", "Mouse hide", "Show below", "Size", "Border"];
+		static readonly string[] columnHeaders = ["<ColumnConditions", "ColumnMode", "ColumnColors", "ColumnMap", "ColumnEdge", "ColumnMouseHide", "ColumnShowBelow", "ColumnSize", "ColumnOutline"];
 
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
 		private readonly int observerId;
@@ -36,8 +36,10 @@ namespace CameraPlus
 		private static int rowToDelete = -1;
 		private static int rowDragged = -1;
 		private static int rowInsert = -1;
+		private static string draggedColor;
+		private static Color draggedColorValue;
 
-		private static Window currentWindow;
+		private static Dialog_Colors currentWindow;
 		static bool Draggable
 		{
 			get => currentWindow.draggable;
@@ -49,6 +51,7 @@ namespace CameraPlus
 			dotConfigs = Find.World.GetComponent<CameraSettings>().dotConfigs;
 			doCloseButton = true;
 			draggable = true;
+			resizeable = true;
 			currentWindow = this;
 			observerId = CheckBoxPaintingObserver.Register(checkboxPainting => draggable = checkboxPainting == false);
 		}
@@ -59,11 +62,16 @@ namespace CameraPlus
 			CheckBoxPaintingObserver.Unregister(observerId);
 		}
 
-		static void DrawMouseAttachment(Texture2D icon)
+		static void DrawMouseAttachment(Texture2D icon, Color? color = null)
 		{
 			var mousePosition = UI.MousePositionOnUIInverted;
 			var mouseRect = new Rect(mousePosition.x + 4f, mousePosition.y + 4f, 32f, 32f);
-			Find.WindowStack.ImmediateWindow(34003428, mouseRect, WindowLayer.Super, () => GUI.DrawTexture(mouseRect.AtZero(), icon), false, false, 0f, null);
+			Find.WindowStack.ImmediateWindow(34003428, mouseRect, WindowLayer.Super, () =>
+			{
+				GUI.color = color ?? Color.white;
+				GUI.DrawTexture(mouseRect.AtZero(), icon);
+				GUI.color = Color.white;
+			}, false, false, 0f, null);
 		}
 
 		public void Tick()
@@ -72,6 +80,9 @@ namespace CameraPlus
 			{
 				Draggable = true;
 				valueChanger = null;
+
+				draggedColor = null;
+				draggedColorValue = default;
 
 				if (rowInsert > -1)
 				{
@@ -92,6 +103,9 @@ namespace CameraPlus
 				dotConfigs.RemoveAt(rowToDelete);
 				rowToDelete = -1;
 			}
+
+			if (draggedColor != null)
+				DrawMouseAttachment(Assets.colorDragMouseAttachment, draggedColorValue);
 
 			if (rowDragged != -1)
 				DrawMouseAttachment(Assets.rowDragMouseAttachment);
@@ -130,7 +144,7 @@ namespace CameraPlus
 
 			var x = 0f;
 			var rect = list.GetRect(height);
-			columns = columnWidths.Select(w =>
+			columns = currentWindow.ColumnWidths.Select(w =>
 			{
 				var column = new Rect(x, rect.y, w, rect.height);
 				x += w + columnSpacing;
@@ -162,6 +176,16 @@ namespace CameraPlus
 			var deleteRect = rect.RightPartPixels(rect.height).ExpandedBy(-4);
 			GUI.color = Color.white;
 			var current = Event.current;
+			if (Mouse.IsOver(rect))
+			{
+				if (draggedColor == title)
+					newColorCallback(draggedColorValue);
+				if (Event.current.type == EventType.MouseDown)
+				{
+					draggedColor = title;
+					draggedColorValue = color;
+				}
+			}
 			if (Widgets.ButtonInvisible(rect))
 				Find.WindowStack.Add(new Dialog_ColorPicker(title, color, newColorCallback));
 		}
@@ -177,15 +201,13 @@ namespace CameraPlus
 			GUI.color = Color.white;
 		}
 
-		static string DotModeName(DotMode mode) => $"DotMode{mode}".Translate();
-
 		static void DrawMode(Rect rect, DotConfig dotConfig)
 		{
-			DrawLabel(rect, DotModeName(dotConfig.mode));
+			DrawLabel(rect, $"DotMode{dotConfig.mode}");
 			if (Widgets.ButtonInvisible(rect))
 			{
 				var modes = (DotMode[])Enum.GetValues(typeof(DotMode));
-				var options = modes.Select(mode => new FloatMenuOption(DotModeName(mode), () => dotConfig.mode = mode));
+				var options = modes.Select(mode => new FloatMenuOption($"DotMode{mode}".Translate(), () => dotConfig.mode = mode));
 				Find.WindowStack.Add(new FloatMenu(options.ToList()));
 			}
 		}
@@ -222,10 +244,12 @@ namespace CameraPlus
 
 		static void DrawLabel(Rect rect, string text)
 		{
+			var leftAligned = text.StartsWith("<");
+			if (leftAligned) text = text.Substring(1);
 			var font = Text.Font;
 			Text.Font = GameFont.Tiny;
-			Text.Anchor = TextAnchor.MiddleCenter;
-			Widgets.Label(rect, text);
+			Text.Anchor = leftAligned ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
+			Widgets.Label(rect, text.TranslateSimple());
 			Text.Anchor = TextAnchor.UpperLeft;
 			Text.Font = font;
 		}

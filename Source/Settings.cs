@@ -217,9 +217,10 @@ namespace CameraPlus
 				},
 				() =>
 				{
-					if (list.ButtonText("Colors".Translate()))
+					if (list.ButtonText("Colors".Translate(), Current.Game != null))
 						Find.WindowStack.Add(new Dialog_Colors());
-				}
+				},
+				0.4f
 			);
 
 			list.NewColumn(); // -----------------------------------------------------------------------------------------------

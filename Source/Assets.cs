@@ -31,6 +31,7 @@ namespace CameraPlus
 		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
 		public static readonly Texture2D valueChangerMouseAttachment = ContentFinder<Texture2D>.Get("ValueChanger", true);
 		public static readonly Texture2D rowDragMouseAttachment = ContentFinder<Texture2D>.Get("RowDrag", true);
+		public static readonly Texture2D colorDragMouseAttachment = ContentFinder<Texture2D>.Get("ColorDrag", true);
 
 		public static Material previewMaterial;
 

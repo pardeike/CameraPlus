@@ -9,7 +9,7 @@
     <Exponentiality>Exponential Zoom Speed</Exponentiality>
     <SoundNearness>Bring local sounds closer</SoundNearness>
     <HotKeys>Keyboard Shortcuts</HotKeys>
-    <Colors>Colors</Colors>
+    <Colors>Colors (saved with game)</Colors>
     <SettingsKey>Camera+ settings</SettingsKey>
     <LoadModifier>Load view</LoadModifier>
     <SaveModifier>Save view</SaveModifier>
@@ -52,7 +52,7 @@
     <Fill>fill</Fill>
     <Selected>selected</Selected>
     <NewCondition>Add new condition</NewCondition>
-    <DotModeOff>Off</DotModeOff>
+    <DotModeDefault>Default</DotModeDefault>
     <DotModeVanillaDot>Vanilla Dot</DotModeVanillaDot>
     <DotModeVanillaSilhouette>Vanilla Silhouette</DotModeVanillaSilhouette>
     <DotModeCameraPlusDot>Camera+ Dot</DotModeCameraPlusDot>
@@ -61,4 +61,13 @@
     <TagCategoryType>Types</TagCategoryType>
     <TagCategoryAttribute>Attributes</TagCategoryAttribute>
     <TagCategoryText>Naming</TagCategoryText>
+    <ColumnConditions>Conditions</ColumnConditions>
+    <ColumnMode>Mode</ColumnMode>
+    <ColumnColors>Colors</ColumnColors>
+    <ColumnMap>Map</ColumnMap>
+    <ColumnEdge>Edge</ColumnEdge>
+    <ColumnMouseHide>Mouse Hide</ColumnMouseHide>
+    <ColumnShowBelow>Show Below</ColumnShowBelow>
+    <ColumnSize>Size</ColumnSize>
+    <ColumnOutline>Outline</ColumnOutline>
 </LanguageData>

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace CameraPlus
 {
@@ -40,18 +41,55 @@ namespace CameraPlus
 			return 4f + label != null ? 18f : 0f;
 		}
 
-		public static void TwoColumns(this Listing_Standard list, Action left, Action right)
+		public static void TwoColumns(this Listing_Standard list, Action left, Action right, float ratio = 0.5f)
 		{
 			var cWidth = list.ColumnWidth;
-			var halfWidth = (cWidth - 12f) / 2f;
-			list.ColumnWidth = halfWidth;
+			var available = cWidth - 12;
+
+			var firstWidth = available * ratio;
+			list.ColumnWidth = firstWidth;
 			var (x, y) = (list.curX, list.curY);
 			left();
 			list.curY = y;
-			list.curX += halfWidth + 12f;
+			list.curX += firstWidth + 12f;
+			list.ColumnWidth = available - firstWidth;
 			right();
 			list.ColumnWidth = cWidth;
 			list.curX = x;
+		}
+
+		public static bool ButtonText(this Listing_Standard list, string label, bool active)
+		{
+			Rect rect = list.GetRect(30f);
+			bool flag = false;
+			if (list.BoundingRectCached == null || rect.Overlaps(list.BoundingRectCached.Value))
+			{
+				var isOver = active && Mouse.IsOver(rect);
+				var anchor = Text.Anchor;
+				var color = GUI.color;
+				var texture2D = Widgets.ButtonBGAtlas;
+				if (isOver)
+				{
+					texture2D = Widgets.ButtonBGAtlasMouseover;
+					if (Input.GetMouseButton(0))
+						texture2D = Widgets.ButtonBGAtlasClick;
+				}
+				Widgets.DrawAtlas(rect, texture2D);
+				if (active)
+					MouseoverSounds.DoRegion(rect);
+				GUI.color = active ? Color.white : Color.white.ToTransparent(0.5f);
+				Text.Anchor = TextAnchor.MiddleCenter;
+				var wordWrap = Text.WordWrap;
+				if (rect.height < Text.LineHeight * 2f)
+					Text.WordWrap = false;
+				Widgets.Label(rect, label);
+				Text.Anchor = anchor;
+				GUI.color = color;
+				Text.WordWrap = wordWrap;
+				flag = active && Widgets.ButtonInvisible(rect, false);
+			}
+			list.Gap(list.verticalSpacing);
+			return flag;
 		}
 	}
 }

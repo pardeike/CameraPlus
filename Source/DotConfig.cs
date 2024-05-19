@@ -6,7 +6,7 @@ namespace CameraPlus
 {
 	public enum DotMode
 	{
-		Off,
+		Default,
 		VanillaDot,
 		VanillaSilhouette,
 		CameraPlusDot,
@@ -17,7 +17,7 @@ namespace CameraPlus
 	{
 		public List<ConditionTag> conditions = [];
 
-		public DotMode mode = DotMode.CameraPlusSilhouette;
+		public DotMode mode = DotMode.Default;
 		public int showBelowPixels = -1;
 		public bool useInside = true;
 		public bool useEdge = true;
@@ -55,7 +55,7 @@ namespace CameraPlus
 			Scribe_Collections.Look(ref conditions, "conditions", LookMode.Deep);
 			conditions ??= [];
 
-			Scribe_Values.Look(ref mode, "mode", DotMode.Off);
+			Scribe_Values.Look(ref mode, "mode", DotMode.Default);
 			Scribe_Values.Look(ref showBelowPixels, "showBelowPixels", -1);
 			Scribe_Values.Look(ref useInside, "useInside", true);
 			Scribe_Values.Look(ref useEdge, "useEdge", true);
