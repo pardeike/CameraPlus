@@ -29,6 +29,13 @@ namespace CameraPlus
 			doCloseButton = false;
 			doCloseX = true;
 			draggable = true;
+			UpdateNegation();
+		}
+
+		void UpdateNegation()
+		{
+			foreach (var (_, tags, _) in categories)
+				tags.Do(tag => tag.Negated = negated);
 		}
 
 		private void ChooseTag(ChooseTag tag)
@@ -67,8 +74,7 @@ namespace CameraPlus
 			var oldNegated = negated;
 			Widgets.CheckboxLabeled(rect, opposite, ref negated);
 			if (oldNegated != negated)
-				foreach (var (_, tags, _) in categories)
-					tags.Do(tag => tag.Negated = negated);
+				UpdateNegation();
 		}
 	}
 }
