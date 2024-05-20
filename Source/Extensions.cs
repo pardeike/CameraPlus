@@ -105,8 +105,11 @@ namespace CameraPlus
 				return $"{color32.r:X2}{color32.g:X2}{color32.b:X2}{color32.a:X2}";
 		}
 
-		public static Color ToColor(this string hex)
+		public static Color? ToColor(this string hex)
 		{
+			if (hex.StartsWith("#"))
+				hex = hex.Substring(1);
+
 			if (hex.Length == 6)
 			{
 				var r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
@@ -130,7 +133,9 @@ namespace CameraPlus
 				return new Color32(r, g, b, 255);
 			}
 
-			return Color.clear;
+			return null;
 		}
+
+		public static DotConfig ToDotConfig(this string xml) => DotConfig.ToDotConfig(xml);
 	}
 }

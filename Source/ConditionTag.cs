@@ -69,7 +69,7 @@ namespace CameraPlus
 			new HediffTag(),
 		];
 
-		public ConditionTag Clone()
+		public virtual ConditionTag Clone()
 		{
 			var copy = (ConditionTag)Activator.CreateInstance(GetType());
 			Traverse.IterateFields(this, copy, (t1, t2) => t2.SetValue(t1.GetValue()));
@@ -192,6 +192,13 @@ namespace CameraPlus
 		}
 
 		public override string Label => $"{MinimalLabel}: {Text}";
+
+		public override ConditionTag Clone()
+		{
+			var copy = (TextTag)base.Clone();
+			copy._text = _text;
+			return copy;
+		}
 
 		public override void ExposeData()
 		{

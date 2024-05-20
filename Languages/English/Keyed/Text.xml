@@ -60,6 +60,7 @@
     <DotModeCameraPlusDot>Camera+ Dot</DotModeCameraPlusDot>
     <DotModeCameraPlusSilhouette>Camera+ Silhouette</DotModeCameraPlusSilhouette>
     <Opposite>Opposite</Opposite>
+    <Duplicate>Duplicate</Duplicate>
     <TagCategoryType>Types</TagCategoryType>
     <TagCategoryAttribute>Attributes</TagCategoryAttribute>
     <TagCategoryText>Naming</TagCategoryText>

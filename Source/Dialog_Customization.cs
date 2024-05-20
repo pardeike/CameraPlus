@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using UnityEngine;
 using Verse;
 
@@ -39,8 +40,38 @@ namespace CameraPlus
 		private static int rowInsert = -1;
 		private static string draggedColor;
 		private static Color draggedColorValue;
-		private static string colorClipboard = null;
-		private static DotConfig rowClipboard = null;
+
+		private static Color? _colorClipboard = null;
+		private static Color? ColorClipboard
+		{
+			get
+			{
+				var colorStr = GUIUtility.systemCopyBuffer;
+				return colorStr.ToColor() ?? _colorClipboard;
+			}
+			set
+			{
+				_colorClipboard = value;
+				if (value.HasValue)
+					GUIUtility.systemCopyBuffer = value.Value.ToHex();
+			}
+		}
+
+		private static DotConfig _rowClipboard = null;
+		private static DotConfig RowClipboard
+		{
+			get
+			{
+				var rowStr = GUIUtility.systemCopyBuffer;
+				return rowStr.ToDotConfig() ?? _rowClipboard;
+			}
+			set
+			{
+				_rowClipboard = value;
+				if (value != null)
+					GUIUtility.systemCopyBuffer = value.ToString();
+			}
+		}
 
 		private static Dialog_Customization currentWindow;
 		static bool Draggable
@@ -185,10 +216,10 @@ namespace CameraPlus
 			{
 				if (Input.GetMouseButton(1))
 				{
-					List<FloatMenuOption> options = [new("Copy".TranslateSimple(), () => colorClipboard = color.ToHex())];
-					if (colorClipboard != null)
+					List<FloatMenuOption> options = [new("Copy".TranslateSimple(), () => ColorClipboard = color)];
+					if (ColorClipboard.HasValue)
 					{
-						var option = new FloatMenuOption("Paste".TranslateSimple(), () => newColorCallback(colorClipboard.ToColor()));
+						var option = new FloatMenuOption("Paste".TranslateSimple(), () => newColorCallback(ColorClipboard.Value));
 						options.Add(option);
 					}
 					var floatMenu = new FloatMenu(options);
@@ -337,10 +368,14 @@ namespace CameraPlus
 				if (Input.GetMouseButton(1))
 				{
 					var dotConfigs = CameraSettings.settings.dotConfigs;
-					List<FloatMenuOption> options = [new("Copy".TranslateSimple(), () => rowClipboard = dotConfigs[row])];
-					if (rowClipboard != null)
+					List<FloatMenuOption> options =
+					[
+						new("Copy".TranslateSimple(), () => RowClipboard = dotConfigs[row]),
+						new("Duplicate".TranslateSimple(), () => dotConfigs.Insert(row, dotConfigs[row]))
+					];
+					if (RowClipboard != null)
 					{
-						var option = new FloatMenuOption("Paste".TranslateSimple(), () => dotConfigs[row] = rowClipboard.Clone());
+						var option = new FloatMenuOption("Paste".TranslateSimple(), () => dotConfigs[row] = RowClipboard.Clone());
 						options.Add(option);
 					}
 					var floatMenu = new FloatMenu(options);

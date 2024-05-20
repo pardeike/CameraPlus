@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
 using UnityEngine;
 using Verse;
 
@@ -84,5 +86,14 @@ namespace CameraPlus
 			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1);
 			Scribe_Values.Look(ref hideOnMouseover, "hideOnMouseover", true);
 		}
+
+		public static DotConfig ToDotConfig(string xml)
+		{
+			if (xml.StartsWith("<?xml") == false)
+				return null;
+			return Tools.ScribeFromString<DotConfig>(xml);
+		}
+
+		public override string ToString() => Tools.ScribeToString(this);
 	}
 }

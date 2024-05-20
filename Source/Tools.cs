@@ -3,7 +3,10 @@ using RimWorld;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -368,6 +371,55 @@ namespace CameraPlus
 			codes = list?.ToArray() ?? [];
 			if (codes.Length == 0)
 				codes = defaults;
+		}
+
+		public static string ScribeToString(IExposable exposable, string rootElementName = null)
+		{
+			Scribe.mode = LoadSaveMode.Saving;
+			using var memoryStream = new MemoryStream();
+			var xmlWriterSettings = new XmlWriterSettings { Indent = true, IndentChars = "\t" };
+			using (var xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings))
+			{
+				Scribe.saver.saveStream = memoryStream;
+				Scribe.saver.writer = xmlWriter;
+				Scribe.saver.writer.WriteStartDocument();
+				Scribe.saver.EnterNode(rootElementName ?? exposable.GetType().Name);
+				exposable.ExposeData();
+				Scribe.saver.ExitNode();
+				Scribe.saver.writer.WriteEndDocument();
+				Scribe.saver.writer.Flush();
+			}
+			memoryStream.Seek(0, SeekOrigin.Begin);
+			using var reader = new StreamReader(memoryStream, Encoding.UTF8);
+			return reader.ReadToEnd();
+		}
+
+		public static T ScribeFromString<T>(string xml) where T : IExposable, new()
+		{
+			try
+			{
+				using var memoryStream = new MemoryStream();
+				using var writer = new StreamWriter(memoryStream, Encoding.UTF8);
+				writer.Write(xml);
+				writer.Flush();
+				memoryStream.Seek(0, SeekOrigin.Begin);
+				using var xmlTextReader = new XmlTextReader(memoryStream);
+				var xmlDocument = new XmlDocument();
+				xmlDocument.Load(xmlTextReader);
+				Scribe.loader.curXmlParent = xmlDocument.DocumentElement;
+				Scribe.mode = LoadSaveMode.LoadingVars;
+				var value = new T();
+				value.ExposeData();
+				Scribe.loader.FinalizeLoading();
+				Scribe.loader.curXmlParent = null;
+				Scribe.mode = LoadSaveMode.Inactive;
+				return value;
+			}
+			catch (Exception ex)
+			{
+				Log.Warning($"Error reading {typeof(T)} from xml: {ex}");
+				return default;
+			}
 		}
 
 		public static float LerpRootSize(float x)
