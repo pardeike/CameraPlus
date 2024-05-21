@@ -1,0 +1,39 @@
+Root_Play.Update
+	Root.Update
+		UIRoot_Play.UIRootUpdate
+			MapInterface.MapInterfaceUpdate
+				SelectionDrawer.DrawSelectionOverlay
+					PREFIX: SelectionDrawer.DrawSelectionBracketFor
+	Game.UpdatePlay
+		TickManager.TickManagerUpdate
+			TickManager.DoSingleTick
+				TickList.Tick
+					Pawn.Tick
+						Gene_Clotting.Tick
+							HediffWithComps.Tended
+								HediffCompProperties_TendDuration.CompTended
+									MoteMaker.ThrowText
+		Map.MapUpdate
+			DynamicDrawManager.DrawDynamicThings
+				Thing.DynamicDrawPhase
+					Pawn.DynamicDrawPhaseAt
+						PawnRenderer.DynamicDrawPhaseAt
+							PREFIX: PawnRenderer.RenderPawnAt
+				DynamicDrawManager.DrawSilhouettes
+					PREFIX: SilhouetteUtility.ShouldDrawSilhouette
+			OverlayDrawer.DrawAllOverlays
+				PREFIX: OverlayDrawer.RenderForbiddenOverlay
+			POSTFIX: DynamicDrawManager.DrawDynamicThings
+
+
+Root.OnGUI
+	UIRoot_Play.UIRootOnGUI
+		MapInterface.MapInterfaceOnGUI_BeforeMainTabs
+			ThingsOverlay.ThingsOverlaysOnGUI
+				Pawn.DrawGUIOverlay
+					PREFIX: PawnUIOverlay.DrawPawnGUIOverlay
+						PREFIX: GenMapUI.DrawPawnLabel
+				Thing.DrawGUIOverlay
+					ThingOverlay.ThingOverlayOnGUI
+						GenMapUI.DrawThingLabel
+							TRANSPILER: GenMapUI.DrawThingLabel

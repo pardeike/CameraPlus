@@ -59,16 +59,19 @@ namespace CameraPlus
 
 		public static bool ShouldShowMarker(Pawn pawn, bool checkCellSize)
 		{
+			if (pawn?.Map == null)
+				return false;
+
 			var dotConfig = dotConfigCache.Get(pawn);
 			if (dotConfig != null)
 			{
 				if (checkCellSize && dotConfig.showBelowPixels != -1 && FastUI.CurUICellSize > dotConfig.showBelowPixels)
 					return false;
-				if (pawn == null || (dotConfig.mode < DotMode.CameraPlusDot && checkCellSize))
+				if (dotConfig.mode < DotMode.CameraPlusDot && checkCellSize)
 					return false;
 				if (dotConfig.hideOnMouseover && MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
 					return false;
-				if (pawn.Map?.fogGrid.IsFogged(pawn.Position) ?? false)
+				if (pawn.Map.fogGrid.IsFogged(pawn.Position))
 					return false;
 				if (InvisibilityUtility.IsHiddenFromPlayer(pawn))
 					return false;
@@ -77,19 +80,19 @@ namespace CameraPlus
 
 			if (checkCellSize && FastUI.CurUICellSize > Settings.dotSize)
 				return false;
-			if (pawn == null || (Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize))
+			if (Settings.dotStyle == DotStyle.VanillaDefault && checkCellSize)
 				return false;
 			return shouldShowDotCache.Get(pawn);
 		}
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)
 		{
+			if (pawn == null)
+				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			if (Settings.dotStyle == DotStyle.VanillaDefault)
 				return true;
 			if (Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
 				return true;
-			if (pawn == null)
-				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			return shouldShowLabelCache.Get(pawn);
 		}
 

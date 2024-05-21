@@ -56,6 +56,9 @@
 		<Content Include="..\Textures\**\*">
 			<Link>Textures\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Content>
+		<Content Include="..\Notes.txt">
+			<Link>!Notes.txt</Link>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>

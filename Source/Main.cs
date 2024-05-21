@@ -227,6 +227,8 @@ namespace CameraPlus
 		}
 	}
 
+	// TODO: needed?
+	// we already patch one level up: PawnUIOverlay.DrawPawnGUIOverlay
 	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
 	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
 	static class GenMapUI_DrawPawnLabel_Patch
