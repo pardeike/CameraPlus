@@ -21,17 +21,20 @@ namespace CameraPlus
 				Remove(pawn);
 			}
 
+			var dotConfig = pawn.GetDotConfig();
+			var outlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
+
 			var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
 			silhouette.SetTexture("_MainTex", GetTexture(pawn));
-			silhouette.SetFloat("_OutlineFactor", Settings.outlineFactor);
+			silhouette.SetFloat("_OutlineFactor", outlineFactor);
 			silhouette.renderQueue = (int)RenderQueue.Overlay;
 
 			Material dot = null;
-			if (Tools.GetMarkerTextures(pawn, out var dotTexture, out _))
+			if (DotTools.GetMarkerTextures(pawn, out var dotTexture, out _))
 			{
 				dot = MaterialAllocator.Create(Assets.BorderedShader);
 				dot.SetTexture("_MainTex", dotTexture);
-				dot.SetFloat("_OutlineFactor", Settings.outlineFactor);
+				dot.SetFloat("_OutlineFactor", outlineFactor);
 				dot.renderQueue = (int)RenderQueue.Overlay;
 			}
 

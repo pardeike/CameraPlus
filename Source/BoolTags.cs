@@ -95,11 +95,16 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.GetType() == vehicleType;
 	}
 
+	public class WildManTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.IsWildMan();
+	}
+
 	// conditions
 
 	public class AdultTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.DevelopmentalStage == DevelopmentalStage.Adult;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.ageTracker.CurLifeStage == LifeStageDefOf.HumanlikeAdult || pawn.DevelopmentalStage == DevelopmentalStage.Adult);
 	}
 
 	public class AttackingTag : BoolTag
@@ -117,9 +122,14 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.IsAwokenCorpse;
 	}
 
+	public class ChildTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.ageTracker.CurLifeStage == LifeStageDefOf.HumanlikeChild || pawn.DevelopmentalStage == DevelopmentalStage.Child);
+	}
+
 	public class CanCastTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.jobs.curDriver.job.ability.CanCast;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.CurJob?.ability?.CanCast ?? false;
 	}
 
 	public class ColonistTag : BoolTag
@@ -144,6 +154,11 @@ namespace CameraPlus
 	public class DeadTag : BoolTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.Dead;
+	}
+
+	public class DeathrestingTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.Deathresting;
 	}
 
 	public class DownedTag : BoolTag
@@ -171,6 +186,11 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.HostFaction == null;
 	}
 
+	public class GuestTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.GuestStatus != null;
+	}
+
 	public class HostileTag : BoolTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.HostileTo(Faction.OfPlayer);
@@ -186,6 +206,11 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.health.hediffSet.hediffs.OfType<Hediff_Injury>().Any(hediff_Injury => hediff_Injury.IsPermanent() == false && hediff_Injury.CanHealNaturally());
 	}
 
+	public class InspiredTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.Inspired;
+	}
+
 	public class MaleTag : BoolTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.gender == Gender.Male;
@@ -198,7 +223,7 @@ namespace CameraPlus
 
 	public class MeleeTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ (pawn.equipment.PrimaryEq?.PrimaryVerb.IsMeleeAttack ?? false);
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.equipment?.PrimaryEq?.PrimaryVerb?.IsMeleeAttack ?? false);
 	}
 
 	public class MentalTag : BoolTag
@@ -219,7 +244,7 @@ namespace CameraPlus
 
 	public class PlayerFactionTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfPlayer;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction.IsPlayer;
 	}
 
 	public class PredatorHuntTag : BoolTag
@@ -234,6 +259,11 @@ namespace CameraPlus
 
 	public class TameTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfPlayer && pawn.Name != null;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.Name != null && (pawn.Faction?.IsPlayer ?? false));
+	}
+
+	public class TeenagerTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.ageTracker.CurLifeStage == Defs.HumanlikeTeenager;
 	}
 }

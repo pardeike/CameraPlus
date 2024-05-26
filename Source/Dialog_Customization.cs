@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Security.Policy;
 using UnityEngine;
 using Verse;
 
@@ -29,7 +27,7 @@ namespace CameraPlus
 
 		static readonly Color borderColor = Color.gray.ToTransparent(0.5f);
 		static readonly Color dragColor = new(1f, 220f / 255, 56f / 255);
-		static readonly string[] columnHeaders = ["<ColumnConditions", "ColumnMode", "ColumnColors", "ColumnMap", "ColumnEdge", "ColumnMouseHide", "ColumnShowBelow", "ColumnSize", "ColumnOutline"];
+		static readonly string[] columnHeaders = ["<ColumnConditions", "ColumnMode", "ColumnColors", "ColumnMap", "ColumnEdge", "ColumnMouseReveal", "ColumnShowBelow", "ColumnSize", "ColumnOutline"];
 
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
 		private readonly int observerId;
@@ -74,11 +72,7 @@ namespace CameraPlus
 		}
 
 		private static Dialog_Customization currentWindow;
-		static bool Draggable
-		{
-			get => currentWindow.draggable;
-			set => currentWindow.draggable = value;
-		}
+		static bool Draggable { set => currentWindow.draggable = value; }
 
 		public Dialog_Customization()
 		{
@@ -109,7 +103,7 @@ namespace CameraPlus
 
 		public void Tick()
 		{
-			Tools.dotConfigCache.Clear();
+			Caches.dotConfigCache.Clear();
 
 			if (Input.GetMouseButton(0) == false)
 			{
@@ -124,7 +118,8 @@ namespace CameraPlus
 					var dotConfigs = CameraSettings.settings.dotConfigs;
 					var dotConfig = dotConfigs[rowDragged];
 					dotConfigs.RemoveAt(rowDragged);
-					if (rowInsert >= rowDragged) rowInsert--;
+					if (rowInsert >= rowDragged)
+						rowInsert--;
 					if (rowInsert >= dotConfigs.Count)
 						dotConfigs.Add(dotConfig);
 					else
@@ -251,11 +246,11 @@ namespace CameraPlus
 
 		static void DrawMode(Rect rect, DotConfig dotConfig)
 		{
-			DrawLabel(rect, $"DotMode{dotConfig.mode}");
+			DrawLabel(rect, dotConfig.mode.ToString());
 			if (Widgets.ButtonInvisible(rect))
 			{
-				var modes = (DotMode[])Enum.GetValues(typeof(DotMode));
-				var options = modes.Select(mode => new FloatMenuOption($"DotMode{mode}".Translate(), () => dotConfig.mode = mode));
+				var modes = (DotStyle[])Enum.GetValues(typeof(DotStyle));
+				var options = modes.Select(mode => new FloatMenuOption(mode.ToString().TranslateSimple(), () => dotConfig.mode = mode));
 				Find.WindowStack.Add(new FloatMenu(options.ToList()));
 			}
 		}
@@ -293,7 +288,8 @@ namespace CameraPlus
 		static void DrawLabel(Rect rect, string text)
 		{
 			var leftAligned = text.StartsWith("<");
-			if (leftAligned) text = text.Substring(1);
+			if (leftAligned)
+				text = text.Substring(1);
 			var font = Text.Font;
 			Text.Font = GameFont.Tiny;
 			Text.Anchor = leftAligned ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
@@ -346,7 +342,7 @@ namespace CameraPlus
 			DrawColors(columnRects[2], dotConfig);
 			DrawCheckbox(columnRects[3], ref dotConfig.useInside);
 			DrawCheckbox(columnRects[4], ref dotConfig.useEdge);
-			DrawCheckbox(columnRects[5], ref dotConfig.hideOnMouseover);
+			DrawCheckbox(columnRects[5], ref dotConfig.mouseReveals);
 			DrawStepper(columnRects[6], ref dotConfig.showBelowPixels, v => Px(v, 1), v => Px(v, -1), (v, d) => DeltaInt(v, d, 1, ref dotConfig.showBelowPixels), v => v == -1 ? "default" : $"{v} px");
 			DrawStepper(columnRects[7], ref dotConfig.relativeSize, v => Pc(v, 0.01f), v => Pc(v, -0.01f), (v, d) => DeltaFloat(v, d, 0.01f, ref dotConfig.relativeSize), v => $"{(int)(v * 100 + 0.5f)}%");
 			DrawStepper(columnRects[8], ref dotConfig.outlineFactor, v => Pc(v, 0.01f), v => Pc(v, -0.01f), (v, d) => DeltaFloat(v, d, 0.01f, ref dotConfig.outlineFactor), v => $"{(int)(v * 100 + 0.5f)}%");
@@ -371,7 +367,7 @@ namespace CameraPlus
 					List<FloatMenuOption> options =
 					[
 						new("Copy".TranslateSimple(), () => RowClipboard = dotConfigs[row]),
-						new("Duplicate".TranslateSimple(), () => dotConfigs.Insert(row, dotConfigs[row]))
+						new("Duplicate".TranslateSimple(), () => dotConfigs.Insert(row, dotConfigs[row].Clone()))
 					];
 					if (RowClipboard != null)
 					{

@@ -1,189 +1,245 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
-	[HarmonyPatch(typeof(DynamicDrawManager))]
-	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
-	static class DotTools
+	class DotTools
 	{
-		static readonly Mesh meshWest = MeshPool.GridPlaneFlip(Vector2.one);
-		static readonly Mesh meshEast = MeshPool.GridPlane(Vector2.one);
-		static readonly Mesh meshClipped = MeshPool.GridPlane(Vector2.one / 2);
-		static readonly Quaternion downedRotation = Quaternion.Euler(0, 90, 0);
-
-		const float clippedScale = 3f;
-		const float markerScale = 2f;
-		const float markerSizeScaler = 2f;
-
-		static void Postfix()
+		[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
+		[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
+		static class PawnRenderer_RenderPawnAt_Patch
 		{
-			var map = Find.CurrentMap;
-			if (map == null)
-				return;
-
-			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
-			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
-
-			var cellSize = FastUI.CurUICellSize;
-			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
-			map.mapPawns.AllPawnsSpawned.DoIf(pawn => Tools.ShouldShowMarker(pawn, false), pawn =>
+			[HarmonyPriority(10000)]
+			public static bool Prefix(Pawn ___pawn)
 			{
-				altitute -= 0.0001f;
+				if (skipCustomRendering)
+					return true;
 
-				var useMarkers = Tools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
-				if (useMarkers == false)
-					return;
+				if (___pawn.Dead)
+					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
 
-				var materials = MarkerCache.MaterialFor(pawn);
-				if (materials == null)
-					return;
-
-				var dotConfig = pawn.GetDotConfig();
-
-				if (Settings.edgeIndicators && (dotConfig?.useEdge ?? true))
-				{
-					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
-					if (clipped)
-					{
-						var materialClipped = materials.dot;
-						if (materialClipped != null)
-						{
-							materialClipped.SetColor("_FillColor", innerColor);
-							materialClipped.SetColor("_OutlineColor", outerColor);
-							DrawClipped(borderMarkerSize, dotConfig, altitute, vec, materialClipped);
-						}
-						return;
-					}
-				}
-
-				if (Settings.dotStyle == DotStyle.VanillaDefault)
-					return;
-
-				if (dotConfig != null)
-				{
-					var dotSize = dotConfig.showBelowPixels;
-					if (cellSize > (dotSize == -1 ? Settings.dotSize : dotSize))
-						return;
-				}
-				else
-				{
-					if (cellSize > Settings.dotSize)
-						return;
-				}
-
-				Material materialMarker = null;
-				if (dotConfig == null || dotConfig.mode == DotMode.Default)
-					materialMarker = Settings.dotStyle == DotStyle.BetterSilhouettes ? (materials.silhouette ?? materials.dot) : materials.dot;
-				else
-					switch (dotConfig.mode)
-					{
-						case DotMode.VanillaDot:
-							materialMarker = materials.dot; // TODO use vanilla
-							break;
-						case DotMode.VanillaSilhouette:
-							materialMarker = materials.silhouette; // TODO use vanilla
-							break;
-						case DotMode.CameraPlusDot:
-							materialMarker = materials.dot;
-							break;
-						case DotMode.CameraPlusSilhouette:
-							materialMarker = materials.silhouette;
-							break;
-					}
-
-				if (materialMarker != null)
-				{
-					materialMarker.SetColor("_FillColor", innerColor);
-					materialMarker.SetColor("_OutlineColor", outerColor);
-					DrawMarker(pawn, dotConfig, materialMarker);
-				}
-			});
+				return ShouldShowMarker(___pawn) == false;
+			}
 		}
 
-		static Rect RealViewRect(float contract)
+		[HarmonyPatch]
+		static class VehicleRenderer_RenderPawnAt_Patch
 		{
-			var p1 = UI.UIToMapPosition(contract, contract + 36); // 36 is bottom bar
-			var wh = UI.UIToMapPosition(UI.screenWidth - contract, UI.screenHeight - contract) - p1;
-			return new Rect(p1.x, p1.z, wh.x, wh.z);
+			public static bool Prepare() => TargetMethod() != null;
+			public static MethodBase TargetMethod() => AccessTools.Method("Vehicles.VehicleRenderer:RenderPawnAt");
+
+			[HarmonyPriority(10000)]
+			public static bool Prefix(Pawn ___vehicle)
+			{
+				if (skipCustomRendering)
+					return true;
+
+				if (___vehicle.Dead)
+					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+
+				return ShouldShowMarker(___vehicle) == false;
+			}
 		}
 
-		static (Vector2 vector, bool clipped) ConfinedPoint(Vector2 p, Rect r)
+		[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
+		static class SelectionDrawer_DrawSelectionBracketFor_Patch
 		{
-			var center = new Vector2(r.x + r.width / 2, r.y + r.height / 2);
-
-			if (r.Contains(p))
-				return (p, false);
-
-			var direction = (p - center).normalized;
-			var dx = direction.x;
-			var dy = direction.y;
-
-			var t = float.MaxValue;
-
-			if (dx != 0)
+			[HarmonyPriority(10000)]
+			public static bool Prefix(object obj)
 			{
-				if (dx > 0)
+				if (obj is not Pawn pawn)
+					return true;
+				return ShouldShowMarker(pawn) == false;
+			}
+		}
+
+		[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
+		static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
+		{
+			[HarmonyPriority(10000)]
+			public static bool Prefix(Pawn ___pawn)
+			{
+				if (skipCustomRendering)
+					return true;
+
+				if (___pawn.Dead)
+					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+
+				if (GetMarkerColors(___pawn, out _, out _) == false)
+					return true;
+
+				return ShouldShowMarker(___pawn) == false;
+			}
+		}
+
+		[HarmonyPatch(typeof(SilhouetteUtility), nameof(SilhouetteUtility.ShouldDrawSilhouette))]
+		static class SilhouetteUtility_ShouldDrawSilhouette_Patch
+		{
+			static bool Prefix(Thing thing, ref bool __result)
+			{
+				if (thing is Pawn pawn && ShouldShowMarker(pawn))
 				{
-					var t1 = (r.xMax - center.x) / dx;
-					if (t1 > 0 && center.y + t1 * dy >= r.yMin && center.y + t1 * dy <= r.yMax)
-						t = Mathf.Min(t, t1);
+					__result = false;
+					return false;
 				}
-				else
-				{
-					var t1 = (r.xMin - center.x) / dx;
-					if (t1 > 0 && center.y + t1 * dy >= r.yMin && center.y + t1 * dy <= r.yMax)
-						t = Mathf.Min(t, t1);
-				}
+				return true;
+			}
+		}
+
+		[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
+		[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
+		static class GenMapUI_DrawPawnLabel_Patch
+		{
+			[HarmonyPriority(10000)]
+			public static bool Prefix(Pawn pawn, float truncateToWidth)
+			{
+				if (skipCustomRendering)
+					return true;
+
+				if (truncateToWidth != 9999f)
+					return true;
+
+				return Tools.ShouldShowLabel(pawn);
+			}
+		}
+
+		//
+
+		public static bool ShouldShowMarker(Pawn pawn)
+		{
+			if (Tools.IsHiddenFromPlayer(pawn))
+				return false;
+
+			var dotConfig = Caches.dotConfigCache.Get(pawn);
+			if (dotConfig != null)
+			{
+				if (dotConfig.mode == DotStyle.VanillaDefault)
+					return false;
+
+				var dotSize = dotConfig.showBelowPixels;
+				if (FastUI.CurUICellSize > (dotSize == -1 ? Settings.dotSize : dotSize))
+					return false;
+
+				if (dotConfig.mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
+					return false;
+
+				return dotConfig.useInside;
 			}
 
-			if (dy != 0)
+			if (FastUI.CurUICellSize > Settings.dotSize)
+				return false;
+
+			if (Settings.dotStyle == DotStyle.VanillaDefault)
+				return false;
+
+			if (Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
+				return false;
+
+			if (Settings.mouseOverShowsLabels && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
+				return false;
+
+			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
+			return Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal;
+		}
+
+		// returning true will prefer markers over labels
+		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
+		{
+			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
+
+			var dotConfig = Caches.dotConfigCache.Get(pawn);
+			if (dotConfig != null)
 			{
-				if (dy > 0)
-				{
-					var t1 = (r.yMax - center.y) / dy;
-					if (t1 > 0 && center.x + t1 * dx >= r.xMin && center.x + t1 * dx <= r.xMax)
-						t = Mathf.Min(t, t1);
-				}
-				else
-				{
-					var t1 = (r.yMin - center.y) / dy;
-					if (t1 > 0 && center.x + t1 * dx >= r.xMin && center.x + t1 * dx <= r.xMax)
-						t = Mathf.Min(t, t1);
-				}
+				innerColor = selected == 1 ? dotConfig.fillSelectedColor : dotConfig.fillColor;
+				outerColor = selected == 1 ? dotConfig.lineSelectedColor : dotConfig.lineColor;
+				return true;
 			}
 
-			return (center + t * direction, true);
-		}
+			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
+			if (cameraDelegate.GetCameraColors != null)
+			{
+				var colors = cameraDelegate.GetCameraColors(pawn);
+				if (colors == null || colors.Length != 2)
+				{
+					innerColor = default;
+					outerColor = default;
+					return false;
+				}
+				innerColor = Settings.customInnerColors[selected].color ?? colors[0];
+				outerColor = Settings.customOuterColors[selected].color ?? colors[1];
+				return true;
+			}
 
-		static void DrawClipped(Vector2 size, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
-		{
-			var v2 = UI.MapToUIPosition(vec);
-			var rect = new Rect(v2.x - size.x / 2, v2.y - size.y / 2, size.x, size.y);
-			var p1 = UI.UIToMapPosition(new Vector2(rect.xMin, rect.yMin));
-			var p2 = UI.UIToMapPosition(new Vector2(rect.xMax, rect.yMax));
-			var scale = p2 - p1;
-			var pos = vec.ToVector3();
-			pos.y = altitute;
-			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
-			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
-		}
-
-		static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)
-		{
-			var q = pawn.Downed ? downedRotation : Quaternion.identity;
-			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
-			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
-			var size = miscPlayer ? 1.5f * Vector2.one : (bodyNode?.Graphic ?? pawn.Graphic)?.drawSize ?? pawn.DrawSize;
-			var relativeSize = Settings.dotRelativeSize * (dotConfig?.relativeSize ?? 1f);
-			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
-			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
-			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
+			var hideAnimalMarkers = Settings.customNameStyle == LabelStyle.HideAnimals;
+			if (isAnimal && hideAnimalMarkers)
+			{
+				innerColor = default;
+				outerColor = default;
+				return false;
+			}
+
+			if (isAnimal || pawn.Faction != Faction.OfPlayer)
+			{
+				innerColor = Settings.defaultInnerColors[selected].color ?? Tools.GetMainColor(pawn);
+				outerColor = pawn.Faction == Faction.OfPlayer ? Settings.playerNormalOuterColors[selected].Value : Settings.defaultOuterColors[selected].color ?? PawnNameColorUtility.PawnNameColorOf(pawn);
+				return true;
+			}
+
+			if (pawn.IsColonistPlayerControlled == false)
+			{
+				outerColor = Settings.playerNormalOuterColors[selected].Value;
+				innerColor = Settings.playerNormalInnerColors[selected].Value;
+			}
+			else if (pawn.IsPlayerControlled == false)
+			{
+				outerColor = Settings.playerMentalOuterColors[selected].Value;
+				innerColor = Settings.playerMentalInnerColors[selected].Value;
+			}
+			else if (pawn.Downed)
+			{
+				outerColor = Settings.playerDownedOuterColors[selected].Value;
+				innerColor = Settings.playerDownedInnerColors[selected].Value;
+			}
+			else if (pawn.Drafted)
+			{
+				outerColor = Settings.playerDraftedOuterColors[selected].Value;
+				innerColor = Settings.playerDraftedInnerColors[selected].Value;
+			}
+			else
+			{
+				outerColor = Settings.playerNormalOuterColors[selected].Value;
+				innerColor = Settings.playerNormalInnerColors[selected].Value;
+			}
+
+			return true;
+		}
+
+		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
+		{
+			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
+			if (cameraDelegate.GetCameraMarkers != null)
+			{
+				var textures = cameraDelegate.GetCameraMarkers(pawn);
+				if (textures == null || textures.Length != 2)
+				{
+					innerTexture = default;
+					outerTexture = default;
+					return false;
+				}
+				innerTexture = textures[0];
+				outerTexture = textures[1];
+				return true;
+			}
+
+			Tools.DefaultMarkerTextures(pawn, out innerTexture, out outerTexture);
+			return true;
 		}
 	}
 }

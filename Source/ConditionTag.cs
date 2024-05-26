@@ -29,6 +29,7 @@ namespace CameraPlus
 			new ShamblerTag(),
 			new SlaveTag(),
 			new VehicleTag(),
+			new WildManTag(),
 		];
 		public static readonly ConditionTag[] AllAttributeTags =
 		[
@@ -36,19 +37,23 @@ namespace CameraPlus
 			new AttackingTag(),
 			new AwakeTag(),
 			new AwokenCorpseTag(),
+			new ChildTag(),
 			new CanCastTag(),
 			new ColonistTag(),
 			new ControllableTag(),
 			new CrawlingTag(),
 			new DeadTag(),
+			new DeathrestingTag(),
 			new DownedTag(),
 			new DraftedTag(),
 			new ExitingMapTag(),
 			new FemaleTag(),
 			new FreeTag(),
+			new GuestTag(),
 			new HostileTag(),
 			new IdleTag(),
 			new InjuredTag(),
+			new InspiredTag(),
 			new MaleTag(),
 			new ManhunterTag(),
 			new MeleeTag(),
@@ -59,6 +64,7 @@ namespace CameraPlus
 			new PredatorHuntTag(),
 			new SelfShutdownTag(),
 			new TameTag(),
+			new TeenagerTag(),
 		];
 
 		public static readonly ConditionTag[] AllTextTags =

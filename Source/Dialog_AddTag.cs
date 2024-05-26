@@ -51,7 +51,7 @@ namespace CameraPlus
 			var rect = list.GetRect(catHeight);
 			var font = Text.Font;
 			Text.Font = GameFont.Tiny;
-			GenUI.DrawElementStack(rect, Text.LineHeightOf(GameFont.Tiny), tags, (r, t) => t.Draw(r, () => ChooseTag(t), null), t => ConditionTag.WidthGetter(t), 4, 5, false);
+			GenUI.DrawElementStack(rect, Text.LineHeightOf(GameFont.Tiny), tags.OrderBy(tag => tag.Label).ToList(), (r, t) => t.Draw(r, () => ChooseTag(t), null), t => ConditionTag.WidthGetter(t), 4, 5, false);
 			Text.Font = font;
 		}
 

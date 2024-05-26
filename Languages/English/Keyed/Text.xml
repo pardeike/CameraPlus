@@ -54,11 +54,6 @@
     <NewCondition>Add new condition</NewCondition>
     <LoadCustomization>Load customization</LoadCustomization>
     <SaveCustomization>Save customization</SaveCustomization>
-    <DotModeDefault>Default</DotModeDefault>
-    <DotModeVanillaDot>Vanilla Dot</DotModeVanillaDot>
-    <DotModeVanillaSilhouette>Vanilla Silhouette</DotModeVanillaSilhouette>
-    <DotModeCameraPlusDot>Camera+ Dot</DotModeCameraPlusDot>
-    <DotModeCameraPlusSilhouette>Camera+ Silhouette</DotModeCameraPlusSilhouette>
     <Opposite>Opposite</Opposite>
     <Duplicate>Duplicate</Duplicate>
     <TagCategoryType>Types</TagCategoryType>
@@ -69,7 +64,7 @@
     <ColumnColors>Colors</ColumnColors>
     <ColumnMap>Map</ColumnMap>
     <ColumnEdge>Edge</ColumnEdge>
-    <ColumnMouseHide>Mouse Hide</ColumnMouseHide>
+    <ColumnMouseReveal>Mouse Reveal</ColumnMouseReveal>
     <ColumnShowBelow>Show Below</ColumnShowBelow>
     <ColumnSize>Size</ColumnSize>
     <ColumnOutline>Outline</ColumnOutline>
