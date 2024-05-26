@@ -11,6 +11,15 @@ namespace CameraPlus
 {
 	class DotTools
 	{
+		static readonly Color[] playerNormalOuterColors = [Color.black, Color.white];
+		static readonly Color[] playerNormalInnerColors = [Color.white, Color.white];
+		static readonly Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
+		static readonly Color[] playerDraftedInnerColors = [Color.white, Color.white];
+		static readonly Color[] playerDownedOuterColors = [Color.gray, Color.white];
+		static readonly Color[] playerDownedInnerColors = [Color.gray, Color.gray];
+		static readonly Color[] playerMentalOuterColors = [new(0.5f, 0f, 0f), Color.white];
+		static readonly Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
+
 		[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
 		[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
 		static class PawnRenderer_RenderPawnAt_Patch
@@ -83,10 +92,20 @@ namespace CameraPlus
 		{
 			static bool Prefix(Thing thing, ref bool __result)
 			{
-				if (thing is Pawn pawn && ShouldShowMarker(pawn))
+				if (thing is Pawn pawn)
 				{
-					__result = false;
-					return false;
+					var dotConfig = Caches.dotConfigCache.Get(pawn);
+					if (dotConfig?.mode == DotStyle.Off)
+					{
+						__result = false;
+						return false;
+					}
+
+					if (ShouldShowMarker(pawn, dotConfig))
+					{
+						__result = false;
+						return false;
+					}
 				}
 				return true;
 			}
@@ -111,12 +130,12 @@ namespace CameraPlus
 
 		//
 
-		public static bool ShouldShowMarker(Pawn pawn)
+		public static bool ShouldShowMarker(Pawn pawn, DotConfig dotConfig = null)
 		{
 			if (Tools.IsHiddenFromPlayer(pawn))
 				return false;
 
-			var dotConfig = Caches.dotConfigCache.Get(pawn);
+			dotConfig ??= Caches.dotConfigCache.Get(pawn);
 			if (dotConfig != null)
 			{
 				if (dotConfig.mode == DotStyle.VanillaDefault)
@@ -132,10 +151,10 @@ namespace CameraPlus
 				return dotConfig.useInside;
 			}
 
-			if (FastUI.CurUICellSize > Settings.dotSize)
+			if (Settings.dotStyle == DotStyle.VanillaDefault)
 				return false;
 
-			if (Settings.dotStyle == DotStyle.VanillaDefault)
+			if (FastUI.CurUICellSize > Settings.dotSize)
 				return false;
 
 			if (Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
@@ -145,7 +164,7 @@ namespace CameraPlus
 				return false;
 
 			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			return Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal;
+			return Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal || dotConfig != null;
 		}
 
 		// returning true will prefer markers over labels
@@ -165,15 +184,12 @@ namespace CameraPlus
 			if (cameraDelegate.GetCameraColors != null)
 			{
 				var colors = cameraDelegate.GetCameraColors(pawn);
-				if (colors == null || colors.Length != 2)
+				if (colors?.Length == 2)
 				{
-					innerColor = default;
-					outerColor = default;
-					return false;
+					innerColor = colors[0];
+					outerColor = colors[1];
+					return true;
 				}
-				innerColor = Settings.customInnerColors[selected].color ?? colors[0];
-				outerColor = Settings.customOuterColors[selected].color ?? colors[1];
-				return true;
 			}
 
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
@@ -187,35 +203,35 @@ namespace CameraPlus
 
 			if (isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
-				innerColor = Settings.defaultInnerColors[selected].color ?? Tools.GetMainColor(pawn);
-				outerColor = pawn.Faction == Faction.OfPlayer ? Settings.playerNormalOuterColors[selected].Value : Settings.defaultOuterColors[selected].color ?? PawnNameColorUtility.PawnNameColorOf(pawn);
+				innerColor = Tools.GetMainColor(pawn);
+				outerColor = pawn.Faction == Faction.OfPlayer ? playerNormalOuterColors[selected] : PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
 			if (pawn.IsColonistPlayerControlled == false)
 			{
-				outerColor = Settings.playerNormalOuterColors[selected].Value;
-				innerColor = Settings.playerNormalInnerColors[selected].Value;
+				outerColor = playerNormalOuterColors[selected];
+				innerColor = playerNormalInnerColors[selected];
 			}
 			else if (pawn.IsPlayerControlled == false)
 			{
-				outerColor = Settings.playerMentalOuterColors[selected].Value;
-				innerColor = Settings.playerMentalInnerColors[selected].Value;
+				outerColor = playerMentalOuterColors[selected];
+				innerColor = playerMentalInnerColors[selected];
 			}
 			else if (pawn.Downed)
 			{
-				outerColor = Settings.playerDownedOuterColors[selected].Value;
-				innerColor = Settings.playerDownedInnerColors[selected].Value;
+				outerColor = playerDownedOuterColors[selected];
+				innerColor = playerDownedInnerColors[selected];
 			}
 			else if (pawn.Drafted)
 			{
-				outerColor = Settings.playerDraftedOuterColors[selected].Value;
-				innerColor = Settings.playerDraftedInnerColors[selected].Value;
+				outerColor = playerDraftedOuterColors[selected];
+				innerColor = playerDraftedInnerColors[selected];
 			}
 			else
 			{
-				outerColor = Settings.playerNormalOuterColors[selected].Value;
-				innerColor = Settings.playerNormalInnerColors[selected].Value;
+				outerColor = playerNormalOuterColors[selected];
+				innerColor = playerNormalInnerColors[selected];
 			}
 
 			return true;

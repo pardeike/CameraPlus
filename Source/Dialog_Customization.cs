@@ -366,12 +366,12 @@ namespace CameraPlus
 					var dotConfigs = CameraSettings.settings.dotConfigs;
 					List<FloatMenuOption> options =
 					[
-						new("Copy".TranslateSimple(), () => RowClipboard = dotConfigs[row]),
+						new("Copy".TranslateSimple(), () => RowClipboard = dotConfigs[row].Clone()),
 						new("Duplicate".TranslateSimple(), () => dotConfigs.Insert(row, dotConfigs[row].Clone()))
 					];
 					if (RowClipboard != null)
 					{
-						var option = new FloatMenuOption("Paste".TranslateSimple(), () => dotConfigs[row] = RowClipboard.Clone());
+						var option = new FloatMenuOption("Paste".TranslateSimple(), () => dotConfigs[row] = RowClipboard);
 						options.Add(option);
 					}
 					var floatMenu = new FloatMenu(options);
@@ -431,6 +431,13 @@ namespace CameraPlus
 			if (list.ButtonText("NewCondition".TranslateSimple()))
 				dotConfigs.Add(new DotConfig());
 			list.NewColumn();
+
+			if (list.ButtonText("RestoreToDefaultSettings".TranslateSimple()))
+			{
+				dotConfigs.Clear();
+				foreach (var dotConfig in CameraSettings.defaultConfig)
+					dotConfigs.Add(dotConfig.Clone());
+			}
 			list.NewColumn();
 
 			if (list.ButtonText("LoadCustomization".TranslateSimple()))

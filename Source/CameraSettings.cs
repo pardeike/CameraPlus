@@ -21,28 +21,26 @@ namespace CameraPlus
 		public static CameraSettings settings;
 		public List<DotConfig> dotConfigs = [.. defaultConfig];
 
-		static readonly List<DotConfig> defaultConfig = [
+		public static readonly List<DotConfig> defaultConfig = [
 			new DotConfig()
 			{
-				conditions = [new ColonistTag()]
+				conditions = [new AnimalTag(), new TameTag() { _negated = true }],
+				lineColor = new(0, 1, 1),
+				fillColor = Color.clear,
+				lineSelectedColor = new(0, 0.5f, 0.5f),
+				fillSelectedColor = new(0, 1, 1, 0.5f),
+				useEdge = false,
+				mouseReveals = false,
 			},
 			new DotConfig()
 			{
-				conditions = [new ColonistTag(), new DraftedTag()],
-				lineColor = new Color(0, 0.5f, 0),
-				lineSelectedColor = new Color(0, 1, 0),
-			},
-			new DotConfig()
-			{
-				conditions = [new ColonistTag(), new MentalTag()],
-				fillColor = new Color(1, 0.75f, 0),
-				fillSelectedColor = new Color(1, 0.75f, 0),
-			},
-			new DotConfig()
-			{
-				conditions = [new ColonistTag(), new DownedTag()],
-				lineColor = new Color(0.5f, 0, 0),
-				lineSelectedColor = new Color(1, 0, 0),
+				conditions = [new AnimalTag()],
+				lineColor = Color.black,
+				fillColor = Color.clear,
+				lineSelectedColor = Color.white,
+				fillSelectedColor = Color.white,
+				mouseReveals = false,
+				outlineFactor = 0.05f,
 			}
 		];
 

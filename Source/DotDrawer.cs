@@ -43,7 +43,7 @@ namespace CameraPlus
 				if (pawn.RaceProps.Animal)
 				{
 					defaultShow = Settings.customNameStyle != LabelStyle.HideAnimals;
-					if (Settings.includeNotTamedAnimals == false && pawn.Name == null)
+					if (Settings.includeNotTamedAnimals == false && pawn.Name == null && dotConfig == null)
 						defaultShow = false;
 				}
 
@@ -62,8 +62,9 @@ namespace CameraPlus
 					}
 				}
 
-				if (Settings.dotStyle == DotStyle.VanillaDefault)
+				if ((dotConfig?.mode ?? Settings.dotStyle) <= DotStyle.VanillaDefault)
 					continue;
+
 				if (dotConfig != null && dotConfig.useInside == false)
 					continue;
 

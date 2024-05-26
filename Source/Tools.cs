@@ -163,7 +163,7 @@ namespace CameraPlus
 		{
 			if (pawn == null)
 				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
-			if (Settings.dotStyle == DotStyle.VanillaDefault)
+			if (Settings.dotStyle <= DotStyle.VanillaDefault)
 				return true;
 			if (Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
 				return true;

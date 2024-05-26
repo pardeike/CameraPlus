@@ -1,38 +1,38 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>欢迎使用新版Camera+！请在设置菜单中探索改进的自定义剪影选项，以优化您的体验。</CameraPlus3>
+	<CameraPlus3>欢迎使用新版Camera+！在设置菜单中探索增强的自定义轮廓选项以改善您的体验。</CameraPlus3>
 	<Zoom>缩放</Zoom>
-	<ZoomedInPercent>最大放大系数</ZoomedInPercent>
-	<ZoomedOutPercent>最大缩小系数</ZoomedOutPercent>
-	<ForZoomedInPercent>对于最高缩放系数</ForZoomedInPercent>
-	<ForZoomedOutPercent>对于最低缩放系数</ForZoomedOutPercent>
-	<Exponentiality>指数变焦速度</Exponentiality>
-	<SoundNearness>使拉进后的声音更加接近</SoundNearness>
-	<HotKeys>键盘快捷键：</HotKeys>
-	<Colors>颜色</Colors>
-	<SettingsKey>显示 Camera+ 设置</SettingsKey>
-	<LoadModifier>加载视角</LoadModifier>
-	<SaveModifier>保存视角</SaveModifier>
+	<ZoomedInPercent>最大放大倍数</ZoomedInPercent>
+	<ZoomedOutPercent>最大缩小倍数</ZoomedOutPercent>
+	<ForZoomedInPercent>最高放大倍数</ForZoomedInPercent>
+	<ForZoomedOutPercent>最低缩小倍数</ForZoomedOutPercent>
+	<Exponentiality>指数缩放速度</Exponentiality>
+	<SoundNearness>将本地声音拉近</SoundNearness>
+	<HotKeys>键盘快捷键</HotKeys>
+	<Colors>颜色（随游戏保存）</Colors>
+	<SettingsKey>Camera+ 设置</SettingsKey>
+	<LoadModifier>加载视图</LoadModifier>
+	<SaveModifier>保存视图</SaveModifier>
 	<DollyPercentLabel>滚动速度</DollyPercentLabel>
-	<ScreenEdgeDollyFrictionLabel>边缘拖动灵敏度</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>缩小后隐藏名字</HideNamesWhenZoomedOut>
+	<ScreenEdgeDollyFrictionLabel>边缘滚动系数</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>缩小时隐藏名称标签</HideNamesWhenZoomedOut>
 	<Pixel>像素</Pixel>
-	<HidePawnLabelBelow>隐藏的小人标签：</HidePawnLabelBelow>
-	<HideThingLabelBelow>隐藏的堆叠标签：</HideThingLabelBelow>
-	<HideDeadPawnsBelow>隐藏下方的死亡棋子: </HideDeadPawnsBelow>
-	<ShowMarkerBelow>显示的标记：</ShowMarkerBelow>
+	<HidePawnLabelBelow>隐藏以下棋子标签：</HidePawnLabelBelow>
+	<HideThingLabelBelow>隐藏以下堆叠标签：</HideThingLabelBelow>
+	<HideDeadPawnsBelow>隐藏以下死去的棋子：</HideDeadPawnsBelow>
+	<ShowMarkerBelow>以下显示为标记：</ShowMarkerBelow>
 	<DotStyle>点样式</DotStyle>
 	<VanillaDefault>原版默认</VanillaDefault>
 	<ClassicDots>Camera+ 点</ClassicDots>
-	<BetterSilhouettes>Camera+ 剪影</BetterSilhouettes>
+	<BetterSilhouettes>Camera+ 轮廓</BetterSilhouettes>
 	<Animals>动物</Animals>
-	<IncludeAnimals>动物使用相同的标记</IncludeAnimals>
-	<AnimalsDifferent>动物使用不同的标记</AnimalsDifferent>
-	<HideAnimals>动物不使用标记</HideAnimals>
+	<IncludeAnimals>动物有相同的标记</IncludeAnimals>
+	<AnimalsDifferent>动物有不同的标记</AnimalsDifferent>
+	<HideAnimals>动物没有标记</HideAnimals>
 	<IncludeNotTamedAnimals>包括未驯服的动物</IncludeNotTamedAnimals>
-	<ZoomToMouse>鼠标缩放</ZoomToMouse>
-	<DisableCameraShake>禁用相机震动</DisableCameraShake>
-	<MouseRevealsLabels>鼠标位置显示名称</MouseRevealsLabels>
+	<ZoomToMouse>缩放至鼠标</ZoomToMouse>
+	<DisableCameraShake>禁用相机抖动</DisableCameraShake>
+	<MouseRevealsLabels>鼠标显示标签</MouseRevealsLabels>
 	<EdgeIndicators>边缘指示器</EdgeIndicators>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
@@ -44,11 +44,28 @@
 	<KeyRightControl>右 Ctrl</KeyRightControl>
 	<KeyRightCommand>右 Cmd</KeyRightCommand>
 	<KeyRightWindows>右 Win</KeyRightWindows>
-	<DotSilhouetteSize>点/剪影大小</DotSilhouetteSize>
+	<DotSilhouetteSize>点/轮廓大小</DotSilhouetteSize>
 	<EdgeDotSize>边缘点大小</EdgeDotSize>
 	<EdgeDistanceFactor>边缘距离</EdgeDistanceFactor>
 	<OutlineSize>轮廓宽度</OutlineSize>
-	<Line>线条</Line>
+	<Outline>轮廓</Outline>
 	<Fill>填充</Fill>
-	<Player>玩家</Player>
+	<Selected>已选择</Selected>
+	<NewCondition>添加新条件</NewCondition>
+	<LoadCustomization>加载自定义设置</LoadCustomization>
+	<SaveCustomization>保存自定义设置</SaveCustomization>
+	<Opposite>相反</Opposite>
+	<Duplicate>重复</Duplicate>
+	<TagCategoryType>类型</TagCategoryType>
+	<TagCategoryAttribute>属性</TagCategoryAttribute>
+	<TagCategoryText>命名</TagCategoryText>
+	<ColumnConditions>点样式条件</ColumnConditions>
+	<ColumnMode>模式</ColumnMode>
+	<ColumnColors>颜色</ColumnColors>
+	<ColumnMap>地图</ColumnMap>
+	<ColumnEdge>边缘</ColumnEdge>
+	<ColumnMouseReveal>鼠标显示</ColumnMouseReveal>
+	<ColumnShowBelow>以下显示</ColumnShowBelow>
+	<ColumnSize>大小</ColumnSize>
+	<ColumnOutline>轮廓</ColumnOutline>
 </LanguageData>

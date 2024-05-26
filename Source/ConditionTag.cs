@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using RimWorld;
+﻿using RimWorld;
 using System;
 using UnityEngine;
 using Verse;
@@ -78,7 +77,8 @@ namespace CameraPlus
 		public virtual ConditionTag Clone()
 		{
 			var copy = (ConditionTag)Activator.CreateInstance(GetType());
-			Traverse.IterateFields(this, copy, (t1, t2) => t2.SetValue(t1.GetValue()));
+			copy._negated = _negated;
+			copy.labelWidth = labelWidth;
 			return copy;
 		}
 
@@ -137,7 +137,9 @@ namespace CameraPlus
 
 		public virtual void ExposeData()
 		{
-			Scribe_Values.Look(ref _negated, "negated", false);
+			var neg = Negated;
+			Scribe_Values.Look(ref neg, "negated", false);
+			Negated = neg;
 		}
 	}
 
@@ -179,6 +181,13 @@ namespace CameraPlus
 
 	public abstract class BoolTag : ConditionTag
 	{
+		public override ConditionTag Clone()
+		{
+			var copy = (BoolTag)Activator.CreateInstance(GetType());
+			copy._negated = _negated;
+			copy.labelWidth = labelWidth;
+			return copy;
+		}
 	}
 
 	public abstract class TextTag : ConditionTag
@@ -201,7 +210,9 @@ namespace CameraPlus
 
 		public override ConditionTag Clone()
 		{
-			var copy = (TextTag)base.Clone();
+			var copy = (TextTag)Activator.CreateInstance(GetType());
+			copy._negated = _negated;
+			copy.labelWidth = labelWidth;
 			copy._text = _text;
 			return copy;
 		}

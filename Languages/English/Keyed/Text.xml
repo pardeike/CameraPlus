@@ -59,7 +59,7 @@
     <TagCategoryType>Types</TagCategoryType>
     <TagCategoryAttribute>Attributes</TagCategoryAttribute>
     <TagCategoryText>Naming</TagCategoryText>
-    <ColumnConditions>Conditions</ColumnConditions>
+    <ColumnConditions>Dot style conditions</ColumnConditions>
     <ColumnMode>Mode</ColumnMode>
     <ColumnColors>Colors</ColumnColors>
     <ColumnMap>Map</ColumnMap>
