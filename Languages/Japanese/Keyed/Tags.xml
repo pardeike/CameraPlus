@@ -109,6 +109,9 @@
 	<GuestTag>ゲスト</GuestTag>
 	<NotGuestTag>ゲストではない</NotGuestTag>
 
+	<HasWeaponTag>武器あり</HasWeaponTag>
+	<NotHasWeaponTag>武器なし</NotHasWeaponTag>
+
 	<HostileTag>敵対的</HostileTag>
 	<NotHostileTag>友好的</NotHostileTag>
 
@@ -166,5 +169,17 @@
 
 	<HediffTag>ヘディフ</HediffTag>
 	<NotHediffTag>ヘディフではない</NotHediffTag>
+
+	<ApparelTag>衣服</ApparelTag>
+	<NotApparelTag>衣服なし</NotApparelTag>
+
+	<InventoryTag>在庫</InventoryTag>
+	<NotInventoryTag>在庫なし</NotInventoryTag>
+
+	<EquipmentTag>装備</EquipmentTag>
+	<NotEquipmentTag>装備なし</NotEquipmentTag>
+
+	<WeaponTag>武器</WeaponTag>
+	<NotWeaponTag>武器なし</NotWeaponTag>
 
 </LanguageData>

@@ -109,6 +109,9 @@
 	<GuestTag>Гость</GuestTag>
 	<NotGuestTag>Не гость</NotGuestTag>
 
+	<HasWeaponTag>Есть оружие</HasWeaponTag>
+	<NotHasWeaponTag>Нет оружия</NotHasWeaponTag>
+
 	<HostileTag>Враждебный</HostileTag>
 	<NotHostileTag>Дружелюбный</NotHostileTag>
 
@@ -166,5 +169,17 @@
 
 	<HediffTag>Геддифф</HediffTag>
 	<NotHediffTag>Не геддифф</NotHediffTag>
+
+	<ApparelTag>Одежда</ApparelTag>
+	<NotApparelTag>Без одежды</NotApparelTag>
+
+	<InventoryTag>Инвентарь</InventoryTag>
+	<NotInventoryTag>Без инвентаря</NotInventoryTag>
+
+	<EquipmentTag>Оборудование</EquipmentTag>
+	<NotEquipmentTag>Без оборудования</NotEquipmentTag>
+
+	<WeaponTag>Оружие</WeaponTag>
+	<NotWeaponTag>Без оружия</NotWeaponTag>
 
 </LanguageData>

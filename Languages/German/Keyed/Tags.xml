@@ -109,6 +109,9 @@
 	<GuestTag>Gast</GuestTag>
 	<NotGuestTag>Kein Gast</NotGuestTag>
 
+	<HasWeaponTag>Hat eine Waffe</HasWeaponTag>
+	<NotHasWeaponTag>Hat keine Waffe</NotHasWeaponTag>
+
 	<HostileTag>Feindlich</HostileTag>
 	<NotHostileTag>Freundlich</NotHostileTag>
 
@@ -166,5 +169,17 @@
 
 	<HediffTag>Krankheit</HediffTag>
 	<NotHediffTag>Keine Krankheit</NotHediffTag>
+
+	<ApparelTag>Kleidung</ApparelTag>
+	<NotApparelTag>Keine Kleidung</NotApparelTag>
+
+	<InventoryTag>Inventar</InventoryTag>
+	<NotInventoryTag>Kein Inventar</NotInventoryTag>
+
+	<EquipmentTag>Ausrüstung</EquipmentTag>
+	<NotEquipmentTag>Keine Ausrüstung</NotEquipmentTag>
+
+	<WeaponTag>Waffe</WeaponTag>
+	<NotWeaponTag>Keine Waffe</NotWeaponTag>
 
 </LanguageData>

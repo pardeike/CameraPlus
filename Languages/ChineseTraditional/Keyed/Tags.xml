@@ -109,6 +109,9 @@
 	<GuestTag>客人</GuestTag>
 	<NotGuestTag>不是客人</NotGuestTag>
 
+	<HasWeaponTag>有武器</HasWeaponTag>
+	<NotHasWeaponTag>沒有武器</NotHasWeaponTag>
+
 	<HostileTag>敵對</HostileTag>
 	<NotHostileTag>友好</NotHostileTag>
 
@@ -166,5 +169,17 @@
 
 	<HediffTag>疾病</HediffTag>
 	<NotHediffTag>無疾病</NotHediffTag>
+
+	<ApparelTag>服裝</ApparelTag>
+	<NotApparelTag>沒有服裝</NotApparelTag>
+
+	<InventoryTag>庫存</InventoryTag>
+	<NotInventoryTag>沒有庫存</NotInventoryTag>
+
+	<EquipmentTag>裝備</EquipmentTag>
+	<NotEquipmentTag>沒有裝備</NotEquipmentTag>
+
+	<WeaponTag>武器</WeaponTag>
+	<NotWeaponTag>沒有武器</NotWeaponTag>
 
 </LanguageData>

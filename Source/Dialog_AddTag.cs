@@ -14,14 +14,14 @@ namespace CameraPlus
 			{
 				("TagCategoryType", ConditionTag.AllTypeTags, 5),
 				("TagCategoryAttribute", ConditionTag.AllAttributeTags, 6),
-				("TagCategoryText", ConditionTag.AllTextTags, 2)
+				("TagCategoryText", ConditionTag.AllTextTags, 3)
 			}
 			.Select(item => (item.label.TranslateSimple(), item.tags.Select(t => new ChooseTag(t)).ToList(), item.rowCount)).ToArray();
 
 		private readonly Action<ConditionTag> callback;
 		private bool negated;
 
-		public override Vector2 InitialSize => new(640f, 440f);
+		public override Vector2 InitialSize => new(640f, 480f);
 
 		public Dialog_AddTag(Action<ConditionTag> callback)
 		{

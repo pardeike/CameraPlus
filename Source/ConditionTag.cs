@@ -49,6 +49,7 @@ namespace CameraPlus
 			new FemaleTag(),
 			new FreeTag(),
 			new GuestTag(),
+			new HasWeaponTag(),
 			new HostileTag(),
 			new IdleTag(),
 			new InjuredTag(),
@@ -72,6 +73,10 @@ namespace CameraPlus
 			new FactionNameTag(),
 			new PawnNameTag(),
 			new HediffTag(),
+			new ApparelTag(),
+			new InventoryTag(),
+			new EquipmentTag(),
+			new WeaponTag(),
 		];
 
 		public virtual ConditionTag Clone()

@@ -109,6 +109,9 @@
 	<GuestTag>Guest</GuestTag>
 	<NotGuestTag>Not a guest</NotGuestTag>
 
+	<HasWeaponTag>Has weapon</HasWeaponTag>
+	<NotHasWeaponTag>Has no weapon</NotHasWeaponTag>
+
 	<HostileTag>Hostile</HostileTag>
 	<NotHostileTag>Friendly</NotHostileTag>
 
@@ -166,5 +169,17 @@
 
 	<HediffTag>Hediff</HediffTag>
 	<NotHediffTag>Not hediff</NotHediffTag>
+
+	<ApparelTag>Apparel</ApparelTag>
+	<NotApparelTag>Not apparel</NotApparelTag>
+
+	<InventoryTag>Inventory</InventoryTag>
+	<NotInventoryTag>Not inventory</NotInventoryTag>
+
+	<EquipmentTag>Equipment</EquipmentTag>
+	<NotEquipmentTag>Not equipment</NotEquipmentTag>
+
+	<WeaponTag>Weapon</WeaponTag>
+	<NotWeaponTag>No weapon</NotWeaponTag>
 
 </LanguageData>

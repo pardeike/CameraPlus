@@ -191,6 +191,11 @@ namespace CameraPlus
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.GuestStatus != null;
 	}
 
+	public class HasWeaponTag : BoolTag
+	{
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.equipment?.Primary != null;
+	}
+
 	public class HostileTag : BoolTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ pawn.HostileTo(Faction.OfPlayer);
