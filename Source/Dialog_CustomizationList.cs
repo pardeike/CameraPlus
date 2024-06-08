@@ -9,12 +9,11 @@ namespace CameraPlus
 {
 	public abstract class Dialog_CustomizationList : Dialog_FileList
 	{
-		internal string FolderPath => GenFilePaths.FolderUnderSaveData("CameraPlus");
-		internal string AbsPathForCustomization(string scenarioName) => Path.Combine(FolderPath, scenarioName + ".xml");
+		internal string AbsPathForCustomization(string scenarioName) => Path.Combine(Assets.CameraPlusFolderPath, scenarioName + ".xml");
 
 		public IEnumerable<FileInfo> AllCustomizations()
 		{
-			var directoryInfo = new DirectoryInfo(FolderPath);
+			var directoryInfo = new DirectoryInfo(Assets.CameraPlusFolderPath);
 			if (!directoryInfo.Exists)
 				directoryInfo.Create();
 			return directoryInfo.GetFiles().Where(f => f.Extension == ".xml").OrderByDescending(f => f.LastWriteTime);

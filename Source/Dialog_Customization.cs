@@ -246,12 +246,14 @@ namespace CameraPlus
 
 		static void DrawMode(Rect rect, DotConfig dotConfig)
 		{
-			DrawLabel(rect, dotConfig.mode.ToString());
+			var label = dotConfig.mode == DotStyle.Custom ? dotConfig.customDotStyle : dotConfig.mode.ToString();
+			DrawLabel(rect, label, true, dotConfig.mode != DotStyle.Custom);
 			if (Widgets.ButtonInvisible(rect))
 			{
 				var modes = (DotStyle[])Enum.GetValues(typeof(DotStyle));
-				var options = modes.Select(mode => new FloatMenuOption(mode.ToString().TranslateSimple(), () => dotConfig.mode = mode));
-				Find.WindowStack.Add(new FloatMenu(options.ToList()));
+				var options = modes.Except([DotStyle.Custom]).Select(mode => new FloatMenuOption(mode.ToString().TranslateSimple(), () => { dotConfig.mode = mode; dotConfig.customDotStyle = null; })).ToList();
+				options.AddRange(Assets.customMarkers.Keys.OrderBy(s => s).Select(fileName => new FloatMenuOption(fileName, () => { dotConfig.mode = DotStyle.Custom; dotConfig.customDotStyle = fileName; }) { Priority = MenuOptionPriority.Low }));
+				Find.WindowStack.Add(new FloatMenu(options));
 			}
 		}
 
@@ -285,17 +287,20 @@ namespace CameraPlus
 			GUI.EndGroup();
 		}
 
-		static void DrawLabel(Rect rect, string text)
+		static void DrawLabel(Rect rect, string text, bool useHighlight = false, bool translate = true)
 		{
 			var leftAligned = text.StartsWith("<");
 			if (leftAligned)
 				text = text.Substring(1);
+			if (useHighlight && Mouse.IsOver(rect))
+				GUI.color = dragColor;
 			var font = Text.Font;
 			Text.Font = GameFont.Tiny;
 			Text.Anchor = leftAligned ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
-			Widgets.Label(rect, text.TranslateSimple());
+			Widgets.Label(rect, translate ? text.TranslateSimple() : text);
 			Text.Anchor = TextAnchor.UpperLeft;
 			Text.Font = font;
+			GUI.color = Color.white;
 		}
 
 		static void DrawStepper<T>(Rect rect, ref T value, Func<T, T> incr, Func<T, T> decr, Action<object, int> deltaCallback, Func<T, string> stringConverter)

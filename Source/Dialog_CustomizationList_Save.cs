@@ -25,7 +25,7 @@ namespace CameraPlus
 		public override void DoFileInteraction(string fileName)
 		{
 			fileName = GenFile.SanitizedFileName(fileName);
-			var absPath = Path.Combine(FolderPath, fileName + ".xml");
+			var absPath = Path.Combine(Assets.CameraPlusFolderPath, fileName + ".xml");
 			LongEventHandler.QueueLongEvent(() => SafeSaver.Save(absPath, rootElementName, Save, false), "SavingLongEvent", false, null, true, null);
 			Messages.Message("SavedAs".Translate(fileName), MessageTypeDefOf.SilentInput, false);
 			Close(true);

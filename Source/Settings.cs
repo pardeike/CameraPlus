@@ -197,7 +197,7 @@ namespace CameraPlus
 			var oldDotStyle = dotStyle;
 			foreach (var label in Enum.GetNames(typeof(DotStyle)))
 			{
-				if (label == DotStyle.Off.ToString())
+				if (label == nameof(DotStyle.Off) || label == nameof(DotStyle.Custom))
 					continue;
 				var val = (DotStyle)Enum.Parse(typeof(DotStyle), label);
 				if (list.RadioButton(label.Translate(), dotStyle == val, 8f))

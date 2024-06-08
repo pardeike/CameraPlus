@@ -162,7 +162,7 @@ namespace CameraPlus
 	// so we make them bigger with the available fonts
 	//
 	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawThingLabel))]
-	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
+	[HarmonyPatch([typeof(Vector2), typeof(string), typeof(Color)])]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
 		static readonly MethodInfo m_GetAdaptedGameFont = SymbolExtensions.GetMethodInfo(() => GetAdaptedGameFont(0f));

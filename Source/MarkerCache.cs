@@ -29,6 +29,15 @@ namespace CameraPlus
 			silhouette.SetFloat("_OutlineFactor", outlineFactor);
 			silhouette.renderQueue = (int)RenderQueue.Overlay;
 
+			Material custom = null;
+			if (dotConfig?.mode == DotStyle.Custom && Assets.customMarkers.TryGetValue(dotConfig.customDotStyle, out var texture))
+			{
+				custom = MaterialAllocator.Create(Assets.BorderedShader);
+				custom.SetTexture("_MainTex", texture);
+				custom.SetFloat("_OutlineFactor", outlineFactor);
+				custom.renderQueue = (int)RenderQueue.Overlay;
+			}
+
 			Material dot = null;
 			if (DotTools.GetMarkerTextures(pawn, out var dotTexture, out _))
 			{
@@ -38,7 +47,7 @@ namespace CameraPlus
 				dot.renderQueue = (int)RenderQueue.Overlay;
 			}
 
-			materials = new Materials { dot = dot, silhouette = silhouette, refreshTick = 300 };
+			materials = new Materials { dot = dot, silhouette = silhouette, custom = custom, refreshTick = 300 };
 
 			cache.Add(pawn, materials);
 			return materials;

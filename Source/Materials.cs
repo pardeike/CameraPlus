@@ -6,6 +6,7 @@ namespace CameraPlus
 	{
 		public Material dot;
 		public Material silhouette;
+		public Material custom;
 		public int refreshTick;
 	}
 }

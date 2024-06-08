@@ -21,7 +21,7 @@ namespace CameraPlus
 		static readonly Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
 
 		[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
-		[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
+		[HarmonyPatch([typeof(Vector3), typeof(Rot4?), typeof(bool)])]
 		static class PawnRenderer_RenderPawnAt_Patch
 		{
 			[HarmonyPriority(10000)]
@@ -112,7 +112,7 @@ namespace CameraPlus
 		}
 
 		[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
-		[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
+		[HarmonyPatch([typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool)])]
 		static class GenMapUI_DrawPawnLabel_Patch
 		{
 			[HarmonyPriority(10000)]

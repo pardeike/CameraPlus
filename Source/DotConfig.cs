@@ -9,6 +9,7 @@ namespace CameraPlus
 	{
 		public List<ConditionTag> conditions = [];
 		public DotStyle mode = DotStyle.BetterSilhouettes;
+		public string customDotStyle = null;
 		public int showBelowPixels = -1;
 		public bool useInside = true;
 		public bool useEdge = true;
@@ -24,6 +25,7 @@ namespace CameraPlus
 		{
 			conditions = [];
 			mode = DotStyle.BetterSilhouettes;
+			customDotStyle = null;
 			showBelowPixels = -1;
 			useInside = true;
 			useEdge = true;
@@ -40,6 +42,7 @@ namespace CameraPlus
 		{
 			conditions = conditions.Select(condition => condition.Clone()).ToArray().ToList(),
 			mode = mode,
+			customDotStyle = customDotStyle,
 			showBelowPixels = showBelowPixels,
 			useInside = useInside,
 			useEdge = useEdge,
@@ -63,6 +66,7 @@ namespace CameraPlus
 			conditions ??= [];
 
 			Scribe_Values.Look(ref mode, "mode", DotStyle.BetterSilhouettes);
+			Scribe_Values.Look(ref customDotStyle, "customDotStyle", null);
 			Scribe_Values.Look(ref showBelowPixels, "showBelowPixels", -1);
 			Scribe_Values.Look(ref useInside, "useInside", true);
 			Scribe_Values.Look(ref useEdge, "useEdge", true);

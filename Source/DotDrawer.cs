@@ -96,6 +96,15 @@ namespace CameraPlus
 						materialMarker.SetColor("_OutlineColor", outerColor);
 						DrawMarker(pawn, dotConfig, materialMarker);
 						break;
+					case DotStyle.Custom:
+						materialMarker = materials.custom;
+						if (materialMarker != null)
+						{
+							materialMarker.SetColor("_FillColor", innerColor);
+							materialMarker.SetColor("_OutlineColor", outerColor);
+							DrawMarker(pawn, dotConfig, materialMarker);
+						}
+						break;
 				}
 			}
 		}
