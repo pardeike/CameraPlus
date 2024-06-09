@@ -2,6 +2,8 @@
 
 Welcome to Camera+!
 
+![image](https://github.com/pardeike/CameraPlus/assets/853584/fe10ffee-119d-4b28-95ad-e71b9fcf67a8)
+
 Enhance your RimWorld experience with Camera+, the ultimate camera control mod. Tired of the limited zoom range and lack of customization in the base game? Camera+ offers unparalleled control over your in-game perspective. Zoom in closer than ever to inspect every detail of your colony, or zoom out to get a strategic overview. Customize the appearance of your pawns with innovative dot styles and silhouettes, making it easier to manage large colonies and battles. With features like smooth edge scrolling, adjustable zoom speed, and comprehensive marker customization, Camera+ ensures that you have the perfect view of your RimWorld at all times. Dive into the settings to fine-tune your experience, save your favorite views, and make the game truly yours. Whether you're a seasoned player or new to the game, Camera+ will revolutionize the way you play RimWorld. Try it now and see the difference!
 
 ## Settings Overview
