@@ -79,6 +79,8 @@ This mod enhances the camera functionality in RimWorld with extended zoom, custo
 - Place custom marker graphics (`.png` files) in the `CameraPlus` folder.
 - These files will be available in the "Mode" column context menu, allowing you to apply your custom graphics.
 
+![image](https://github.com/pardeike/CameraPlus/assets/853584/f42df852-b5b4-4730-94f7-ac91a20f937e)
+
 For detailed configuration, please refer to the in-game settings menu. Enjoy your enhanced RimWorld experience with Camera+!
 
 Powered by [Harmony](https://github.com/pardeike/Harmony)
