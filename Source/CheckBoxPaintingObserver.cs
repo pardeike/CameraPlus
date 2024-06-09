@@ -5,8 +5,7 @@ using Verse;
 
 namespace CameraPlus
 {
-	[HarmonyPatch(typeof(Widgets))]
-	[HarmonyPatch(nameof(Widgets.WidgetsOnGUI))]
+	[HarmonyPatch(typeof(Widgets), nameof(Widgets.WidgetsOnGUI))]
 	static class Widgets_WidgetsOnGUI_Patch
 	{
 		static bool checkboxPainting;

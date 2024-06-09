@@ -6,8 +6,7 @@ using Verse;
 
 namespace CameraPlus
 {
-	[HarmonyPatch(typeof(World))]
-	[HarmonyPatch(nameof(World.FinalizeInit))]
+	[HarmonyPatch(typeof(World), nameof(World.FinalizeInit))]
 	static class World_FinalizeInit_Patch
 	{
 		public static void Postfix(World __instance)

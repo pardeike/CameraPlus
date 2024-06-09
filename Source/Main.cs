@@ -96,14 +96,13 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(DynamicDrawManager))]
-	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
+	[HarmonyPatch(typeof(DynamicDrawManager), nameof(DynamicDrawManager.DrawDynamicThings))]
 	static class DynamicDrawManager_DrawDynamicThings_Patch
 	{
 		static void Postfix()
 		{
 			var map = Find.CurrentMap;
-			if (map != null)
+			if (map != null && skipCustomRendering == false)
 				DotDrawer.DrawDots(map);
 		}
 	}
@@ -355,8 +354,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(Map))]
-	[HarmonyPatch(nameof(Map.MapUpdate))]
+	[HarmonyPatch(typeof(Map), nameof(Map.MapUpdate))]
 	static class Map_MapUpdate_Patch
 	{
 		static bool done = false;
@@ -396,9 +394,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(KeyBindingDef))]
-	[HarmonyPatch(nameof(KeyBindingDef.KeyDownEvent))]
-	[HarmonyPatch(MethodType.Getter)]
+	[HarmonyPatch(typeof(KeyBindingDef), nameof(KeyBindingDef.KeyDownEvent), MethodType.Getter)]
 	static class KeyBindingDef_KeyDownEvent_Patch
 	{
 		static bool wasDown = false;
@@ -431,15 +427,13 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(Root))]
-	[HarmonyPatch(nameof(Root.OnGUI))]
+	[HarmonyPatch(typeof(Root), nameof(Root.OnGUI))]
 	static class Root_OnGUI_Patch
 	{
 		public static void Postfix() => KeyBindingDef_KeyDownEvent_Patch.CleanupAtEndOfFrame();
 	}
 
-	[HarmonyPatch(typeof(Game))]
-	[HarmonyPatch(nameof(Game.UpdatePlay))]
+	[HarmonyPatch(typeof(Game), (nameof(Game.UpdatePlay)))]
 	static class Game_UpdatePlay_Patch
 	{
 		static DateTime lastChange = DateTime.MinValue;
@@ -471,8 +465,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(TickManager))]
-	[HarmonyPatch(nameof(TickManager.TogglePaused))]
+	[HarmonyPatch(typeof(TickManager), nameof(TickManager.TogglePaused))]
 	static class TickManager_TogglePaused_Patch
 	{
 		public static void Postfix(TickManager __instance)
@@ -482,15 +475,13 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(MainTabWindow_Menu))]
-	[HarmonyPatch(nameof(MainTabWindow_Menu.PreOpen))]
+	[HarmonyPatch(typeof(MainTabWindow_Menu), nameof(MainTabWindow_Menu.PreOpen))]
 	static class MainTabWindow_Menu_PreOpen_Patch
 	{
 		public static void Postfix() => Tools.ResetSnapback();
 	}
 
-	[HarmonyPatch(typeof(UIRoot_Play))]
-	[HarmonyPatch(nameof(UIRoot_Play.UIRootOnGUI))]
+	[HarmonyPatch(typeof(UIRoot_Play), nameof(UIRoot_Play.UIRootOnGUI))]
 	static class UIRoot_Play_UIRootOnGUI_Patch
 	{
 		public static void Postfix()

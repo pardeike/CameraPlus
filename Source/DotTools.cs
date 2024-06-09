@@ -61,7 +61,7 @@ namespace CameraPlus
 			[HarmonyPriority(10000)]
 			public static bool Prefix(object obj)
 			{
-				if (obj is not Pawn pawn)
+				if (skipCustomRendering || obj is not Pawn pawn)
 					return true;
 				return ShouldShowMarker(pawn) == false;
 			}
@@ -91,6 +91,9 @@ namespace CameraPlus
 		{
 			static bool Prefix(Thing thing, ref bool __result)
 			{
+				if (skipCustomRendering)
+					return true;
+
 				if (thing is Pawn pawn)
 				{
 					var dotConfig = Caches.dotConfigCache.Get(pawn);
