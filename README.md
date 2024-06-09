@@ -28,24 +28,19 @@ This mod enhances the camera functionality in RimWorld with extended zoom, custo
 - **Disable camera shake**: Disables camera shake effects for a more stable viewing experience.
 - **Bring local sounds closer**: Increases volume of local sounds when zoomed out, maintaining immersion even at a distance.
 
-### [dialog x]
-![Main Settings Dialog](path-to-image-file)
+![image](https://github.com/pardeike/CameraPlus/assets/853584/f2fc8e4c-c927-4593-934b-0176864c6c18)
 
 ## Keyboard Shortcuts
 - **Camera+ settings**: `Left Shift` + `Tab` for quick access to settings.
 - **Load view**: `Left Shift` + `1-9` to quickly switch to saved views.
 - **Save view**: `Left Alt` + `1-9` to save your current view configuration.
 
-### [dialog x]
-![Keyboard Shortcuts](path-to-image-file)
+![image](https://github.com/pardeike/CameraPlus/assets/853584/eae4022a-c57c-44f3-8b31-0c575e999c23)
 
 ## Dot Style
 - **Vanilla default**: Original game markers for a familiar look.
 - **Camera+ dots**: Custom dot markers for pawns, making it easy to differentiate between types.
 - **Camera+ silhouettes**: Enhanced customizable silhouettes for a clearer visual representation.
-
-### [dialog x]
-![Dot Style Settings](path-to-image-file)
 
 ## Animal Markers
 - **Animals have the same marker**: Consistent markers for all animals.
@@ -60,23 +55,20 @@ This mod enhances the camera functionality in RimWorld with extended zoom, custo
 - Combine tags to form "AND" conditions for precise control.
 - Customize colors, edge markers, mouse reveal settings, and size adjustments for each condition.
 
-### [dialog x]
-![Dot Style Conditions](path-to-image-file)
+![image](https://github.com/pardeike/CameraPlus/assets/853584/1f4403e8-82aa-4d11-b346-1144a5596bcc)
 
 ### Adding Conditions
-- Use the "+" button to add tags, allowing you to create detailed rules for marker customization.
-- Some tags have editable text parameters for even more specific conditions.
+- Use the "+" button to add tags, allowing you to create detailed rules for marker customization. The first rule that matches defines the marker style and sets the custom settings.
+- Some tags have editable text parameters for even more specific conditions:
 
-### [dialog x]
-![Add Condition](path-to-image-file)
+![image](https://github.com/pardeike/CameraPlus/assets/853584/1a98b7c9-3560-4379-a048-8aaa9344be59)
 
 ### Tags
 - **Types**: e.g., Animal, Human, Mechanoid to categorize pawns.
 - **Attributes**: e.g., Attacking, Drafted, Injured to specify states and behaviors.
 - **Naming**: e.g., Faction, Weapon to target specific names and types.
 
-### [dialog x]
-![Tags Dialog](path-to-image-file)
+![image](https://github.com/pardeike/CameraPlus/assets/853584/50b6f6d6-7350-4f8b-bcbf-69b9387bfa0c)
 
 ## Saving and Loading Customizations
 - Save or load your settings from the `CameraPlus` folder in the RimWorld settings directory: `C:\Users\USERNAME\AppData\LocalLow\Ludeon Studios\RimWorld by Ludeon Studios\CameraPlus`.
@@ -89,5 +81,3 @@ For detailed configuration, please refer to the in-game settings menu. Enjoy you
 
 Powered by [Harmony](https://github.com/pardeike/Harmony)
 The runtime patch library for Unity
-
-![Harmony](https://s24.postimg.org/58bl1rz39/logo.png)
