@@ -239,7 +239,7 @@ namespace CameraPlus
 			var oldOutlineFactor = outlineFactor;
 			list.Slider(ref outlineFactor, 0f, 0.4f, () => "OutlineSize".Translate() + ": " + Math.Round(outlineFactor * 100, 0) + "%");
 			if (oldOutlineFactor != outlineFactor)
-				MarkerCache.cache.Clear();
+				MarkerCache.Clear();
 
 			list.End();
 		}

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -25,6 +26,7 @@ namespace CameraPlus
 			var outlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
 
 			var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
+			silhouette.name = $"{pawn.ThingID}-silhouette";
 			silhouette.SetTexture("_MainTex", GetTexture(pawn));
 			silhouette.SetFloat("_OutlineFactor", outlineFactor);
 			silhouette.renderQueue = (int)RenderQueue.Overlay;
@@ -33,6 +35,7 @@ namespace CameraPlus
 			if (dotConfig?.mode == DotStyle.Custom && Assets.customMarkers.TryGetValue(dotConfig.customDotStyle, out var texture))
 			{
 				custom = MaterialAllocator.Create(Assets.BorderedShader);
+				custom.name = $"{pawn.ThingID}-custom";
 				custom.SetTexture("_MainTex", texture);
 				custom.SetFloat("_OutlineFactor", outlineFactor);
 				custom.renderQueue = (int)RenderQueue.Overlay;
@@ -42,6 +45,7 @@ namespace CameraPlus
 			if (DotTools.GetMarkerTextures(pawn, out var dotTexture, out _))
 			{
 				dot = MaterialAllocator.Create(Assets.BorderedShader);
+				dot.name = $"{pawn.ThingID}-dot";
 				dot.SetTexture("_MainTex", dotTexture);
 				dot.SetFloat("_OutlineFactor", outlineFactor);
 				dot.renderQueue = (int)RenderQueue.Overlay;
@@ -53,15 +57,27 @@ namespace CameraPlus
 			return materials;
 		}
 
+		public static void Clear()
+		{
+			var pawns = cache.Keys.ToList();
+			foreach (var pawn in pawns)
+				Remove(pawn);
+			cache.Clear();
+		}
+
 		public static void Remove(Pawn pawn)
 		{
 			var dot = cache[pawn].dot;
 			if (dot != null)
-				Object.Destroy(dot);
+				MaterialAllocator.Destroy(dot);
 
 			var silhouette = cache[pawn].silhouette;
 			if (silhouette != null)
-				Object.Destroy(silhouette);
+				MaterialAllocator.Destroy(silhouette);
+
+			var custom = cache[pawn].custom;
+			if (custom != null)
+				MaterialAllocator.Destroy(custom);
 
 			cache.Remove(pawn);
 		}

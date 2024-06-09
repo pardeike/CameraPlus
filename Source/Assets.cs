@@ -112,6 +112,8 @@ namespace CameraPlus
 			var directoryInfo = new DirectoryInfo(CameraPlusFolderPath);
 			if (!directoryInfo.Exists)
 				directoryInfo.Create();
+			foreach (var texture in customMarkers.Values)
+				Object.Destroy(texture);
 			customMarkers.Clear();
 			var items = directoryInfo.GetFiles().Where(f => f.Extension.ToLower() == ".png");
 			foreach (var item in items)
