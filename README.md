@@ -11,69 +11,69 @@ This mod enhances the camera functionality in RimWorld with extended zoom, custo
 ### Zoom
 - **Maximum zoomed in factor**: Adjusts how close you can zoom in.
 - **Maximum zoomed out factor**: Adjusts how far you can zoom out.
-- **Exponential Zoom Speed**: Controls the acceleration of zoom speed.
+- **Exponential Zoom Speed**: Controls the acceleration of zoom speed for a more natural zooming experience.
 
 ### Scroll Speed
-- **Scroll speed for highest zoom factor**: Defines scroll speed when fully zoomed in.
-- **Scroll speed for lowest zoom factor**: Defines scroll speed when fully zoomed out.
+- **Scroll speed for highest zoom factor**: Defines scroll speed when fully zoomed in, ensuring smooth navigation.
+- **Scroll speed for lowest zoom factor**: Defines scroll speed when fully zoomed out, allowing quick panning across the map.
 
 ### Edge Scroll Factor
-- **Edge scroll factor for highest zoom factor**: Adjusts edge scroll speed when fully zoomed in.
-- **Edge scroll factor for lowest zoom factor**: Adjusts edge scroll speed when fully zoomed out.
+- **Edge scroll factor for highest zoom factor**: Adjusts edge scroll speed when fully zoomed in, perfect for fine-tuned control.
+- **Edge scroll factor for lowest zoom factor**: Adjusts edge scroll speed when fully zoomed out, helping you move swiftly around the map.
 
 ### Other Settings
-- **Zoom to mouse**: Keeps the point under the mouse at the same position when zooming.
-- **Mouse reveals labels**: Shows pawn labels on mouse hover.
-- **Edge indicators**: Toggles directional markers for off-screen pawns.
-- **Disable camera shake**: Disables camera shake effects.
-- **Bring local sounds closer**: Increases volume of local sounds when zoomed out.
+- **Zoom to mouse**: Keeps the point under the mouse at the same position when zooming, making navigation intuitive.
+- **Mouse reveals labels**: Shows pawn labels on mouse hover, providing instant information at a glance.
+- **Edge indicators**: Toggles directional markers for off-screen pawns, ensuring you never lose track of your colonists.
+- **Disable camera shake**: Disables camera shake effects for a more stable viewing experience.
+- **Bring local sounds closer**: Increases volume of local sounds when zoomed out, maintaining immersion even at a distance.
 
 ### [dialog x]
 ![Main Settings Dialog](path-to-image-file)
 
 ## Keyboard Shortcuts
-- **Camera+ settings**: `Left Shift` + `Tab`
-- **Load view**: `Left Shift` + `1-9`
-- **Save view**: `Left Alt` + `1-9`
+- **Camera+ settings**: `Left Shift` + `Tab` for quick access to settings.
+- **Load view**: `Left Shift` + `1-9` to quickly switch to saved views.
+- **Save view**: `Left Alt` + `1-9` to save your current view configuration.
 
 ### [dialog x]
 ![Keyboard Shortcuts](path-to-image-file)
 
 ## Dot Style
-- **Vanilla default**: Original game markers.
-- **Camera+ dots**: Custom dot markers for pawns.
-- **Camera+ silhouettes**: Enhanced customizable silhouettes.
+- **Vanilla default**: Original game markers for a familiar look.
+- **Camera+ dots**: Custom dot markers for pawns, making it easy to differentiate between types.
+- **Camera+ silhouettes**: Enhanced customizable silhouettes for a clearer visual representation.
 
 ### [dialog x]
 ![Dot Style Settings](path-to-image-file)
 
 ## Animal Markers
-- **Animals have the same marker**
-- **Animals have a different marker**
-- **Animals have no marker**
-- **Include untamed animals**: Toggles marker for untamed animals.
-- **Dot/silhouette size**: Adjusts the size of the markers.
+- **Animals have the same marker**: Consistent markers for all animals.
+- **Animals have a different marker**: Different markers for different animals.
+- **Animals have no marker**: Removes markers from animals.
+- **Include untamed animals**: Toggles marker for untamed animals, keeping your wild fauna in check.
+- **Dot/silhouette size**: Adjusts the size of the markers for better visibility.
 
 ## Advanced Customization (Colors)
 ### Dot Style Conditions
-- Add rules to customize pawn markers based on conditions.
-- Combine tags to form "AND" conditions.
+- Add rules to customize pawn markers based on conditions, providing flexibility in how markers are displayed.
+- Combine tags to form "AND" conditions for precise control.
 - Customize colors, edge markers, mouse reveal settings, and size adjustments for each condition.
 
 ### [dialog x]
 ![Dot Style Conditions](path-to-image-file)
 
 ### Adding Conditions
-- Use the "+" button to add tags.
-- Some tags have editable text parameters.
+- Use the "+" button to add tags, allowing you to create detailed rules for marker customization.
+- Some tags have editable text parameters for even more specific conditions.
 
 ### [dialog x]
 ![Add Condition](path-to-image-file)
 
 ### Tags
-- **Types**: e.g., Animal, Human, Mechanoid
-- **Attributes**: e.g., Attacking, Drafted, Injured
-- **Naming**: e.g., Faction, Weapon
+- **Types**: e.g., Animal, Human, Mechanoid to categorize pawns.
+- **Attributes**: e.g., Attacking, Drafted, Injured to specify states and behaviors.
+- **Naming**: e.g., Faction, Weapon to target specific names and types.
 
 ### [dialog x]
 ![Tags Dialog](path-to-image-file)
@@ -83,7 +83,7 @@ This mod enhances the camera functionality in RimWorld with extended zoom, custo
 
 ## Custom Marker Graphics
 - Place custom marker graphics (`.png` files) in the `CameraPlus` folder.
-- These files will be available in the "Mode" column context menu.
+- These files will be available in the "Mode" column context menu, allowing you to apply your custom graphics.
 
 For detailed configuration, please refer to the in-game settings menu. Enjoy your enhanced RimWorld experience with Camera+!
 
