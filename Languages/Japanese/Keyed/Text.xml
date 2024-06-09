@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>Camera+の新バージョンへようこそ！設定メニューのカスタムシルエットオプションを探索して、体験を向上させましょう。</CameraPlus3>
+	<CameraPlus3>Camera+の新しいバージョンへようこそ！設定メニューで強化されたカスタムシルエットオプションを探索して、体験を向上させましょう。</CameraPlus3>
 	<Zoom>ズーム</Zoom>
 	<ZoomedInPercent>最大ズームイン倍率</ZoomedInPercent>
 	<ZoomedOutPercent>最大ズームアウト倍率</ZoomedOutPercent>
-	<ForZoomedInPercent>最高のズーム率の場合</ForZoomedInPercent>
-	<ForZoomedOutPercent>ズーム率を最小にするには</ForZoomedOutPercent>
+	<ForZoomedInPercent>最高ズームイン倍率</ForZoomedInPercent>
+	<ForZoomedOutPercent>最低ズームアウト倍率</ForZoomedOutPercent>
 	<Exponentiality>指数ズーム速度</Exponentiality>
-	<SoundNearness>付近の音が聞こえるズーム倍率</SoundNearness>
-	<HotKeys>ホットキー</HotKeys>
-	<Colors>色</Colors>
-	<SettingsKey>Camera+の設定</SettingsKey>
-	<LoadModifier>ビューを復元</LoadModifier>
+	<SoundNearness>ローカルサウンドを近づける</SoundNearness>
+	<HotKeys>キーボードショートカット</HotKeys>
+	<Colors>色（ゲームと一緒に保存されます）</Colors>
+	<SettingsKey>Camera+設定</SettingsKey>
+	<LoadModifier>ビューをロード</LoadModifier>
 	<SaveModifier>ビューを保存</SaveModifier>
-	<DollyPercentLabel>スクロールの速度</DollyPercentLabel>
+	<DollyPercentLabel>スクロール速度</DollyPercentLabel>
 	<ScreenEdgeDollyFrictionLabel>エッジスクロール係数</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>ズームアウトした時名前を非表示にする</HideNamesWhenZoomedOut>
+	<HideNamesWhenZoomedOut>ズームアウト時に名前のラベルを非表示</HideNamesWhenZoomedOut>
 	<Pixel>ピクセル</Pixel>
-	<HidePawnLabelBelow>以下にポーン名を非表示にします： </HidePawnLabelBelow>
-	<HideThingLabelBelow>以下にモノのラベルを非表示にします： </HideThingLabelBelow>
-	<HideDeadPawnsBelow>以下の死んだポーンを隠す: </HideDeadPawnsBelow>
-	<ShowMarkerBelow>マーカーとして表示： </ShowMarkerBelow>
+	<HidePawnLabelBelow>以下のポーンラベルを非表示：</HidePawnLabelBelow>
+	<HideThingLabelBelow>以下のスタックラベルを非表示：</HideThingLabelBelow>
+	<HideDeadPawnsBelow>以下の死んだポーンを非表示：</HideDeadPawnsBelow>
+	<ShowMarkerBelow>以下にマーカーとして表示：</ShowMarkerBelow>
 	<DotStyle>ドットスタイル</DotStyle>
-	<VanillaDefault>バニラデフォルト</VanillaDefault>
-	<ClassicDots>Camera+ ドット</ClassicDots>
-	<BetterSilhouettes>Camera+ シルエット</BetterSilhouettes>
+	<VanillaDefault>デフォルトのバニラ</VanillaDefault>
+	<ClassicDots>Camera+ドット</ClassicDots>
+	<BetterSilhouettes>Camera+シルエット</BetterSilhouettes>
 	<Animals>動物</Animals>
-	<IncludeAnimals>動物は同じマーカーを持っています</IncludeAnimals>
-	<AnimalsDifferent>動物は別のマーカーを持っています</AnimalsDifferent>
-	<HideAnimals>動物にはマーカーがありません</HideAnimals>
-	<IncludeNotTamedAnimals>飼いならされていない動物を含める</IncludeNotTamedAnimals>
-	<ZoomToMouse>マウスポインタにズーム</ZoomToMouse>
-	<DisableCameraShake>カメラの揺れを無効にします</DisableCameraShake>
-	<MouseRevealsLabels>マウスでラベルを表示</MouseRevealsLabels>
-	<EdgeIndicators>エッジインジケーター</EdgeIndicators>
+	<IncludeAnimals>動物に同じマーカーを表示</IncludeAnimals>
+	<AnimalsDifferent>動物に異なるマーカーを表示</AnimalsDifferent>
+	<HideAnimals>動物にマーカーを表示しない</HideAnimals>
+	<IncludeNotTamedAnimals>未調教の動物を含む</IncludeNotTamedAnimals>
+	<ZoomToMouse>マウスにズーム</ZoomToMouse>
+	<DisableCameraShake>カメラの揺れを無効にする</DisableCameraShake>
+	<MouseRevealsLabels>マウスがラベルを表示する</MouseRevealsLabels>
+	<EdgeIndicators>エッジインジケータ</EdgeIndicators>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>
@@ -44,11 +44,28 @@
 	<KeyRightControl>右Ctrl</KeyRightControl>
 	<KeyRightCommand>右Cmd</KeyRightCommand>
 	<KeyRightWindows>右Win</KeyRightWindows>
-	<DotSilhouetteSize>点/シルエットのサイズ</DotSilhouetteSize>
-	<EdgeDotSize>エッジの点のサイズ</EdgeDotSize>
+	<DotSilhouetteSize>ドット/シルエットのサイズ</DotSilhouetteSize>
+	<EdgeDotSize>エッジドットサイズ</EdgeDotSize>
 	<EdgeDistanceFactor>エッジ距離</EdgeDistanceFactor>
 	<OutlineSize>アウトラインの幅</OutlineSize>
-	<Line>ライン</Line>
+	<Outline>アウトライン</Outline>
 	<Fill>塗りつぶし</Fill>
-	<Player>プレイヤー</Player>
+	<Selected>選択済み</Selected>
+	<NewCondition>新しい条件を追加</NewCondition>
+	<LoadCustomization>カスタマイズを読み込む</LoadCustomization>
+	<SaveCustomization>カスタマイズを保存</SaveCustomization>
+	<Opposite>反対</Opposite>
+	<Duplicate>複製</Duplicate>
+	<TagCategoryType>タイプ</TagCategoryType>
+	<TagCategoryAttribute>属性</TagCategoryAttribute>
+	<TagCategoryText>命名</TagCategoryText>
+	<ColumnConditions>ドットスタイル条件</ColumnConditions>
+	<ColumnMode>モード</ColumnMode>
+	<ColumnColors>色</ColumnColors>
+	<ColumnMap>地図</ColumnMap>
+	<ColumnEdge>エッジ</ColumnEdge>
+	<ColumnMouseReveal>マウスの表示</ColumnMouseReveal>
+	<ColumnShowBelow>以下に表示</ColumnShowBelow>
+	<ColumnSize>サイズ</ColumnSize>
+	<ColumnOutline>アウトライン</ColumnOutline>
 </LanguageData>

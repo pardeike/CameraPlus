@@ -1,55 +1,71 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>Bienvenue dans la nouvelle version de Camera+ ! Découvrez les options de silhouettes personnalisées améliorées dans le menu des paramètres pour améliorer votre expérience.</CameraPlus3>
+	<CameraPlus3>Bienvenue dans la nouvelle version de Camera+ ! Explorez les options de silhouette personnalisées améliorées dans le menu des paramètres pour améliorer votre expérience.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Facteur de zoom maximal</ZoomedInPercent>
-	<ZoomedOutPercent>Facteur de zoom arrière maximal</ZoomedOutPercent>
+	<ZoomedOutPercent>Facteur de dézoom maximal</ZoomedOutPercent>
 	<ForZoomedInPercent>Pour le facteur de zoom le plus élevé</ForZoomedInPercent>
-	<ForZoomedOutPercent>Pour le facteur de zoom le plus bas</ForZoomedOutPercent>
+	<ForZoomedOutPercent>Pour le facteur de dézoom le plus bas</ForZoomedOutPercent>
 	<Exponentiality>Vitesse de zoom exponentielle</Exponentiality>
-	<SoundNearness>Rapprocher les sons proches</SoundNearness>
+	<SoundNearness>Rapprocher les sons locaux</SoundNearness>
 	<HotKeys>Raccourcis clavier</HotKeys>
-	<Colors>Couleurs</Colors>
-	<Animals>Animaux</Animals>
-	<SettingsKey>Camera+ paramètres</SettingsKey>
+	<Colors>Couleurs (enregistrées avec le jeu)</Colors>
+	<SettingsKey>Paramètres de Camera+</SettingsKey>
 	<LoadModifier>Charger la vue</LoadModifier>
 	<SaveModifier>Sauvegarder la vue</SaveModifier>
 	<DollyPercentLabel>Vitesse de défilement</DollyPercentLabel>
-	<ScreenEdgeDollyFrictionLabel>Facteur de vitesse de défilement</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>Masquer les étiquettes de nom lors d'un zoom arrière</HideNamesWhenZoomedOut>
+	<ScreenEdgeDollyFrictionLabel>Facteur de défilement sur les bords</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>Cacher les étiquettes de nom lors du dézoom</HideNamesWhenZoomedOut>
 	<Pixel>Pixel</Pixel>
-	<HidePawnLabelBelow>Masquer les étiquettes de personnages ci-dessous: </HidePawnLabelBelow>
-	<HideThingLabelBelow>Masquer les étiquettes de stockage ci-dessous: </HideThingLabelBelow>
-	<HideDeadPawnsBelow>Masquer les pions morts ci-dessous : </HideDeadPawnsBelow>
-	<ShowMarkerBelow>Afficher comme marqueur ci-dessous: </ShowMarkerBelow>
+	<HidePawnLabelBelow>Cacher les étiquettes de pion en dessous de :</HidePawnLabelBelow>
+	<HideThingLabelBelow>Cacher les étiquettes de pile en dessous de :</HideThingLabelBelow>
+	<HideDeadPawnsBelow>Cacher les pions morts en dessous de :</HideDeadPawnsBelow>
+	<ShowMarkerBelow>Afficher comme marqueur en dessous de :</ShowMarkerBelow>
 	<DotStyle>Style de point</DotStyle>
-	<VanillaDefault>Défaut vanille</VanillaDefault>
+	<VanillaDefault>Défaut Vanilla</VanillaDefault>
 	<ClassicDots>Points Camera+</ClassicDots>
 	<BetterSilhouettes>Silhouettes Camera+</BetterSilhouettes>
 	<Animals>Animaux</Animals>
 	<IncludeAnimals>Les animaux ont le même marqueur</IncludeAnimals>
 	<AnimalsDifferent>Les animaux ont un marqueur différent</AnimalsDifferent>
 	<HideAnimals>Les animaux n'ont pas de marqueur</HideAnimals>
-	<IncludeNotTamedAnimals>Inclure les animaux sauvages</IncludeNotTamedAnimals>
-	<ZoomToMouse>Zoom sur la souris</ZoomToMouse>
-	<DisableCameraShake>Désactiver la caméra secouer</DisableCameraShake>
+	<IncludeNotTamedAnimals>Inclure les animaux non apprivoisés</IncludeNotTamedAnimals>
+	<ZoomToMouse>Zoomer sur la souris</ZoomToMouse>
+	<DisableCameraShake>Désactiver le tremblement de la caméra</DisableCameraShake>
 	<MouseRevealsLabels>La souris révèle les étiquettes</MouseRevealsLabels>
 	<EdgeIndicators>Indicateurs de bord</EdgeIndicators>
-	<KeyLeftShift>Left Shift</KeyLeftShift>
-	<KeyLeftAlt>Left Alt</KeyLeftAlt>
-	<KeyLeftControl>Left Ctrl</KeyLeftControl>
-	<KeyLeftCommand>Left Cmd</KeyLeftCommand>
-	<KeyLeftWindows>Left Win</KeyLeftWindows>
-	<KeyRightShift>Right Shift</KeyRightShift>
-	<KeyRightAlt>Right Alt</KeyRightAlt>
-	<KeyRightControl>Right Ctrl</KeyRightControl>
-	<KeyRightCommand>Right Cmd</KeyRightCommand>
-	<KeyRightWindows>Right Win</KeyRightWindows>
-	<DotSilhouetteSize>Taille du point/silhouette</DotSilhouetteSize>
-	<EdgeDotSize>Taille du point de bord</EdgeDotSize>
-	<EdgeDistanceFactor>Facteur de distance du bord</EdgeDistanceFactor>
+	<KeyLeftShift>Shift gauche</KeyLeftShift>
+	<KeyLeftAlt>Alt gauche</KeyLeftAlt>
+	<KeyLeftControl>Ctrl gauche</KeyLeftControl>
+	<KeyLeftCommand>Cmd gauche</KeyLeftCommand>
+	<KeyLeftWindows>Win gauche</KeyLeftWindows>
+	<KeyRightShift>Shift droit</KeyRightShift>
+	<KeyRightAlt>Alt droit</KeyRightAlt>
+	<KeyRightControl>Ctrl droit</KeyRightControl>
+	<KeyRightCommand>Cmd droit</KeyRightCommand>
+	<KeyRightWindows>Win droit</KeyRightWindows>
+	<DotSilhouetteSize>Taille des points/silhouettes</DotSilhouetteSize>
+	<EdgeDotSize>Taille des points de bord</EdgeDotSize>
+	<EdgeDistanceFactor>Distance de bord</EdgeDistanceFactor>
 	<OutlineSize>Largeur du contour</OutlineSize>
-	<Line>Ligne</Line>
-	<Fill>Remplissage</Fill>
-	<Player>Joueur</Player>
+	<Outline>contour</Outline>
+	<Fill>remplir</Fill>
+	<Selected>sélectionné</Selected>
+	<NewCondition>Ajouter une nouvelle condition</NewCondition>
+	<LoadCustomization>Charger la personnalisation</LoadCustomization>
+	<SaveCustomization>Sauvegarder la personnalisation</SaveCustomization>
+	<Opposite>Opposé</Opposite>
+	<Duplicate>Dupliquer</Duplicate>
+	<TagCategoryType>Types</TagCategoryType>
+	<TagCategoryAttribute>Attributs</TagCategoryAttribute>
+	<TagCategoryText>Nommer</TagCategoryText>
+	<ColumnConditions>Conditions de style de point</ColumnConditions>
+	<ColumnMode>Mode</ColumnMode>
+	<ColumnColors>Couleurs</ColumnColors>
+	<ColumnMap>Carte</ColumnMap>
+	<ColumnEdge>Bord</ColumnEdge>
+	<ColumnMouseReveal>Révélation par la souris</ColumnMouseReveal>
+	<ColumnShowBelow>Afficher en dessous de</ColumnShowBelow>
+	<ColumnSize>Taille</ColumnSize>
+	<ColumnOutline>Contour</ColumnOutline>
 </LanguageData>

@@ -1,54 +1,71 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>Willkommen zur neuen Version von Camera+! Entdecken Sie verbesserte Optionen für benutzerdefinierte Silhouetten im Einstellungsmenü, um Ihr Erlebnis zu verbessern.</CameraPlus3>
+	<CameraPlus3>Willkommen bei der neuen Version von Camera+! Erkunden Sie erweiterte benutzerdefinierte Silhouettenoptionen im Einstellungsmenü, um Ihre Erfahrung zu verbessern.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
-	<ZoomedInPercent>Höchster Zoomfaktor</ZoomedInPercent>
-	<ZoomedOutPercent>Niedrigster Zoomfaktor</ZoomedOutPercent>
+	<ZoomedInPercent>Maximaler Vergrößerungsfaktor</ZoomedInPercent>
+	<ZoomedOutPercent>Maximaler Verkleinerungsfaktor</ZoomedOutPercent>
 	<ForZoomedInPercent>Für höchsten Zoomfaktor</ForZoomedInPercent>
 	<ForZoomedOutPercent>Für niedrigsten Zoomfaktor</ForZoomedOutPercent>
 	<Exponentiality>Exponentielle Zoomgeschwindigkeit</Exponentiality>
-	<SoundNearness>Lokale Geräusche näher bringen</SoundNearness>
-	<HotKeys>Tastenkürzel</HotKeys>
-	<Colors>Farben</Colors>
+	<SoundNearness>Bringen Sie lokale Geräusche näher</SoundNearness>
+	<HotKeys>Tastenkombinationen</HotKeys>
+	<Colors>Farben (mit dem Spiel gespeichert)</Colors>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
 	<LoadModifier>Ansicht laden</LoadModifier>
 	<SaveModifier>Ansicht speichern</SaveModifier>
 	<DollyPercentLabel>Scrollgeschwindigkeit</DollyPercentLabel>
-	<ScreenEdgeDollyFrictionLabel>Bildschirmrand-Scrollfaktor</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>Labels beim Rauszoomen verstecken</HideNamesWhenZoomedOut>
+	<ScreenEdgeDollyFrictionLabel>Rand-Scroll-Faktor</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>Namensschilder bei Verkleinerung ausblenden</HideNamesWhenZoomedOut>
 	<Pixel>Pixel</Pixel>
-	<HidePawnLabelBelow>Labels von Spielfiguren verstecken, wenn kleiner als: </HidePawnLabelBelow>
-	<HideThingLabelBelow>Labels von Objekten verstecken, wenn kleiner als: </HideThingLabelBelow>
-	<HideDeadPawnsBelow>Verstecke tote Spielfiguren unten: </HideDeadPawnsBelow>
-	<ShowMarkerBelow>Spielfiguren als Marker darstellen, wenn kleiner als: </ShowMarkerBelow>
+	<HidePawnLabelBelow>Verstecke Schachfigurenschilder unter:</HidePawnLabelBelow>
+	<HideThingLabelBelow>Verstecke Stapelschilder unter:</HideThingLabelBelow>
+	<HideDeadPawnsBelow>Verstecke tote Schachfiguren unter:</HideDeadPawnsBelow>
+	<ShowMarkerBelow>Als Markierung anzeigen unter:</ShowMarkerBelow>
 	<DotStyle>Punktstil</DotStyle>
-	<VanillaDefault>Vanilla-Standard</VanillaDefault>
+	<VanillaDefault>Standard-Einstellung</VanillaDefault>
 	<ClassicDots>Camera+ Punkte</ClassicDots>
 	<BetterSilhouettes>Camera+ Silhouetten</BetterSilhouettes>
 	<Animals>Tiere</Animals>
-	<IncludeAnimals>Tiere haben den gleichen Marker</IncludeAnimals>
+	<IncludeAnimals>Tiere haben denselben Marker</IncludeAnimals>
 	<AnimalsDifferent>Tiere haben einen anderen Marker</AnimalsDifferent>
 	<HideAnimals>Tiere haben keinen Marker</HideAnimals>
-	<IncludeNotTamedAnimals>Ungezähmte Tiere einbeziehen</IncludeNotTamedAnimals>
-	<ZoomToMouse>Beim Mauszeiger zoomen</ZoomToMouse>
-	<DisableCameraShake>Kameraverwacklung deaktivieren</DisableCameraShake>
-	<MouseRevealsLabels>Mauszeiger enthüllt Labels</MouseRevealsLabels>
+	<IncludeNotTamedAnimals>Ungezähmte Tiere einschließen</IncludeNotTamedAnimals>
+	<ZoomToMouse>Zoom auf Maus</ZoomToMouse>
+	<DisableCameraShake>Kamerawackeln deaktivieren</DisableCameraShake>
+	<MouseRevealsLabels>Maus enthüllt Schilder</MouseRevealsLabels>
 	<EdgeIndicators>Randindikatoren</EdgeIndicators>
-	<KeyLeftShift>L-Umschalt</KeyLeftShift>
-	<KeyLeftAlt>L-Alt</KeyLeftAlt>
-	<KeyLeftControl>L-Strg</KeyLeftControl>
-	<KeyLeftCommand>L-Cmd</KeyLeftCommand>
-	<KeyLeftWindows>L-Win</KeyLeftWindows>
-	<KeyRightShift>R-Umschalt</KeyRightShift>
-	<KeyRightAlt>R-Alt</KeyRightAlt>
-	<KeyRightControl>R-Strg</KeyRightControl>
-	<KeyRightCommand>R-Cmd</KeyRightCommand>
-	<KeyRightWindows>R-Win</KeyRightWindows>
+	<KeyLeftShift>Linke Umschalttaste</KeyLeftShift>
+	<KeyLeftAlt>Linke Alt-Taste</KeyLeftAlt>
+	<KeyLeftControl>Linke Strg-Taste</KeyLeftControl>
+	<KeyLeftCommand>Linke Befehlstaste</KeyLeftCommand>
+	<KeyLeftWindows>Linke Windows-Taste</KeyLeftWindows>
+	<KeyRightShift>Rechte Umschalttaste</KeyRightShift>
+	<KeyRightAlt>Rechte Alt-Taste</KeyRightAlt>
+	<KeyRightControl>Rechte Strg-Taste</KeyRightControl>
+	<KeyRightCommand>Rechte Befehlstaste</KeyRightCommand>
+	<KeyRightWindows>Rechte Windows-Taste</KeyRightWindows>
 	<DotSilhouetteSize>Punkt-/Silhouettengröße</DotSilhouetteSize>
-	<EdgeDotSize>Kantenpunktgröße</EdgeDotSize>
-	<EdgeDistanceFactor>Kantenabstand</EdgeDistanceFactor>
-	<OutlineSize>Konturweite</OutlineSize>
-	<Line>Linie</Line>
+	<EdgeDotSize>Randpunktgröße</EdgeDotSize>
+	<EdgeDistanceFactor>Randabstand</EdgeDistanceFactor>
+	<OutlineSize>Konturbreite</OutlineSize>
+	<Outline>Kontur</Outline>
 	<Fill>Füllung</Fill>
-	<Player>Spieler</Player>
+	<Selected>ausgewählt</Selected>
+	<NewCondition>Neue Bedingung hinzufügen</NewCondition>
+	<LoadCustomization>Anpassung laden</LoadCustomization>
+	<SaveCustomization>Anpassung speichern</SaveCustomization>
+	<Opposite>Gegenteil</Opposite>
+	<Duplicate>Duplizieren</Duplicate>
+	<TagCategoryType>Typen</TagCategoryType>
+	<TagCategoryAttribute>Attribute</TagCategoryAttribute>
+	<TagCategoryText>Benennung</TagCategoryText>
+	<ColumnConditions>Punktstil-Bedingungen</ColumnConditions>
+	<ColumnMode>Modus</ColumnMode>
+	<ColumnColors>Farben</ColumnColors>
+	<ColumnMap>Karte</ColumnMap>
+	<ColumnEdge>Rand</ColumnEdge>
+	<ColumnMouseReveal>Maus-Enthüllung</ColumnMouseReveal>
+	<ColumnShowBelow>Unten anzeigen</ColumnShowBelow>
+	<ColumnSize>Größe</ColumnSize>
+	<ColumnOutline>Kontur</ColumnOutline>
 </LanguageData>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+	<!-- types -->
+	<AncientTag>遠古</AncientTag>
+	<NotAncientTag>不是遠古</NotAncientTag>
+
+	<AnimalTag>動物</AnimalTag>
+	<NotAnimalTag>不是動物</NotAnimalTag>
+
+	<CreepJoinerTag>爬行者加入</CreepJoinerTag>
+	<NotCreepJoinerTag>不是爬行者加入</NotCreepJoinerTag>
+
+	<EmpireTag>來自帝國</EmpireTag>
+	<NotEmpireTag>不是來自帝國</NotEmpireTag>
+
+	<EntityTag>實體</EntityTag>
+	<NotEntityTag>不是實體</NotEntityTag>
+
+	<GhoulTag>食屍鬼</GhoulTag>
+	<NotGhoulTag>不是食屍鬼</NotGhoulTag>
+
+	<HoraxCultTag>邪教徒</HoraxCultTag>
+	<NotHoraxCultTag>不是邪教徒</NotHoraxCultTag>
+
+	<HumanTag>人類</HumanTag>
+	<NotHumanTag>不是人類</NotHumanTag>
+
+	<InsectTag>昆蟲</InsectTag>
+	<NotInsectTag>不是昆蟲</NotInsectTag>
+
+	<MechanoidTag>機械體</MechanoidTag>
+	<NotMechanoidTag>不是機械體</NotMechanoidTag>
+
+	<Mechanitor>機械師</Mechanitor>
+	<NotMechanitor>不是機械師</NotMechanitor>
+
+	<MutantTag>變種人</MutantTag>
+	<NotMutantTag>不是變種人</NotMutantTag>
+
+	<PirateTag>海盜</PirateTag>
+	<NotPirateTag>不是海盜</NotPirateTag>
+
+	<PrisonerTag>囚犯</PrisonerTag>
+	<NotPrisonerTag>不是囚犯</NotPrisonerTag>
+
+	<ShamblerTag>蹣跚者</ShamblerTag>
+	<NotShamblerTag>不是蹣跚者</NotShamblerTag>
+
+	<SlaveTag>奴隸</SlaveTag>
+	<NotSlaveTag>不是奴隸</NotSlaveTag>
+
+	<VehicleTag>車輛</VehicleTag>
+	<NotVehicleTag>不是車輛</NotVehicleTag>
+
+	<WildManTag>野人</WildManTag>
+	<NotWildManTag>不是野人</NotWildManTag>
+
+
+	<!-- properties -->
+	<AdultTag>成年人</AdultTag>
+	<NotAdultTag>不是成年人</NotAdultTag>
+
+	<AttackingTag>攻擊中</AttackingTag>
+	<NotAttackingTag>未攻擊</NotAttackingTag>
+
+	<AwakeTag>清醒</AwakeTag>
+	<NotAwakeTag>睡著</NotAwakeTag>
+
+	<AwokenCorpseTag>復活屍體</AwokenCorpseTag>
+	<NotAwokenCorpseTag>不是復活屍體</NotAwokenCorpseTag>
+
+	<ChildTag>孩子</ChildTag>
+	<NotChildTag>不是孩子</NotChildTag>
+
+	<CanCastTag>可施法</CanCastTag>
+	<NotCanCastTag>不可施法</NotCanCastTag>
+
+	<ColonistTag>殖民者</ColonistTag>
+	<NotColonistTag>不是殖民者</NotColonistTag>
+
+	<ControllableTag>可控</ControllableTag>
+	<NotControllableTag>不可控</NotControllableTag>
+
+	<CrawlingTag>爬行</CrawlingTag>
+	<NotCrawlingTag>不爬行</NotCrawlingTag>
+
+	<DeadTag>已死</DeadTag>
+	<NotDeadTag>活著</NotDeadTag>
+
+	<DeathrestingTag>死亡休眠</DeathrestingTag>
+	<NotDeathrestingTag>未死亡休眠</NotDeathrestingTag>
+
+	<DownedTag>倒地</DownedTag>
+	<NotDownedTag>未倒地</NotDownedTag>
+
+	<DraftedTag>徵召</DraftedTag>
+	<NotDraftedTag>未徵召</NotDraftedTag>
+
+	<ExitingMapTag>離開地圖</ExitingMapTag>
+	<NotExitingMapTag>未離開地圖</NotExitingMapTag>
+
+	<FemaleTag>女性</FemaleTag>
+	<NotFemaleTag>不是女性</NotFemaleTag>
+
+	<FreeTag>自由</FreeTag>
+	<NotFreeTag>不自由</NotFreeTag>
+
+	<GuestTag>客人</GuestTag>
+	<NotGuestTag>不是客人</NotGuestTag>
+
+	<HasWeaponTag>有武器</HasWeaponTag>
+	<NotHasWeaponTag>沒有武器</NotHasWeaponTag>
+
+	<HostileTag>敵對</HostileTag>
+	<NotHostileTag>友好</NotHostileTag>
+
+	<IdleTag>閒置</IdleTag>
+	<NotIdleTag>未閒置</NotIdleTag>
+
+	<InjuredTag>受傷</InjuredTag>
+	<NotInjuredTag>未受傷</NotInjuredTag>
+
+	<InspiredTag>靈感</InspiredTag>
+	<NotInspiredTag>無靈感</NotInspiredTag>
+
+	<MaleTag>男性</MaleTag>
+	<NotMaleTag>不是男性</NotMaleTag>
+
+	<ManhunterTag>人類獵手</ManhunterTag>
+	<NotManhunterTag>不是人類獵手</NotManhunterTag>
+
+	<MeleeTag>近戰</MeleeTag>
+	<NotMeleeTag>不是近戰</NotMeleeTag>
+
+	<MentalTag>精神崩潰</MentalTag>
+	<NotMentalTag>未精神崩潰</NotMentalTag>
+
+	<ModdedTag>來自模組</ModdedTag>
+	<NotModdedTag>原版</NotModdedTag>
+
+	<OverseenTag>被監督</OverseenTag>
+	<NotOverseenTag>未被監督</NotOverseenTag>
+
+	<PlayerFactionTag>玩家派系</PlayerFactionTag>
+	<NotPlayerFactionTag>不是玩家派系</NotPlayerFactionTag>
+
+	<PredatorHuntTag>捕食者狩獵</PredatorHuntTag>
+	<NotPredatorHuntTag>未捕食</NotPredatorHuntTag>
+
+	<SelfShutdownTag>關閉</SelfShutdownTag>
+	<NotSelfShutdownTag>未關閉</NotSelfShutdownTag>
+
+	<TameTag>馴服</TameTag>
+	<NotTameTag>未馴服</NotTameTag>
+
+	<TeenagerTag>青少年</TeenagerTag>
+	<NotTeenagerTag>不是青少年</NotTeenagerTag>
+
+	<!-- names -->
+	<KindDefTag>種類</KindDefTag>
+	<NotKindDefTag>不是種類</NotKindDefTag>
+
+	<FactionNameTag>派系</FactionNameTag>
+	<NotFactionNameTag>不是派系</NotFactionNameTag>
+
+	<PawnNameTag>命名</PawnNameTag>
+	<NotPawnNameTag>未命名</NotPawnNameTag>
+
+	<HediffTag>疾病</HediffTag>
+	<NotHediffTag>無疾病</NotHediffTag>
+
+	<ApparelTag>服裝</ApparelTag>
+	<NotApparelTag>沒有服裝</NotApparelTag>
+
+	<InventoryTag>庫存</InventoryTag>
+	<NotInventoryTag>沒有庫存</NotInventoryTag>
+
+	<EquipmentTag>裝備</EquipmentTag>
+	<NotEquipmentTag>沒有裝備</NotEquipmentTag>
+
+	<WeaponTag>武器</WeaponTag>
+	<NotWeaponTag>沒有武器</NotWeaponTag>
+
+</LanguageData>

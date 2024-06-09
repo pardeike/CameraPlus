@@ -1,54 +1,71 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>Добро пожаловать в новую версию Camera+! Изучите улучшенные настройки пользовательских силуэтов в меню настроек, чтобы улучшить ваш опыт.</CameraPlus3>
-	<Zoom>Увеличение</Zoom>
+	<CameraPlus3>Добро пожаловать в новую версию Camera+! Изучите улучшенные параметры пользовательских силуэтов в меню настроек, чтобы улучшить ваш опыт.</CameraPlus3>
+	<Zoom>Масштаб</Zoom>
 	<ZoomedInPercent>Максимальный коэффициент увеличения</ZoomedInPercent>
 	<ZoomedOutPercent>Максимальный коэффициент уменьшения</ZoomedOutPercent>
 	<ForZoomedInPercent>Для максимального увеличения</ForZoomedInPercent>
-	<ForZoomedOutPercent>Для минимального увеличения</ForZoomedOutPercent>
-	<Exponentiality>Экспоненциальная скорость зума</Exponentiality>
-	<SoundNearness>Сделать местные звуки ближе</SoundNearness>
+	<ForZoomedOutPercent>Для максимального уменьшения</ForZoomedOutPercent>
+	<Exponentiality>Экспоненциальная скорость масштабирования</Exponentiality>
+	<SoundNearness>Приблизить местные звуки</SoundNearness>
 	<HotKeys>Горячие клавиши</HotKeys>
-	<Colors>Цвета</Colors>
+	<Colors>Цвета (сохраняются с игрой)</Colors>
 	<SettingsKey>Настройки Camera+</SettingsKey>
 	<LoadModifier>Загрузить вид</LoadModifier>
 	<SaveModifier>Сохранить вид</SaveModifier>
 	<DollyPercentLabel>Скорость прокрутки</DollyPercentLabel>
-	<ScreenEdgeDollyFrictionLabel>Коэффициент прокрутки края</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>Скрыть метки имен при уменьшении масштаба</HideNamesWhenZoomedOut>
+	<ScreenEdgeDollyFrictionLabel>Коэффициент прокрутки по краю</ScreenEdgeDollyFrictionLabel>
+	<HideNamesWhenZoomedOut>Скрыть имена при уменьшении</HideNamesWhenZoomedOut>
 	<Pixel>Пиксель</Pixel>
 	<HidePawnLabelBelow>Скрыть метки пешек ниже:</HidePawnLabelBelow>
 	<HideThingLabelBelow>Скрыть метки стека ниже:</HideThingLabelBelow>
-	<HideDeadPawnsBelow>Скрыть мертвые пешки ниже: </HideDeadPawnsBelow>
-	<ShowMarkerBelow>Показать как маркер ниже:</ShowMarkerBelow>
+	<HideDeadPawnsBelow>Скрыть мертвых пешек ниже:</HideDeadPawnsBelow>
+	<ShowMarkerBelow>Показывать как маркер ниже:</ShowMarkerBelow>
 	<DotStyle>Стиль точек</DotStyle>
-	<VanillaDefault>Стандарт Vanilla</VanillaDefault>
+	<VanillaDefault>Стандартное значение</VanillaDefault>
 	<ClassicDots>Точки Camera+</ClassicDots>
 	<BetterSilhouettes>Силуэты Camera+</BetterSilhouettes>
 	<Animals>Животные</Animals>
-	<IncludeAnimals>У животных одинаковый маркер</IncludeAnimals>
-	<AnimalsDifferent>У животных другой маркер</AnimalsDifferent>
-	<HideAnimals>У животных нет маркера</HideAnimals>
-	<IncludeNotTamedAnimals>Включить диких животных</IncludeNotTamedAnimals>
-	<ZoomToMouse>Увеличить к курсору</ZoomToMouse>
-	<DisableCameraShake>Отключить встряхивание камеры</DisableCameraShake>
-	<MouseRevealsLabels>Мышь показывает ярлыки</MouseRevealsLabels>
+	<IncludeAnimals>Животные имеют тот же маркер</IncludeAnimals>
+	<AnimalsDifferent>Животные имеют другой маркер</AnimalsDifferent>
+	<HideAnimals>Животные не имеют маркера</HideAnimals>
+	<IncludeNotTamedAnimals>Включить не прирученных животных</IncludeNotTamedAnimals>
+	<ZoomToMouse>Масштабировать к мыши</ZoomToMouse>
+	<DisableCameraShake>Отключить тряску камеры</DisableCameraShake>
+	<MouseRevealsLabels>Мышь показывает метки</MouseRevealsLabels>
 	<EdgeIndicators>Индикаторы краев</EdgeIndicators>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>
 	<KeyLeftCommand>Левый Cmd</KeyLeftCommand>
 	<KeyLeftWindows>Левый Win</KeyLeftWindows>
-	<KeyRightShift>Сдвиг вправо</KeyRightShift>
+	<KeyRightShift>Правый Shift</KeyRightShift>
 	<KeyRightAlt>Правый Alt</KeyRightAlt>
 	<KeyRightControl>Правый Ctrl</KeyRightControl>
 	<KeyRightCommand>Правый Cmd</KeyRightCommand>
 	<KeyRightWindows>Правый Win</KeyRightWindows>
-	<DotSilhouetteSize>Размер точки/силуэта</DotSilhouetteSize>
-	<EdgeDotSize>Размер точки на краю</EdgeDotSize>
-	<EdgeDistanceFactor>Фактор расстояния к краю</EdgeDistanceFactor>
+	<DotSilhouetteSize>Размер точек/силуэтов</DotSilhouetteSize>
+	<EdgeDotSize>Размер точек по краю</EdgeDotSize>
+	<EdgeDistanceFactor>Расстояние до края</EdgeDistanceFactor>
 	<OutlineSize>Ширина контура</OutlineSize>
-	<Line>Линия</Line>
-	<Fill>Заполнение</Fill>
-	<Player>Игрок</Player>
+	<Outline>контур</Outline>
+	<Fill>заливка</Fill>
+	<Selected>выбрано</Selected>
+	<NewCondition>Добавить новое условие</NewCondition>
+	<LoadCustomization>Загрузить настройку</LoadCustomization>
+	<SaveCustomization>Сохранить настройку</SaveCustomization>
+	<Opposite>Противоположное</Opposite>
+	<Duplicate>Дублировать</Duplicate>
+	<TagCategoryType>Типы</TagCategoryType>
+	<TagCategoryAttribute>Атрибуты</TagCategoryAttribute>
+	<TagCategoryText>Названия</TagCategoryText>
+	<ColumnConditions>Условия стиля точек</ColumnConditions>
+	<ColumnMode>Режим</ColumnMode>
+	<ColumnColors>Цвета</ColumnColors>
+	<ColumnMap>Карта</ColumnMap>
+	<ColumnEdge>Край</ColumnEdge>
+	<ColumnMouseReveal>Мышь показывает</ColumnMouseReveal>
+	<ColumnShowBelow>Показать ниже</ColumnShowBelow>
+	<ColumnSize>Размер</ColumnSize>
+	<ColumnOutline>Контур</ColumnOutline>
 </LanguageData>

@@ -8,7 +8,7 @@ namespace CameraPlus
 
 		public override void ExposeData()
 		{
-			for (var i = 0; i < 9; i++)
+			for (var i = 0; i < views.Length; i++)
 				Scribe_Deep.Look(ref views[i], "view" + (i + 1), [map]);
 		}
 	}

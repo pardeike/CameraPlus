@@ -8,5 +8,7 @@ namespace CameraPlus
 	{
 		public static SoundDef SnapBack;
 		public static SoundDef ApplySnap;
+
+		public static LifeStageDef HumanlikeTeenager;
 	}
 }

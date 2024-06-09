@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+	<!-- types -->
+	<AncientTag>古代人</AncientTag>
+	<NotAncientTag>古代人ではない</NotAncientTag>
+
+	<AnimalTag>動物</AnimalTag>
+	<NotAnimalTag>動物ではない</NotAnimalTag>
+
+	<CreepJoinerTag>這い寄る参加者</CreepJoinerTag>
+	<NotCreepJoinerTag>這い寄る参加者ではない</NotCreepJoinerTag>
+
+	<EmpireTag>帝国出身</EmpireTag>
+	<NotEmpireTag>帝国出身ではない</NotEmpireTag>
+
+	<EntityTag>存在</EntityTag>
+	<NotEntityTag>存在ではない</NotEntityTag>
+
+	<GhoulTag>グール</GhoulTag>
+	<NotGhoulTag>グールではない</NotGhoulTag>
+
+	<HoraxCultTag>カルト教団員</HoraxCultTag>
+	<NotHoraxCultTag>カルト教団員ではない</NotHoraxCultTag>
+
+	<HumanTag>人間</HumanTag>
+	<NotHumanTag>人間ではない</NotHumanTag>
+
+	<InsectTag>昆虫</InsectTag>
+	<NotInsectTag>昆虫ではない</NotInsectTag>
+
+	<MechanoidTag>メカノイド</MechanoidTag>
+	<NotMechanoidTag>メカノイドではない</NotMechanoidTag>
+
+	<Mechanitor>メカニター</Mechanitor>
+	<NotMechanitor>メカニターではない</NotMechanitor>
+
+	<MutantTag>ミュータント</MutantTag>
+	<NotMutantTag>ミュータントではない</NotMutantTag>
+
+	<PirateTag>海賊</PirateTag>
+	<NotPirateTag>海賊ではない</NotPirateTag>
+
+	<PrisonerTag>囚人</PrisonerTag>
+	<NotPrisonerTag>囚人ではない</NotPrisonerTag>
+
+	<ShamblerTag>シャンブラー</ShamblerTag>
+	<NotShamblerTag>シャンブラーではない</NotShamblerTag>
+
+	<SlaveTag>奴隷</SlaveTag>
+	<NotSlaveTag>奴隷ではない</NotSlaveTag>
+
+	<VehicleTag>乗り物</VehicleTag>
+	<NotVehicleTag>乗り物ではない</NotVehicleTag>
+
+	<WildManTag>野生人</WildManTag>
+	<NotWildManTag>野生人ではない</NotWildManTag>
+
+
+	<!-- properties -->
+	<AdultTag>大人</AdultTag>
+	<NotAdultTag>大人ではない</NotAdultTag>
+
+	<AttackingTag>攻撃中</AttackingTag>
+	<NotAttackingTag>攻撃していない</NotAttackingTag>
+
+	<AwakeTag>起きている</AwakeTag>
+	<NotAwakeTag>寝ている</NotAwakeTag>
+
+	<AwokenCorpseTag>覚醒した死体</AwokenCorpseTag>
+	<NotAwokenCorpseTag>覚醒した死体ではない</NotAwokenCorpseTag>
+
+	<ChildTag>子供</ChildTag>
+	<NotChildTag>子供ではない</NotChildTag>
+
+	<CanCastTag>キャスト可能</CanCastTag>
+	<NotCanCastTag>キャスト不可能</NotCanCastTag>
+
+	<ColonistTag>入植者</ColonistTag>
+	<NotColonistTag>入植者ではない</NotColonistTag>
+
+	<ControllableTag>制御可能</ControllableTag>
+	<NotControllableTag>制御不可能</NotControllableTag>
+
+	<CrawlingTag>這っている</CrawlingTag>
+	<NotCrawlingTag>這っていない</NotCrawlingTag>
+
+	<DeadTag>死亡</DeadTag>
+	<NotDeadTag>生存</NotDeadTag>
+
+	<DeathrestingTag>デスレスト中</DeathrestingTag>
+	<NotDeathrestingTag>デスレスト中ではない</NotDeathrestingTag>
+
+	<DownedTag>倒れている</DownedTag>
+	<NotDownedTag>倒れていない</NotDownedTag>
+
+	<DraftedTag>徴兵中</DraftedTag>
+	<NotDraftedTag>徴兵されていない</NotDraftedTag>
+
+	<ExitingMapTag>マップから出ている</ExitingMapTag>
+	<NotExitingMapTag>マップから出ていない</NotExitingMapTag>
+
+	<FemaleTag>女性</FemaleTag>
+	<NotFemaleTag>女性ではない</NotFemaleTag>
+
+	<FreeTag>自由</FreeTag>
+	<NotFreeTag>不自由</NotFreeTag>
+
+	<GuestTag>ゲスト</GuestTag>
+	<NotGuestTag>ゲストではない</NotGuestTag>
+
+	<HasWeaponTag>武器あり</HasWeaponTag>
+	<NotHasWeaponTag>武器なし</NotHasWeaponTag>
+
+	<HostileTag>敵対的</HostileTag>
+	<NotHostileTag>友好的</NotHostileTag>
+
+	<IdleTag>アイドル状態</IdleTag>
+	<NotIdleTag>アイドル状態ではない</NotIdleTag>
+
+	<InjuredTag>負傷中</InjuredTag>
+	<NotInjuredTag>負傷していない</NotInjuredTag>
+
+	<InspiredTag>インスパイアされた</InspiredTag>
+	<NotInspiredTag>インスパイアされていない</NotInspiredTag>
+
+	<MaleTag>男性</MaleTag>
+	<NotMaleTag>男性ではない</NotMaleTag>
+
+	<ManhunterTag>人間狩り</ManhunterTag>
+	<NotManhunterTag>人間狩りではない</NotManhunterTag>
+
+	<MeleeTag>近接戦闘</MeleeTag>
+	<NotMeleeTag>近接戦闘ではない</NotMeleeTag>
+
+	<MentalTag>精神崩壊中</MentalTag>
+	<NotMentalTag>精神崩壊していない</NotMentalTag>
+
+	<ModdedTag>MODから</ModdedTag>
+	<NotModdedTag>バニラ</NotModdedTag>
+
+	<OverseenTag>監督されている</OverseenTag>
+	<NotOverseenTag>監督されていない</NotOverseenTag>
+
+	<PlayerFactionTag>プレイヤーの派閥</PlayerFactionTag>
+	<NotPlayerFactionTag>プレイヤーの派閥ではない</NotPlayerFactionTag>
+
+	<PredatorHuntTag>捕食者として狩りをしている</PredatorHuntTag>
+	<NotPredatorHuntTag>捕食者として狩りをしていない</NotPredatorHuntTag>
+
+	<SelfShutdownTag>自動停止</SelfShutdownTag>
+	<NotSelfShutdownTag>自動停止していない</NotSelfShutdownTag>
+
+	<TameTag>飼い慣らされた</TameTag>
+	<NotTameTag>飼い慣らされていない</NotTameTag>
+
+	<TeenagerTag>ティーンエイジャー</TeenagerTag>
+	<NotTeenagerTag>ティーンエイジャーではない</NotTeenagerTag>
+
+	<!-- names -->
+	<KindDefTag>種別</KindDefTag>
+	<NotKindDefTag>種別ではない</NotKindDefTag>
+
+	<FactionNameTag>派閥</FactionNameTag>
+	<NotFactionNameTag>派閥ではない</NotFactionNameTag>
+
+	<PawnNameTag>名付けられた</PawnNameTag>
+	<NotPawnNameTag>名付けられていない</NotPawnNameTag>
+
+	<HediffTag>ヘディフ</HediffTag>
+	<NotHediffTag>ヘディフではない</NotHediffTag>
+
+	<ApparelTag>衣服</ApparelTag>
+	<NotApparelTag>衣服なし</NotApparelTag>
+
+	<InventoryTag>在庫</InventoryTag>
+	<NotInventoryTag>在庫なし</NotInventoryTag>
+
+	<EquipmentTag>装備</EquipmentTag>
+	<NotEquipmentTag>装備なし</NotEquipmentTag>
+
+	<WeaponTag>武器</WeaponTag>
+	<NotWeaponTag>武器なし</NotWeaponTag>
+
+</LanguageData>

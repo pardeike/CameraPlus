@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+	<!-- types -->
+	<AncientTag>Ancien</AncientTag>
+	<NotAncientTag>Pas ancien</NotAncientTag>
+
+	<AnimalTag>Animal</AnimalTag>
+	<NotAnimalTag>Pas un animal</NotAnimalTag>
+
+	<CreepJoinerTag>Recrue rampante</CreepJoinerTag>
+	<NotCreepJoinerTag>Pas une recrue rampante</NotCreepJoinerTag>
+
+	<EmpireTag>De l'empire</EmpireTag>
+	<NotEmpireTag>Pas de l'empire</NotEmpireTag>
+
+	<EntityTag>Entité</EntityTag>
+	<NotEntityTag>Pas une entité</NotEntityTag>
+
+	<GhoulTag>Goule</GhoulTag>
+	<NotGhoulTag>Pas une goule</NotGhoulTag>
+
+	<HoraxCultTag>Cultiste</HoraxCultTag>
+	<NotHoraxCultTag>Pas un cultiste</NotHoraxCultTag>
+
+	<HumanTag>Humain</HumanTag>
+	<NotHumanTag>Pas un humain</NotHumanTag>
+
+	<InsectTag>Insecte</InsectTag>
+	<NotInsectTag>Pas un insecte</NotInsectTag>
+
+	<MechanoidTag>Méchanoïde</MechanoidTag>
+	<NotMechanoidTag>Pas un méchanoïde</NotMechanoidTag>
+
+	<Mechanitor>Mécaniteur</Mechanitor>
+	<NotMechanitor>Pas un mécaniteur</NotMechanitor>
+
+	<MutantTag>Mutant</MutantTag>
+	<NotMutantTag>Pas un mutant</NotMutantTag>
+
+	<PirateTag>Pirate</PirateTag>
+	<NotPirateTag>Pas un pirate</NotPirateTag>
+
+	<PrisonerTag>Prisonnier</PrisonerTag>
+	<NotPrisonerTag>Pas un prisonnier</NotPrisonerTag>
+
+	<ShamblerTag>Traînard</ShamblerTag>
+	<NotShamblerTag>Pas un traînard</NotShamblerTag>
+
+	<SlaveTag>Esclave</SlaveTag>
+	<NotSlaveTag>Pas un esclave</NotSlaveTag>
+
+	<VehicleTag>Véhicule</VehicleTag>
+	<NotVehicleTag>Pas un véhicule</NotVehicleTag>
+
+	<WildManTag>Sauvage</WildManTag>
+	<NotWildManTag>Pas un sauvage</NotWildManTag>
+
+
+	<!-- properties -->
+	<AdultTag>Adulte</AdultTag>
+	<NotAdultTag>Pas un adulte</NotAdultTag>
+
+	<AttackingTag>Attaque</AttackingTag>
+	<NotAttackingTag>N'attaque pas</NotAttackingTag>
+
+	<AwakeTag>Éveillé</AwakeTag>
+	<NotAwakeTag>Endormi</NotAwakeTag>
+
+	<AwokenCorpseTag>Cadavre réveillé</AwokenCorpseTag>
+	<NotAwokenCorpseTag>Pas un cadavre réveillé</NotAwokenCorpseTag>
+
+	<ChildTag>Enfant</ChildTag>
+	<NotChildTag>Pas un enfant</NotChildTag>
+
+	<CanCastTag>Peut lancer des sorts</CanCastTag>
+	<NotCanCastTag>Ne peut pas lancer des sorts</NotCanCastTag>
+
+	<ColonistTag>Colon</ColonistTag>
+	<NotColonistTag>Pas un colon</NotColonistTag>
+
+	<ControllableTag>Contrôlable</ControllableTag>
+	<NotControllableTag>Pas contrôlable</NotControllableTag>
+
+	<CrawlingTag>Rampe</CrawlingTag>
+	<NotCrawlingTag>Ne rampe pas</NotCrawlingTag>
+
+	<DeadTag>Mort</DeadTag>
+	<NotDeadTag>Vivant</NotDeadTag>
+
+	<DeathrestingTag>Repos mortuaire</DeathrestingTag>
+	<NotDeathrestingTag>Pas en repos mortuaire</NotDeathrestingTag>
+
+	<DownedTag>À terre</DownedTag>
+	<NotDownedTag>Pas à terre</NotDownedTag>
+
+	<DraftedTag>Réquisitionné</DraftedTag>
+	<NotDraftedTag>Pas réquisitionné</NotDraftedTag>
+
+	<ExitingMapTag>Quitte la carte</ExitingMapTag>
+	<NotExitingMapTag>Ne quitte pas la carte</NotExitingMapTag>
+
+	<FemaleTag>Femme</FemaleTag>
+	<NotFemaleTag>Pas une femme</NotFemaleTag>
+
+	<FreeTag>Libre</FreeTag>
+	<NotFreeTag>Pas libre</NotFreeTag>
+
+	<GuestTag>Invité</GuestTag>
+	<NotGuestTag>Pas un invité</NotGuestTag>
+
+	<HasWeaponTag>A une arme</HasWeaponTag>
+	<NotHasWeaponTag>N'a pas d'arme</NotHasWeaponTag>
+
+	<HostileTag>Hostile</HostileTag>
+	<NotHostileTag>Amical</NotHostileTag>
+
+	<IdleTag>Inactif</IdleTag>
+	<NotIdleTag>Pas inactif</NotIdleTag>
+
+	<InjuredTag>Blessé</InjuredTag>
+	<NotInjuredTag>Pas blessé</NotInjuredTag>
+
+	<InspiredTag>Inspiré</InspiredTag>
+	<NotInspiredTag>Pas inspiré</NotInspiredTag>
+
+	<MaleTag>Homme</MaleTag>
+	<NotMaleTag>Pas un homme</NotMaleTag>
+
+	<ManhunterTag>Chasseur d'hommes</ManhunterTag>
+	<NotManhunterTag>Pas un chasseur d'hommes</NotManhunterTag>
+
+	<MeleeTag>Mêlée</MeleeTag>
+	<NotMeleeTag>Pas de mêlée</NotMeleeTag>
+
+	<MentalTag>Crise de nerfs</MentalTag>
+	<NotMentalTag>Pas en crise de nerfs</NotMentalTag>
+
+	<ModdedTag>Modifié</ModdedTag>
+	<NotModdedTag>Vanille</NotModdedTag>
+
+	<OverseenTag>Surveillé</OverseenTag>
+	<NotOverseenTag>Pas surveillé</NotOverseenTag>
+
+	<PlayerFactionTag>Faction du joueur</PlayerFactionTag>
+	<NotPlayerFactionTag>Pas la faction du joueur</NotPlayerFactionTag>
+
+	<PredatorHuntTag>Chasse prédateur</PredatorHuntTag>
+	<NotPredatorHuntTag>Ne chasse pas</NotPredatorHuntTag>
+
+	<SelfShutdownTag>Arrêt</SelfShutdownTag>
+	<NotSelfShutdownTag>Pas à l'arrêt</NotSelfShutdownTag>
+
+	<TameTag>Apprivoisé</TameTag>
+	<NotTameTag>Pas apprivoisé</NotTameTag>
+
+	<TeenagerTag>Adolescent</TeenagerTag>
+	<NotTeenagerTag>Pas un adolescent</NotTeenagerTag>
+
+	<!-- names -->
+	<KindDefTag>Type</KindDefTag>
+	<NotKindDefTag>Pas de type</NotKindDefTag>
+
+	<FactionNameTag>Faction</FactionNameTag>
+	<NotFactionNameTag>Pas de faction</NotFactionNameTag>
+
+	<PawnNameTag>Nom</PawnNameTag>
+	<NotPawnNameTag>Pas de nom</NotPawnNameTag>
+
+	<HediffTag>Affliction</HediffTag>
+	<NotHediffTag>Pas d'affliction</NotHediffTag>
+
+	<ApparelTag>Vêtements</ApparelTag>
+	<NotApparelTag>Pas de vêtements</NotApparelTag>
+
+	<InventoryTag>Inventaire</InventoryTag>
+	<NotInventoryTag>Pas d'inventaire</NotInventoryTag>
+
+	<EquipmentTag>Équipement</EquipmentTag>
+	<NotEquipmentTag>Pas d'équipement</NotEquipmentTag>
+
+	<WeaponTag>Arme</WeaponTag>
+	<NotWeaponTag>Pas d'arme</NotWeaponTag>
+
+</LanguageData>

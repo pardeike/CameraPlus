@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Verse;
@@ -11,6 +13,9 @@ namespace CameraPlus
 	[StaticConstructorOnStartup]
 	public static class Assets
 	{
+		public static string CameraPlusFolderPath => GenFilePaths.FolderUnderSaveData("CameraPlus");
+		static FileSystemWatcher watcher;
+
 		public static readonly Texture2D dummyTexture = new(1, 1);
 		public static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
 		public static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
@@ -22,12 +27,19 @@ namespace CameraPlus
 		public static readonly Texture2D colorBackgroundPattern = ContentFinder<Texture2D>.Get("ColorBackgroundPattern", true);
 		public static readonly Texture2D editoBackgroundPattern = ContentFinder<Texture2D>.Get("EditorBackgroundPattern", true);
 		public static readonly Texture2D swatchBackgroundPattern = ContentFinder<Texture2D>.Get("SwatchBackgroundPattern", true);
+		public static readonly Texture2D[] steppers = [ContentFinder<Texture2D>.Get("StepperUp", true), ContentFinder<Texture2D>.Get("StepperDown", true)];
+		public static readonly Texture2D bracket = ContentFinder<Texture2D>.Get("Bracket", true);
 		public static readonly Texture2D columnHeaderPreview = ContentFinder<Texture2D>.Get("ColumnHeaderPreview", true);
 		public static readonly Texture2D columnHeader = ContentFinder<Texture2D>.Get("ColumnHeader", true);
 		public static readonly Texture2D columnHeaderSelected = ContentFinder<Texture2D>.Get("ColumnHeaderSelected", true);
+		public static readonly Texture2D deleteTagButton = ContentFinder<Texture2D>.Get("TagDelete", true);
 		public static readonly Texture2D deleteColorButton = ContentFinder<Texture2D>.Get("DeleteColorButton", true);
+		public static readonly Texture2D valueChangerMouseAttachment = ContentFinder<Texture2D>.Get("ValueChanger", true);
+		public static readonly Texture2D rowDragMouseAttachment = ContentFinder<Texture2D>.Get("RowDrag", true);
+		public static readonly Texture2D colorDragMouseAttachment = ContentFinder<Texture2D>.Get("ColorDrag", true);
+		public static readonly Dictionary<string, Texture2D> customMarkers = [];
 
-		public static Material[] previewMaterials;
+		public static Material previewMaterial;
 
 		static bool initialized = false;
 		static Material colorBedMaterial, huesMaterial;
@@ -63,13 +75,9 @@ namespace CameraPlus
 			if (borderedShader == null)
 				Log.Error("Cannot load Bordered shader from asset bundle.");
 
-			previewMaterials = new Material[2];
-			for (var i = 0; i < previewMaterials.Length; i++)
-			{
-				previewMaterials[i] = MaterialAllocator.Create(borderedShader);
-				previewMaterials[i].SetTexture("_MainTex", i == 0 ? outerColonistTexture : outerAnimalTexture);
-				previewMaterials[i].renderQueue = (int)RenderQueue.Overlay;
-			}
+			previewMaterial = MaterialAllocator.Create(borderedShader);
+			previewMaterial.SetTexture("_MainTex", outerColonistTexture);
+			previewMaterial.renderQueue = (int)RenderQueue.Overlay;
 
 			var newestVersion = new CameraPlusSettings().currentVersion;
 			if (Settings.currentVersion < newestVersion)
@@ -79,7 +87,41 @@ namespace CameraPlus
 				LongEventHandler.ExecuteWhenFinished(Settings.Write);
 			}
 
+			LoadCustomMarkers();
+
+			watcher = new()
+			{
+				Path = CameraPlusFolderPath,
+				Filter = "*.png",
+				NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName
+			};
+			watcher = new(CameraPlusFolderPath, "*.png");
+			watcher.Created += (_, _) => ScheduleLoadCustomMarkers();
+			watcher.Changed += (_, _) => ScheduleLoadCustomMarkers();
+			watcher.Renamed += (_, _) => ScheduleLoadCustomMarkers();
+			watcher.Deleted += (_, _) => ScheduleLoadCustomMarkers();
+			watcher.EnableRaisingEvents = true;
+
 			initialized = true;
+		}
+
+		static void ScheduleLoadCustomMarkers() => LongEventHandler.QueueLongEvent(LoadCustomMarkers, "Loading custom markers", false, null);
+
+		static void LoadCustomMarkers()
+		{
+			var directoryInfo = new DirectoryInfo(CameraPlusFolderPath);
+			if (!directoryInfo.Exists)
+				directoryInfo.Create();
+			foreach (var texture in customMarkers.Values)
+				Object.Destroy(texture);
+			customMarkers.Clear();
+			var items = directoryInfo.GetFiles().Where(f => f.Extension.ToLower() == ".png");
+			foreach (var item in items)
+			{
+				var texture = new Texture2D(2, 2);
+				texture.LoadImage(File.ReadAllBytes(item.FullName));
+				customMarkers[item.Name] = texture;
+			}
 		}
 
 		public static Material ColorBedMaterial => colorBedMaterial;

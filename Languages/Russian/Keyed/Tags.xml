@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+	<!-- types -->
+	<AncientTag>Древний</AncientTag>
+	<NotAncientTag>Не древний</NotAncientTag>
+
+	<AnimalTag>Животное</AnimalTag>
+	<NotAnimalTag>Не животное</NotAnimalTag>
+
+	<CreepJoinerTag>Ползучий присоединяющийся</CreepJoinerTag>
+	<NotCreepJoinerTag>Не ползучий присоединяющийся</NotCreepJoinerTag>
+
+	<EmpireTag>Из империи</EmpireTag>
+	<NotEmpireTag>Не из империи</NotEmpireTag>
+
+	<EntityTag>Сущность</EntityTag>
+	<NotEntityTag>Не сущность</NotEntityTag>
+
+	<GhoulTag>Упырь</GhoulTag>
+	<NotGhoulTag>Не упырь</NotGhoulTag>
+
+	<HoraxCultTag>Культист</HoraxCultTag>
+	<NotHoraxCultTag>Не культист</NotHoraxCultTag>
+
+	<HumanTag>Человек</HumanTag>
+	<NotHumanTag>Не человек</NotHumanTag>
+
+	<InsectTag>Насекомое</InsectTag>
+	<NotInsectTag>Не насекомое</NotInsectTag>
+
+	<MechanoidTag>Механоид</MechanoidTag>
+	<NotMechanoidTag>Не механоид</NotMechanoidTag>
+
+	<Mechanitor>Механитор</Mechanitor>
+	<NotMechanitor>Не механитор</NotMechanitor>
+
+	<MutantTag>Мутант</MutantTag>
+	<NotMutantTag>Не мутант</NotMutantTag>
+
+	<PirateTag>Пират</PirateTag>
+	<NotPirateTag>Не пират</NotPirateTag>
+
+	<PrisonerTag>Заключенный</PrisonerTag>
+	<NotPrisonerTag>Не заключенный</NotPrisonerTag>
+
+	<ShamblerTag>Шатающийся</ShamblerTag>
+	<NotShamblerTag>Не шатающийся</NotShamblerTag>
+
+	<SlaveTag>Раб</SlaveTag>
+	<NotSlaveTag>Не раб</NotSlaveTag>
+
+	<VehicleTag>Транспорт</VehicleTag>
+	<NotVehicleTag>Не транспорт</NotVehicleTag>
+
+	<WildManTag>Дикарь</WildManTag>
+	<NotWildManTag>Не дикарь</NotWildManTag>
+
+
+	<!-- properties -->
+	<AdultTag>Взрослый</AdultTag>
+	<NotAdultTag>Не взрослый</NotAdultTag>
+
+	<AttackingTag>Атакующий</AttackingTag>
+	<NotAttackingTag>Не атакующий</NotAttackingTag>
+
+	<AwakeTag>Бодрствующий</AwakeTag>
+	<NotAwakeTag>Спящий</NotAwakeTag>
+
+	<AwokenCorpseTag>Воскрешенный труп</AwokenCorpseTag>
+	<NotAwokenCorpseTag>Не воскрешенный труп</NotAwokenCorpseTag>
+
+	<ChildTag>Ребенок</ChildTag>
+	<NotChildTag>Не ребенок</NotChildTag>
+
+	<CanCastTag>Может колдовать</CanCastTag>
+	<NotCanCastTag>Не может колдовать</NotCanCastTag>
+
+	<ColonistTag>Колонист</ColonistTag>
+	<NotColonistTag>Не колонист</NotColonistTag>
+
+	<ControllableTag>Управляемый</ControllableTag>
+	<NotControllableTag>Не управляемый</NotControllableTag>
+
+	<CrawlingTag>Ползущий</CrawlingTag>
+	<NotCrawlingTag>Не ползущий</NotCrawlingTag>
+
+	<DeadTag>Мертвый</DeadTag>
+	<NotDeadTag>Живой</NotDeadTag>
+
+	<DeathrestingTag>В состоянии смерти</DeathrestingTag>
+	<NotDeathrestingTag>Не в состоянии смерти</NotDeathrestingTag>
+
+	<DownedTag>Поверженный</DownedTag>
+	<NotDownedTag>Не поверженный</NotDownedTag>
+
+	<DraftedTag>Призванный</DraftedTag>
+	<NotDraftedTag>Не призванный</NotDraftedTag>
+
+	<ExitingMapTag>Покидающий карту</ExitingMapTag>
+	<NotExitingMapTag>Не покидающий карту</NotExitingMapTag>
+
+	<FemaleTag>Женщина</FemaleTag>
+	<NotFemaleTag>Не женщина</NotFemaleTag>
+
+	<FreeTag>Свободный</FreeTag>
+	<NotFreeTag>Не свободный</NotFreeTag>
+
+	<GuestTag>Гость</GuestTag>
+	<NotGuestTag>Не гость</NotGuestTag>
+
+	<HasWeaponTag>Есть оружие</HasWeaponTag>
+	<NotHasWeaponTag>Нет оружия</NotHasWeaponTag>
+
+	<HostileTag>Враждебный</HostileTag>
+	<NotHostileTag>Дружелюбный</NotHostileTag>
+
+	<IdleTag>Бездействующий</IdleTag>
+	<NotIdleTag>Не бездействующий</NotIdleTag>
+
+	<InjuredTag>Раненый</InjuredTag>
+	<NotInjuredTag>Не раненый</NotInjuredTag>
+
+	<InspiredTag>Вдохновленный</InspiredTag>
+	<NotInspiredTag>Не вдохновленный</NotInspiredTag>
+
+	<MaleTag>Мужчина</MaleTag>
+	<NotMaleTag>Не мужчина</NotMaleTag>
+
+	<ManhunterTag>Охотник на людей</ManhunterTag>
+	<NotManhunterTag>Не охотник на людей</NotManhunterTag>
+
+	<MeleeTag>Ближний бой</MeleeTag>
+	<NotMeleeTag>Не ближний бой</NotMeleeTag>
+
+	<MentalTag>В психическом срыве</MentalTag>
+	<NotMentalTag>Не в психическом срыве</NotMentalTag>
+
+	<ModdedTag>Из мода</ModdedTag>
+	<NotModdedTag>Оригинальный</NotModdedTag>
+
+	<OverseenTag>Наблюдаемый</OverseenTag>
+	<NotOverseenTag>Не наблюдаемый</NotOverseenTag>
+
+	<PlayerFactionTag>Фракция игрока</PlayerFactionTag>
+	<NotPlayerFactionTag>Не фракция игрока</NotPlayerFactionTag>
+
+	<PredatorHuntTag>Охота хищника</PredatorHuntTag>
+	<NotPredatorHuntTag>Не охота хищника</NotPredatorHuntTag>
+
+	<SelfShutdownTag>Самозакрытие</SelfShutdownTag>
+	<NotSelfShutdownTag>Не самозакрытие</NotSelfShutdownTag>
+
+	<TameTag>Прирученный</TameTag>
+	<NotTameTag>Не прирученный</NotTameTag>
+
+	<TeenagerTag>Подросток</TeenagerTag>
+	<NotTeenagerTag>Не подросток</NotTeenagerTag>
+
+	<!-- names -->
+	<KindDefTag>Тип</KindDefTag>
+	<NotKindDefTag>Не тип</NotKindDefTag>
+
+	<FactionNameTag>Фракция</FactionNameTag>
+	<NotFactionNameTag>Не фракция</NotFactionNameTag>
+
+	<PawnNameTag>Названный</PawnNameTag>
+	<NotPawnNameTag>Не названный</NotPawnNameTag>
+
+	<HediffTag>Геддифф</HediffTag>
+	<NotHediffTag>Не геддифф</NotHediffTag>
+
+	<ApparelTag>Одежда</ApparelTag>
+	<NotApparelTag>Без одежды</NotApparelTag>
+
+	<InventoryTag>Инвентарь</InventoryTag>
+	<NotInventoryTag>Без инвентаря</NotInventoryTag>
+
+	<EquipmentTag>Оборудование</EquipmentTag>
+	<NotEquipmentTag>Без оборудования</NotEquipmentTag>
+
+	<WeaponTag>Оружие</WeaponTag>
+	<NotWeaponTag>Без оружия</NotWeaponTag>
+
+</LanguageData>

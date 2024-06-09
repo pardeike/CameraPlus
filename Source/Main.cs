@@ -96,6 +96,18 @@ namespace CameraPlus
 		}
 	}
 
+	[HarmonyPatch(typeof(DynamicDrawManager))]
+	[HarmonyPatch(nameof(DynamicDrawManager.DrawDynamicThings))]
+	static class DynamicDrawManager_DrawDynamicThings_Patch
+	{
+		static void Postfix()
+		{
+			var map = Find.CurrentMap;
+			if (map != null)
+				DotDrawer.DrawDots(map);
+		}
+	}
+
 	[HarmonyPatch(typeof(MoteMaker), nameof(MoteMaker.ThrowText))]
 	[HarmonyPatch([typeof(Vector3), typeof(Map), typeof(string), typeof(Color), typeof(float)])]
 	static class MoteMaker_ThrowText_Patch
@@ -120,54 +132,6 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
-	[HarmonyPatch(new Type[] { typeof(Vector3), typeof(Rot4?), typeof(bool) })]
-	static class PawnRenderer_RenderPawnAt_Patch
-	{
-		[HarmonyPriority(10000)]
-		public static bool Prefix(Pawn ___pawn)
-		{
-			if (skipCustomRendering)
-				return true;
-
-			if (___pawn.Dead)
-				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
-
-			return Tools.ShouldShowMarker(___pawn, true) == false;
-		}
-	}
-
-	[HarmonyPatch]
-	static class VehicleRenderer_RenderPawnAt_Patch
-	{
-		public static bool Prepare() => TargetMethod() != null;
-		public static MethodBase TargetMethod() => AccessTools.Method("Vehicles.VehicleRenderer:RenderPawnAt");
-
-		[HarmonyPriority(10000)]
-		public static bool Prefix(Pawn ___vehicle)
-		{
-			if (skipCustomRendering)
-				return true;
-
-			if (___vehicle.Dead)
-				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
-
-			return Tools.ShouldShowMarker(___vehicle, true) == false;
-		}
-	}
-
-	[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
-	static class SelectionDrawer_DrawSelectionBracketFor_Patch
-	{
-		[HarmonyPriority(10000)]
-		public static bool Prefix(object obj)
-		{
-			if (obj is not Pawn pawn)
-				return true;
-			return Tools.ShouldShowMarker(pawn, true) == false;
-		}
-	}
-
 	[HarmonyPatch(typeof(OverlayDrawer), nameof(OverlayDrawer.RenderForbiddenOverlay))]
 	static class DrawAllOverlaysPatch
 	{
@@ -180,25 +144,6 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(PawnUIOverlay), nameof(PawnUIOverlay.DrawPawnGUIOverlay))]
-	static class PawnUIOverlay_DrawPawnGUIOverlay_Patch
-	{
-		[HarmonyPriority(10000)]
-		public static bool Prefix(Pawn ___pawn)
-		{
-			if (skipCustomRendering)
-				return true;
-
-			if (___pawn.Dead)
-				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
-
-			if (Tools.GetMarkerColors(___pawn, out _, out _) == false)
-				return true;
-
-			return Tools.ShouldShowMarker(___pawn, true) == false;
-		}
-	}
-	//
 	// Dubs Performance Analyzer patch on PawnUIOverlay.DrawPawnGUIOverlay needs to be turned off
 	//
 	[HarmonyPatch]
@@ -213,45 +158,11 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(SilhouetteUtility), nameof(SilhouetteUtility.ShouldDrawSilhouette))]
-	static class SilhouetteUtility_ShouldDrawSilhouette_Patch
-	{
-		static bool Prefix(Thing thing, ref bool __result)
-		{
-			if (thing is Pawn pawn && Tools.ShouldShowMarker(pawn, true))
-			{
-				__result = false;
-				return false;
-			}
-			return true;
-		}
-	}
-
-	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawPawnLabel))]
-	[HarmonyPatch(new Type[] { typeof(Pawn), typeof(Vector2), typeof(float), typeof(float), typeof(Dictionary<string, string>), typeof(GameFont), typeof(bool), typeof(bool) })]
-	static class GenMapUI_DrawPawnLabel_Patch
-	{
-		[HarmonyPriority(10000)]
-		public static bool Prefix(Pawn pawn, float truncateToWidth)
-		{
-			if (skipCustomRendering)
-				return true;
-
-			if (truncateToWidth != 9999f)
-				return true;
-
-			if (Tools.ShouldShowMarker(pawn, true))
-				return Tools.GetMarkerColors(pawn, out _, out _) == false;
-
-			return Tools.ShouldShowLabel(pawn);
-		}
-	}
-
 	// if we zoom in a lot, tiny font labels look very out of place
 	// so we make them bigger with the available fonts
 	//
 	[HarmonyPatch(typeof(GenMapUI), nameof(GenMapUI.DrawThingLabel))]
-	[HarmonyPatch(new Type[] { typeof(Vector2), typeof(string), typeof(Color) })]
+	[HarmonyPatch([typeof(Vector2), typeof(string), typeof(Color)])]
 	static class GenMapUI_DrawThingLabel_Patch
 	{
 		static readonly MethodInfo m_GetAdaptedGameFont = SymbolExtensions.GetMethodInfo(() => GetAdaptedGameFont(0f));

@@ -39,6 +39,8 @@ namespace CameraPlus
 		readonly Func<KEY, KEYID> keyConverter = keyConverter;
 		readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
 
+		public void Clear() => cache.Clear();
+
 		public VALUE Get(KEY key)
 		{
 			if (key == null)
