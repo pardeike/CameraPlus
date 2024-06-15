@@ -183,12 +183,14 @@ namespace CameraPlus
 				},
 				() =>
 				{
-					if (list.ButtonText("Rules".Translate()))
+					var isInGame = Current.Game != null;
+					var label = isInGame ? "RulesGame" : "RulesStart";
+					if (list.ButtonText(label.Translate()))
 					{
-						var dotConfigs = Current.Game != null ? CameraSettings.settings.dotConfigs : CameraSettings.defaultConfig;
-						var dotConfigDefaults = Current.Game != null ? CameraSettings.defaultConfig : CameraSettings.defaultDefaultConfig;
-						var action = Current.Game != null ? null : new Action(() => Tools.SaveDotConfigs(Tools.DefaultRulesFilePath, CameraSettings.defaultConfig));
-						Find.WindowStack.Add(new Dialog_Customization(dotConfigs, dotConfigDefaults, action));
+						var dotConfigs = isInGame ? CameraSettings.settings.dotConfigs : CameraSettings.defaultConfig;
+						var dotConfigDefaults = isInGame ? CameraSettings.defaultConfig : CameraSettings.defaultDefaultConfig;
+						var closeAction = isInGame ? null : new Action(() => Tools.SaveDotConfigs(Tools.DefaultRulesFilePath, CameraSettings.defaultConfig));
+						Find.WindowStack.Add(new Dialog_Customization(dotConfigs, dotConfigDefaults, closeAction));
 					}
 				},
 				0.4f

@@ -16,7 +16,7 @@ namespace CameraPlus
 	class Tools
 	{
 		public static bool IsHiddenFromPlayer(Pawn pawn) => pawn?.Map == null || pawn.Map.fogGrid.IsFogged(pawn.Position) || InvisibilityUtility.IsHiddenFromPlayer(pawn);
-		public static string DefaultRulesFilePath => Path.Combine(GenFilePaths.SaveDataFolderPath, "CameraPlusDefaultRules.xml");
+		public static string DefaultRulesFilePath => Path.Combine(GenFilePaths.ConfigFolderPath, "CameraPlusDefaultRules.xml");
 
 		public static Color GetMainColor(Pawn pawn)
 		{

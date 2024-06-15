@@ -52,6 +52,8 @@ namespace CameraPlus
 			if (initialized)
 				return;
 
+			CameraSettings.InitDefaultDefaults();
+
 			var arch = "Win64";
 			var platform = Application.platform;
 			if (platform == RuntimePlatform.LinuxEditor || platform == RuntimePlatform.LinuxPlayer)

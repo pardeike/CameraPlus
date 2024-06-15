@@ -45,7 +45,7 @@ namespace CameraPlus
 			}
 		];
 
-		static CameraSettings()
+		public static void InitDefaultDefaults()
 		{
 			var filePath = Tools.DefaultRulesFilePath;
 			if (File.Exists(filePath) == false)
