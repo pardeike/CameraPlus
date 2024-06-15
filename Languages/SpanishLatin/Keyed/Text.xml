@@ -7,7 +7,7 @@
 	<ForZoomedInPercent>Para el factor de acercamiento más alto</ForZoomedInPercent>
 	<ForZoomedOutPercent>Para el factor de alejamiento más bajo</ForZoomedOutPercent>
 	<Exponentiality>Velocidad de zoom exponencial</Exponentiality>
-	<SoundNearness>Acerque los sonidos locales</SoundNearness>
+	<SoundNearness>Acercar los sonidos distantes</SoundNearness>
 	<HotKeys>Atajos de teclado</HotKeys>
 	<Rules>Reglas (guardadas con el juego)</Rules>
 	<SettingsKey>Configuración de Camera+</SettingsKey>
@@ -21,7 +21,7 @@
 	<HideThingLabelBelow>Ocultar etiquetas de pila debajo de:</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Ocultar peones muertos debajo de:</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Mostrar como marcador debajo de:</ShowMarkerBelow>
-	<DotStyle>Estilo de punto (reglas sobrescriben)</DotStyle>
+	<DotStyle>Estilo de punto{0}</DotStyle>
 	<VanillaDefault>Predeterminado de Vanilla</VanillaDefault>
 	<ClassicDots>Puntos de Camera+</ClassicDots>
 	<BetterSilhouettes>Siluetas de Camera+</BetterSilhouettes>
@@ -32,8 +32,8 @@
 	<IncludeNotTamedAnimals>Incluir animales no domesticados</IncludeNotTamedAnimals>
 	<ZoomToMouse>Zoom al ratón</ZoomToMouse>
 	<DisableCameraShake>Desactivar el movimiento de la cámara</DisableCameraShake>
-	<MouseRevealsLabels>El ratón revela etiquetas</MouseRevealsLabels>
-	<EdgeIndicators>Indicadores de borde (reglas sobrescriben)</EdgeIndicators>
+	<MouseRevealsLabels>El ratón revela etiquetas{0}</MouseRevealsLabels>
+	<EdgeIndicators>Indicadores de borde{0}</EdgeIndicators>
 	<KeyLeftShift>Shift izquierdo</KeyLeftShift>
 	<KeyLeftAlt>Alt izquierdo</KeyLeftAlt>
 	<KeyLeftControl>Ctrl izquierdo</KeyLeftControl>
@@ -59,7 +59,7 @@
 	<TagCategoryType>Tipos</TagCategoryType>
 	<TagCategoryAttribute>Atributos</TagCategoryAttribute>
 	<TagCategoryText>Denominación</TagCategoryText>
-	<ColumnConditions>Condiciones de estilo de punto</ColumnConditions>
+	<ColumnConditions>Reglas de estilo de puntos</ColumnConditions>
 	<ColumnMode>Modo</ColumnMode>
 	<ColumnColors>Colores</ColumnColors>
 	<ColumnMap>Mapa</ColumnMap>
@@ -68,4 +68,6 @@
 	<ColumnShowBelow>Mostrar debajo de</ColumnShowBelow>
 	<ColumnSize>Tamaño</ColumnSize>
 	<ColumnOutline>Contorno</ColumnOutline>
+	<OverwriteRuleSingular> (sobrescrito por {0} regla)</OverwriteRuleSingular>
+	<OverwriteRulePlural> (sobrescrito por {0} reglas)</OverwriteRulePlural>
 </LanguageData>

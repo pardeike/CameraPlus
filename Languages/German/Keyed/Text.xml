@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
-	<CameraPlus3>Willkommen bei der neuen Version von Camera+! Erkunden Sie erweiterte benutzerdefinierte Silhouettenoptionen im Einstellungsmenü, um Ihre Erfahrung zu verbessern.</CameraPlus3>
+	<CameraPlus3>Willkommen bei der neuen Version von Camera+! Erkunden Sie erweiterte benutzerdefinierte Silhouettenoptionen im Camera+ Einstellungsmenü, um Ihre Spiel zu verbessern.</CameraPlus3>
 	<Zoom>Zoom</Zoom>
 	<ZoomedInPercent>Maximaler Vergrößerungsfaktor</ZoomedInPercent>
 	<ZoomedOutPercent>Maximaler Verkleinerungsfaktor</ZoomedOutPercent>
 	<ForZoomedInPercent>Für höchsten Zoomfaktor</ForZoomedInPercent>
 	<ForZoomedOutPercent>Für niedrigsten Zoomfaktor</ForZoomedOutPercent>
 	<Exponentiality>Exponentielle Zoomgeschwindigkeit</Exponentiality>
-	<SoundNearness>Bringen Sie lokale Geräusche näher</SoundNearness>
+	<SoundNearness>Entfernte Geräusche näher bringen</SoundNearness>
 	<HotKeys>Tastenkombinationen</HotKeys>
 	<RulesStart>Regeln (Standard)</RulesStart>
 	<RulesGame>Regeln (mit dem Spiel gespeichert)</RulesGame>
@@ -22,7 +22,7 @@
 	<HideThingLabelBelow>Verstecke Stapelschilder unter:</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Verstecke tote Schachfiguren unter:</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Als Markierung anzeigen unter:</ShowMarkerBelow>
-	<DotStyle>Punktstil (Regeln überschreiben)</DotStyle>
+	<DotStyle>Punktstil{0}</DotStyle>
 	<VanillaDefault>Standard-Einstellung</VanillaDefault>
 	<ClassicDots>Camera+ Punkte</ClassicDots>
 	<BetterSilhouettes>Camera+ Silhouetten</BetterSilhouettes>
@@ -33,8 +33,8 @@
 	<IncludeNotTamedAnimals>Ungezähmte Tiere einschließen</IncludeNotTamedAnimals>
 	<ZoomToMouse>Zoom auf Maus</ZoomToMouse>
 	<DisableCameraShake>Kamerawackeln deaktivieren</DisableCameraShake>
-	<MouseRevealsLabels>Maus enthüllt Schilder</MouseRevealsLabels>
-	<EdgeIndicators>Kantenindikatoren (Regeln überschreiben)</EdgeIndicators>
+	<MouseRevealsLabels>Maus enthüllt Schilder{0}</MouseRevealsLabels>
+	<EdgeIndicators>Kantenindikatoren{0}</EdgeIndicators>
 	<KeyLeftShift>Linke Umschalttaste</KeyLeftShift>
 	<KeyLeftAlt>Linke Alt-Taste</KeyLeftAlt>
 	<KeyLeftControl>Linke Strg-Taste</KeyLeftControl>
@@ -60,7 +60,7 @@
 	<TagCategoryType>Typen</TagCategoryType>
 	<TagCategoryAttribute>Attribute</TagCategoryAttribute>
 	<TagCategoryText>Benennung</TagCategoryText>
-	<ColumnConditions>Punktstil-Bedingungen</ColumnConditions>
+	<ColumnConditions>Punktstilregeln</ColumnConditions>
 	<ColumnMode>Modus</ColumnMode>
 	<ColumnColors>Farben</ColumnColors>
 	<ColumnMap>Karte</ColumnMap>
@@ -69,4 +69,6 @@
 	<ColumnShowBelow>Unten anzeigen</ColumnShowBelow>
 	<ColumnSize>Größe</ColumnSize>
 	<ColumnOutline>Kontur</ColumnOutline>
+	<OverwriteRuleSingular> (überschrieben durch {0} Regel)</OverwriteRuleSingular>
+	<OverwriteRulePlural> (überschrieben durch {0} Regeln)</OverwriteRulePlural>
 </LanguageData>

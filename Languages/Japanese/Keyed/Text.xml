@@ -7,7 +7,7 @@
 	<ForZoomedInPercent>最高ズームイン倍率</ForZoomedInPercent>
 	<ForZoomedOutPercent>最低ズームアウト倍率</ForZoomedOutPercent>
 	<Exponentiality>指数ズーム速度</Exponentiality>
-	<SoundNearness>ローカルサウンドを近づける</SoundNearness>
+	<SoundNearness>遠くの音を近くに引き寄せる</SoundNearness>
 	<HotKeys>キーボードショートカット</HotKeys>
 	<Rules>ルール（ゲームと一緒に保存）</Rules>
 	<SettingsKey>Camera+設定</SettingsKey>
@@ -21,7 +21,7 @@
 	<HideThingLabelBelow>以下のスタックラベルを非表示：</HideThingLabelBelow>
 	<HideDeadPawnsBelow>以下の死んだポーンを非表示：</HideDeadPawnsBelow>
 	<ShowMarkerBelow>以下にマーカーとして表示：</ShowMarkerBelow>
-	<DotStyle>ドットスタイル（ルールの上書き）</DotStyle>
+	<DotStyle>ドットスタイル{0}</DotStyle>
 	<VanillaDefault>デフォルトのバニラ</VanillaDefault>
 	<ClassicDots>Camera+ドット</ClassicDots>
 	<BetterSilhouettes>Camera+シルエット</BetterSilhouettes>
@@ -32,8 +32,8 @@
 	<IncludeNotTamedAnimals>未調教の動物を含む</IncludeNotTamedAnimals>
 	<ZoomToMouse>マウスにズーム</ZoomToMouse>
 	<DisableCameraShake>カメラの揺れを無効にする</DisableCameraShake>
-	<MouseRevealsLabels>マウスがラベルを表示する</MouseRevealsLabels>
-	<EdgeIndicators>エッジインジケーター（ルールの上書き）</EdgeIndicators>
+	<MouseRevealsLabels>マウスがラベルを表示する{0}</MouseRevealsLabels>
+	<EdgeIndicators>エッジインジケーター{0}</EdgeIndicators>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>
@@ -59,7 +59,7 @@
 	<TagCategoryType>タイプ</TagCategoryType>
 	<TagCategoryAttribute>属性</TagCategoryAttribute>
 	<TagCategoryText>命名</TagCategoryText>
-	<ColumnConditions>ドットスタイル条件</ColumnConditions>
+	<ColumnConditions>ドットスタイルルール</ColumnConditions>
 	<ColumnMode>モード</ColumnMode>
 	<ColumnColors>色</ColumnColors>
 	<ColumnMap>地図</ColumnMap>
@@ -68,4 +68,6 @@
 	<ColumnShowBelow>以下に表示</ColumnShowBelow>
 	<ColumnSize>サイズ</ColumnSize>
 	<ColumnOutline>アウトライン</ColumnOutline>
+	<OverwriteRuleSingular>（{0}つのルールで上書きされました）</OverwriteRuleSingular>
+	<OverwriteRulePlural>（{0}つのルールで上書きされました）</OverwriteRulePlural>
 </LanguageData>

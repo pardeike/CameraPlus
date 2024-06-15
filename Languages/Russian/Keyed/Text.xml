@@ -7,7 +7,7 @@
 	<ForZoomedInPercent>Для максимального увеличения</ForZoomedInPercent>
 	<ForZoomedOutPercent>Для максимального уменьшения</ForZoomedOutPercent>
 	<Exponentiality>Экспоненциальная скорость масштабирования</Exponentiality>
-	<SoundNearness>Приблизить местные звуки</SoundNearness>
+	<SoundNearness>Приблизить далекие звуки</SoundNearness>
 	<HotKeys>Горячие клавиши</HotKeys>
 	<Rules>Правила (сохранены с игрой)</Rules>
 	<SettingsKey>Настройки Camera+</SettingsKey>
@@ -21,7 +21,7 @@
 	<HideThingLabelBelow>Скрыть метки стека ниже:</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Скрыть мертвых пешек ниже:</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Показывать как маркер ниже:</ShowMarkerBelow>
-	<DotStyle>Стиль точки (правила переписывают)</DotStyle>
+	<DotStyle>Стиль точки{0}</DotStyle>
 	<VanillaDefault>Стандартное значение</VanillaDefault>
 	<ClassicDots>Точки Camera+</ClassicDots>
 	<BetterSilhouettes>Силуэты Camera+</BetterSilhouettes>
@@ -32,8 +32,8 @@
 	<IncludeNotTamedAnimals>Включить не прирученных животных</IncludeNotTamedAnimals>
 	<ZoomToMouse>Масштабировать к мыши</ZoomToMouse>
 	<DisableCameraShake>Отключить тряску камеры</DisableCameraShake>
-	<MouseRevealsLabels>Мышь показывает метки</MouseRevealsLabels>
-	<EdgeIndicators>Краевые индикаторы (правила переписывают)</EdgeIndicators>
+	<MouseRevealsLabels>Мышь показывает метки{0}</MouseRevealsLabels>
+	<EdgeIndicators>Краевые индикаторы{0}</EdgeIndicators>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>
@@ -59,7 +59,7 @@
 	<TagCategoryType>Типы</TagCategoryType>
 	<TagCategoryAttribute>Атрибуты</TagCategoryAttribute>
 	<TagCategoryText>Названия</TagCategoryText>
-	<ColumnConditions>Условия стиля точек</ColumnConditions>
+	<ColumnConditions>Правила стиля точек</ColumnConditions>
 	<ColumnMode>Режим</ColumnMode>
 	<ColumnColors>Цвета</ColumnColors>
 	<ColumnMap>Карта</ColumnMap>
@@ -68,4 +68,6 @@
 	<ColumnShowBelow>Показать ниже</ColumnShowBelow>
 	<ColumnSize>Размер</ColumnSize>
 	<ColumnOutline>Контур</ColumnOutline>
+	<OverwriteRuleSingular> (перезаписано {0} правилом)</OverwriteRuleSingular>
+	<OverwriteRulePlural> (перезаписано {0} правилами)</OverwriteRulePlural>
 </LanguageData>

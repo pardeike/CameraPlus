@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -49,6 +50,12 @@ namespace CameraPlus
 		public static readonly float minRootOutput = 15;
 		public static readonly float maxRootOutput = 65;
 
+		static List<DotConfig> CurrentDotConfigs()
+		{
+			var isInGame = Current.Game != null;
+			return isInGame ? CameraSettings.settings.dotConfigs : CameraSettings.defaultConfig;
+		}
+
 		public override void ExposeData()
 		{
 			base.ExposeData();
@@ -90,6 +97,16 @@ namespace CameraPlus
 		{
 			minRootResult = zoomedInPercent * 2;
 			maxRootResult = zoomedOutPercent * 2;
+		}
+
+		static string ReplaceRuleOverride(string key, Func<DotConfig, bool> predicate)
+		{
+			var n = CurrentDotConfigs().Count(dc => predicate(dc));
+			if (n == 0)
+				return key.Translate("");
+			if (n == 1)
+				return key.Translate("OverwriteRuleSingular".Translate(1));
+			return key.Translate("OverwriteRulePlural".Translate(n));
 		}
 
 		public void DoWindowContents(Rect inRect)
@@ -164,8 +181,8 @@ namespace CameraPlus
 			list.Gap(16f);
 
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
-			list.CheckboxLabeled("MouseRevealsLabels".Translate(), ref mouseOverShowsLabels);
-			list.CheckboxLabeled("EdgeIndicators".Translate(), ref edgeIndicators);
+			list.CheckboxLabeled(ReplaceRuleOverride("MouseRevealsLabels", dc => dc.mouseReveals != mouseOverShowsLabels), ref mouseOverShowsLabels);
+			list.CheckboxLabeled(ReplaceRuleOverride("EdgeIndicators", dc => dc.useEdge != edgeIndicators), ref edgeIndicators);
 			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
 
 			list.Gap(16f);
@@ -187,10 +204,9 @@ namespace CameraPlus
 					var label = isInGame ? "RulesGame" : "RulesStart";
 					if (list.ButtonText(label.Translate()))
 					{
-						var dotConfigs = isInGame ? CameraSettings.settings.dotConfigs : CameraSettings.defaultConfig;
 						var dotConfigDefaults = isInGame ? CameraSettings.defaultConfig : CameraSettings.defaultDefaultConfig;
 						var closeAction = isInGame ? null : new Action(() => Tools.SaveDotConfigs(Tools.DefaultRulesFilePath, CameraSettings.defaultConfig));
-						Find.WindowStack.Add(new Dialog_Customization(dotConfigs, dotConfigDefaults, closeAction));
+						Find.WindowStack.Add(new Dialog_Customization(CurrentDotConfigs(), dotConfigDefaults, closeAction));
 					}
 				},
 				0.4f
@@ -200,8 +216,8 @@ namespace CameraPlus
 			list.curX += 17;
 			list.Gap(16f);
 
-			_ = list.Label("DotStyle".Translate());
-			var oldDotStyle = dotStyle;
+			var dotStyleLabel = ReplaceRuleOverride("DotStyle", dc => dc.mode != dotStyle);
+			_ = list.Label(dotStyleLabel);
 			foreach (var label in Enum.GetNames(typeof(DotStyle)))
 			{
 				if (label == nameof(DotStyle.Off) || label == nameof(DotStyle.Custom))

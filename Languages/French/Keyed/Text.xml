@@ -7,7 +7,7 @@
 	<ForZoomedInPercent>Pour le facteur de zoom le plus élevé</ForZoomedInPercent>
 	<ForZoomedOutPercent>Pour le facteur de dézoom le plus bas</ForZoomedOutPercent>
 	<Exponentiality>Vitesse de zoom exponentielle</Exponentiality>
-	<SoundNearness>Rapprocher les sons locaux</SoundNearness>
+	<SoundNearness>Rapprocher les sons distants</SoundNearness>
 	<HotKeys>Raccourcis clavier</HotKeys>
 	<RulesStart>Règles (par défaut)</RulesStart>
 	<RulesGame>Règles (enregistrées avec le jeu)</RulesGame>
@@ -22,7 +22,7 @@
 	<HideThingLabelBelow>Cacher les étiquettes de pile en dessous de :</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Cacher les pions morts en dessous de :</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Afficher comme marqueur en dessous de :</ShowMarkerBelow>
-	<DotStyle>Style de point (règles écrasées)</DotStyle>
+	<DotStyle>Style de point{0}</DotStyle>
 	<VanillaDefault>Défaut Vanilla</VanillaDefault>
 	<ClassicDots>Points Camera+</ClassicDots>
 	<BetterSilhouettes>Silhouettes Camera+</BetterSilhouettes>
@@ -33,8 +33,8 @@
 	<IncludeNotTamedAnimals>Inclure les animaux non apprivoisés</IncludeNotTamedAnimals>
 	<ZoomToMouse>Zoomer sur la souris</ZoomToMouse>
 	<DisableCameraShake>Désactiver le tremblement de la caméra</DisableCameraShake>
-	<MouseRevealsLabels>La souris révèle les étiquettes</MouseRevealsLabels>
-	<EdgeIndicators>Indicateurs de bord (règles écrasées)</EdgeIndicators>
+	<MouseRevealsLabels>La souris révèle les étiquettes{0}</MouseRevealsLabels>
+	<EdgeIndicators>Indicateurs de bord{0}</EdgeIndicators>
 	<KeyLeftShift>Shift gauche</KeyLeftShift>
 	<KeyLeftAlt>Alt gauche</KeyLeftAlt>
 	<KeyLeftControl>Ctrl gauche</KeyLeftControl>
@@ -60,7 +60,7 @@
 	<TagCategoryType>Types</TagCategoryType>
 	<TagCategoryAttribute>Attributs</TagCategoryAttribute>
 	<TagCategoryText>Nommer</TagCategoryText>
-	<ColumnConditions>Conditions de style de point</ColumnConditions>
+	<ColumnConditions>Règles de style de point</ColumnConditions>
 	<ColumnMode>Mode</ColumnMode>
 	<ColumnColors>Couleurs</ColumnColors>
 	<ColumnMap>Carte</ColumnMap>
@@ -69,4 +69,6 @@
 	<ColumnShowBelow>Afficher en dessous de</ColumnShowBelow>
 	<ColumnSize>Taille</ColumnSize>
 	<ColumnOutline>Contour</ColumnOutline>
+	<OverwriteRuleSingular> (écrasé par {0} règle)</OverwriteRuleSingular>
+	<OverwriteRulePlural> (écrasé par {0} règles)</OverwriteRulePlural>
 </LanguageData>

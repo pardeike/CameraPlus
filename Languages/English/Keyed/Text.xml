@@ -7,7 +7,7 @@
     <ForZoomedInPercent>For highest zoom factor</ForZoomedInPercent>
     <ForZoomedOutPercent>For lowest zoom factor</ForZoomedOutPercent>
     <Exponentiality>Exponential zoom speed</Exponentiality>
-    <SoundNearness>Bring local sounds closer</SoundNearness>
+    <SoundNearness>Bring distant sounds closer</SoundNearness>
     <HotKeys>Keyboard shortcuts</HotKeys>
     <RulesStart>Rules (defaults)</RulesStart>
     <RulesGame>Rules (saved with game)</RulesGame>
@@ -22,7 +22,7 @@
     <HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
     <HideDeadPawnsBelow>Hide dead pawns below: </HideDeadPawnsBelow>
     <ShowMarkerBelow>Show as marker below: </ShowMarkerBelow>
-    <DotStyle>Dot style (rules overwrite)</DotStyle>
+    <DotStyle>Dot style{0}</DotStyle>
     <VanillaDefault>Vanilla default</VanillaDefault>
     <ClassicDots>Camera+ dots</ClassicDots>
     <BetterSilhouettes>Camera+ silhouettes</BetterSilhouettes>
@@ -33,8 +33,8 @@
     <IncludeNotTamedAnimals>Include untamed animals</IncludeNotTamedAnimals>
     <ZoomToMouse>Zoom to mouse</ZoomToMouse>
     <DisableCameraShake>Disable camera shake</DisableCameraShake>
-    <MouseRevealsLabels>Mouse reveals labels</MouseRevealsLabels>
-    <EdgeIndicators>Edge indicators (rules overwrite)</EdgeIndicators>
+    <MouseRevealsLabels>Mouse reveals labels{0}</MouseRevealsLabels>
+    <EdgeIndicators>Edge indicators{0}</EdgeIndicators>
     <KeyLeftShift>Left Shift</KeyLeftShift>
     <KeyLeftAlt>Left Alt</KeyLeftAlt>
     <KeyLeftControl>Left Ctrl</KeyLeftControl>
@@ -60,7 +60,7 @@
     <TagCategoryType>Types</TagCategoryType>
     <TagCategoryAttribute>Attributes</TagCategoryAttribute>
     <TagCategoryText>Naming</TagCategoryText>
-    <ColumnConditions>Dot style conditions</ColumnConditions>
+    <ColumnConditions>Dot style rules</ColumnConditions>
     <ColumnMode>Mode</ColumnMode>
     <ColumnColors>Colors</ColumnColors>
     <ColumnMap>Map</ColumnMap>
@@ -69,4 +69,6 @@
     <ColumnShowBelow>Show Below</ColumnShowBelow>
     <ColumnSize>Size</ColumnSize>
     <ColumnOutline>Outline</ColumnOutline>
+    <OverwriteRuleSingular> (overwritten by {0} rule)</OverwriteRuleSingular>
+    <OverwriteRulePlural> (overwritten by {0} rules)</OverwriteRulePlural>
 </LanguageData>

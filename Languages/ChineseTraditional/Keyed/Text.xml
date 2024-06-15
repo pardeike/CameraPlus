@@ -7,7 +7,7 @@
 	<ForZoomedInPercent>最高放大倍數</ForZoomedInPercent>
 	<ForZoomedOutPercent>最低縮小倍數</ForZoomedOutPercent>
 	<Exponentiality>指數縮放速度</Exponentiality>
-	<SoundNearness>將本地聲音拉近</SoundNearness>
+	<SoundNearness>將遠處的聲音拉近</SoundNearness>
 	<HotKeys>鍵盤快捷鍵</HotKeys>
 	<RulesStart>規則（默認）</RulesStart>
 	<RulesGame>規則（隨遊戲保存）</RulesGame>
@@ -22,7 +22,7 @@
 	<HideThingLabelBelow>隱藏以下堆疊標籤：</HideThingLabelBelow>
 	<HideDeadPawnsBelow>隱藏以下死去的棋子：</HideDeadPawnsBelow>
 	<ShowMarkerBelow>以下顯示為標記：</ShowMarkerBelow>
-	<DotStyle>點樣式（規則覆蓋）</DotStyle>
+	<DotStyle>點樣式{0}</DotStyle>
 	<VanillaDefault>原版默認</VanillaDefault>
 	<ClassicDots>Camera+ 點</ClassicDots>
 	<BetterSilhouettes>Camera+ 輪廓</BetterSilhouettes>
@@ -33,8 +33,8 @@
 	<IncludeNotTamedAnimals>包括未馴服的動物</IncludeNotTamedAnimals>
 	<ZoomToMouse>縮放至鼠標</ZoomToMouse>
 	<DisableCameraShake>禁用相機抖動</DisableCameraShake>
-	<MouseRevealsLabels>鼠標顯示標籤</MouseRevealsLabels>
-	<EdgeIndicators>邊緣指示器（規則覆蓋）</EdgeIndicators>
+	<MouseRevealsLabels>鼠標顯示標籤{0}</MouseRevealsLabels>
+	<EdgeIndicators>邊緣指示器{0}</EdgeIndicators>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>
@@ -60,7 +60,7 @@
 	<TagCategoryType>類型</TagCategoryType>
 	<TagCategoryAttribute>屬性</TagCategoryAttribute>
 	<TagCategoryText>命名</TagCategoryText>
-	<ColumnConditions>點樣式條件</ColumnConditions>
+	<ColumnConditions>點樣式規則</ColumnConditions>
 	<ColumnMode>模式</ColumnMode>
 	<ColumnColors>顏色</ColumnColors>
 	<ColumnMap>地圖</ColumnMap>
@@ -69,4 +69,6 @@
 	<ColumnShowBelow>以下顯示</ColumnShowBelow>
 	<ColumnSize>大小</ColumnSize>
 	<ColumnOutline>輪廓</ColumnOutline>
+	<OverwriteRuleSingular>（被{0}條規則覆蓋）</OverwriteRuleSingular>
+	<OverwriteRulePlural>（被{0}條規則覆蓋）</OverwriteRulePlural>
 </LanguageData>
