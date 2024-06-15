@@ -3,8 +3,6 @@ using Verse;
 
 namespace CameraPlus
 {
-
-
 	public class KindDefTag : TextTag
 	{
 		public override bool Matches(Pawn pawn) => Negated ^ Tools.ContainsCaseInsensitive(pawn.kindDef, Text);
