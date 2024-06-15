@@ -6,10 +6,11 @@
     <ZoomedOutPercent>Maximum zoomed out factor</ZoomedOutPercent>
     <ForZoomedInPercent>For highest zoom factor</ForZoomedInPercent>
     <ForZoomedOutPercent>For lowest zoom factor</ForZoomedOutPercent>
-    <Exponentiality>Exponential Zoom Speed</Exponentiality>
+    <Exponentiality>Exponential zoom speed</Exponentiality>
     <SoundNearness>Bring local sounds closer</SoundNearness>
-    <HotKeys>Keyboard Shortcuts</HotKeys>
-    <Colors>Colors (saved with game)</Colors>
+    <HotKeys>Keyboard shortcuts</HotKeys>
+    <RulesStart>Rules (defaults)</RulesStart>
+    <RulesGame>Rules (saved with game)</RulesGame>
     <SettingsKey>Camera+ settings</SettingsKey>
     <LoadModifier>Load view</LoadModifier>
     <SaveModifier>Save view</SaveModifier>
@@ -21,7 +22,7 @@
     <HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
     <HideDeadPawnsBelow>Hide dead pawns below: </HideDeadPawnsBelow>
     <ShowMarkerBelow>Show as marker below: </ShowMarkerBelow>
-    <DotStyle>Dot Style</DotStyle>
+    <DotStyle>Dot style (rules overwrite)</DotStyle>
     <VanillaDefault>Vanilla default</VanillaDefault>
     <ClassicDots>Camera+ dots</ClassicDots>
     <BetterSilhouettes>Camera+ silhouettes</BetterSilhouettes>
@@ -33,7 +34,7 @@
     <ZoomToMouse>Zoom to mouse</ZoomToMouse>
     <DisableCameraShake>Disable camera shake</DisableCameraShake>
     <MouseRevealsLabels>Mouse reveals labels</MouseRevealsLabels>
-    <EdgeIndicators>Edge indicators</EdgeIndicators>
+    <EdgeIndicators>Edge indicators (rules overwrite)</EdgeIndicators>
     <KeyLeftShift>Left Shift</KeyLeftShift>
     <KeyLeftAlt>Left Alt</KeyLeftAlt>
     <KeyLeftControl>Left Ctrl</KeyLeftControl>

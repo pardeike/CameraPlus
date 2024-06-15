@@ -9,7 +9,8 @@
 	<Exponentiality>指数缩放速度</Exponentiality>
 	<SoundNearness>将本地声音拉近</SoundNearness>
 	<HotKeys>键盘快捷键</HotKeys>
-	<Colors>颜色（随游戏保存）</Colors>
+	<RulesStart>规则（默认）</RulesStart>
+	<RulesGame>规则（随游戏保存）</RulesGame>
 	<SettingsKey>Camera+ 设置</SettingsKey>
 	<LoadModifier>加载视图</LoadModifier>
 	<SaveModifier>保存视图</SaveModifier>
@@ -21,7 +22,7 @@
 	<HideThingLabelBelow>隐藏以下堆叠标签：</HideThingLabelBelow>
 	<HideDeadPawnsBelow>隐藏以下死去的棋子：</HideDeadPawnsBelow>
 	<ShowMarkerBelow>以下显示为标记：</ShowMarkerBelow>
-	<DotStyle>点样式</DotStyle>
+	<DotStyle>点样式（规则覆盖）</DotStyle>
 	<VanillaDefault>原版默认</VanillaDefault>
 	<ClassicDots>Camera+ 点</ClassicDots>
 	<BetterSilhouettes>Camera+ 轮廓</BetterSilhouettes>
@@ -33,7 +34,7 @@
 	<ZoomToMouse>缩放至鼠标</ZoomToMouse>
 	<DisableCameraShake>禁用相机抖动</DisableCameraShake>
 	<MouseRevealsLabels>鼠标显示标签</MouseRevealsLabels>
-	<EdgeIndicators>边缘指示器</EdgeIndicators>
+	<EdgeIndicators>边缘指示器（规则覆盖）</EdgeIndicators>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>

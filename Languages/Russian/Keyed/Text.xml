@@ -9,7 +9,7 @@
 	<Exponentiality>Экспоненциальная скорость масштабирования</Exponentiality>
 	<SoundNearness>Приблизить местные звуки</SoundNearness>
 	<HotKeys>Горячие клавиши</HotKeys>
-	<Colors>Цвета (сохраняются с игрой)</Colors>
+	<Rules>Правила (сохранены с игрой)</Rules>
 	<SettingsKey>Настройки Camera+</SettingsKey>
 	<LoadModifier>Загрузить вид</LoadModifier>
 	<SaveModifier>Сохранить вид</SaveModifier>
@@ -21,7 +21,7 @@
 	<HideThingLabelBelow>Скрыть метки стека ниже:</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Скрыть мертвых пешек ниже:</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Показывать как маркер ниже:</ShowMarkerBelow>
-	<DotStyle>Стиль точек</DotStyle>
+	<DotStyle>Стиль точки (правила переписывают)</DotStyle>
 	<VanillaDefault>Стандартное значение</VanillaDefault>
 	<ClassicDots>Точки Camera+</ClassicDots>
 	<BetterSilhouettes>Силуэты Camera+</BetterSilhouettes>
@@ -33,7 +33,7 @@
 	<ZoomToMouse>Масштабировать к мыши</ZoomToMouse>
 	<DisableCameraShake>Отключить тряску камеры</DisableCameraShake>
 	<MouseRevealsLabels>Мышь показывает метки</MouseRevealsLabels>
-	<EdgeIndicators>Индикаторы краев</EdgeIndicators>
+	<EdgeIndicators>Краевые индикаторы (правила переписывают)</EdgeIndicators>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>

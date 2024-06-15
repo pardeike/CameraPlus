@@ -6,7 +6,7 @@ namespace CameraPlus
 {
 	public class Dialog_CustomizationList_Save : Dialog_CustomizationList
 	{
-		const string rootElementName = "CameraPlusCustomization";
+		public const string rootElementName = "CameraPlusCustomization";
 
 		public override bool ShouldDoTypeInField => true;
 

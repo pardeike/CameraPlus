@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld.Planet;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Verse;
 
@@ -17,11 +18,12 @@ namespace CameraPlus
 
 	public class CameraSettings(World world) : WorldComponent(world)
 	{
-		public static CameraSettings settings;
 		public List<DotConfig> dotConfigs = [.. defaultConfig];
 
-		public static readonly List<DotConfig> defaultConfig = [
-			new DotConfig()
+		public static CameraSettings settings;
+		public static List<DotConfig> defaultConfig = [];
+		public static readonly List<DotConfig> defaultDefaultConfig = [
+			new()
 			{
 				conditions = [new AnimalTag(), new TameTag() { _negated = true }],
 				lineColor = new(0, 1, 1),
@@ -31,7 +33,7 @@ namespace CameraPlus
 				useEdge = false,
 				mouseReveals = false,
 			},
-			new DotConfig()
+			new()
 			{
 				conditions = [new AnimalTag()],
 				lineColor = Color.black,
@@ -42,6 +44,14 @@ namespace CameraPlus
 				outlineFactor = 0.05f,
 			}
 		];
+
+		static CameraSettings()
+		{
+			var filePath = Tools.DefaultRulesFilePath;
+			if (File.Exists(filePath) == false)
+				Tools.SaveDotConfigs(filePath, defaultDefaultConfig);
+			defaultConfig = Tools.LoadDotConfigs(filePath);
+		}
 
 		public override void ExposeData()
 		{

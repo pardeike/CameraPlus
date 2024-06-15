@@ -9,7 +9,7 @@
 	<Exponentiality>指数ズーム速度</Exponentiality>
 	<SoundNearness>ローカルサウンドを近づける</SoundNearness>
 	<HotKeys>キーボードショートカット</HotKeys>
-	<Colors>色（ゲームと一緒に保存されます）</Colors>
+	<Rules>ルール（ゲームと一緒に保存）</Rules>
 	<SettingsKey>Camera+設定</SettingsKey>
 	<LoadModifier>ビューをロード</LoadModifier>
 	<SaveModifier>ビューを保存</SaveModifier>
@@ -21,7 +21,7 @@
 	<HideThingLabelBelow>以下のスタックラベルを非表示：</HideThingLabelBelow>
 	<HideDeadPawnsBelow>以下の死んだポーンを非表示：</HideDeadPawnsBelow>
 	<ShowMarkerBelow>以下にマーカーとして表示：</ShowMarkerBelow>
-	<DotStyle>ドットスタイル</DotStyle>
+	<DotStyle>ドットスタイル（ルールの上書き）</DotStyle>
 	<VanillaDefault>デフォルトのバニラ</VanillaDefault>
 	<ClassicDots>Camera+ドット</ClassicDots>
 	<BetterSilhouettes>Camera+シルエット</BetterSilhouettes>
@@ -33,7 +33,7 @@
 	<ZoomToMouse>マウスにズーム</ZoomToMouse>
 	<DisableCameraShake>カメラの揺れを無効にする</DisableCameraShake>
 	<MouseRevealsLabels>マウスがラベルを表示する</MouseRevealsLabels>
-	<EdgeIndicators>エッジインジケータ</EdgeIndicators>
+	<EdgeIndicators>エッジインジケーター（ルールの上書き）</EdgeIndicators>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>

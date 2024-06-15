@@ -29,6 +29,10 @@ namespace CameraPlus
 		static readonly Color dragColor = new(1f, 220f / 255, 56f / 255);
 		static readonly string[] columnHeaders = ["<ColumnConditions", "ColumnMode", "ColumnColors", "ColumnMap", "ColumnEdge", "ColumnMouseReveal", "ColumnShowBelow", "ColumnSize", "ColumnOutline"];
 
+		private Action closeAction;
+		private List<DotConfig> dotConfigDefaults;
+		private List<DotConfig> dotConfigs;
+
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
 		private readonly int observerId;
 		private static Vector2 scrollPosition = Vector2.zero;
@@ -74,8 +78,11 @@ namespace CameraPlus
 		private static Dialog_Customization currentWindow;
 		static bool Draggable { set => currentWindow.draggable = value; }
 
-		public Dialog_Customization()
+		public Dialog_Customization(List<DotConfig> dotConfigs, List<DotConfig> dotConfigDefaults, Action closeAction = null)
 		{
+			this.dotConfigs = dotConfigs;
+			this.dotConfigDefaults = dotConfigDefaults;
+			this.closeAction = closeAction;
 			doCloseButton = true;
 			draggable = true;
 			resizeable = true;
@@ -87,6 +94,12 @@ namespace CameraPlus
 		{
 			base.PreClose();
 			CheckBoxPaintingObserver.Unregister(observerId);
+		}
+
+		public override void PostClose()
+		{
+			base.PostClose();
+			closeAction?.Invoke();
 		}
 
 		static void DrawMouseAttachment(Texture2D icon, Color? color = null)
@@ -115,7 +128,6 @@ namespace CameraPlus
 
 				if (rowInsert > -1)
 				{
-					var dotConfigs = CameraSettings.settings.dotConfigs;
 					var dotConfig = dotConfigs[rowDragged];
 					dotConfigs.RemoveAt(rowDragged);
 					if (rowInsert >= rowDragged)
@@ -131,7 +143,7 @@ namespace CameraPlus
 
 			if (rowToDelete > -1)
 			{
-				CameraSettings.settings.dotConfigs.RemoveAt(rowToDelete);
+				dotConfigs.RemoveAt(rowToDelete);
 				rowToDelete = -1;
 			}
 
@@ -335,13 +347,14 @@ namespace CameraPlus
 		static void DeltaInt(object v, int delta, int step, ref int val) => val = Mathf.Max(-1, (int)v + delta * step);
 		static void DeltaFloat(object v, float delta, float step, ref float val) => val = Mathf.Max(0, (float)v + delta * step);
 
-		static void ColorEditorRow(Listing_Standard list, int row, DotConfig dotConfig)
+		static void ColorEditorRow(Listing_Standard list, int row, List<DotConfig> dotConfigs)
 		{
 			PrepareRow(list, rowHeight, row, out var columnRects, out var actionButtons);
 
 			if (rowDragged == row)
 				Widgets.DrawBoxSolid(columnRects[0].Union(columnRects[8]), dragColor.ToTransparent(0.2f));
 
+			var dotConfig = dotConfigs[row];
 			DrawConditionTags(columnRects[0], row + 1, dotConfig.conditions);
 			DrawMode(columnRects[1], dotConfig);
 			DrawColors(columnRects[2], dotConfig);
@@ -368,7 +381,6 @@ namespace CameraPlus
 
 				if (Input.GetMouseButton(1))
 				{
-					var dotConfigs = CameraSettings.settings.dotConfigs;
 					List<FloatMenuOption> options =
 					[
 						new("Copy".TranslateSimple(), () => RowClipboard = dotConfigs[row].Clone()),
@@ -403,7 +415,6 @@ namespace CameraPlus
 			list.Gap(rowSpacing);
 			var outRect = list.GetRect(inRect.height - list.curY - 2 * rowSpacing - bottomRowHeight);
 
-			var dotConfigs = CameraSettings.settings.dotConfigs;
 			var configCount = dotConfigs.Count;
 			var viewRect = new Rect(0, 0, inRect.width - scrollbarWidth, rowHeight * configCount + rowSpacing * configCount);
 			Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
@@ -411,7 +422,7 @@ namespace CameraPlus
 			var innerList = new Listing_Standard();
 			innerList.Begin(viewRect);
 			for (var row = 0; row < configCount; row++)
-				ColorEditorRow(innerList, row, dotConfigs[row]);
+				ColorEditorRow(innerList, row, dotConfigs);
 			if (ShouldInsert(innerList.curY, configCount))
 			{
 				rowInsert = configCount;
@@ -440,7 +451,7 @@ namespace CameraPlus
 			if (list.ButtonText("RestoreToDefaultSettings".TranslateSimple()))
 			{
 				dotConfigs.Clear();
-				foreach (var dotConfig in CameraSettings.defaultConfig)
+				foreach (var dotConfig in dotConfigDefaults)
 					dotConfigs.Add(dotConfig.Clone());
 			}
 			list.NewColumn();

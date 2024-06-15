@@ -16,6 +16,7 @@ namespace CameraPlus
 	class Tools
 	{
 		public static bool IsHiddenFromPlayer(Pawn pawn) => pawn?.Map == null || pawn.Map.fogGrid.IsFogged(pawn.Position) || InvisibilityUtility.IsHiddenFromPlayer(pawn);
+		public static string DefaultRulesFilePath => Path.Combine(GenFilePaths.SaveDataFolderPath, "CameraPlusDefaultRules.xml");
 
 		public static Color GetMainColor(Pawn pawn)
 		{
@@ -298,6 +299,28 @@ namespace CameraPlus
 			var minVal = 1f - 0.15f;
 			var maxVal = 1f - 0.15f;
 			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, minVal, maxVal, orthSize);
+		}
+
+		public static List<DotConfig> LoadDotConfigs(string filePath)
+		{
+			try
+			{
+				Scribe.loader.InitLoading(filePath);
+				var dotConfigs = new List<DotConfig>();
+				Scribe_Collections.Look(ref dotConfigs, nameof(dotConfigs), LookMode.Deep);
+				Scribe.loader.FinalizeLoading();
+				return dotConfigs;
+			}
+			catch
+			{
+				Scribe.ForceStop();
+				return [];
+			}
+		}
+
+		public static void SaveDotConfigs(string filePath, List<DotConfig> dotConfigs)
+		{
+			SafeSaver.Save(filePath, Dialog_CustomizationList_Save.rootElementName, () => Scribe_Collections.Look(ref dotConfigs, nameof(dotConfigs), LookMode.Deep), false);
 		}
 
 		public static string ToLabel(KeyCode code)

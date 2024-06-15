@@ -9,7 +9,8 @@
 	<Exponentiality>Vitesse de zoom exponentielle</Exponentiality>
 	<SoundNearness>Rapprocher les sons locaux</SoundNearness>
 	<HotKeys>Raccourcis clavier</HotKeys>
-	<Colors>Couleurs (enregistrées avec le jeu)</Colors>
+	<RulesStart>Règles (par défaut)</RulesStart>
+	<RulesGame>Règles (enregistrées avec le jeu)</RulesGame>
 	<SettingsKey>Paramètres de Camera+</SettingsKey>
 	<LoadModifier>Charger la vue</LoadModifier>
 	<SaveModifier>Sauvegarder la vue</SaveModifier>
@@ -21,7 +22,7 @@
 	<HideThingLabelBelow>Cacher les étiquettes de pile en dessous de :</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Cacher les pions morts en dessous de :</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Afficher comme marqueur en dessous de :</ShowMarkerBelow>
-	<DotStyle>Style de point</DotStyle>
+	<DotStyle>Style de point (règles écrasées)</DotStyle>
 	<VanillaDefault>Défaut Vanilla</VanillaDefault>
 	<ClassicDots>Points Camera+</ClassicDots>
 	<BetterSilhouettes>Silhouettes Camera+</BetterSilhouettes>
@@ -33,7 +34,7 @@
 	<ZoomToMouse>Zoomer sur la souris</ZoomToMouse>
 	<DisableCameraShake>Désactiver le tremblement de la caméra</DisableCameraShake>
 	<MouseRevealsLabels>La souris révèle les étiquettes</MouseRevealsLabels>
-	<EdgeIndicators>Indicateurs de bord</EdgeIndicators>
+	<EdgeIndicators>Indicateurs de bord (règles écrasées)</EdgeIndicators>
 	<KeyLeftShift>Shift gauche</KeyLeftShift>
 	<KeyLeftAlt>Alt gauche</KeyLeftAlt>
 	<KeyLeftControl>Ctrl gauche</KeyLeftControl>

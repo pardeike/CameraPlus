@@ -18,7 +18,7 @@ namespace CameraPlus
 		public static CameraPlusSettings Settings;
 		public static float orthographicSize = -1f;
 
-		// for other mods: set temporarily to true to skip any hiding
+		// for other mods: set temporarily to true to skip anything Camera+ drawing related
 		public static bool skipCustomRendering = false;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
@@ -376,6 +376,7 @@ namespace CameraPlus
 			if (fPlanetMaterial == null)
 				return;
 			var mat = fPlanetMaterial.GetValue(null) as Material;
+			Log.Error($"fPlanetMaterial mat={mat}");
 			if (mat == null)
 				return;
 			mat.mainTextureOffset = new Vector2(0.3f, 0.3f);

@@ -14,22 +14,10 @@ namespace CameraPlus
 		public override void DoFileInteraction(string fileName)
 		{
 			var filePath = AbsPathForCustomization(fileName);
-			try
-			{
-				Scribe.loader.InitLoading(filePath);
-				var dotConfigs = new List<DotConfig>();
-				Scribe_Collections.Look(ref dotConfigs, "dotConfigs", LookMode.Deep);
-				Scribe.loader.FinalizeLoading();
-
-				var cameraSettings = Find.World.GetComponent<CameraSettings>();
-				cameraSettings.dotConfigs.Clear();
-				cameraSettings.dotConfigs.AddRange(dotConfigs);
-			}
-			catch (Exception ex)
-			{
-				Scribe.ForceStop();
-				Log.Error("Failed loading " + fileName + ": " + ex.ToString());
-			}
+			var dotConfigs = Tools.LoadDotConfigs(filePath);
+			var cameraSettings = Find.World.GetComponent<CameraSettings>();
+			cameraSettings.dotConfigs.Clear();
+			cameraSettings.dotConfigs.AddRange(dotConfigs);
 			Close(true);
 		}
 	}

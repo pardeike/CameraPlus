@@ -9,7 +9,8 @@
 	<Exponentiality>Exponentielle Zoomgeschwindigkeit</Exponentiality>
 	<SoundNearness>Bringen Sie lokale Geräusche näher</SoundNearness>
 	<HotKeys>Tastenkombinationen</HotKeys>
-	<Colors>Farben (mit dem Spiel gespeichert)</Colors>
+	<RulesStart>Regeln (Standard)</RulesStart>
+	<RulesGame>Regeln (mit dem Spiel gespeichert)</RulesGame>
 	<SettingsKey>Camera+ Einstellungen</SettingsKey>
 	<LoadModifier>Ansicht laden</LoadModifier>
 	<SaveModifier>Ansicht speichern</SaveModifier>
@@ -21,7 +22,7 @@
 	<HideThingLabelBelow>Verstecke Stapelschilder unter:</HideThingLabelBelow>
 	<HideDeadPawnsBelow>Verstecke tote Schachfiguren unter:</HideDeadPawnsBelow>
 	<ShowMarkerBelow>Als Markierung anzeigen unter:</ShowMarkerBelow>
-	<DotStyle>Punktstil</DotStyle>
+	<DotStyle>Punktstil (Regeln überschreiben)</DotStyle>
 	<VanillaDefault>Standard-Einstellung</VanillaDefault>
 	<ClassicDots>Camera+ Punkte</ClassicDots>
 	<BetterSilhouettes>Camera+ Silhouetten</BetterSilhouettes>
@@ -33,7 +34,7 @@
 	<ZoomToMouse>Zoom auf Maus</ZoomToMouse>
 	<DisableCameraShake>Kamerawackeln deaktivieren</DisableCameraShake>
 	<MouseRevealsLabels>Maus enthüllt Schilder</MouseRevealsLabels>
-	<EdgeIndicators>Randindikatoren</EdgeIndicators>
+	<EdgeIndicators>Kantenindikatoren (Regeln überschreiben)</EdgeIndicators>
 	<KeyLeftShift>Linke Umschalttaste</KeyLeftShift>
 	<KeyLeftAlt>Linke Alt-Taste</KeyLeftAlt>
 	<KeyLeftControl>Linke Strg-Taste</KeyLeftControl>
