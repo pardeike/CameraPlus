@@ -162,13 +162,11 @@ namespace CameraPlus
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)
 		{
-			if (pawn == null)
-				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			if (Settings.dotStyle <= DotStyle.VanillaDefault)
 				return true;
 			if (Settings.mouseOverShowsLabels && MouseDistanceSquared(pawn?.DrawPos ?? screenPos, pawn != null) <= 2.25f) // TODO
 				return true;
-			return Caches.shouldShowLabelCache.Get(pawn);
+			return pawn == null ? FastUI.CurUICellSize > Settings.hideThingLabelBelow : Caches.shouldShowLabelCache.Get(pawn);
 		}
 
 		public static float LerpDoubleSafe(float inFrom, float inTo, float outFrom, float outTo, float x)

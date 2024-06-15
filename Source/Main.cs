@@ -209,22 +209,23 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CurrentZoom), MethodType.Getter)]
 	static class CameraDriver_CurrentZoom_Patch
 	{
-		// these values are from vanilla. we remap them to the range 30 - 60
-		static readonly float[] sizes = new[] { 12f, 13.8f, 42f, 57f }
-				.Select(f => Tools.LerpDoubleSafe(12, 57, 30, 60, f))
-				.ToArray();
-		static readonly float size0 = sizes[0], size1 = sizes[1], size2 = sizes[2], size3 = sizes[3];
+		// these values are from vanilla. we remap them to the range [30..40] - 60 depending on UIScale
+		const float size0 = 12f;
+		const float size1 = 13.8f;
+		const float size2 = 42f;
+		const float size3 = 57f;
 
 		public static bool Prefix(ref CameraZoomRange __result, float ___rootSize)
 		{
 			var lerped = Tools.LerpRootSize(___rootSize);
-			if (lerped < size0)
+			var lowerBound = 45 - (Prefs.UIScale - 1) * 15;
+			if (lerped < GenMath.LerpDouble(12, 57, lowerBound, 60, size0))
 				__result = CameraZoomRange.Closest;
-			else if (lerped < size1)
+			else if (lerped < GenMath.LerpDouble(12, 57, lowerBound, 60, size1))
 				__result = CameraZoomRange.Close;
-			else if (lerped < size2)
+			else if (lerped < GenMath.LerpDouble(12, 57, lowerBound, 60, size2))
 				__result = CameraZoomRange.Middle;
-			else if (lerped < size3)
+			else if (lerped < GenMath.LerpDouble(12, 57, lowerBound, 60, size3))
 				__result = CameraZoomRange.Far;
 			else
 				__result = CameraZoomRange.Furthest;
@@ -376,7 +377,6 @@ namespace CameraPlus
 			if (fPlanetMaterial == null)
 				return;
 			var mat = fPlanetMaterial.GetValue(null) as Material;
-			Log.Error($"fPlanetMaterial mat={mat}");
 			if (mat == null)
 				return;
 			mat.mainTextureOffset = new Vector2(0.3f, 0.3f);
