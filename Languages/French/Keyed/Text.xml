@@ -9,7 +9,7 @@
 	<Exponentiality>Vitesse de zoom exponentielle</Exponentiality>
 	<SoundNearness>Rapprocher les sons distants</SoundNearness>
 	<HotKeys>Raccourcis clavier</HotKeys>
-	<RulesStart>Règles (par défaut)</RulesStart>
+	<RulesStart>Règles (pour les nouvelles parties)</RulesStart>
 	<RulesGame>Règles (enregistrées avec le jeu)</RulesGame>
 	<SettingsKey>Paramètres de Camera+</SettingsKey>
 	<LoadModifier>Charger la vue</LoadModifier>

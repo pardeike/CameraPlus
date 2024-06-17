@@ -9,7 +9,7 @@
 	<Exponentiality>指數縮放速度</Exponentiality>
 	<SoundNearness>將遠處的聲音拉近</SoundNearness>
 	<HotKeys>鍵盤快捷鍵</HotKeys>
-	<RulesStart>規則（默認）</RulesStart>
+	<RulesStart>規則（適用於新遊戲）</RulesStart>
 	<RulesGame>規則（隨遊戲保存）</RulesGame>
 	<SettingsKey>Camera+ 設置</SettingsKey>
 	<LoadModifier>加載視圖</LoadModifier>

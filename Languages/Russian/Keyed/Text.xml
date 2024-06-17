@@ -9,7 +9,8 @@
 	<Exponentiality>Экспоненциальная скорость масштабирования</Exponentiality>
 	<SoundNearness>Приблизить далекие звуки</SoundNearness>
 	<HotKeys>Горячие клавиши</HotKeys>
-	<Rules>Правила (сохранены с игрой)</Rules>
+	<RulesStart>Правила (для новых игр)</RulesStart>
+	<RulesGame>Правила (сохраненные с игрой)</RulesGame>
 	<SettingsKey>Настройки Camera+</SettingsKey>
 	<LoadModifier>Загрузить вид</LoadModifier>
 	<SaveModifier>Сохранить вид</SaveModifier>

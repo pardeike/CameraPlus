@@ -9,7 +9,8 @@
 	<Exponentiality>Velocidad de zoom exponencial</Exponentiality>
 	<SoundNearness>Acercar los sonidos distantes</SoundNearness>
 	<HotKeys>Atajos de teclado</HotKeys>
-	<Rules>Reglas (guardadas con el juego)</Rules>
+	<RulesStart>Reglas (para nuevos juegos)</RulesStart>
+	<RulesGame>Reglas (guardadas con el juego)</RulesGame>
 	<SettingsKey>Configuración de Camera+</SettingsKey>
 	<LoadModifier>Cargar vista</LoadModifier>
 	<SaveModifier>Guardar vista</SaveModifier>

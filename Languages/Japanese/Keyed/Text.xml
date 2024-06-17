@@ -9,7 +9,8 @@
 	<Exponentiality>指数ズーム速度</Exponentiality>
 	<SoundNearness>遠くの音を近くに引き寄せる</SoundNearness>
 	<HotKeys>キーボードショートカット</HotKeys>
-	<Rules>ルール（ゲームと一緒に保存）</Rules>
+	<RulesStart>ルール（新しいゲームの場合）</RulesStart>
+	<RulesGame>ルール（ゲームと共に保存）</RulesGame>
 	<SettingsKey>Camera+設定</SettingsKey>
 	<LoadModifier>ビューをロード</LoadModifier>
 	<SaveModifier>ビューを保存</SaveModifier>
