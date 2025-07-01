@@ -1,4 +1,4 @@
-﻿using Brrainz;
+﻿// using Brrainz;
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
@@ -85,7 +85,7 @@ namespace CameraPlus
 		public static void Prefix() => Tools.HandleHotkeys();
 	}
 
-	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.CalculateCurInputDollyVect))]
+	[HarmonyPatch(typeof(CameraDriver), "CalculateCurInputDollyVect")]
 	static class CameraDriver_CalculateCurInputDollyVect_Patch
 	{
 		public static void Postfix(ref Vector2 __result)
@@ -130,7 +130,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(OverlayDrawer), nameof(OverlayDrawer.RenderForbiddenOverlay))]
+	[HarmonyPatch(typeof(OverlayDrawer), "RenderForbiddenOverlay")]
 	static class DrawAllOverlaysPatch
 	{
 		[HarmonyPriority(10000)]
@@ -232,7 +232,7 @@ namespace CameraPlus
 		}
 	}
 
-	[HarmonyPatch(typeof(CameraDriver), nameof(CameraDriver.ApplyPositionToGameObject))]
+	[HarmonyPatch(typeof(CameraDriver), "ApplyPositionToGameObject")]
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
