@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Verse;
 using static CameraPlus.CameraPlusMain;
+using SystemFileSystemWatcher = global::System.IO.FileSystemWatcher;
 
 namespace CameraPlus
 {
@@ -14,7 +15,7 @@ namespace CameraPlus
 	public static class Assets
 	{
 		public static string CameraPlusFolderPath => GenFilePaths.FolderUnderSaveData("CameraPlus");
-		static FileSystemWatcher watcher;
+		static SystemFileSystemWatcher watcher;
 
 		public static readonly Texture2D dummyTexture = new(1, 1);
 		public static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
@@ -62,6 +63,7 @@ namespace CameraPlus
 				arch = "MacOS";
 
 			var me = LoadedModManager.GetMod<CameraPlusMain>();
+			Log.Message($"CameraPlus: Found mod at {me.Content.RootDir}");
 			var path = Path.Combine(me.Content.RootDir, "Resources", arch, "effects");
 			var assets = AssetBundle.LoadFromFile(path);
 
@@ -91,17 +93,26 @@ namespace CameraPlus
 
 			LoadCustomMarkers();
 
-			watcher = new()
+			// Use alias to resolve ambiguity
+			watcher = new SystemFileSystemWatcher(CameraPlusFolderPath, "*.png")
 			{
-				Path = CameraPlusFolderPath,
-				Filter = "*.png",
 				NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName
 			};
-			watcher = new(CameraPlusFolderPath, "*.png");
-			watcher.Created += (_, _) => ScheduleLoadCustomMarkers();
-			watcher.Changed += (_, _) => ScheduleLoadCustomMarkers();
-			watcher.Renamed += (_, _) => ScheduleLoadCustomMarkers();
-			watcher.Deleted += (_, _) => ScheduleLoadCustomMarkers();
+			
+			// Use reflection to avoid ambiguity issues with event handlers
+			var watcherType = typeof(SystemFileSystemWatcher);
+			var createdEvent = watcherType.GetEvent("Created");
+			var changedEvent = watcherType.GetEvent("Changed");
+			var renamedEvent = watcherType.GetEvent("Renamed");
+			var deletedEvent = watcherType.GetEvent("Deleted");
+			
+			var handler = new System.IO.FileSystemEventHandler((_, _) => ScheduleLoadCustomMarkers());
+			var renamedHandler = new System.IO.RenamedEventHandler((_, _) => ScheduleLoadCustomMarkers());
+			
+			createdEvent.AddEventHandler(watcher, handler);
+			changedEvent.AddEventHandler(watcher, handler);
+			renamedEvent.AddEventHandler(watcher, renamedHandler);
+			deletedEvent.AddEventHandler(watcher, handler);
 			watcher.EnableRaisingEvents = true;
 
 			initialized = true;

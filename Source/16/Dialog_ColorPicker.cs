@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.IO;
 using System.Linq;
@@ -209,9 +209,9 @@ namespace CameraPlus
 				return;
 			swatches = File.ReadAllText(path).Split('\n')
 				.Where(l => l.NullOrEmpty() == false)
-				.Select(l => l == "undefined" ? [] : l.Split(' ').Select(s => ParseHelper.ParseFloat(s)).ToArray())
+				.Select(l => l == "undefined" ? System.Array.Empty<float>() : l.Split(' ').Select(s => ParseHelper.ParseFloat(s)).ToList().ToArray())
 				.Select(p => p.Length == 0 ? (Color?)null : new Color(p[0], p[1], p[2], p[3]))
-				.ToArray();
+				.ToList().ToArray(); // Disambiguate ToArray by converting to List first
 		}
 
 		static void SaveSwatches()

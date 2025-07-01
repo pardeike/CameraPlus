@@ -1,4 +1,4 @@
-﻿// using Brrainz;
+using Brrainz;
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 using static CameraPlus.CameraPlusMain;
@@ -256,12 +258,22 @@ namespace CameraPlus
 			orthographicSize = orthSize;
 		}
 
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+
+		private static IEnumerable<CodeInstruction> process(IEnumerable<CodeInstruction> instructions)
 		{
+			int count = 0;
 			foreach (var instruction in instructions)
 			{
-				if (instruction.opcode == OpCodes.Ret)
-					instruction.opcode = OpCodes.Ldarg_0;
+				bool retInstruction = instruction.opcode == OpCodes.Ret;
+				if (retInstruction)
+				{
+					count++;
+					if (count == 2)
+					{
+						instruction.opcode = OpCodes.Ldarg_0;
+					}
+				}
+					
 				yield return instruction;
 			}
 			yield return new CodeInstruction(OpCodes.Ldarg_0);
@@ -386,8 +398,7 @@ namespace CameraPlus
 		{
 			if (done)
 				return;
-			if (WorldRendererUtility.WorldRenderedNow)
-				return;
+			// Skip world renderer check as the API has changed in RimWorld 1.6
 			if (Find.CurrentMap != __instance)
 				return;
 			FixSoSMaterial();

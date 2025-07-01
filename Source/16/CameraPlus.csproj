@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<RootNamespace>$(ModFileName)</RootNamespace>
@@ -69,7 +69,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
 
-		<!-- <PackageReference Include="Brrainz.RimWorld.CrossPromotion" Version="1.1.2" /> -->
+		<PackageReference Include="Brrainz.RimWorld.CrossPromotion" Version="1.1.2" />
 		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4503-beta" GeneratePathProperty="true" />
 		<PackageReference Include="Lib.Harmony" Version="2.3.3.0" ExcludeAssets="runtime" />
 		<!-- <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" /> -->
@@ -107,8 +107,8 @@
 	</Target> -->
 
 	<Target Name="PostBuildAction" AfterTargets="Build">
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
 	</Target>
 
 	<!-- <Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
