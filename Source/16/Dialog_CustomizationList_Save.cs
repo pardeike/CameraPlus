@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using RimWorld;
 using Verse;
 
@@ -26,7 +26,7 @@ namespace CameraPlus
 		{
 			fileName = GenFile.SanitizedFileName(fileName);
 			var absPath = Path.Combine(Assets.CameraPlusFolderPath, fileName + ".xml");
-			LongEventHandler.QueueLongEvent(() => SafeSaver.Save(absPath, rootElementName, Save, false), "SavingLongEvent", false, null, true, null);
+			LongEventHandler.QueueLongEvent(() => SafeSaver.Save(absPath, rootElementName, Save, false), "SavingLongEvent", false, null);
 			Messages.Message("SavedAs".Translate(fileName), MessageTypeDefOf.SilentInput, false);
 			Close(true);
 		}

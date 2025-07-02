@@ -184,7 +184,7 @@ namespace CameraPlus
 			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
-			var size = miscPlayer ? 1.5f * Vector2.one : (bodyNode?.Graphic ?? pawn.Graphic)?.drawSize ?? pawn.DrawSize;
+			var size = miscPlayer ? 1.5f * Vector2.one : pawn.Graphic?.drawSize ?? pawn.DrawSize; // Use pawn.Graphic directly since bodyNode.Graphic is no longer accessible
 			var relativeSize = Settings.dotRelativeSize * (dotConfig?.relativeSize ?? 1f);
 			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;

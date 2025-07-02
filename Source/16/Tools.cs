@@ -25,7 +25,7 @@ namespace CameraPlus
 			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
 			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
 				return Color.clear;
-			var graphic = bodyNode.Graphic;
+			var graphic = pawn.Graphic; // PawnRenderNode no longer has a public Graphic property; use pawn.Graphic for main graphic
 
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (Caches.cachedMainColors.TryGetValue(key, out var color) == false)
@@ -59,7 +59,7 @@ namespace CameraPlus
 					.GroupBy(color => color)
 					.OrderByDescending(group => group.Count())
 					.Select(group => (color: group.Key, hsl: Tools.HSL(group.Key), count: group.Count()))
-					.ToArray();
+					.ToList().ToArray(); // Disambiguate ToArray by converting to List first
 				if (combinedColors.Length == 0)
 				{
 					color = Color.clear;
@@ -200,8 +200,8 @@ namespace CameraPlus
 			if (Scribe.mode == LoadSaveMode.Saving && ArrayEquals(codes, defaults))
 				return;
 			var list = codes.ToList();
-			Scribe_Collections.Look(ref list, name, typeof(T) == typeof(OptionalColor) ? LookMode.Deep : LookMode.Value, []);
-			codes = list?.ToArray() ?? [];
+			Scribe_Collections.Look(ref list, name, typeof(T) == typeof(OptionalColor) ? LookMode.Deep : LookMode.Value, System.Array.Empty<T>());
+			codes = list?.ToList().ToArray() ?? System.Array.Empty<T>(); // Disambiguate ToArray by converting to List first
 			if (codes.Length == 0)
 				codes = defaults;
 		}
