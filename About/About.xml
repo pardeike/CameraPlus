@@ -19,7 +19,7 @@
       <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
     </li>
   </modDependencies>
-  <packageId>brrainz.cameraplus.forked</packageId>
+  <packageId>brrainz.cameraplus</packageId>
   <modVersion>3.2.0.0</modVersion>
   <steamAppId>867467808</steamAppId>
   <url>https://github.com/pardeike/CameraPlus</url>
