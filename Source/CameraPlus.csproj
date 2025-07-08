@@ -6,7 +6,7 @@
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<PlatformTarget>x64</PlatformTarget>
-		<OutputPath>../..\1.6\Assemblies\</OutputPath>
+		<OutputPath>..\1.6\Assemblies\</OutputPath>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<Version>$(ModVersion)</Version>
@@ -21,17 +21,20 @@
 		<RepositoryUrl>$(Repository)</RepositoryUrl>
 		<Product>$(ModName)</Product>
 	</PropertyGroup>
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<!-- do not generate pdb file -->
-		<DebugType>none</DebugType>
-		<!-- do not generate the assembly info files -->
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugSymbols>false</DebugSymbols>
-		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-		<LangVersion>latest</LangVersion>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Optimize>true</Optimize>
+		<DebugType>none</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugSymbols>true</DebugSymbols>
+		<DefineConstants>RW12;RW13;TRACE;DEBUG</DefineConstants>
+		<Optimize>false</Optimize>
+		<DebugType>portable</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -58,29 +61,19 @@
 		</Content>
 	</ItemGroup>
 
-	<PropertyGroup>
-	    <PublicizeAll>true</PublicizeAll>
-	</PropertyGroup>
-
 	<ItemGroup>
-
-		<PackageReference Include="Krafs.Publicizer" Version="2.*">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
-
 		<PackageReference Include="Brrainz.RimWorld.CrossPromotion" Version="1.1.2" />
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4503-beta" GeneratePathProperty="true" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4514-beta" GeneratePathProperty="true" />
 		<PackageReference Include="Lib.Harmony" Version="2.3.3.0" ExcludeAssets="runtime" />
-		<!-- <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" /> -->
-		<!-- <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference> -->
-		<!-- <PackageReference Include="TaskPubliciser" Version="1.0.3" /> -->
+		</PackageReference>
+		<PackageReference Include="TaskPubliciser" Version="1.0.3" />
 	</ItemGroup>
 
-	<!-- <Target Name="MyCode" BeforeTargets="UpdateReferences">
+	<Target Name="MyCode" BeforeTargets="UpdateReferences">
 		<PropertyGroup>
 			<AssemblyCSharp>$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll</AssemblyCSharp>
 			<PubliciseOutputPath>$(PkgKrafs_Rimworld_Ref)\ref\net472\</PubliciseOutputPath>
@@ -97,22 +90,22 @@
 				<Private>false</Private>
 			</Reference>
 		</ItemGroup>
-	</Target> -->
+	</Target>
 
-	<!-- <Target Name="UpdateReferences" AfterTargets="ResolveLockFileReferences">
+	<Target Name="UpdateReferences" AfterTargets="ResolveLockFileReferences">
 		<Message Importance="High" Text="Remove References ..." />
 		<ItemGroup>
 			<Reference Remove="$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll" />
 		</ItemGroup>
-	</Target> -->
-
-	<Target Name="PostBuildAction" AfterTargets="Build">
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
 	</Target>
 
-	<!-- <Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
-		<Delete Files="..\1.5\Assemblies\0Harmony.dll" />
+	<Target Name="PostBuildAction" AfterTargets="Build">
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
+	</Target>
+
+	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
+		<Delete Files="..\1.6\Assemblies\0Harmony.dll" />
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<ItemGroup>
 			<Copy_11 Include="..\1.1\**" />
@@ -120,6 +113,7 @@
 			<Copy_13 Include="..\1.3\**" />
 			<Copy_14 Include="..\1.4\**" />
 			<Copy_15 Include="..\1.5\**" />
+			<Copy_15 Include="..\1.6\**" />
 			<CopyAbout Include="..\About\**" />
 			<CopyAssemblies Include="..\Assemblies\**" />
 			<CopyDefs Include="..\Defs\**" />
@@ -136,6 +130,7 @@
 		<Copy SourceFiles="@(Copy_13)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.3\%(RecursiveDir)" />
 		<Copy SourceFiles="@(Copy_14)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.4\%(RecursiveDir)" />
 		<Copy SourceFiles="@(Copy_15)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.5\%(RecursiveDir)" />
+		<Copy SourceFiles="@(Copy_15)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.6\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyAssemblies)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Assemblies\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyDefs)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Defs\%(RecursiveDir)" />
@@ -146,10 +141,10 @@
 		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-	</Target> -->
+	</Target>
 
-	<!-- <Target Name="ZipMod" AfterTargets="CopyToRimworld" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
+	<Target Name="ZipMod" AfterTargets="CopyToRimworld" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
 		<ZipDirectory SourceDirectory="$(RIMWORLD_MOD_DIR)\$(ModFileName)" DestinationFile="$(RIMWORLD_MOD_DIR)\$(ModFileName).zip" Overwrite="true" />
-	</Target> -->
+	</Target>
 
 </Project>

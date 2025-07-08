@@ -1,10 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.2.0
+VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{B8EFCA5F-814F-285C-A8CB-F00F14650265}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraPlus", "Source\16\CameraPlus.csproj", "{920C32F3-3D9A-7015-6557-3A814357636A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CameraPlus", "Source\CameraPlus.csproj", "{B0D46BB5-08FF-4E04-9EFD-3E32E38A9CC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,18 +10,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{920C32F3-3D9A-7015-6557-3A814357636A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{920C32F3-3D9A-7015-6557-3A814357636A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{920C32F3-3D9A-7015-6557-3A814357636A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{920C32F3-3D9A-7015-6557-3A814357636A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0D46BB5-08FF-4E04-9EFD-3E32E38A9CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0D46BB5-08FF-4E04-9EFD-3E32E38A9CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0D46BB5-08FF-4E04-9EFD-3E32E38A9CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0D46BB5-08FF-4E04-9EFD-3E32E38A9CC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{920C32F3-3D9A-7015-6557-3A814357636A} = {B8EFCA5F-814F-285C-A8CB-F00F14650265}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BEB86668-0147-481A-B68A-FABA7F25076F}
+		SolutionGuid = {9426EAA5-96EA-4750-85F8-673CCDAA2399}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		version = 1.0
 	EndGlobalSection
 EndGlobal
