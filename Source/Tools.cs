@@ -26,7 +26,7 @@ namespace CameraPlus
 			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
 				return Color.clear;
 
-            var graphic = renderer.BodyGraphic;
+			var graphic = renderer.BodyGraphic;
 
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (Caches.cachedMainColors.TryGetValue(key, out var color) == false)
