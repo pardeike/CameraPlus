@@ -16,7 +16,7 @@
 	<SaveModifier>ビューを保存</SaveModifier>
 	<DollyPercentLabel>スクロール速度</DollyPercentLabel>
 	<ScreenEdgeDollyFrictionLabel>エッジスクロール係数</ScreenEdgeDollyFrictionLabel>
-	<HideNamesWhenZoomedOut>ズームアウト時に名前のラベルを非表示</HideNamesWhenZoomedOut>
+	<HideNamesWhenZoomedOut>ズームアウト時に名前ラベルを非表示</HideNamesWhenZoomedOut>
 	<Pixel>ピクセル</Pixel>
 	<HidePawnLabelBelow>以下のポーンラベルを非表示：</HidePawnLabelBelow>
 	<HideThingLabelBelow>以下のスタックラベルを非表示：</HideThingLabelBelow>
@@ -69,6 +69,6 @@
 	<ColumnShowBelow>以下に表示</ColumnShowBelow>
 	<ColumnSize>サイズ</ColumnSize>
 	<ColumnOutline>アウトライン</ColumnOutline>
-	<OverwriteRuleSingular>（{0}つのルールで上書きされました）</OverwriteRuleSingular>
-	<OverwriteRulePlural>（{0}つのルールで上書きされました）</OverwriteRulePlural>
+	<OverwriteRuleSingular>（{0}つのルールで上書き)</OverwriteRuleSingular>
+	<OverwriteRulePlural>（{0}つのルールで上書き)</OverwriteRulePlural>
 </LanguageData>
