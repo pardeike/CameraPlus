@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -184,9 +184,10 @@ namespace CameraPlus
 			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
-			var size = miscPlayer ? 1.5f * Vector2.one : pawn.Graphic?.drawSize ?? pawn.DrawSize; // Use pawn.Graphic directly since bodyNode.Graphic is no longer accessible
+			var drawSize = pawn.Drawer.renderer?.BodyGraphic?.drawSize ?? pawn.DrawSize;
+			var finalDrawSize = miscPlayer ? 1.5f * drawSize : drawSize;
 			var relativeSize = Settings.dotRelativeSize * (dotConfig?.relativeSize ?? 1f);
-			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((size.x + size.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
+			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((finalDrawSize.x + finalDrawSize.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
 		}
