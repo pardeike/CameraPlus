@@ -35,9 +35,11 @@ namespace CameraPlus
 
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{
+			using var measure = PerfMetrics.Measure("Caches.GetCachedCameraDelegate");
 			var type = pawn.GetType();
 			if (cachedCameraDelegates.TryGetValue(type, out var result) == false)
 			{
+				PerfMetrics.Count("camera_delegate.cache_misses");
 				result = new CameraDelegates(pawn);
 				cachedCameraDelegates[type] = result;
 			}

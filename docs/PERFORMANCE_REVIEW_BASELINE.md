@@ -42,9 +42,9 @@ Settings and editor UI:
 
 `FastUI` is frame-scoped and avoids repeating RimWorld UI coordinate calls in the same frame.
 
-`Caches.dotConfigCache` and `Caches.shouldShowLabelCache` are quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
+`Caches.dotConfigCache` and `Caches.shouldShowLabelCache` are quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
 
-`MarkerCache` holds per-pawn Unity materials and refreshes entries after 300 retrievals. It destroys old materials through `MaterialAllocator.Destroy()`.
+`MarkerCache` holds per-pawn Unity materials and refreshes entries after 300 retrievals. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`.
 
 `cachedMainColors` stores sampled texture colors by pawn runtime type and body graphic path. This avoids repeated texture readback/downsampling after the first sample for a graphic.
 
@@ -61,6 +61,21 @@ Likely candidates to verify with profiling:
 - `CameraDelegates` reflection for new pawn runtime types.
 - Repeated `UI.MapToUIPosition()` and `UI.UIToMapPosition()` calls in edge-marker calculations.
 - File watcher reload behavior for custom marker PNGs.
+
+## Verified First-Pass Fixes
+
+Verified during the 2026-05-15 prep pass:
+
+- Removed LINQ allocation from `DotDrawer.DrawDots()` by iterating `map.mapPawns.AllPawnsSpawned` directly.
+- Reused the already-fetched `DotConfig` through marker color/material paths.
+- Changed quota-cache hits to mutate cache entries instead of replacing dictionary values every request.
+- Cached per-material marker colors so `_FillColor` and `_OutlineColor` are only set when the colors change.
+- Replaced per-edge UI conversion scale work with one per-frame clipped-marker map scale.
+- Replaced normalized edge ray intersection with direct rectangle scale math.
+- Preserved render state in `Tools.DownsampleTexture()` by restoring the previous active `RenderTexture`.
+- Converted raw RimWorld silhouette textures into cached cutout-mask textures before drawing them with the Camera+ bordered shader.
+
+The primary 962-pawn scenario improved from `3629.618 us` to `2363.312 us` average `DotDrawer.DrawDots` time at the 600-draw snapshot. Keep both the performance CSV and the visual closeup screenshots when evaluating later refactors; the earlier broad color corruption and the later silhouette texture-frame artifact were real regressions.
 
 ## Correctness Constraints For Optimization
 

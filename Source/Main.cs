@@ -102,6 +102,7 @@ namespace CameraPlus
 	{
 		static void Postfix()
 		{
+			using var measure = PerfMetrics.Measure("DynamicDrawManager.DrawDynamicThings.Postfix");
 			var map = Find.CurrentMap;
 			if (map != null && skipCustomRendering == false)
 				DotDrawer.DrawDots(map);

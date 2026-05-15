@@ -19,25 +19,36 @@ namespace CameraPlus
 
 		public static void DrawDots(Map map)
 		{
+			using var measure = PerfMetrics.Measure("DotDrawer.DrawDots");
+			PerfMetrics.Count("dotdrawer.draw_calls");
+			PerfMetrics.Sample("dotdrawer.all_pawns_spawned", map.mapPawns.AllPawnsSpawned.Count);
+
 			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
+			var clippedMarkerMapScale = ClippedMarkerMapScale(borderMarkerSize);
 
 			var cellSize = FastUI.CurUICellSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
-			var pawnsToRender = map.mapPawns.AllPawnsSpawned.Where(pawn => Tools.IsHiddenFromPlayer(pawn) == false);
-			foreach (var pawn in pawnsToRender)
+			var visiblePawns = 0;
+			var markerDraws = 0;
+			var edgeDraws = 0;
+			foreach (var pawn in map.mapPawns.AllPawnsSpawned)
 			{
+				if (Tools.IsHiddenFromPlayer(pawn))
+					continue;
+
+				visiblePawns++;
 				altitute -= 0.0001f;
 
-				var useMarkers = DotTools.GetMarkerColors(pawn, out var innerColor, out var outerColor);
+				var dotConfig = Caches.dotConfigCache.Get(pawn);
+				var useMarkers = DotTools.GetMarkerColors(pawn, dotConfig, out var innerColor, out var outerColor);
 				if (useMarkers == false)
 					continue;
 
-				var materials = MarkerCache.MaterialFor(pawn);
+				var materials = MarkerCache.MaterialFor(pawn, dotConfig);
 				if (materials == null)
 					continue;
-
-				var dotConfig = pawn.GetDotConfig();
+				materials.ApplyColors(innerColor, outerColor);
 
 				var defaultShow = true;
 				if (pawn.RaceProps.Animal)
@@ -55,9 +66,8 @@ namespace CameraPlus
 						var materialClipped = materials.dot;
 						if (materialClipped != null)
 						{
-							materialClipped.SetColor("_FillColor", innerColor);
-							materialClipped.SetColor("_OutlineColor", outerColor);
-							DrawClipped(borderMarkerSize, dotConfig, altitute, vec, materialClipped);
+							edgeDraws++;
+							DrawClipped(clippedMarkerMapScale, dotConfig, altitute, vec, materialClipped);
 						}
 					}
 				}
@@ -86,27 +96,29 @@ namespace CameraPlus
 				{
 					case DotStyle.ClassicDots:
 						materialMarker = materials.dot;
-						materialMarker.SetColor("_FillColor", innerColor);
-						materialMarker.SetColor("_OutlineColor", outerColor);
+						markerDraws++;
 						DrawMarker(pawn, dotConfig, materialMarker);
 						break;
 					case DotStyle.BetterSilhouettes:
 						materialMarker = materials.silhouette;
-						materialMarker.SetColor("_FillColor", innerColor);
-						materialMarker.SetColor("_OutlineColor", outerColor);
+						markerDraws++;
 						DrawMarker(pawn, dotConfig, materialMarker);
 						break;
 					case DotStyle.Custom:
 						materialMarker = materials.custom;
 						if (materialMarker != null)
 						{
-							materialMarker.SetColor("_FillColor", innerColor);
-							materialMarker.SetColor("_OutlineColor", outerColor);
+							markerDraws++;
 							DrawMarker(pawn, dotConfig, materialMarker);
 						}
 						break;
 				}
 			}
+
+			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
+			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
+			PerfMetrics.Sample("dotdrawer.edge_draws", edgeDraws);
+			PerfMetrics.FlushIfNeeded();
 		}
 
 		private static Rect RealViewRect(float contract)
@@ -116,61 +128,34 @@ namespace CameraPlus
 			return new Rect(p1.x, p1.z, wh.x, wh.z);
 		}
 
+		private static Vector3 ClippedMarkerMapScale(Vector2 size)
+		{
+			var halfSize = size / 2f;
+			var center = new Vector2(UI.screenWidth / 2f, UI.screenHeight / 2f);
+			var p1 = UI.UIToMapPosition(center - halfSize);
+			var p2 = UI.UIToMapPosition(center + halfSize);
+			return p2 - p1;
+		}
+
 		private static (Vector2 vector, bool clipped) ConfinedPoint(Vector2 p, Rect r)
 		{
 			var center = new Vector2(r.x + r.width / 2, r.y + r.height / 2);
+			var delta = p - center;
+			var halfWidth = r.width / 2f;
+			var halfHeight = r.height / 2f;
 
-			if (r.Contains(p))
+			if (Mathf.Abs(delta.x) <= halfWidth && Mathf.Abs(delta.y) <= halfHeight)
 				return (p, false);
 
-			var direction = (p - center).normalized;
-			var dx = direction.x;
-			var dy = direction.y;
-
-			var t = float.MaxValue;
-
-			if (dx != 0)
-			{
-				if (dx > 0)
-				{
-					var t1 = (r.xMax - center.x) / dx;
-					if (t1 > 0 && center.y + t1 * dy >= r.yMin && center.y + t1 * dy <= r.yMax)
-						t = Mathf.Min(t, t1);
-				}
-				else
-				{
-					var t1 = (r.xMin - center.x) / dx;
-					if (t1 > 0 && center.y + t1 * dy >= r.yMin && center.y + t1 * dy <= r.yMax)
-						t = Mathf.Min(t, t1);
-				}
-			}
-
-			if (dy != 0)
-			{
-				if (dy > 0)
-				{
-					var t1 = (r.yMax - center.y) / dy;
-					if (t1 > 0 && center.x + t1 * dx >= r.xMin && center.x + t1 * dx <= r.xMax)
-						t = Mathf.Min(t, t1);
-				}
-				else
-				{
-					var t1 = (r.yMin - center.y) / dy;
-					if (t1 > 0 && center.x + t1 * dx >= r.xMin && center.x + t1 * dx <= r.xMax)
-						t = Mathf.Min(t, t1);
-				}
-			}
-
-			return (center + t * direction, true);
+			var xScale = delta.x == 0f ? float.MaxValue : halfWidth / Mathf.Abs(delta.x);
+			var yScale = delta.y == 0f ? float.MaxValue : halfHeight / Mathf.Abs(delta.y);
+			var scale = Mathf.Min(xScale, yScale);
+			return (center + delta * scale, true);
 		}
 
-		private static void DrawClipped(Vector2 size, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
+		private static void DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
 		{
-			var v2 = UI.MapToUIPosition(vec);
-			var rect = new Rect(v2.x - size.x / 2, v2.y - size.y / 2, size.x, size.y);
-			var p1 = UI.UIToMapPosition(new Vector2(rect.xMin, rect.yMin));
-			var p2 = UI.UIToMapPosition(new Vector2(rect.xMax, rect.yMax));
-			var scale = p2 - p1;
+			using var measure = PerfMetrics.Measure("DotDrawer.DrawClipped");
 			var pos = vec.ToVector3();
 			pos.y = altitute;
 			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
@@ -179,9 +164,9 @@ namespace CameraPlus
 
 		private static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)
 		{
+			using var measure = PerfMetrics.Measure("DotDrawer.DrawMarker");
 			var q = pawn.Downed ? downedRotation : Quaternion.identity;
 			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
-			_ = pawn.Drawer.renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode);
 			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
 			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
 			var drawSize = pawn.Drawer.renderer?.BodyGraphic?.drawSize ?? pawn.DrawSize;

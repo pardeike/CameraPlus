@@ -15,11 +15,25 @@ namespace CameraPlus
 {
 	class Tools
 	{
-		public static bool IsHiddenFromPlayer(Pawn pawn) => pawn?.Map == null || pawn.Map.fogGrid.IsFogged(pawn.Position) || InvisibilityUtility.IsHiddenFromPlayer(pawn);
+		public static bool IsHiddenFromPlayer(Pawn pawn)
+		{
+			if (pawn?.Map == null)
+				return true;
+
+			if (pawn.Map.fogGrid.IsFogged(pawn.Position))
+				return true;
+
+			if (DebugSettings.showHiddenPawns || pawn.Faction == Faction.OfPlayer)
+				return false;
+
+			return InvisibilityUtility.IsHiddenFromPlayer(pawn);
+		}
+
 		public static string DefaultRulesFilePath => Path.Combine(GenFilePaths.ConfigFolderPath, "CameraPlusDefaultRules.xml");
 
 		public static Color GetMainColor(Pawn pawn)
 		{
+			using var measure = PerfMetrics.Measure("Tools.GetMainColor");
 			var renderer = pawn.Drawer.renderer;
 			var pawnRenderFlags = renderer.DefaultRenderFlagsNow | PawnRenderFlags.Clothes | PawnRenderFlags.Headgear;
 			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
@@ -31,6 +45,7 @@ namespace CameraPlus
 			var key = pawn.GetType().FullName + ":" + graphic.path;
 			if (Caches.cachedMainColors.TryGetValue(key, out var color) == false)
 			{
+				PerfMetrics.Count("main_color.cache_misses");
 				color = Color.clear;
 
 				if (graphic.color != Color.white)
@@ -81,17 +96,23 @@ namespace CameraPlus
 
 		public static Texture2D DownsampleTexture(Texture2D nonReadableTexture, int n)
 		{
-			RenderTexture tempRT = RenderTexture.GetTemporary(n, n, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-			tempRT.filterMode = FilterMode.Point;
-			Graphics.Blit(nonReadableTexture, tempRT);
 			RenderTexture previous = RenderTexture.active;
-			RenderTexture.active = tempRT;
-			Texture2D readableTexture = new Texture2D(n, n, TextureFormat.ARGB32, false);
-			readableTexture.ReadPixels(new Rect(0, 0, n, n), 0, 0);
-			readableTexture.Apply();
-			RenderTexture.active = previous;
-			RenderTexture.ReleaseTemporary(tempRT);
-			return readableTexture;
+			RenderTexture tempRT = RenderTexture.GetTemporary(n, n, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+			try
+			{
+				tempRT.filterMode = FilterMode.Point;
+				Graphics.Blit(nonReadableTexture, tempRT);
+				RenderTexture.active = tempRT;
+				Texture2D readableTexture = new Texture2D(n, n, TextureFormat.ARGB32, false);
+				readableTexture.ReadPixels(new Rect(0, 0, n, n), 0, 0);
+				readableTexture.Apply();
+				return readableTexture;
+			}
+			finally
+			{
+				RenderTexture.active = previous;
+				RenderTexture.ReleaseTemporary(tempRT);
+			}
 		}
 
 		public static (float h, float s, float l) HSL(Color color)

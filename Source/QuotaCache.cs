@@ -5,7 +5,13 @@ namespace CameraPlus
 {
 	public class WeakQuotaCache<KEY, KEYID, VALUE>(int maxRetrievals, Func<KEY, KEYID> keyConverter, Func<KEY, VALUE> fetchCallback) where VALUE : class
 	{
-		readonly Dictionary<KEYID, (WeakReference<VALUE> value, int count)> cache = [];
+		class Entry(VALUE value)
+		{
+			public readonly WeakReference<VALUE> value = new(value);
+			public int count;
+		}
+
+		readonly Dictionary<KEYID, Entry> cache = [];
 		readonly int maxRetrievals = maxRetrievals;
 		readonly Func<KEY, KEYID> keyConverter = keyConverter;
 		readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
@@ -17,16 +23,16 @@ namespace CameraPlus
 
 			var rawKey = keyConverter(key);
 
-			if (!cache.ContainsKey(rawKey) || cache[rawKey].count >= maxRetrievals)
+			if (cache.TryGetValue(rawKey, out var entry) == false || entry.count >= maxRetrievals)
 			{
 				VALUE newValue = fetchCallback(key);
-				cache[rawKey] = (new WeakReference<VALUE>(newValue), 0);
+				entry = new Entry(newValue);
+				cache[rawKey] = entry;
 			}
 
-			var (value, count) = cache[rawKey];
-			cache[rawKey] = (value, count + 1);
+			entry.count++;
 
-			if (value.TryGetTarget(out VALUE returnValue))
+			if (entry.value.TryGetTarget(out VALUE returnValue))
 				return returnValue;
 			return default;
 		}
@@ -34,10 +40,17 @@ namespace CameraPlus
 
 	public class QuotaCache<KEY, KEYID, VALUE>(int maxRetrievals, Func<KEY, KEYID> keyConverter, Func<KEY, VALUE> fetchCallback)
 	{
-		readonly Dictionary<KEYID, (VALUE value, int count)> cache = [];
+		class Entry(VALUE value)
+		{
+			public VALUE value = value;
+			public int count;
+		}
+
+		readonly Dictionary<KEYID, Entry> cache = [];
 		readonly int maxRetrievals = maxRetrievals;
 		readonly Func<KEY, KEYID> keyConverter = keyConverter;
 		readonly Func<KEY, VALUE> fetchCallback = fetchCallback;
+		readonly string metricName = typeof(VALUE).Name;
 
 		public void Clear() => cache.Clear();
 
@@ -47,17 +60,21 @@ namespace CameraPlus
 				return default;
 
 			var rawKey = keyConverter(key);
+			PerfMetrics.Count($"quota_cache.{metricName}.requests");
 
-			if (!cache.ContainsKey(rawKey) || cache[rawKey].count >= maxRetrievals)
+			if (cache.TryGetValue(rawKey, out var entry) == false || entry.count >= maxRetrievals)
 			{
+				PerfMetrics.Count($"quota_cache.{metricName}.refreshes");
 				VALUE newValue = fetchCallback(key);
-				cache[rawKey] = (newValue, 0);
+				entry = new Entry(newValue);
+				cache[rawKey] = entry;
 			}
+			else
+				PerfMetrics.Count($"quota_cache.{metricName}.hits");
 
-			var (value, count) = cache[rawKey];
-			cache[rawKey] = (value, count + 1);
+			entry.count++;
 
-			return value;
+			return entry.value;
 		}
 	}
 }

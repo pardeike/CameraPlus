@@ -37,6 +37,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(CameraPlusPerf)'=='true'">
+		<DefineConstants>$(DefineConstants);CAMERAPLUS_PERF</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<Content Include="..\Directory.Build.props">
 			<Link>%(Filename)%(Extension)</Link>

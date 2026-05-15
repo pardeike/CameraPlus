@@ -134,6 +134,9 @@ namespace CameraPlus
 
 		public static bool ShouldShowMarker(Pawn pawn, DotConfig dotConfig = null)
 		{
+			using var measure = PerfMetrics.Measure("DotTools.ShouldShowMarker");
+			PerfMetrics.Count("should_show_marker.calls");
+
 			if (Tools.IsHiddenFromPlayer(pawn))
 				return false;
 
@@ -171,10 +174,15 @@ namespace CameraPlus
 
 		// returning true will prefer markers over labels
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
+			=> GetMarkerColors(pawn, Caches.dotConfigCache.Get(pawn), out innerColor, out outerColor);
+
+		public static bool GetMarkerColors(Pawn pawn, DotConfig dotConfig, out Color innerColor, out Color outerColor)
 		{
+			using var measure = PerfMetrics.Measure("DotTools.GetMarkerColors");
+			PerfMetrics.Count("get_marker_colors.calls");
+
 			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
 
-			var dotConfig = Caches.dotConfigCache.Get(pawn);
 			if (dotConfig != null)
 			{
 				innerColor = selected == 1 ? dotConfig.fillSelectedColor : dotConfig.fillColor;
@@ -241,6 +249,7 @@ namespace CameraPlus
 
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
 		{
+			using var measure = PerfMetrics.Measure("DotTools.GetMarkerTextures");
 			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
 			if (cameraDelegate.GetCameraMarkers != null)
 			{
