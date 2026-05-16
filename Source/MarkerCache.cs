@@ -24,9 +24,9 @@ namespace CameraPlus
 			if (cache.TryGetValue(pawn, out var materials))
 			{
 				PerfMetrics.Count("marker_cache.hits");
-				materials.refreshTick--;
-				if (materials.refreshTick > 0)
+				if (materials.Matches(dotConfig))
 					return materials;
+
 				PerfMetrics.Count("marker_cache.refreshes");
 				Remove(pawn);
 			}
@@ -61,7 +61,15 @@ namespace CameraPlus
 				dot.renderQueue = (int)RenderQueue.Overlay;
 			}
 
-			materials = new Materials { dot = dot, silhouette = silhouette, custom = custom, refreshTick = 300 };
+			materials = new Materials
+			{
+				dot = dot,
+				silhouette = silhouette,
+				custom = custom,
+				mode = dotConfig?.mode ?? Settings.dotStyle,
+				customDotStyle = dotConfig?.customDotStyle,
+				outlineFactor = outlineFactor
+			};
 
 			cache.Add(pawn, materials);
 			return materials;

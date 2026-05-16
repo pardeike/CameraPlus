@@ -135,6 +135,7 @@ namespace CameraPlus
 				texture.LoadImage(File.ReadAllBytes(item.FullName));
 				customMarkers[item.Name] = texture;
 			}
+			MarkerCache.Clear();
 		}
 
 		public static Material ColorBedMaterial => colorBedMaterial;

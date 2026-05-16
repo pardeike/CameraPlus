@@ -1,4 +1,5 @@
 using UnityEngine;
+using static CameraPlus.CameraPlusMain;
 
 namespace CameraPlus
 {
@@ -7,7 +8,9 @@ namespace CameraPlus
 		public Material dot;
 		public Material silhouette;
 		public Material custom;
-		public int refreshTick;
+		public DotStyle mode;
+		public string customDotStyle;
+		public float outlineFactor;
 
 		bool colorsApplied;
 		Color fillColor;
@@ -25,6 +28,16 @@ namespace CameraPlus
 			ApplyColors(dot, fill, outline);
 			ApplyColors(silhouette, fill, outline);
 			ApplyColors(custom, fill, outline);
+		}
+
+		public bool Matches(DotConfig dotConfig)
+		{
+			var expectedMode = dotConfig?.mode ?? Settings.dotStyle;
+			var expectedCustomDotStyle = dotConfig?.customDotStyle;
+			var expectedOutlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
+			return mode == expectedMode
+				&& customDotStyle == expectedCustomDotStyle
+				&& Mathf.Approximately(outlineFactor, expectedOutlineFactor);
 		}
 
 		static void ApplyColors(Material material, Color fill, Color outline)

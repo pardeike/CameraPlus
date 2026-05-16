@@ -79,10 +79,11 @@ namespace CameraPlus
 				if (___pawn.Dead)
 					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
 
-				if (GetMarkerColors(___pawn, out _, out _) == false)
+				var decision = MarkerDecisionCache.Get(___pawn);
+				if (decision.hasMarkerColors == false)
 					return true;
 
-				return ShouldShowMarker(___pawn) == false;
+				return decision.suppressVanilla == false;
 			}
 		}
 
@@ -96,14 +97,14 @@ namespace CameraPlus
 
 				if (thing is Pawn pawn)
 				{
-					var dotConfig = Caches.dotConfigCache.Get(pawn);
-					if (dotConfig?.mode == DotStyle.Off)
+					var decision = MarkerDecisionCache.Get(pawn);
+					if (decision.dotConfig?.mode == DotStyle.Off)
 					{
 						__result = false;
 						return false;
 					}
 
-					if (ShouldShowMarker(pawn, dotConfig))
+					if (decision.suppressVanilla)
 					{
 						__result = false;
 						return false;
@@ -137,39 +138,7 @@ namespace CameraPlus
 			using var measure = PerfMetrics.Measure("DotTools.ShouldShowMarker");
 			PerfMetrics.Count("should_show_marker.calls");
 
-			if (Tools.IsHiddenFromPlayer(pawn))
-				return false;
-
-			dotConfig ??= Caches.dotConfigCache.Get(pawn);
-			if (dotConfig != null)
-			{
-				if (dotConfig.mode == DotStyle.VanillaDefault)
-					return false;
-
-				var dotSize = dotConfig.showBelowPixels;
-				if (FastUI.CurUICellSize > (dotSize == -1 ? Settings.dotSize : dotSize))
-					return false;
-
-				if (dotConfig.mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
-					return false;
-
-				return dotConfig.useInside;
-			}
-
-			if (Settings.dotStyle == DotStyle.VanillaDefault)
-				return false;
-
-			if (FastUI.CurUICellSize > Settings.dotSize)
-				return false;
-
-			if (Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
-				return false;
-
-			if (Settings.mouseOverShowsLabels && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
-				return false;
-
-			var tamedAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			return Settings.includeNotTamedAnimals || pawn.RaceProps.Animal == false || tamedAnimal || dotConfig != null;
+			return MarkerDecisionCache.Get(pawn, dotConfig).suppressVanilla;
 		}
 
 		// returning true will prefer markers over labels

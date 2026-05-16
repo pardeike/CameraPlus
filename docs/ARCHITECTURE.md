@@ -73,6 +73,7 @@ Important camera patches:
 
 Marker rendering is split across three layers:
 
+- `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
 - `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
 - `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures.
@@ -81,17 +82,19 @@ The normal draw flow is:
 
 1. RimWorld reaches dynamic drawing for the current map.
 2. `DotDrawer.DrawDots(map)` enumerates `map.mapPawns.AllPawnsSpawned`.
-3. Each pawn is filtered for fog/invisibility and marker eligibility.
-4. `Caches.dotConfigCache` finds the first matching `DotConfig`.
-5. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
-6. `MarkerCache.MaterialFor(pawn)` creates or refreshes the marker materials.
-7. `DotDrawer` draws edge markers for off-screen pawns and in-map markers when zoom thresholds apply.
+3. Each pawn is filtered for fog/invisibility.
+4. `MarkerDecisionCache` fetches the first matching `DotConfig` through `Caches.dotConfigCache` and computes marker, edge, vanilla-suppression, zoom-threshold, and mouse-reveal decisions.
+5. If no edge marker or in-map marker can be drawn, `DotDrawer` skips color and material work for that pawn.
+6. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
+7. `MarkerCache.MaterialFor(pawn, dotConfig)` creates or refreshes the marker materials.
+8. `DotDrawer` draws edge markers for off-screen pawns and in-map markers when zoom thresholds apply.
 
 Vanilla rendering suppression is intentional:
 
 - Pawn bodies, vehicle pawns, selection brackets, pawn UI overlays, and RimWorld silhouettes can be skipped when CameraPlus markers are active.
 - Pawn and thing labels can be hidden when zoomed out, unless the mouse is close enough to reveal them.
 - `CameraPlusMain.skipCustomRendering` is a public escape hatch other mods can set temporarily to bypass CameraPlus drawing decisions.
+- Perf builds can additionally patch `PawnRenderer.DynamicDrawPhaseAt` to skip vanilla renderer phases for marker-replaced pawns. That experiment is intentionally behind the `CAMERAPLUS_PERF` compile gate.
 
 ## Caches
 
@@ -105,7 +108,9 @@ Vanilla rendering suppression is intentional:
 
 `Caches.cachedCameraDelegates` stores reflection-discovered external integration delegates by pawn runtime type.
 
-`MarkerCache.cache` stores `Material` objects by `Pawn` and refreshes them every 300 retrievals. It owns `MaterialAllocator.Destroy()` cleanup when entries expire or the cache is cleared.
+`MarkerDecisionCache` stores the computed marker decision by `thingIDNumber` for the current Unity frame. It exists so the dynamic draw postfix and the vanilla-rendering suppression prefixes can share the same rule lookup and zoom/mouse decision work.
+
+`MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, and outline factor still match the current rule/settings state. It owns `MaterialAllocator.Destroy()` cleanup when entries are invalidated or the cache is cleared. Custom marker PNG reloads clear this cache so stale custom marker materials are not reused.
 
 ## Settings And Editor UI
 

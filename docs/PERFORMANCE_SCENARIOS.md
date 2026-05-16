@@ -196,6 +196,54 @@ quota_cache.DotConfig.refreshes total=27152
 
 Compared with the replacement baseline, `DotDrawer.DrawDots` improved from `3629.618 us` to `2363.312 us` per draw in the 600-draw snapshot, about a 34.9% reduction. `DotDrawer.DrawClipped` moved from `1.003 us` to `0.253 us` per edge marker, and `DotTools.GetMarkerColors` moved from `0.601 us` to `0.127 us` per call.
 
+## Second-Pass Perf-Gated Checkpoint
+
+Measured after adding the shared marker decision cache, state-based material invalidation, and the `CAMERAPLUS_PERF`-only renderer-phase skip experiment.
+
+- CSV: `/Users/ap/Library/Application Support/RimWorld/Config/CameraPlusPerf/cameraplus-perf-20260515-190955.csv`
+- Scenario: `CameraPlusPerf_962Pawns_EdgeDots`
+- Camera: root size `39.172226`, map position `(128, 122)`, view rect `minX=-13`, `maxX=269`, `minZ=45`, `maxZ=198`
+- Playback: RimBridge Lua fixture `scripts/rimbridge/cameraplus_perf_run.lua`, `speed=Ultrafast`
+- Result: the scripted run advanced 2483 ticks, then the scenario paused itself. Use the 600-draw row from the file for comparison because a later closeup screenshot was captured in the same RimWorld process.
+
+600-draw section averages:
+
+```text
+DynamicDrawManager.DrawDynamicThings.Postfix  calls=600    avg=2343.504 us  max=38.352 ms
+DotDrawer.DrawDots                            calls=600    avg=2342.038 us  max=37.570 ms
+DotDrawer.DrawClipped                         calls=266929 avg=0.255 us     max=0.025 ms
+DotDrawer.DrawMarker                          calls=578162 avg=0.845 us     max=4.005 ms
+DotTools.GetMarkerColors                      calls=578162 avg=0.121 us     max=0.224 ms
+MarkerCache.MaterialFor                       calls=578162 avg=0.254 us     max=3.460 ms
+```
+
+600-draw samples and counters:
+
+```text
+dotdrawer.all_pawns_spawned       latest=962 max=962 avg=962.000
+dotdrawer.visible_pawns           latest=962 max=962 avg=962.000
+dotdrawer.marker_draws            latest=962 max=962 avg=962.000
+dotdrawer.edge_draws              latest=444 max=468 avg=444.141
+dotdrawer.draw_calls              total=601
+marker_decision.cache_misses      total=578162
+marker_decision.cache_hits        total=1362569
+renderer_phase.skip.EnsureInitialized total=341700
+renderer_phase.skip.ParallelPreDraw   total=341700
+renderer_phase.skip.Draw              total=341700
+marker_cache.hits                 total=577200
+marker_cache.misses               total=962
+quota_cache.DotConfig.requests    total=578162
+quota_cache.DotConfig.refreshes   total=10582
+```
+
+Compared with the replacement baseline, `DotDrawer.DrawDots` improved from `3629.618 us` to `2342.038 us` at the 600-draw snapshot, about a 35.5% reduction. Compared with the first optimized checkpoint, this is roughly flat for `DotDrawer.DrawDots`; the main measured effect is the reduced `DotConfig` request volume and the perf-build-only renderer-phase skip signal.
+
+The same run also captured the closeup visual fixture through RimBridge:
+
+```text
+/Users/ap/Library/Application Support/RimWorld/Screenshots/cameraplus-closeup-second-pass.png
+```
+
 ## High-Edge Sanity Check
 
 The closeup visual save can leave Camera+ settings in a more aggressive state before loading the 962-pawn save. That state produced 948 edge dots per draw and is useful as an extra stress pass, but it should not replace the cold-start baseline above.

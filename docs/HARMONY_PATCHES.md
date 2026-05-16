@@ -36,6 +36,8 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `SilhouetteUtility.ShouldDrawSilhouette` | `DotTools.cs` | Prefix | Prevents vanilla silhouettes when CameraPlus markers are active or explicitly off. | Interaction with RimWorld silhouette cache. |
 | `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides pawn labels by marker/zoom/mouse rules. | Hot label path; `truncateToWidth == 9999f` guard matters. |
 
+Perf builds also patch `PawnRenderer.DynamicDrawPhaseAt(DrawPhase, Vector3, Rot4?, bool)` in `PerfRendererPhasePatches.cs`. That prefix is compiled only when `CameraPlusPerf=true`; it skips the vanilla renderer phases for pawns that are already replaced by CameraPlus markers, and records `renderer_phase.skip.*` counters. Keep this out of normal builds until compatibility with layered apparel, weapons, overlays, vehicles, and other renderer patches has been reviewed separately.
+
 ## Snapback And Pause Handling
 
 | Target | File | Patch | Purpose | Risk |

@@ -42,9 +42,11 @@ Settings and editor UI:
 
 `FastUI` is frame-scoped and avoids repeating RimWorld UI coordinate calls in the same frame.
 
+`MarkerDecisionCache` is frame-scoped and stores one marker decision per pawn `thingIDNumber`. It shares the expensive decision work between the dynamic draw postfix and vanilla-rendering suppression prefixes.
+
 `Caches.dotConfigCache` and `Caches.shouldShowLabelCache` are quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
 
-`MarkerCache` holds per-pawn Unity materials and refreshes entries after 300 retrievals. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`.
+`MarkerCache` holds per-pawn Unity materials and refreshes entries only when the marker mode, custom marker name, or outline factor no longer matches the current rule/settings state. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`.
 
 `cachedMainColors` stores sampled texture colors by pawn runtime type and body graphic path. This avoids repeated texture readback/downsampling after the first sample for a graphic.
 
@@ -76,6 +78,18 @@ Verified during the 2026-05-15 prep pass:
 - Converted raw RimWorld silhouette textures into cached cutout-mask textures before drawing them with the Camera+ bordered shader.
 
 The primary 962-pawn scenario improved from `3629.618 us` to `2363.312 us` average `DotDrawer.DrawDots` time at the 600-draw snapshot. Keep both the performance CSV and the visual closeup screenshots when evaluating later refactors; the earlier broad color corruption and the later silhouette texture-frame artifact were real regressions.
+
+## Verified Second-Pass Experiments
+
+Verified during the follow-up performance pass:
+
+- Added `MarkerDecisionCache` so marker draw code and vanilla-suppression patches share the same per-frame decision result.
+- Deferred marker color and material lookup in `DotDrawer.DrawDots()` until an edge marker or in-map marker is actually needed.
+- Replaced retrieval-count material refreshes with state-based invalidation for marker mode, custom marker name, and outline factor.
+- Cleared marker materials when custom marker PNGs are reloaded.
+- Added a `CAMERAPLUS_PERF`-only `PawnRenderer.DynamicDrawPhaseAt` prefix that can measure the effect of skipping vanilla renderer phases for marker-replaced pawns.
+
+The perf-gated run on `CameraPlusPerf_962Pawns_EdgeDots` reached the 600-draw snapshot with `962` visible pawns, `962` marker draws, and active edge dots. `DotDrawer.DrawDots` averaged `2342.038 us` and `DynamicDrawManager.DrawDynamicThings.Postfix` averaged `2343.504 us` in that snapshot. The production build still does not include the renderer-phase skip.
 
 ## Correctness Constraints For Optimization
 

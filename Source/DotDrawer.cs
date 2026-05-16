@@ -27,7 +27,6 @@ namespace CameraPlus
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 			var clippedMarkerMapScale = ClippedMarkerMapScale(borderMarkerSize);
 
-			var cellSize = FastUI.CurUICellSize;
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
 			var visiblePawns = 0;
 			var markerDraws = 0;
@@ -40,7 +39,29 @@ namespace CameraPlus
 				visiblePawns++;
 				altitute -= 0.0001f;
 
-				var dotConfig = Caches.dotConfigCache.Get(pawn);
+				var decision = MarkerDecisionCache.Get(pawn);
+				var dotConfig = decision.dotConfig;
+				var drawEdge = false;
+				var edgeVector = default(Vector2);
+				if (decision.edgeEnabled)
+				{
+					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
+					if (clipped)
+					{
+						drawEdge = true;
+						edgeVector = vec;
+					}
+				}
+
+				if (drawEdge == false && decision.canDrawInsideMarker == false)
+					continue;
+
+				if (decision.hasMarkerColors == false)
+				{
+					PerfMetrics.Count("dotdrawer.skipped_colorless");
+					continue;
+				}
+
 				var useMarkers = DotTools.GetMarkerColors(pawn, dotConfig, out var innerColor, out var outerColor);
 				if (useMarkers == false)
 					continue;
@@ -50,49 +71,21 @@ namespace CameraPlus
 					continue;
 				materials.ApplyColors(innerColor, outerColor);
 
-				var defaultShow = true;
-				if (pawn.RaceProps.Animal)
+				if (drawEdge)
 				{
-					defaultShow = Settings.customNameStyle != LabelStyle.HideAnimals;
-					if (Settings.includeNotTamedAnimals == false && pawn.Name == null && dotConfig == null)
-						defaultShow = false;
-				}
-
-				if (dotConfig?.useEdge ?? (Settings.edgeIndicators && defaultShow))
-				{
-					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
-					if (clipped)
+					var materialClipped = materials.dot;
+					if (materialClipped != null)
 					{
-						var materialClipped = materials.dot;
-						if (materialClipped != null)
-						{
-							edgeDraws++;
-							DrawClipped(clippedMarkerMapScale, dotConfig, altitute, vec, materialClipped);
-						}
+						edgeDraws++;
+						DrawClipped(clippedMarkerMapScale, dotConfig, altitute, edgeVector, materialClipped);
 					}
 				}
 
-				if ((dotConfig?.mode ?? Settings.dotStyle) <= DotStyle.VanillaDefault)
-					continue;
-
-				if (dotConfig != null && dotConfig.useInside == false)
-					continue;
-
-				if (defaultShow == false)
-					continue;
-
-				var dotSize = dotConfig?.showBelowPixels ?? Settings.dotSize;
-				if (dotSize == -1)
-					dotSize = Settings.dotSize;
-				if (cellSize > dotSize)
-					continue;
-
-				var mouseReveals = dotConfig?.mouseReveals ?? Settings.mouseOverShowsLabels;
-				if (mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f) // TODO
+				if (decision.canDrawInsideMarker == false)
 					continue;
 
 				Material materialMarker;
-				switch (dotConfig?.mode ?? Settings.dotStyle)
+				switch (decision.mode)
 				{
 					case DotStyle.ClassicDots:
 						materialMarker = materials.dot;
