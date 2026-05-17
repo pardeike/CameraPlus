@@ -14,9 +14,9 @@ namespace CameraPlus
 		static readonly Color[] playerNormalInnerColors = [Color.white, Color.white];
 		static readonly Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
 		static readonly Color[] playerDraftedInnerColors = [Color.white, Color.white];
-		static readonly Color[] playerDownedOuterColors = [Color.gray, Color.white];
+		static readonly Color[] playerDownedOuterColors = [new(0.25f, 0.25f, 0.25f), Color.white];
 		static readonly Color[] playerDownedInnerColors = [Color.gray, Color.gray];
-		static readonly Color[] playerMentalOuterColors = [new(0.5f, 0f, 0f), Color.white];
+		static readonly Color[] playerMentalOuterColors = [new(0.25f, 0f, 0f), Color.white];
 		static readonly Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
 
 		[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
