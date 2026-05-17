@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>Tier-Regelung</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>Randindikatoren</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>Marker-Aussehen</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>Standardfarben für Kolonistenmarker</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>Normal</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>Eingezogen</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>Niedergeschlagen</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>Mentaler Zusammenbruch</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>Erweiterte Aktionen</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>Hilfe</SettingsHelp_Title>
 	<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 	<SettingsHelp_AnimalPolicy>Steuert, welche Tiere für Markerbehandlung infrage kommen und welche Standard-Markerfamilie sie nutzen.&#10;&#10;Nützlich, um Kolonietiere sichtbar zu halten und Wildtier-Rauschen zu reduzieren. Ausgeschlossene Tiere überspringen auch Tiermarker-Regeln.</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>Steuert, ob Offscreen-Bauernmarker gezeichnet werden und ob Tier-Randmarker Bauernfarben übernehmen können.&#10;&#10;Die Farboption hängt von diesem Schalter ab und ist am deutlichsten bei transparenten Tierregel-Füllungen.</SettingsHelp_EdgeIndicators>
 	<SettingsHelp_MarkerAppearance>Passt die visuelle Fläche von Punkten, Silhouetten und Randindikatoren an.&#10;&#10;Nutzen Sie dies nach der Wahl des Markerverhaltens; es sind Feineinstellungen, keine Filterregeln. Passende Regeln können Markergröße multiplizieren oder Konturbreite ersetzen.</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_DefaultColonistMarkerColors>Legt die Standardfarben für Kontur und Füllung von Kolonistenmarkern fest, wenn Camera+ seine eingebauten Spielerbauern-Farben verwendet.&#10;&#10;Das sind Rückfallfarben, keine Regelfarben. Passende Regeln, eigene Markerfarben anderer Mods und Tierfarben können für die von ihnen gesteuerten Bauern weiterhin eigene Farben liefern.</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+-Tastenkombinationen verbinden eine oder zwei optionale Modifikatortasten mit einer Haupttaste.&#10;&#10;Die Haupttaste für Einstellungen ist konfigurierbar. Laden und Speichern von Kameraansichten nutzt immer die Zahlentasten 1 bis 9.</SettingsHelp_KeyboardShortcuts>
 	<SettingsHelp_AdvancedActions>Regeln bleiben in einem separaten Editor, weil die Regeltabelle ein eigenes Layout und eigenes Interaktionsmodell braucht.</SettingsHelp_AdvancedActions>
 	<SettingsHelp_ZoomedInPercent>Setzt den nächsten visuellen Zoom. Kleinere Werte erlauben eine nähere Ansicht.&#10;&#10;Das ist auch der nahe Endpunkt für Bewegungs- und Randscroll-Abstimmung. Wenn Sie ihn bei geladener Karte ändern, aktualisiert Camera+ den aktiven Kamerabereich sofort.</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>Kontur</Outline>
 	<Fill>Füllung</Fill>
 	<Selected>ausgewählt</Selected>
+	<NotSelected>nicht ausgewählt</NotSelected>
 	<NewCondition>Neue Bedingung hinzufügen</NewCondition>
 	<LoadCustomization>Anpassung laden</LoadCustomization>
 	<SaveCustomization>Anpassung speichern</SaveCustomization>

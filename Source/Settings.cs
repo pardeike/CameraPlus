@@ -36,6 +36,22 @@ namespace CameraPlus
 		public float clippedRelativeSize = 0.75f;
 		public float clippedBorderDistanceFactor = 0.4f;
 		public float outlineFactor = 0.1f;
+		public Color defaultColonistNormalOutline = Color.black;
+		public Color defaultColonistNormalFill = Color.white;
+		public Color defaultColonistNormalSelectedOutline = new(0.75f, 0.75f, 0.75f);
+		public Color defaultColonistNormalSelectedFill = Color.white;
+		public Color defaultColonistDraftedOutline = new(0f, 0.5f, 0f);
+		public Color defaultColonistDraftedFill = Color.white;
+		public Color defaultColonistDraftedSelectedOutline = new(0.25f, 0.75f, 0.25f);
+		public Color defaultColonistDraftedSelectedFill = Color.white;
+		public Color defaultColonistDownedOutline = new(0.25f, 0.25f, 0.25f);
+		public Color defaultColonistDownedFill = Color.gray;
+		public Color defaultColonistDownedSelectedOutline = Color.white;
+		public Color defaultColonistDownedSelectedFill = Color.gray;
+		public Color defaultColonistMentalOutline = new(0.25f, 0f, 0f);
+		public Color defaultColonistMentalFill = new(0.5f, 0f, 0f);
+		public Color defaultColonistMentalSelectedOutline = Color.white;
+		public Color defaultColonistMentalSelectedFill = new(0.5f, 0f, 0f);
 
 		public KeyCode[] cameraSettingsMod = [KeyCode.LeftShift, KeyCode.None];
 		public KeyCode cameraSettingsKey = KeyCode.Tab;
@@ -142,6 +158,22 @@ namespace CameraPlus
 			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", defaults.clippedRelativeSize);
 			Scribe_Values.Look(ref clippedBorderDistanceFactor, "clippedBorderDistanceFactor", defaults.clippedBorderDistanceFactor);
 			Scribe_Values.Look(ref outlineFactor, "outlineFactor", defaults.outlineFactor);
+			Scribe_Values.Look(ref defaultColonistNormalOutline, "defaultColonistNormalOutline", defaults.defaultColonistNormalOutline);
+			Scribe_Values.Look(ref defaultColonistNormalFill, "defaultColonistNormalFill", defaults.defaultColonistNormalFill);
+			Scribe_Values.Look(ref defaultColonistNormalSelectedOutline, "defaultColonistNormalSelectedOutline", defaults.defaultColonistNormalSelectedOutline);
+			Scribe_Values.Look(ref defaultColonistNormalSelectedFill, "defaultColonistNormalSelectedFill", defaults.defaultColonistNormalSelectedFill);
+			Scribe_Values.Look(ref defaultColonistDraftedOutline, "defaultColonistDraftedOutline", defaults.defaultColonistDraftedOutline);
+			Scribe_Values.Look(ref defaultColonistDraftedFill, "defaultColonistDraftedFill", defaults.defaultColonistDraftedFill);
+			Scribe_Values.Look(ref defaultColonistDraftedSelectedOutline, "defaultColonistDraftedSelectedOutline", defaults.defaultColonistDraftedSelectedOutline);
+			Scribe_Values.Look(ref defaultColonistDraftedSelectedFill, "defaultColonistDraftedSelectedFill", defaults.defaultColonistDraftedSelectedFill);
+			Scribe_Values.Look(ref defaultColonistDownedOutline, "defaultColonistDownedOutline", defaults.defaultColonistDownedOutline);
+			Scribe_Values.Look(ref defaultColonistDownedFill, "defaultColonistDownedFill", defaults.defaultColonistDownedFill);
+			Scribe_Values.Look(ref defaultColonistDownedSelectedOutline, "defaultColonistDownedSelectedOutline", defaults.defaultColonistDownedSelectedOutline);
+			Scribe_Values.Look(ref defaultColonistDownedSelectedFill, "defaultColonistDownedSelectedFill", defaults.defaultColonistDownedSelectedFill);
+			Scribe_Values.Look(ref defaultColonistMentalOutline, "defaultColonistMentalOutline", defaults.defaultColonistMentalOutline);
+			Scribe_Values.Look(ref defaultColonistMentalFill, "defaultColonistMentalFill", defaults.defaultColonistMentalFill);
+			Scribe_Values.Look(ref defaultColonistMentalSelectedOutline, "defaultColonistMentalSelectedOutline", defaults.defaultColonistMentalSelectedOutline);
+			Scribe_Values.Look(ref defaultColonistMentalSelectedFill, "defaultColonistMentalSelectedFill", defaults.defaultColonistMentalSelectedFill);
 			Tools.ScribeArrays(ref cameraSettingsMod, "cameraSettingsMod", defaults.cameraSettingsMod);
 			Scribe_Values.Look(ref cameraSettingsKey, "cameraSettingsKey", defaults.cameraSettingsKey);
 			Tools.ScribeArrays(ref cameraSettingsLoad, "cameraSettingsLoad", defaults.cameraSettingsLoad);
@@ -529,6 +561,122 @@ namespace CameraPlus
 					MarkerCache.Clear();
 				outlineFactor = value;
 			}, "SettingsHelp_OutlineSize", note: outlineNote, noteColor: outlineNote != null ? RuleNoteColor : DisabledTextColor, helpExtra: RuleOverrideHelp(outlineRuleCount));
+			ctx.Gap(14f);
+			DrawDefaultColonistColors(ctx);
+		}
+
+		void DrawDefaultColonistColors(SettingsUiContext ctx)
+		{
+			var ruleCount = RuleCount(RuleCanAffectDefaultColonistColors);
+			DrawSubheading(ctx, "DefaultColonistMarkerColors", "SettingsHelp_DefaultColonistMarkerColors", OverrideNote(ruleCount), RuleOverrideHelp(ruleCount));
+			ctx.Gap(groupHeaderContentGap);
+			DrawDefaultColonistColorGroup(ctx, "DefaultColonistNormalColors",
+				defaultColonistNormalOutline, value => defaultColonistNormalOutline = value,
+				defaultColonistNormalFill, value => defaultColonistNormalFill = value,
+				defaultColonistNormalSelectedOutline, value => defaultColonistNormalSelectedOutline = value,
+				defaultColonistNormalSelectedFill, value => defaultColonistNormalSelectedFill = value);
+			DrawDefaultColonistColorGroup(ctx, "DefaultColonistDraftedColors",
+				defaultColonistDraftedOutline, value => defaultColonistDraftedOutline = value,
+				defaultColonistDraftedFill, value => defaultColonistDraftedFill = value,
+				defaultColonistDraftedSelectedOutline, value => defaultColonistDraftedSelectedOutline = value,
+				defaultColonistDraftedSelectedFill, value => defaultColonistDraftedSelectedFill = value);
+			DrawDefaultColonistColorGroup(ctx, "DefaultColonistDownedColors",
+				defaultColonistDownedOutline, value => defaultColonistDownedOutline = value,
+				defaultColonistDownedFill, value => defaultColonistDownedFill = value,
+				defaultColonistDownedSelectedOutline, value => defaultColonistDownedSelectedOutline = value,
+				defaultColonistDownedSelectedFill, value => defaultColonistDownedSelectedFill = value);
+			DrawDefaultColonistColorGroup(ctx, "DefaultColonistMentalColors",
+				defaultColonistMentalOutline, value => defaultColonistMentalOutline = value,
+				defaultColonistMentalFill, value => defaultColonistMentalFill = value,
+				defaultColonistMentalSelectedOutline, value => defaultColonistMentalSelectedOutline = value,
+				defaultColonistMentalSelectedFill, value => defaultColonistMentalSelectedFill = value);
+		}
+
+		void DrawDefaultColonistColorGroup(SettingsUiContext ctx, string titleKey, Color normalOutline, Action<Color> setNormalOutline, Color normalFill, Action<Color> setNormalFill, Color selectedOutline, Action<Color> setSelectedOutline, Color selectedFill, Action<Color> setSelectedFill)
+		{
+			DrawColorTypeLabel(ctx, titleKey);
+			DrawDefaultColonistColorRow(ctx, titleKey, "NotSelected", normalOutline, setNormalOutline, normalFill, setNormalFill);
+			DrawDefaultColonistColorRow(ctx, titleKey, "Selected", selectedOutline, setSelectedOutline, selectedFill, setSelectedFill);
+			ctx.Gap(12f);
+		}
+
+		static bool RuleCanAffectDefaultColonistColors(DotConfig dotConfig)
+			=> dotConfig.conditions == null || dotConfig.conditions.Any(ConditionExcludesDefaultColonistColors) == false;
+
+		static bool ConditionExcludesDefaultColonistColors(ConditionTag condition)
+		{
+			if (condition.Negated)
+				return false;
+			return condition is AnimalTag
+				or AncientTag
+				or EmpireTag
+				or EntityTag
+				or HoraxCultTag
+				or InsectTag
+				or PirateTag
+				or PrisonerTag
+				or WildManTag;
+		}
+
+		void DrawSubheading(SettingsUiContext ctx, string titleKey, string helpKey, string note = null, string helpExtra = null)
+		{
+			var title = titleKey.Translate().ToString();
+			var titleRectHeight = Mathf.Max(28f, TextHeight(title, ctx.Width - 2f * navItemPadding, GameFont.Small) + 6f);
+			var noteHeight = NoteHeight(note, ctx.Width);
+			var row = ctx.GetRect(titleRectHeight + noteHeight + (noteHeight > 0f ? 4f : 0f));
+			var titleRect = new Rect(row.x, row.y, row.width, titleRectHeight);
+			DrawControlHover(row, titleKey, helpKey, helpExtra);
+			DrawFill(titleRect, new Color(1f, 1f, 1f, 0.13f));
+			DrawText(titleRect.ContractedBy(navItemPadding, 0f), title, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+			DrawNote(note, row.x, titleRect.yMax + 2f, row.width, RuleNoteColor);
+		}
+
+		void DrawColorTypeLabel(SettingsUiContext ctx, string titleKey)
+		{
+			var title = titleKey.Translate().ToString();
+			var height = Mathf.Max(24f, TextHeight(title, ctx.Width, GameFont.Small) + 4f);
+			var row = ctx.GetRect(height);
+			DrawControlHover(row, titleKey, "SettingsHelp_DefaultColonistMarkerColors");
+			DrawText(row, title, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+		}
+
+		void DrawDefaultColonistColorRow(SettingsUiContext ctx, string titleKey, string stateKey, Color outline, Action<Color> setOutline, Color fill, Action<Color> setFill)
+		{
+			const float colorButtonSize = 28f;
+			const float labelGap = 6f;
+			const float pairGap = 14f;
+
+			var stateLabel = $"- {stateKey.Translate()}";
+			var outlineLabel = "Outline".Translate().ToString();
+			var fillLabel = "Fill".Translate().ToString();
+			var outlineLabelWidth = Mathf.Max(60f, TextWidth(outlineLabel, GameFont.Small) + 4f);
+			var fillLabelWidth = Mathf.Max(40f, TextWidth(fillLabel, GameFont.Small) + 4f);
+			var controlsWidth = outlineLabelWidth + labelGap + colorButtonSize + pairGap + fillLabelWidth + labelGap + colorButtonSize;
+			var stateWidth = Mathf.Max(100f, ctx.Width - controlsWidth - 12f);
+			var stateHeight = TextHeight(stateLabel, stateWidth, GameFont.Small);
+			var rowHeight = Mathf.Max(colorButtonSize, stateHeight) + 6f;
+			var row = ctx.GetRect(rowHeight);
+			var lineY = row.y + (row.height - colorButtonSize) / 2f;
+
+			DrawControlHover(row, titleKey, "SettingsHelp_DefaultColonistMarkerColors");
+			DrawText(new Rect(row.x, row.y, stateWidth, row.height), stateLabel, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+
+			var x = row.xMax - controlsWidth;
+			DrawText(new Rect(x, row.y, outlineLabelWidth, row.height), outlineLabel, GameFont.Small, Color.white, TextAnchor.MiddleRight);
+			x += outlineLabelWidth + labelGap;
+			DrawDefaultColorButton(new Rect(x, lineY, colorButtonSize, colorButtonSize), $"{titleKey.Translate()} - {stateLabel} - {outlineLabel}", outline, setOutline);
+			x += colorButtonSize + pairGap;
+			DrawText(new Rect(x, row.y, fillLabelWidth, row.height), fillLabel, GameFont.Small, Color.white, TextAnchor.MiddleRight);
+			x += fillLabelWidth + labelGap;
+			DrawDefaultColorButton(new Rect(x, lineY, colorButtonSize, colorButtonSize), $"{titleKey.Translate()} - {stateLabel} - {fillLabel}", fill, setFill);
+		}
+
+		static void DrawDefaultColorButton(Rect rect, string title, Color color, Action<Color> setColor)
+		{
+			GUI.DrawTexture(rect, Assets.colorBackgroundPattern, ScaleMode.ScaleAndCrop);
+			Widgets.DrawBoxSolidWithOutline(rect, color, Dialog_ColorPicker.borderFullColor, 2);
+			if (Widgets.ButtonInvisible(rect))
+				Find.WindowStack.Add(new Dialog_ColorPicker(title, color, setColor));
 		}
 
 		void DrawKeyboardShortcuts(SettingsUiContext ctx)

@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>動物マーカー</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>端インジケーター</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>マーカー表示</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>入植者マーカーのデフォルト色</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>通常</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>徴兵中</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>ダウン</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>精神崩壊</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>詳細操作</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>ヘルプ</SettingsHelp_Title>
 	<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 	<SettingsHelp_AnimalPolicy>どの動物をマーカー処理の対象にし、どの既定マーカー系列を使うかを制御します。&#10;&#10;コロニー動物を見えるままにしつつ、野生動物の散らかりを抑えるのに使えます。除外された動物は動物マーカールールも通りません。</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>画面外ポーンマーカーを描くか、動物の端マーカーがポーン色を引き継げるかを制御します。&#10;&#10;色オプションはこの切り替えに依存し、動物ルールの塗りが透明な時に最も目立ちます。</SettingsHelp_EdgeIndicators>
 	<SettingsHelp_MarkerAppearance>ドット、シルエット、端インジケーターの見た目の占有量を調整します。&#10;&#10;マーカー動作を選んだ後の仕上げ用で、フィルタールールではありません。一致ルールはマーカーサイズを掛けたり、アウトライン幅を置き換えたりできます。</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_DefaultColonistMarkerColors>Camera+ が内蔵のプレイヤーポーン色を使うとき、入植者マーカーのアウトライン色と塗りつぶし色のデフォルトを設定します。&#10;&#10;これは予備の色であり、ルール色ではありません。一致ルール、他のModが渡すマーカー色、動物のポーン色処理は、それぞれの対象ポーンに独自の色を使えます。</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+ショートカットは、1つまたは2つの任意の修飾キーと主キーを組み合わせます。&#10;&#10;設定ショートカットの主キーは変更できます。ビューの読み込みと保存は常に数字キー1から9を使います。</SettingsHelp_KeyboardShortcuts>
 	<SettingsHelp_AdvancedActions>ルール表は専用のレイアウトと操作方式が必要なため、別エディターに残しています。</SettingsHelp_AdvancedActions>
 	<SettingsHelp_ZoomedInPercent>最も近い視覚ズームを設定します。小さい値ほど近くまで見られます。&#10;&#10;これは移動速度と画面端スクロールの近い端点でもあります。マップ読み込み中に変えると、Camera+は有効なカメラ範囲をすぐ更新します。</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>アウトライン</Outline>
 	<Fill>塗りつぶし</Fill>
 	<Selected>選択済み</Selected>
+	<NotSelected>未選択</NotSelected>
 	<NewCondition>新しい条件を追加</NewCondition>
 	<LoadCustomization>カスタマイズを読み込む</LoadCustomization>
 	<SaveCustomization>カスタマイズを保存</SaveCustomization>

@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>动物策略</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>边缘指示器</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>标记外观</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>殖民者标记默认颜色</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>普通</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>征召</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>倒地</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>精神崩溃</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>高级操作</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>帮助</SettingsHelp_Title>
 	<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 	<SettingsHelp_AnimalPolicy>控制哪些动物可参与标记处理，以及它们使用哪种默认标记系列。&#10;&#10;这有助于保留殖民地动物可见性，同时减少野生动物杂乱。被排除的动物也会跳过动物标记规则。</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>控制是否绘制屏幕外小人标记，以及动物边缘标记是否可继承小人颜色。&#10;&#10;颜色选项依赖此开关，并且在动物规则填充透明时最明显。</SettingsHelp_EdgeIndicators>
 	<SettingsHelp_MarkerAppearance>调整圆点、剪影和边缘指示器的视觉占用。&#10;&#10;选择标记行为后再使用这些设置；它们是外观调校，不是过滤规则。匹配规则可以乘以标记大小，或替代轮廓宽度。</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_DefaultColonistMarkerColors>设置 Camera+ 使用内置玩家 pawn 颜色时，殖民者标记轮廓和填充的默认颜色。&#10;&#10;这些是备用颜色，不是规则颜色。匹配规则、其他 mod 提供的标记颜色以及动物 pawn 颜色处理仍可为它们控制的 pawn 提供自己的颜色。</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+ 快捷键会把一个或两个可选修饰键与主键组合。&#10;&#10;设置快捷键的主键可配置。载入和保存镜头视图始终使用数字键 1 到 9。</SettingsHelp_KeyboardShortcuts>
 	<SettingsHelp_AdvancedActions>规则保留在独立编辑器中，因为规则表需要自己的布局和交互方式。</SettingsHelp_AdvancedActions>
 	<SettingsHelp_ZoomedInPercent>设置最近的视觉缩放。数值越小，视角越近。&#10;&#10;这也是移动速度和边缘滚动调校的近端点。如果在地图已载入时改变它，Camera+ 会立即更新当前镜头范围。</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>轮廓</Outline>
 	<Fill>填充</Fill>
 	<Selected>已选择</Selected>
+	<NotSelected>未选择</NotSelected>
 	<NewCondition>添加新条件</NewCondition>
 	<LoadCustomization>加载自定义设置</LoadCustomization>
 	<SaveCustomization>保存自定义设置</SaveCustomization>

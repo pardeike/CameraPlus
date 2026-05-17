@@ -10,14 +10,7 @@ namespace CameraPlus
 {
 	class DotTools
 	{
-		static readonly Color[] playerNormalOuterColors = [Color.black, Color.white];
-		static readonly Color[] playerNormalInnerColors = [Color.white, Color.white];
-		static readonly Color[] playerDraftedOuterColors = [new(0f, 0.5f, 0f), new(0.25f, 0.75f, 0.25f)];
-		static readonly Color[] playerDraftedInnerColors = [Color.white, Color.white];
-		static readonly Color[] playerDownedOuterColors = [new(0.25f, 0.25f, 0.25f), Color.white];
-		static readonly Color[] playerDownedInnerColors = [Color.gray, Color.gray];
-		static readonly Color[] playerMentalOuterColors = [new(0.25f, 0f, 0f), Color.white];
-		static readonly Color[] playerMentalInnerColors = [new(0.5f, 0f, 0f), new(0.5f, 0f, 0f)];
+		static readonly Color[] playerAnimalOuterColors = [Color.black, Color.white];
 
 		[HarmonyPatch(typeof(PawnRenderer), nameof(PawnRenderer.RenderPawnAt))]
 		[HarmonyPatch([typeof(Vector3), typeof(Rot4?), typeof(bool)])]
@@ -176,37 +169,29 @@ namespace CameraPlus
 			if (animalPolicy.isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
 				innerColor = Tools.GetMainColor(pawn);
-				outerColor = pawn.Faction == Faction.OfPlayer ? playerNormalOuterColors[selected] : PawnNameColorUtility.PawnNameColorOf(pawn);
+				outerColor = pawn.Faction == Faction.OfPlayer ? playerAnimalOuterColors[selected] : PawnNameColorUtility.PawnNameColorOf(pawn);
 				return true;
 			}
 
 			if (pawn.IsColonistPlayerControlled == false)
-			{
-				outerColor = playerNormalOuterColors[selected];
-				innerColor = playerNormalInnerColors[selected];
-			}
+				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 			else if (pawn.IsPlayerControlled == false)
-			{
-				outerColor = playerMentalOuterColors[selected];
-				innerColor = playerMentalInnerColors[selected];
-			}
+				GetDefaultColonistColors(selected, Settings.defaultColonistMentalOutline, Settings.defaultColonistMentalFill, Settings.defaultColonistMentalSelectedOutline, Settings.defaultColonistMentalSelectedFill, out innerColor, out outerColor);
 			else if (pawn.Downed)
-			{
-				outerColor = playerDownedOuterColors[selected];
-				innerColor = playerDownedInnerColors[selected];
-			}
+				GetDefaultColonistColors(selected, Settings.defaultColonistDownedOutline, Settings.defaultColonistDownedFill, Settings.defaultColonistDownedSelectedOutline, Settings.defaultColonistDownedSelectedFill, out innerColor, out outerColor);
 			else if (pawn.Drafted)
-			{
-				outerColor = playerDraftedOuterColors[selected];
-				innerColor = playerDraftedInnerColors[selected];
-			}
+				GetDefaultColonistColors(selected, Settings.defaultColonistDraftedOutline, Settings.defaultColonistDraftedFill, Settings.defaultColonistDraftedSelectedOutline, Settings.defaultColonistDraftedSelectedFill, out innerColor, out outerColor);
 			else
-			{
-				outerColor = playerNormalOuterColors[selected];
-				innerColor = playerNormalInnerColors[selected];
-			}
+				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 
 			return true;
+		}
+
+		static void GetDefaultColonistColors(int selected, Color outline, Color fill, Color selectedOutline, Color selectedFill, out Color innerColor, out Color outerColor)
+		{
+			var isSelected = selected == 1;
+			outerColor = isSelected ? selectedOutline : outline;
+			innerColor = isSelected ? selectedFill : fill;
 		}
 
 		public static Color GetEdgeFillColor(Pawn pawn, Color fillColor)

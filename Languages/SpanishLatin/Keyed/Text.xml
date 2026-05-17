@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>Política de animales</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>Indicadores de borde</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>Apariencia de marcadores</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>Colores predeterminados de marcadores de colonos</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>Normal</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>Reclutado</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>Incapacitado</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>Crisis mental</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>Acciones avanzadas</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>Ayuda</SettingsHelp_Title>
 		<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 		<SettingsHelp_AnimalPolicy>Controla qué animales son elegibles para el manejo de marcadores y qué familia de marcadores predeterminada usan.&#10;&#10;Sirve para mantener visibles los animales de colonia mientras reduces el ruido de animales salvajes. Los animales excluidos también omiten las reglas de marcador animal.</SettingsHelp_AnimalPolicy>
 		<SettingsHelp_EdgeIndicators>Controla si se dibujan marcadores de peones fuera de pantalla y si los marcadores de borde animales pueden heredar colores de peón.&#10;&#10;La opción de color depende de este interruptor y se nota más cuando los rellenos de reglas animales son transparentes.</SettingsHelp_EdgeIndicators>
 		<SettingsHelp_MarkerAppearance>Ajusta la huella visual de puntos, siluetas e indicadores de borde.&#10;&#10;Úsalo después de elegir el comportamiento de marcadores; son controles de acabado, no reglas de filtrado. Las reglas coincidentes pueden multiplicar el tamaño de marcador o reemplazar el ancho del contorno.</SettingsHelp_MarkerAppearance>
+		<SettingsHelp_DefaultColonistMarkerColors>Define los colores predeterminados de contorno y relleno para marcadores de colonos cuando Camera+ usa sus colores integrados para peones del jugador.&#10;&#10;Son colores de reserva, no colores de reglas. Las reglas coincidentes, los colores de marcador de otros mods y el manejo de colores de animales aún pueden aportar sus propios colores.</SettingsHelp_DefaultColonistMarkerColors>
 		<SettingsHelp_KeyboardShortcuts>Los atajos de Camera+ combinan una o dos teclas modificadoras opcionales con una tecla principal.&#10;&#10;El atajo de ajustes tiene una tecla principal configurable. Cargar y guardar vistas de cámara siempre usa las teclas numéricas del 1 al 9.</SettingsHelp_KeyboardShortcuts>
 		<SettingsHelp_AdvancedActions>Las reglas permanecen en un editor separado porque la tabla de reglas necesita su propio diseño y modelo de interacción.</SettingsHelp_AdvancedActions>
 		<SettingsHelp_ZoomedInPercent>Define el zoom visual más cercano. Los valores más pequeños permiten una vista más cercana.&#10;&#10;También es el extremo cercano para los ajustes de velocidad de movimiento y desplazamiento de borde. Si lo cambias con un mapa cargado, Camera+ actualiza de inmediato el rango activo de la cámara.</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>contorno</Outline>
 	<Fill>relleno</Fill>
 	<Selected>seleccionado</Selected>
+	<NotSelected>no seleccionado</NotSelected>
 	<NewCondition>Agregar nueva condición</NewCondition>
 	<LoadCustomization>Cargar personalización</LoadCustomization>
 	<SaveCustomization>Guardar personalización</SaveCustomization>

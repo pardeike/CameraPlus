@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>Politique animaux</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>Indicateurs de bord</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>Apparence des marqueurs</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>Couleurs par défaut des marqueurs de colons</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>Normal</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>Mobilisé</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>À terre</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>Crise mentale</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>Actions avancées</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>Aide</SettingsHelp_Title>
 	<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 	<SettingsHelp_AnimalPolicy>Contrôle quels animaux sont éligibles au traitement par marqueurs et quelle famille de marqueurs par défaut ils utilisent.&#10;&#10;Utile pour garder les animaux de colonie visibles tout en réduisant le bruit des animaux sauvages. Les animaux exclus ignorent aussi les règles de marqueurs animaux.</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>Contrôle si les marqueurs de pions hors écran sont dessinés et si les marqueurs de bord animaux peuvent hériter des couleurs du pion.&#10;&#10;L'option de couleur dépend de cet interrupteur et se voit surtout quand les remplissages de règles animales sont transparents.</SettingsHelp_EdgeIndicators>
 	<SettingsHelp_MarkerAppearance>Ajuste l'empreinte visuelle des points, silhouettes et indicateurs de bord.&#10;&#10;Utilisez ces réglages après le choix du comportement de marqueur ; ce sont des réglages d'apparence, pas des règles de filtrage. Les règles correspondantes peuvent multiplier la taille ou remplacer le contour.</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_DefaultColonistMarkerColors>Définit les couleurs de contour et de remplissage par défaut des marqueurs de colons quand Camera+ utilise ses couleurs intégrées pour les pions du joueur.&#10;&#10;Ce sont des couleurs de repli, pas des couleurs de règles. Les règles correspondantes, les couleurs de marqueur fournies par d'autres mods et la gestion des couleurs animales peuvent toujours fournir leurs propres couleurs.</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Les raccourcis Camera+ combinent une ou deux touches modificatrices optionnelles avec une touche principale.&#10;&#10;La touche principale des paramètres est configurable. Charger et sauvegarder des vues utilise toujours les touches 1 à 9.</SettingsHelp_KeyboardShortcuts>
 	<SettingsHelp_AdvancedActions>Les règles restent dans un éditeur séparé car le tableau de règles a besoin de sa propre mise en page et de son propre modèle d'interaction.</SettingsHelp_AdvancedActions>
 	<SettingsHelp_ZoomedInPercent>Définit le zoom visuel le plus proche. Les valeurs plus petites autorisent une vue plus proche.&#10;&#10;C'est aussi l'extrémité proche pour la vitesse de mouvement et le défilement de bord. Si vous la changez avec une carte chargée, Camera+ met à jour la plage active immédiatement.</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>contour</Outline>
 	<Fill>remplir</Fill>
 	<Selected>sélectionné</Selected>
+	<NotSelected>non sélectionné</NotSelected>
 	<NewCondition>Ajouter une nouvelle condition</NewCondition>
 	<LoadCustomization>Charger la personnalisation</LoadCustomization>
 	<SaveCustomization>Sauvegarder la personnalisation</SaveCustomization>

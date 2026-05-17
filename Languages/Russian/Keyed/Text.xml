@@ -59,6 +59,11 @@
 	<SettingsGroup_AnimalPolicy>Маркеры животных</SettingsGroup_AnimalPolicy>
 	<SettingsGroup_EdgeIndicators>Краевые индикаторы</SettingsGroup_EdgeIndicators>
 	<SettingsGroup_MarkerAppearance>Вид маркеров</SettingsGroup_MarkerAppearance>
+	<DefaultColonistMarkerColors>Цвета маркеров колонистов по умолчанию</DefaultColonistMarkerColors>
+	<DefaultColonistNormalColors>Обычный</DefaultColonistNormalColors>
+	<DefaultColonistDraftedColors>Призван</DefaultColonistDraftedColors>
+	<DefaultColonistDownedColors>Сбит с ног</DefaultColonistDownedColors>
+	<DefaultColonistMentalColors>Психический срыв</DefaultColonistMentalColors>
 	<SettingsGroup_AdvancedActions>Доп. действия</SettingsGroup_AdvancedActions>
 	<SettingsHelp_Title>Справка</SettingsHelp_Title>
 		<SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
 		<SettingsHelp_AnimalPolicy>Управляет тем, какие животные участвуют в обработке маркеров и какой набор маркеров по умолчанию они используют.&#10;&#10;Это удобно, чтобы оставить животных колонии видимыми и при этом уменьшить шум от диких животных. Исключенные животные также пропускают правила маркеров животных.</SettingsHelp_AnimalPolicy>
 		<SettingsHelp_EdgeIndicators>Управляет тем, рисуются ли маркеры пешек вне экрана и могут ли краевые маркеры животных наследовать цвета пешек.&#10;&#10;Цветовой параметр зависит от этого переключателя и лучше всего заметен, когда заливка в правилах животных прозрачная.</SettingsHelp_EdgeIndicators>
 		<SettingsHelp_MarkerAppearance>Настраивает визуальный размер точек, силуэтов и краевых индикаторов.&#10;&#10;Используйте это после выбора поведения маркеров; это косметические настройки, а не правила фильтрации. Подходящие правила могут умножать размер маркера или заменять ширину контура.</SettingsHelp_MarkerAppearance>
+		<SettingsHelp_DefaultColonistMarkerColors>Задает цвета контура и заливки по умолчанию для маркеров колонистов, когда Camera+ использует встроенные цвета пешек игрока.&#10;&#10;Это резервные цвета, а не цвета правил. Подходящие правила, цвета маркеров из других модов и обработка цветов животных все еще могут задавать собственные цвета.</SettingsHelp_DefaultColonistMarkerColors>
 		<SettingsHelp_KeyboardShortcuts>Сочетания Camera+ объединяют одну или две необязательные клавиши-модификаторы с основной клавишей.&#10;&#10;У сочетания настроек основную клавишу можно менять. Загрузка и сохранение видов камеры всегда используют цифровые клавиши от 1 до 9.</SettingsHelp_KeyboardShortcuts>
 		<SettingsHelp_AdvancedActions>Правила остаются в отдельном редакторе, потому что таблице правил нужен собственный макет и своя модель взаимодействия.</SettingsHelp_AdvancedActions>
 		<SettingsHelp_ZoomedInPercent>Задает ближайший визуальный масштаб. Меньшие значения позволяют смотреть ближе.&#10;&#10;Это также ближняя конечная точка для скорости движения и прокрутки у края. Если изменить ее на загруженной карте, Camera+ сразу обновит активный диапазон камеры.</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
 	<Outline>контур</Outline>
 	<Fill>заливка</Fill>
 	<Selected>выбрано</Selected>
+	<NotSelected>не выбрано</NotSelected>
 	<NewCondition>Добавить новое условие</NewCondition>
 	<LoadCustomization>Загрузить настройку</LoadCustomization>
 	<SaveCustomization>Сохранить настройку</SaveCustomization>

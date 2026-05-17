@@ -59,6 +59,11 @@
     <SettingsGroup_AnimalPolicy>Animal policy</SettingsGroup_AnimalPolicy>
     <SettingsGroup_EdgeIndicators>Edge indicators</SettingsGroup_EdgeIndicators>
     <SettingsGroup_MarkerAppearance>Marker appearance</SettingsGroup_MarkerAppearance>
+    <DefaultColonistMarkerColors>Default colonist marker colors</DefaultColonistMarkerColors>
+    <DefaultColonistNormalColors>Normal</DefaultColonistNormalColors>
+    <DefaultColonistDraftedColors>Drafted</DefaultColonistDraftedColors>
+    <DefaultColonistDownedColors>Downed</DefaultColonistDownedColors>
+    <DefaultColonistMentalColors>Mental break</DefaultColonistMentalColors>
     <SettingsGroup_AdvancedActions>Advanced actions</SettingsGroup_AdvancedActions>
     <SettingsHelp_Title>Help</SettingsHelp_Title>
     <SettingsHelp_About>{0}</SettingsHelp_About>
@@ -103,6 +108,7 @@
     <SettingsHelp_AnimalPolicy>Controls which animals are eligible for marker handling and which default marker family they use.&#10;&#10;This is useful for keeping colony animals visible while reducing wild-animal clutter. Excluded animals also skip animal marker rules.</SettingsHelp_AnimalPolicy>
     <SettingsHelp_EdgeIndicators>Controls whether off-screen pawn markers are drawn and whether animal edge markers can inherit pawn colors.&#10;&#10;The color option depends on this switch and is most visible when animal rule fills are transparent.</SettingsHelp_EdgeIndicators>
     <SettingsHelp_MarkerAppearance>Adjusts the visual footprint of dots, silhouettes, and edge indicators.&#10;&#10;Use these after choosing marker behavior; they are polish controls, not filtering rules. Matching rules can multiply marker size or replace outline width.</SettingsHelp_MarkerAppearance>
+    <SettingsHelp_DefaultColonistMarkerColors>Sets the default outline and fill colors for colonist markers when Camera+ is using its built-in player-pawn colors.&#10;&#10;These are fallback colors, not rule colors. Matching rules, custom marker colors from other mods, and animal pawn-color handling can still provide their own colors for the pawns they control.</SettingsHelp_DefaultColonistMarkerColors>
     <SettingsHelp_KeyboardShortcuts>Camera+ shortcuts combine one or two optional modifier keys with a main key.&#10;&#10;The settings shortcut has a configurable main key. Loading and saving camera views always use number keys 1 through 9.</SettingsHelp_KeyboardShortcuts>
     <SettingsHelp_AdvancedActions>Rules remain in a separate editor because the rule table needs its own layout and interaction model.</SettingsHelp_AdvancedActions>
     <SettingsHelp_ZoomedInPercent>Sets the closest visual zoom. Smaller values allow a closer view.&#10;&#10;This is also the close endpoint for movement-speed and edge-scroll tuning. If you change it while a map is loaded, Camera+ updates the active camera range immediately.</SettingsHelp_ZoomedInPercent>
@@ -148,6 +154,7 @@
     <Outline>outline</Outline>
     <Fill>fill</Fill>
     <Selected>selected</Selected>
+    <NotSelected>not selected</NotSelected>
     <NewCondition>Add new condition</NewCondition>
     <LoadCustomization>Load customization</LoadCustomization>
     <SaveCustomization>Save customization</SaveCustomization>
