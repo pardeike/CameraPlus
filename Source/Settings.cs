@@ -29,6 +29,7 @@ namespace CameraPlus
 		public int hideDeadPawnsBelow = 0;
 		public bool mouseOverShowsLabels = true;
 		public bool edgeIndicators = true;
+		public bool pawnColoredEdgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
 		public float dotRelativeSize = 1.25f;
@@ -79,6 +80,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref hideDeadPawnsBelow, "hideDeadPawnsBelow", defaults.hideDeadPawnsBelow);
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
 			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
+			Scribe_Values.Look(ref pawnColoredEdgeIndicators, "pawnColoredEdgeIndicators", defaults.pawnColoredEdgeIndicators);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
 			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", defaults.includeNotTamedAnimals);
 			Scribe_Values.Look(ref dotRelativeSize, "dotRelativeSize", defaults.dotRelativeSize);
@@ -183,6 +185,7 @@ namespace CameraPlus
 			list.CheckboxLabeled("ZoomToMouse".Translate(), ref zoomToMouse);
 			list.CheckboxLabeled(ReplaceRuleOverride("MouseRevealsLabels", dc => dc.mouseReveals != mouseOverShowsLabels), ref mouseOverShowsLabels);
 			list.CheckboxLabeled(ReplaceRuleOverride("EdgeIndicators", dc => dc.useEdge != edgeIndicators), ref edgeIndicators);
+			list.CheckboxLabeled("PawnColoredEdgeIndicators".Translate(), ref pawnColoredEdgeIndicators);
 			list.CheckboxLabeled("DisableCameraShake".Translate(), ref disableCameraShake);
 
 			list.Gap(16f);

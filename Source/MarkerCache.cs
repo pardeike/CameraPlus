@@ -14,6 +14,7 @@ namespace CameraPlus
 		public static readonly Dictionary<Pawn, Materials> cache = [];
 		static readonly Dictionary<int, Texture2D> silhouetteTextureCache = [];
 		const float defaultSilhouetteCutoff = 0.5f;
+		const string colorPropertyName = "_Color";
 
 		public static Materials MaterialFor(Pawn pawn)
 			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
@@ -52,6 +53,7 @@ namespace CameraPlus
 			}
 
 			Material dot = null;
+			Material edgeDot = null;
 			if (DotTools.GetMarkerTextures(pawn, out var dotTexture, out _))
 			{
 				dot = MaterialAllocator.Create(Assets.BorderedShader);
@@ -59,11 +61,18 @@ namespace CameraPlus
 				SetMarkerTexture(dot, dotTexture, canMutateTexture: true);
 				dot.SetFloat("_OutlineFactor", outlineFactor);
 				dot.renderQueue = (int)RenderQueue.Overlay;
+
+				edgeDot = MaterialAllocator.Create(Assets.BorderedShader);
+				edgeDot.name = $"{pawn.ThingID}-edge-dot";
+				SetMarkerTexture(edgeDot, dotTexture, canMutateTexture: true);
+				edgeDot.SetFloat("_OutlineFactor", outlineFactor);
+				edgeDot.renderQueue = (int)RenderQueue.Overlay;
 			}
 
 			materials = new Materials
 			{
 				dot = dot,
+				edgeDot = edgeDot,
 				silhouette = silhouette,
 				custom = custom,
 				mode = dotConfig?.mode ?? Settings.dotStyle,
@@ -93,6 +102,10 @@ namespace CameraPlus
 			if (dot != null)
 				MaterialAllocator.Destroy(dot);
 
+			var edgeDot = cache[pawn].edgeDot;
+			if (edgeDot != null)
+				MaterialAllocator.Destroy(edgeDot);
+
 			var silhouette = cache[pawn].silhouette;
 			if (silhouette != null)
 				MaterialAllocator.Destroy(silhouette);
@@ -111,35 +124,48 @@ namespace CameraPlus
 			material.SetTexture("_MainTex", texture);
 		}
 
-		// copied from RenderPawnAt(Vector3 drawLoc, Rot4? rotOverride, bool neverAimWeapon)
-		// TODO maybe make a reverse patch?
-		static void UpdateSilhouetteCache(Pawn pawn)
+		static Graphic GetSilhouetteGraphic(Pawn pawn)
 		{
 			var renderer = pawn.Drawer.renderer;
-			var graphic = pawn.RaceProps.Humanlike
+			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
+			return pawn.RaceProps.Humanlike
 				? pawn.ageTracker.CurLifeStage.silhouetteGraphicData.Graphic
 				: (pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData == null
 					? renderer.BodyGraphic
 					: pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData.Graphic
 					);
+		}
+
+		// copied from RenderPawnAt(Vector3 drawLoc, Rot4? rotOverride, bool neverAimWeapon)
+		// TODO maybe make a reverse patch?
+		static void UpdateSilhouetteCache(Pawn pawn, Graphic graphic)
+		{
+			var renderer = pawn.Drawer.renderer;
 			var bodyPos = renderer.GetBodyPos(pawn.DrawPos, PawnPosture.Standing, out _);
 			renderer.SetSilhouetteData(graphic, bodyPos);
 		}
 
 		static Texture GetTexture(Pawn pawn)
 		{
-			UpdateSilhouetteCache(pawn);
+			var graphic = GetSilhouetteGraphic(pawn);
+			if (graphic == null)
+			{
+				Tools.DefaultMarkerTextures(pawn, out var fallbackInner, out _);
+				return fallbackInner;
+			}
+
+			UpdateSilhouetteCache(pawn, graphic);
 			if (pawn.Drawer.renderer.SilhouetteGraphic != null)
 			{
 				var (_, material) = SilhouetteUtility.GetCachedSilhouetteData(pawn);
-				return PreparedSilhouetteTexture(material);
+				return PreparedSilhouetteTexture(material, graphic.color);
 			}
 
 			Tools.DefaultMarkerTextures(pawn, out var inner, out _);
 			return inner;
 		}
 
-		static Texture PreparedSilhouetteTexture(Material sourceMaterial)
+		static Texture PreparedSilhouetteTexture(Material sourceMaterial, Color graphicTint)
 		{
 			var sourceTexture = sourceMaterial?.mainTexture;
 			if (sourceTexture == null)
@@ -147,13 +173,15 @@ namespace CameraPlus
 
 			var cutoff = SilhouetteAlphaCutoff(sourceMaterial);
 			var cutoffByte = Mathf.Clamp(Mathf.RoundToInt(cutoff * byte.MaxValue), 1, byte.MaxValue);
+			var tint = SourceMaterialTint(sourceMaterial, graphicTint);
 			var key = Gen.HashCombineInt(sourceTexture.GetInstanceID(), cutoffByte);
+			key = Gen.HashCombineInt(key, ColorHash(tint));
 			if (silhouetteTextureCache.TryGetValue(key, out var cachedTexture))
 				return cachedTexture;
 
 			try
 			{
-				cachedTexture = CreateCutoutTexture(sourceTexture, cutoffByte);
+				cachedTexture = CreateCutoutTexture(sourceTexture, cutoffByte, tint);
 				silhouetteTextureCache[key] = cachedTexture;
 				return cachedTexture;
 			}
@@ -171,7 +199,35 @@ namespace CameraPlus
 			return defaultSilhouetteCutoff;
 		}
 
-		static Texture2D CreateCutoutTexture(Texture sourceTexture, int cutoffByte)
+		static Color SourceMaterialTint(Material material, Color graphicTint)
+		{
+			var color = graphicTint;
+			if (material != null && material.HasProperty(colorPropertyName))
+			{
+				var materialTint = material.GetColor(colorPropertyName);
+				if (IsWhite(color))
+					color = materialTint;
+			}
+			color.a = 1f;
+			return color;
+		}
+
+		static bool IsWhite(Color color)
+			=> Mathf.Approximately(color.r, 1f)
+			&& Mathf.Approximately(color.g, 1f)
+			&& Mathf.Approximately(color.b, 1f);
+
+		static int ColorHash(Color color)
+		{
+			var color32 = (Color32)color;
+			var hash = (int)color32.r;
+			hash = Gen.HashCombineInt(hash, color32.g);
+			hash = Gen.HashCombineInt(hash, color32.b);
+			hash = Gen.HashCombineInt(hash, color32.a);
+			return hash;
+		}
+
+		static Texture2D CreateCutoutTexture(Texture sourceTexture, int cutoffByte, Color tint)
 		{
 			var previous = RenderTexture.active;
 			var tempRT = RenderTexture.GetTemporary(sourceTexture.width, sourceTexture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
@@ -190,7 +246,12 @@ namespace CameraPlus
 					if (color.a < cutoffByte)
 						color = new Color32(0, 0, 0, 0);
 					else
+					{
+						color.r = (byte)Mathf.Clamp(Mathf.RoundToInt(color.r * tint.r), 0, 255);
+						color.g = (byte)Mathf.Clamp(Mathf.RoundToInt(color.g * tint.g), 0, 255);
+						color.b = (byte)Mathf.Clamp(Mathf.RoundToInt(color.b * tint.b), 0, 255);
 						color.a = byte.MaxValue;
+					}
 					pixels[i] = color;
 				}
 

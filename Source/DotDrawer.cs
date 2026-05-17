@@ -1,4 +1,5 @@
 using RimWorld;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -12,10 +13,12 @@ namespace CameraPlus
 		static readonly Mesh meshEast = MeshPool.GridPlane(Vector2.one);
 		static readonly Mesh meshClipped = MeshPool.GridPlane(Vector2.one / 2);
 		static readonly Quaternion downedRotation = Quaternion.Euler(0, 90, 0);
+		static readonly List<EdgeDrawCommand> edgeDrawCommands = [];
 
 		const float clippedScale = 3f;
 		const float markerScale = 2f;
 		const float markerSizeScaler = 2f;
+		const float edgeAltitudeStep = 0.0001f;
 
 		public static void DrawDots(Map map)
 		{
@@ -27,7 +30,7 @@ namespace CameraPlus
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 			var clippedMarkerMapScale = ClippedMarkerMapScale(borderMarkerSize);
 
-			var altitute = AltitudeLayer.Silhouettes.AltitudeFor();
+			edgeDrawCommands.Clear();
 			var visiblePawns = 0;
 			var markerDraws = 0;
 			var edgeDraws = 0;
@@ -37,7 +40,6 @@ namespace CameraPlus
 					continue;
 
 				visiblePawns++;
-				altitute -= 0.0001f;
 
 				var decision = MarkerDecisionCache.Get(pawn);
 				var dotConfig = decision.dotConfig;
@@ -69,20 +71,22 @@ namespace CameraPlus
 				var materials = MarkerCache.MaterialFor(pawn, dotConfig);
 				if (materials == null)
 					continue;
-				materials.ApplyColors(innerColor, outerColor);
 
 				if (drawEdge)
 				{
-					var materialClipped = materials.dot;
+					var materialClipped = materials.edgeDot;
 					if (materialClipped != null)
 					{
+						var edgeFillColor = DotTools.GetEdgeFillColor(pawn, innerColor);
+						edgeDrawCommands.Add(new EdgeDrawCommand(pawn, dotConfig, materials, edgeVector, edgeFillColor, outerColor));
 						edgeDraws++;
-						DrawClipped(clippedMarkerMapScale, dotConfig, altitute, edgeVector, materialClipped);
 					}
 				}
 
 				if (decision.canDrawInsideMarker == false)
 					continue;
+
+				materials.ApplyColors(innerColor, outerColor);
 
 				Material materialMarker;
 				switch (decision.mode)
@@ -108,10 +112,59 @@ namespace CameraPlus
 				}
 			}
 
+			DrawEdges(clippedMarkerMapScale);
+
 			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
 			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
 			PerfMetrics.Sample("dotdrawer.edge_draws", edgeDraws);
 			PerfMetrics.FlushIfNeeded();
+		}
+
+		static void DrawEdges(Vector3 clippedMarkerMapScale)
+		{
+			if (edgeDrawCommands.Count == 0)
+				return;
+
+			edgeDrawCommands.Sort(CompareEdgeDrawCommands);
+			var altitute = AltitudeLayer.Silhouettes.AltitudeFor() - edgeDrawCommands.Count * edgeAltitudeStep;
+			for (var i = 0; i < edgeDrawCommands.Count; i++)
+			{
+				var command = edgeDrawCommands[i];
+				command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
+				DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
+				altitute += edgeAltitudeStep;
+			}
+
+			edgeDrawCommands.Clear();
+		}
+
+		static int CompareEdgeDrawCommands(EdgeDrawCommand left, EdgeDrawCommand right)
+		{
+			var layerComparison = right.layer.CompareTo(left.layer);
+			return layerComparison != 0 ? layerComparison : right.thingIdNumber.CompareTo(left.thingIdNumber);
+		}
+
+		static int EdgeLayerFor(Pawn pawn)
+		{
+			var playerFaction = pawn.Faction?.IsPlayer ?? false;
+			if (pawn.RaceProps.Animal)
+				return playerFaction ? 1 : 4;
+
+			if (pawn.IsColonist || playerFaction)
+				return 0;
+
+			return pawn.HostileTo(Faction.OfPlayer) ? 2 : 3;
+		}
+
+		readonly struct EdgeDrawCommand(Pawn pawn, DotConfig dotConfig, Materials materials, Vector2 edgeVector, Color fillColor, Color outlineColor)
+		{
+			public readonly DotConfig dotConfig = dotConfig;
+			public readonly Materials materials = materials;
+			public readonly Vector2 edgeVector = edgeVector;
+			public readonly Color fillColor = fillColor;
+			public readonly Color outlineColor = outlineColor;
+			public readonly int layer = EdgeLayerFor(pawn);
+			public readonly int thingIdNumber = pawn.thingIDNumber;
 		}
 
 		private static Rect RealViewRect(float contract)

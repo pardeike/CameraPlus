@@ -35,6 +35,7 @@
 	<DisableCameraShake>カメラの揺れを無効にする</DisableCameraShake>
 	<MouseRevealsLabels>マウスがラベルを表示する{0}</MouseRevealsLabels>
 	<EdgeIndicators>エッジインジケーター{0}</EdgeIndicators>
+	<PawnColoredEdgeIndicators>ポーン色のエッジ表示</PawnColoredEdgeIndicators>
 	<KeyLeftShift>左Shift</KeyLeftShift>
 	<KeyLeftAlt>左Alt</KeyLeftAlt>
 	<KeyLeftControl>左Ctrl</KeyLeftControl>

@@ -35,6 +35,7 @@
 	<DisableCameraShake>Kamerawackeln deaktivieren</DisableCameraShake>
 	<MouseRevealsLabels>Maus enthüllt Schilder{0}</MouseRevealsLabels>
 	<EdgeIndicators>Kantenindikatoren{0}</EdgeIndicators>
+	<PawnColoredEdgeIndicators>Randpunkte in Figurenfarbe</PawnColoredEdgeIndicators>
 	<KeyLeftShift>Linke Umschalttaste</KeyLeftShift>
 	<KeyLeftAlt>Linke Alt-Taste</KeyLeftAlt>
 	<KeyLeftControl>Linke Strg-Taste</KeyLeftControl>

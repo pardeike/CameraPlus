@@ -35,6 +35,7 @@
 	<DisableCameraShake>Desactivar el movimiento de la cámara</DisableCameraShake>
 	<MouseRevealsLabels>El ratón revela etiquetas{0}</MouseRevealsLabels>
 	<EdgeIndicators>Indicadores de borde{0}</EdgeIndicators>
+	<PawnColoredEdgeIndicators>Bordes con color de peón</PawnColoredEdgeIndicators>
 	<KeyLeftShift>Shift izquierdo</KeyLeftShift>
 	<KeyLeftAlt>Alt izquierdo</KeyLeftAlt>
 	<KeyLeftControl>Ctrl izquierdo</KeyLeftControl>

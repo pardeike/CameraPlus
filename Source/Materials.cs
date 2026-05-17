@@ -6,6 +6,7 @@ namespace CameraPlus
 	public class Materials
 	{
 		public Material dot;
+		public Material edgeDot;
 		public Material silhouette;
 		public Material custom;
 		public DotStyle mode;
@@ -28,6 +29,11 @@ namespace CameraPlus
 			ApplyColors(dot, fill, outline);
 			ApplyColors(silhouette, fill, outline);
 			ApplyColors(custom, fill, outline);
+		}
+
+		public void ApplyEdgeColors(Color fill, Color outline)
+		{
+			ApplyColors(edgeDot, fill, outline);
 		}
 
 		public bool Matches(DotConfig dotConfig)

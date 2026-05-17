@@ -35,6 +35,7 @@
 	<DisableCameraShake>Отключить тряску камеры</DisableCameraShake>
 	<MouseRevealsLabels>Мышь показывает метки{0}</MouseRevealsLabels>
 	<EdgeIndicators>Краевые индикаторы{0}</EdgeIndicators>
+	<PawnColoredEdgeIndicators>Края цвета пешек</PawnColoredEdgeIndicators>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>

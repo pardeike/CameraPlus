@@ -156,6 +156,8 @@ namespace CameraPlus
 			{
 				innerColor = selected == 1 ? dotConfig.fillSelectedColor : dotConfig.fillColor;
 				outerColor = selected == 1 ? dotConfig.lineSelectedColor : dotConfig.lineColor;
+				if (ShouldPreserveSelectedAnimalSilhouetteFill(pawn, dotConfig, selected, innerColor))
+					innerColor = dotConfig.fillColor;
 				return true;
 			}
 
@@ -214,6 +216,29 @@ namespace CameraPlus
 			}
 
 			return true;
+		}
+
+		public static Color GetEdgeFillColor(Pawn pawn, Color fillColor)
+		{
+			using var measure = PerfMetrics.Measure("DotTools.GetEdgeFillColor");
+			PerfMetrics.Count("get_edge_fill_color.calls");
+
+			if (Settings.pawnColoredEdgeIndicators == false || fillColor.a > 0f || pawn.RaceProps.Animal == false)
+				return fillColor;
+
+			var pawnColor = Tools.GetMainColor(pawn);
+			return pawnColor.a > 0f ? pawnColor : fillColor;
+		}
+
+		static bool ShouldPreserveSelectedAnimalSilhouetteFill(Pawn pawn, DotConfig dotConfig, int selected, Color fillColor)
+		{
+			if (selected == 0 || dotConfig.mode != DotStyle.BetterSilhouettes || pawn.RaceProps.Animal == false)
+				return false;
+
+			if (dotConfig.fillColor.a > 0f)
+				return false;
+
+			return fillColor == Color.white;
 		}
 
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)

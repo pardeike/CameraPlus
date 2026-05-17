@@ -39,7 +39,7 @@ namespace CameraPlus
 				lineColor = Color.black,
 				fillColor = Color.clear,
 				lineSelectedColor = Color.white,
-				fillSelectedColor = Color.white,
+				fillSelectedColor = Color.clear,
 				mouseReveals = false,
 				outlineFactor = 0.05f,
 			}

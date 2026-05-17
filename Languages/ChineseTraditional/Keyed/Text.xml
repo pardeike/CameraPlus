@@ -35,6 +35,7 @@
 	<DisableCameraShake>禁用相機抖動</DisableCameraShake>
 	<MouseRevealsLabels>鼠標顯示標籤{0}</MouseRevealsLabels>
 	<EdgeIndicators>邊緣指示器{0}</EdgeIndicators>
+	<PawnColoredEdgeIndicators>邊緣指示器使用單位顏色</PawnColoredEdgeIndicators>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>
