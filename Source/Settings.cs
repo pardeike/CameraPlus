@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using RimWorld;
@@ -56,24 +56,39 @@ namespace CameraPlus
 		const float navWidth = 160f;
 		const float helpWidth = 220f;
 		const float scrollBarWidth = 16f;
+		const float contentHorizontalPadding = 12f;
+		const float bottomButtonClearance = 64f;
+		const float navItemPadding = 8f;
+		const float navIconBoxSize = 26f;
+		const float navIconPadding = 2f;
+		const float navIconLabelGap = 8f;
+		const float groupHeaderContentGap = 10f;
+		const float shortcutButtonWidth = 80f;
+		const float shortcutButtonSpacing = 4f;
+		const float shortcutButtonHeight = 28f;
+
+		static readonly Color DisabledTextColor = new Color(0.55f, 0.55f, 0.55f);
+		static readonly Color RuleNoteColor = new Color(0.95f, 0.72f, 0.36f);
 
 		SettingsTopicId selectedTopic = SettingsTopicId.All;
 		Vector2 settingsScrollPosition = Vector2.zero;
 		float settingsContentHeight = 1f;
 		string hoveredHelpTitleKey;
 		string hoveredHelpBodyKey;
+		string hoveredHelpExtraText;
 
 		static readonly SettingsTopic[] topics = [
 			new(SettingsTopicId.All, "SettingsTopic_All", "SettingsHelp_All"),
-			new(SettingsTopicId.Zoom, "SettingsTopic_Zoom", "SettingsHelp_Zoom"),
-			new(SettingsTopicId.Movement, "SettingsTopic_Movement", "SettingsHelp_Movement"),
-			new(SettingsTopicId.Audio, "SettingsTopic_Audio", "SettingsHelp_Audio"),
-			new(SettingsTopicId.Camera, "SettingsTopic_Camera", "SettingsHelp_Camera"),
-			new(SettingsTopicId.Labels, "SettingsTopic_Labels", "SettingsHelp_Labels"),
-			new(SettingsTopicId.Markers, "SettingsTopic_Markers", "SettingsHelp_Markers"),
-			new(SettingsTopicId.Animals, "SettingsTopic_Animals", "SettingsHelp_Animals"),
-			new(SettingsTopicId.Edges, "SettingsTopic_Edges", "SettingsHelp_Edges"),
-			new(SettingsTopicId.Appearance, "SettingsTopic_Appearance", "SettingsHelp_Appearance"),
+			new(SettingsTopicId.Zoom, "SettingsTopic_Zoom", "SettingsHelp_Zoom", "SettingsTopics/Zoom"),
+			new(SettingsTopicId.Movement, "SettingsTopic_Movement", "SettingsHelp_Movement", "SettingsTopics/Movement"),
+			new(SettingsTopicId.Audio, "SettingsTopic_Audio", "SettingsHelp_Audio", "SettingsTopics/Audio"),
+			new(SettingsTopicId.Camera, "SettingsTopic_Camera", "SettingsHelp_Camera", "SettingsTopics/Camera"),
+			new(SettingsTopicId.Labels, "SettingsTopic_Labels", "SettingsHelp_Labels", "SettingsTopics/Labels"),
+			new(SettingsTopicId.Markers, "SettingsTopic_Markers", "SettingsHelp_Markers", "SettingsTopics/Markers"),
+			new(SettingsTopicId.Animals, "SettingsTopic_Animals", "SettingsHelp_Animals", "SettingsTopics/Animals"),
+			new(SettingsTopicId.Edges, "SettingsTopic_Edges", "SettingsHelp_Edges", "SettingsTopics/Edges"),
+			new(SettingsTopicId.Appearance, "SettingsTopic_Appearance", "SettingsHelp_Appearance", "SettingsTopics/Appearance"),
+			new(SettingsTopicId.Shortcuts, "SettingsTopic_Keyboard", "SettingsHelp_Shortcuts", "SettingsTopics/Keyboard"),
 		];
 
 		static readonly SettingsGroup[] groups = [
@@ -88,6 +103,7 @@ namespace CameraPlus
 			new(SettingsGroupId.AnimalPolicy, SettingsTopicId.Animals, "SettingsGroup_AnimalPolicy", "SettingsHelp_AnimalPolicy"),
 			new(SettingsGroupId.EdgeIndicators, SettingsTopicId.Edges, "SettingsGroup_EdgeIndicators", "SettingsHelp_EdgeIndicators"),
 			new(SettingsGroupId.MarkerAppearance, SettingsTopicId.Appearance, "SettingsGroup_MarkerAppearance", "SettingsHelp_MarkerAppearance"),
+			new(SettingsGroupId.KeyboardShortcuts, SettingsTopicId.Shortcuts, "HotKeys", "SettingsHelp_KeyboardShortcuts"),
 		];
 
 		static List<DotConfig> CurrentDotConfigs()
@@ -140,14 +156,54 @@ namespace CameraPlus
 			maxRootResult = zoomedOutPercent * 2;
 		}
 
-		static string OverrideNote(Func<DotConfig, bool> predicate)
+		static int RuleCount(Func<DotConfig, bool> predicate)
+			=> CurrentDotConfigs().Count(dc => predicate(dc));
+
+		static string OverrideNote(int n)
 		{
-			var n = CurrentDotConfigs().Count(dc => predicate(dc));
 			if (n == 1)
 				return "SettingsNote_OverriddenByRule".Translate(1);
 			if (n > 1)
 				return "SettingsNote_OverriddenByRules".Translate(n);
 			return null;
+		}
+
+		static string OverrideNote(Func<DotConfig, bool> predicate)
+			=> OverrideNote(RuleCount(predicate));
+
+		static string RuleOverrideHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleOverrideByRule".Translate().ToString() : "SettingsHelp_RuleOverrideByRules".Translate(n).ToString());
+
+		static string RuleMarkerStyleHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleMarkerStyleByRule".Translate().ToString() : "SettingsHelp_RuleMarkerStyleByRules".Translate(n).ToString());
+
+		static string RuleMarkerThresholdHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleMarkerThresholdByRule".Translate().ToString() : "SettingsHelp_RuleMarkerThresholdByRules".Translate(n).ToString());
+
+		static string RuleSizeMultiplierHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleSizeMultiplierByRule".Translate().ToString() : "SettingsHelp_RuleSizeMultiplierByRules".Translate(n).ToString());
+
+		static string RuleInsideMarkerHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleInsideMarkerByRule".Translate().ToString() : "SettingsHelp_RuleInsideMarkerByRules".Translate(n).ToString());
+
+		static string RuleEdgeDisabledByStyleHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleEdgeDisabledByStyleByRule".Translate().ToString() : "SettingsHelp_RuleEdgeDisabledByStyleByRules".Translate(n).ToString());
+
+		static string RuleAnimalEdgeColorHelp(int n)
+			=> n <= 0 ? null : (n == 1 ? "SettingsHelp_RuleAnimalEdgeColorByRule".Translate().ToString() : "SettingsHelp_RuleAnimalEdgeColorByRules".Translate(n).ToString());
+
+		static string CombineHelp(params string[] paragraphs)
+		{
+			var result = "";
+			foreach (var paragraph in paragraphs)
+			{
+				if (paragraph.NullOrEmpty())
+					continue;
+				if (result.NullOrEmpty() == false)
+					result += "\n\n";
+				result += paragraph;
+			}
+			return result.NullOrEmpty() ? null : result;
 		}
 
 		public void DoWindowContents(Rect inRect)
@@ -157,12 +213,13 @@ namespace CameraPlus
 
 			hoveredHelpTitleKey = null;
 			hoveredHelpBodyKey = null;
+			hoveredHelpExtraText = null;
 
 			var outerRect = inRect.ContractedBy(4f);
 			var topRect = new Rect(outerRect.x, outerRect.y, outerRect.width, topRowHeight);
 			DrawTopActions(topRect);
 
-			var bodyRect = new Rect(outerRect.x, topRect.yMax + 8f, outerRect.width, outerRect.height - topRowHeight - 8f);
+			var bodyRect = new Rect(outerRect.x, topRect.yMax + 8f, outerRect.width, outerRect.height - topRowHeight - 8f - bottomButtonClearance);
 			var effectiveHelpWidth = Mathf.Min(helpWidth, Mathf.Max(190f, bodyRect.width * 0.25f));
 			var effectiveNavWidth = Mathf.Min(navWidth, Mathf.Max(140f, bodyRect.width * 0.18f));
 			var settingsWidth = bodyRect.width - effectiveNavWidth - effectiveHelpWidth - 2f * columnSpacing;
@@ -180,20 +237,15 @@ namespace CameraPlus
 		{
 			var restoreLabel = "RestoreToDefaultSettings".Translate().ToString();
 			var rulesLabel = (Current.Game != null ? "RulesGame" : "RulesStart").Translate().ToString();
-			var shortcutsLabel = "HotKeys".Translate().ToString();
 
 			var restoreWidth = Mathf.Min(180f, restoreLabel.GetWidthCached() + 24f);
 			var rulesWidth = Mathf.Min(220f, rulesLabel.GetWidthCached() + 24f);
-			var shortcutsWidth = Mathf.Min(190f, shortcutsLabel.GetWidthCached() + 24f);
 			var buttonY = rect.y + 2f;
 			var buttonHeight = rect.height - 4f;
 
 			var restoreRect = new Rect(rect.xMax - restoreWidth, buttonY, restoreWidth, buttonHeight);
 			var rulesRect = new Rect(restoreRect.x - rulesWidth - 8f, buttonY, rulesWidth, buttonHeight);
-			var shortcutsRect = new Rect(rulesRect.x - shortcutsWidth - 8f, buttonY, shortcutsWidth, buttonHeight);
 
-			if (Widgets.ButtonText(shortcutsRect, shortcutsLabel))
-				Find.WindowStack.Add(new Dialog_Shortcuts());
 			if (Widgets.ButtonText(rulesRect, rulesLabel))
 				OpenRulesDialog();
 			if (Widgets.ButtonText(restoreRect, restoreLabel))
@@ -222,19 +274,42 @@ namespace CameraPlus
 			foreach (var topic in topics)
 			{
 				var label = topic.LabelKey.Translate().ToString();
-				var rowHeight = Mathf.Max(28f, TextHeight(label, rect.width - 12f, GameFont.Tiny) + 8f);
+				var icon = TopicIcon(topic);
+				var hasIcon = icon != null;
+				var labelX = rect.x + navItemPadding + (hasIcon ? navIconBoxSize + navIconLabelGap : 0f);
+				var labelWidth = rect.xMax - navItemPadding - labelX;
+				var labelHeight = TextHeight(label, labelWidth, GameFont.Small);
+				var lineHeight = TextLineHeight(GameFont.Small);
+				var minTextHeight = hasIcon
+					? navItemPadding + (navIconBoxSize - lineHeight) / 2f + labelHeight + navItemPadding
+					: labelHeight + 2f * navItemPadding;
+				var rowHeight = Mathf.Max(38f, minTextHeight, hasIcon ? navIconBoxSize + 2f * navItemPadding : 0f);
 				var rowRect = new Rect(rect.x, y, rect.width, rowHeight);
 				var selected = selectedTopic == topic.Id;
 				if (selected)
-					DrawFill(rowRect, new Color(1f, 1f, 1f, 0.10f));
+					DrawFill(rowRect, new Color(1f, 1f, 1f, 0.13f));
 				else if (Mouse.IsOver(rowRect))
-					DrawFill(rowRect, new Color(1f, 1f, 1f, 0.05f));
+					DrawFill(rowRect, new Color(1f, 1f, 1f, 0.06f));
 
-				DrawText(rowRect.ContractedBy(6f, 3f), label, GameFont.Tiny, selected ? Color.white : Color.gray);
+				if (hasIcon)
+				{
+					var iconBox = new Rect(rect.x + navItemPadding, rowRect.y + navItemPadding, navIconBoxSize, navIconBoxSize);
+					GUI.DrawTexture(iconBox.ContractedBy(navIconPadding), icon, ScaleMode.ScaleToFit, true);
+					var labelRect = new Rect(labelX, iconBox.center.y - lineHeight / 2f, labelWidth, labelHeight);
+					DrawText(labelRect, label, GameFont.Small, Color.white);
+				}
+				else
+				{
+					DrawText(rowRect.ContractedBy(navItemPadding, 0f), label, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+				}
+
 				if (Widgets.ButtonInvisible(rowRect))
 				{
 					if (selectedTopic != topic.Id)
+					{
 						settingsScrollPosition = Vector2.zero;
+						settingsContentHeight = 1f;
+					}
 					selectedTopic = topic.Id;
 				}
 
@@ -246,15 +321,18 @@ namespace CameraPlus
 
 		void DrawSettingsContent(Rect rect)
 		{
-			var viewRect = new Rect(0f, 0f, rect.width - scrollBarWidth, Mathf.Max(settingsContentHeight, rect.height + 1f));
+			var viewHeight = Mathf.Max(settingsContentHeight, rect.height);
+			var needsScrollBar = viewHeight > rect.height;
+			var viewWidth = rect.width - (needsScrollBar ? scrollBarWidth : 0f);
+			var viewRect = new Rect(0f, 0f, viewWidth, viewHeight);
 			Widgets.BeginScrollView(rect, ref settingsScrollPosition, viewRect);
-			var ctx = new SettingsUiContext(viewRect.width);
+			var ctx = new SettingsUiContext(contentHorizontalPadding, viewRect.width - 2f * contentHorizontalPadding);
 
 			foreach (var group in groups)
 				if (selectedTopic == SettingsTopicId.All || selectedTopic == group.Topic)
 					DrawGroup(ctx, group);
 
-			settingsContentHeight = Mathf.Max(rect.height + 1f, ctx.CurY + 12f);
+			settingsContentHeight = Mathf.Max(rect.height, ctx.CurY + 12f);
 			Widgets.EndScrollView();
 		}
 
@@ -262,6 +340,7 @@ namespace CameraPlus
 		{
 			ctx.Gap(6f);
 			DrawGroupTitle(ctx, group.TitleKey, group.HelpKey);
+			ctx.Gap(groupHeaderContentGap);
 			switch (group.Id)
 			{
 				case SettingsGroupId.ZoomRange:
@@ -297,6 +376,9 @@ namespace CameraPlus
 				case SettingsGroupId.MarkerAppearance:
 					DrawMarkerAppearance(ctx);
 					break;
+				case SettingsGroupId.KeyboardShortcuts:
+					DrawKeyboardShortcuts(ctx);
+					break;
 			}
 			ctx.Gap(14f);
 		}
@@ -304,12 +386,12 @@ namespace CameraPlus
 		void DrawGroupTitle(SettingsUiContext ctx, string titleKey, string helpKey)
 		{
 			var title = titleKey.Translate().ToString();
-			var height = TextHeight(title, ctx.Width, GameFont.Small) + 8f;
+			var height = Mathf.Max(28f, TextHeight(title, ctx.Width - 2f * navItemPadding, GameFont.Small) + 6f);
 			var rect = ctx.GetRect(height);
 			if (Mouse.IsOver(rect))
 				SetHelp(titleKey, helpKey);
-			DrawText(new Rect(rect.x, rect.y, rect.width, height - 3f), title, GameFont.Small, Color.white);
-			DrawFill(new Rect(rect.x, rect.yMax - 2f, rect.width, 1f), new Color(1f, 1f, 1f, 0.12f));
+			DrawFill(rect, new Color(1f, 1f, 1f, 0.13f));
+			DrawText(rect.ContractedBy(navItemPadding, 0f), title, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
 		}
 
 		void DrawZoomRange(SettingsUiContext ctx)
@@ -374,7 +456,9 @@ namespace CameraPlus
 			var enabled = dotStyle > DotStyle.VanillaDefault;
 			var note = enabled ? null : "SettingsNote_RequiresCameraMarkers".Translate().ToString();
 
-			DrawCheckbox(ctx, "MouseRevealsLabels", ref mouseOverShowsLabels, "SettingsHelp_MouseRevealsLabels", enabled, note ?? OverrideNote(dc => dc.mouseReveals != mouseOverShowsLabels), Caches.ClearMarkerState);
+			var mouseRevealRuleCount = enabled ? RuleCount(dc => dc.mouseReveals != mouseOverShowsLabels) : 0;
+			var overrideNote = OverrideNote(mouseRevealRuleCount);
+			DrawCheckbox(ctx, "MouseRevealsLabels", ref mouseOverShowsLabels, "SettingsHelp_MouseRevealsLabels", enabled, note ?? overrideNote, Caches.ClearMarkerState, 0f, note == null && overrideNote != null ? RuleNoteColor : DisabledTextColor, RuleOverrideHelp(mouseRevealRuleCount));
 			DrawIntSlider(ctx, "HidePawnLabelBelow", hidePawnLabelBelow, 0, 64, PixelValue, value =>
 			{
 				hidePawnLabelBelow = value;
@@ -390,17 +474,24 @@ namespace CameraPlus
 
 		void DrawMarkerStyle(SettingsUiContext ctx)
 		{
-			DrawDotStyleOption(ctx, DotStyle.VanillaDefault);
-			DrawDotStyleOption(ctx, DotStyle.ClassicDots);
-			DrawDotStyleOption(ctx, DotStyle.BetterSilhouettes);
+			var markerStyleRuleCount = RuleCount(dc => dc.mode != dotStyle);
+			var insideMarkerRuleCount = RuleCount(dc => dc.useInside == false);
+			var markerStyleHelp = CombineHelp(RuleMarkerStyleHelp(markerStyleRuleCount), RuleInsideMarkerHelp(insideMarkerRuleCount));
+			DrawDotStyleOption(ctx, DotStyle.VanillaDefault, markerStyleHelp);
+			DrawDotStyleOption(ctx, DotStyle.ClassicDots, markerStyleHelp);
+			DrawDotStyleOption(ctx, DotStyle.BetterSilhouettes, markerStyleHelp);
+			ctx.Gap(8f);
 
 			var enabled = dotStyle > DotStyle.VanillaDefault;
 			var note = enabled ? null : "SettingsNote_RequiresCameraMarkers".Translate().ToString();
+			var thresholdRuleCount = enabled ? RuleCount(dc => dc.showBelowPixels != -1) : 0;
+			var thresholdNote = note ?? OverrideNote(thresholdRuleCount);
+			var thresholdHelp = CombineHelp(RuleMarkerThresholdHelp(thresholdRuleCount), RuleInsideMarkerHelp(insideMarkerRuleCount));
 			DrawIntSlider(ctx, "ShowMarkerBelow", dotSize, 1, 64, value => $"{value} {"Pixel".Translate()}", value =>
 			{
 				dotSize = value;
 				Caches.ClearMarkerState();
-			}, "SettingsHelp_ShowMarkerBelow", enabled, note, true);
+			}, "SettingsHelp_ShowMarkerBelow", enabled, thresholdNote, true, note == null && thresholdNote != null ? RuleNoteColor : DisabledTextColor, thresholdHelp);
 		}
 
 		void DrawAnimalPolicy(SettingsUiContext ctx)
@@ -414,25 +505,86 @@ namespace CameraPlus
 
 		void DrawEdgeIndicators(SettingsUiContext ctx)
 		{
-			DrawCheckbox(ctx, "EdgeIndicators", ref edgeIndicators, "SettingsHelp_EdgeIndicators", true, OverrideNote(dc => dc.useEdge != edgeIndicators), Caches.ClearMarkerState);
+			var edgeRuleCount = RuleCount(dc => dc.useEdge != edgeIndicators);
+			var edgeOffStyleRuleCount = RuleCount(dc => dc.mode == DotStyle.Off);
+			var edgeHelp = CombineHelp(RuleOverrideHelp(edgeRuleCount), RuleEdgeDisabledByStyleHelp(edgeOffStyleRuleCount));
+			DrawCheckbox(ctx, "EdgeIndicators", ref edgeIndicators, "SettingsHelp_EdgeIndicators", true, OverrideNote(edgeRuleCount), Caches.ClearMarkerState, 0f, RuleNoteColor, edgeHelp);
 			var note = edgeIndicators ? null : "SettingsNote_RequiresEdgeIndicators".Translate().ToString();
-			DrawCheckbox(ctx, "PawnColoredEdgeIndicators", ref pawnColoredEdgeIndicators, "SettingsHelp_AnimalEdgeColors", edgeIndicators, note, Caches.ClearMarkerState, 18f);
+			var animalEdgeColorRuleCount = edgeIndicators && pawnColoredEdgeIndicators ? RuleCount(dc => dc.fillColor.a > 0f || dc.fillSelectedColor.a > 0f) : 0;
+			DrawCheckbox(ctx, "PawnColoredEdgeIndicators", ref pawnColoredEdgeIndicators, "SettingsHelp_AnimalEdgeColors", edgeIndicators, note, Caches.ClearMarkerState, 18f, helpExtra: RuleAnimalEdgeColorHelp(animalEdgeColorRuleCount));
 		}
 
 		void DrawMarkerAppearance(SettingsUiContext ctx)
 		{
-			DrawFloatSlider(ctx, "DotSilhouetteSize", dotRelativeSize, 0f, 4f, PercentValue, value => dotRelativeSize = value, "SettingsHelp_DotSilhouetteSize");
-			DrawFloatSlider(ctx, "EdgeDotSize", clippedRelativeSize, 0f, 2f, PercentValue, value => clippedRelativeSize = value, "SettingsHelp_EdgeDotSize");
+			var sizeRuleCount = RuleCount(dc => Mathf.Approximately(dc.relativeSize, 1f) == false);
+			var sizeHelp = RuleSizeMultiplierHelp(sizeRuleCount);
+			DrawFloatSlider(ctx, "DotSilhouetteSize", dotRelativeSize, 0f, 4f, PercentValue, value => dotRelativeSize = value, "SettingsHelp_DotSilhouetteSize", helpExtra: sizeHelp);
+			DrawFloatSlider(ctx, "EdgeDotSize", clippedRelativeSize, 0f, 2f, PercentValue, value => clippedRelativeSize = value, "SettingsHelp_EdgeDotSize", helpExtra: sizeHelp);
 			DrawFloatSlider(ctx, "EdgeDistanceFactor", clippedBorderDistanceFactor, 0f, 2f, PercentValue, value => clippedBorderDistanceFactor = value, "SettingsHelp_EdgeDistanceFactor");
+			var outlineRuleCount = RuleCount(dc => Mathf.Approximately(dc.outlineFactor, outlineFactor) == false);
+			var outlineNote = OverrideNote(outlineRuleCount);
 			DrawFloatSlider(ctx, "OutlineSize", outlineFactor, 0f, 0.4f, PercentValue, value =>
 			{
 				if (Mathf.Approximately(outlineFactor, value) == false)
 					MarkerCache.Clear();
 				outlineFactor = value;
-			}, "SettingsHelp_OutlineSize");
+			}, "SettingsHelp_OutlineSize", note: outlineNote, noteColor: outlineNote != null ? RuleNoteColor : DisabledTextColor, helpExtra: RuleOverrideHelp(outlineRuleCount));
 		}
 
-		void DrawDotStyleOption(SettingsUiContext ctx, DotStyle value)
+		void DrawKeyboardShortcuts(SettingsUiContext ctx)
+		{
+			DrawShortcutRow(ctx, "SettingsKey", "SettingsHelp_SettingsShortcut", rect =>
+			{
+				var keyRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(keyRect, true, Settings.cameraSettingsKey, KeyCode.Tab, code => Settings.cameraSettingsKey = code);
+				var secondModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsMod[1], KeyCode.None, code => Settings.cameraSettingsMod[1] = code);
+				var firstModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsMod[0], KeyCode.None, code => Settings.cameraSettingsMod[0] = code);
+			});
+
+			DrawShortcutRow(ctx, "LoadModifier", "SettingsHelp_LoadShortcut", rect =>
+			{
+				var numberRect = TakeShortcutButton(ref rect);
+				DrawText(numberRect, "1 - 9", GameFont.Small, Color.white, TextAnchor.MiddleCenter);
+				var secondModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsLoad[1], KeyCode.None, code => Settings.cameraSettingsLoad[1] = code);
+				var firstModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsLoad[0], KeyCode.LeftShift, code => Settings.cameraSettingsLoad[0] = code);
+			});
+
+			DrawShortcutRow(ctx, "SaveModifier", "SettingsHelp_SaveShortcut", rect =>
+			{
+				var numberRect = TakeShortcutButton(ref rect);
+				DrawText(numberRect, "1 - 9", GameFont.Small, Color.white, TextAnchor.MiddleCenter);
+				var secondModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsSave[1], KeyCode.None, code => Settings.cameraSettingsSave[1] = code);
+				var firstModifierRect = TakeShortcutButton(ref rect);
+				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsSave[0], KeyCode.LeftAlt, code => Settings.cameraSettingsSave[0] = code);
+			});
+		}
+
+		void DrawShortcutRow(SettingsUiContext ctx, string labelKey, string helpKey, Action<Rect> drawButtons)
+		{
+			var label = labelKey.Translate().ToString();
+			var buttonsWidth = 3f * shortcutButtonWidth + 2f * shortcutButtonSpacing;
+			var labelWidth = ctx.Width - buttonsWidth - 12f;
+			var labelHeight = TextHeight(label, labelWidth, GameFont.Small);
+			var rowHeight = Mathf.Max(shortcutButtonHeight, labelHeight) + 8f;
+			var row = ctx.GetRect(rowHeight);
+			DrawControlHover(row, labelKey, helpKey);
+			DrawText(new Rect(row.x, row.y, labelWidth, row.height), label, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+			drawButtons(new Rect(row.xMax - buttonsWidth, row.y + (row.height - shortcutButtonHeight) / 2f, buttonsWidth, shortcutButtonHeight));
+		}
+
+		static Rect TakeShortcutButton(ref Rect available)
+		{
+			var rect = new Rect(available.xMax - shortcutButtonWidth, available.y, shortcutButtonWidth, shortcutButtonHeight);
+			available.xMax = rect.x - shortcutButtonSpacing;
+			return rect;
+		}
+
+		void DrawDotStyleOption(SettingsUiContext ctx, DotStyle value, string helpExtra)
 		{
 			DrawRadio(ctx, value.ToString(), dotStyle == value, "SettingsHelp_DotStyle", () =>
 			{
@@ -441,7 +593,7 @@ namespace CameraPlus
 					dotStyle = value;
 					Caches.ClearMarkerState();
 				}
-			});
+			}, helpExtra: helpExtra);
 		}
 
 		void DrawAnimalStyleOption(SettingsUiContext ctx, LabelStyle value)
@@ -456,21 +608,21 @@ namespace CameraPlus
 			});
 		}
 
-		void DrawFloatSlider(SettingsUiContext ctx, string labelKey, float value, float min, float max, Func<float, string> valueText, Action<float> setter, string helpKey, bool enabled = true, string note = null)
+		void DrawFloatSlider(SettingsUiContext ctx, string labelKey, float value, float min, float max, Func<float, string> valueText, Action<float> setter, string helpKey, bool enabled = true, string note = null, Color? noteColor = null, string helpExtra = null)
 		{
-			var label = labelKey.Translate().ToString();
+			var label = ControlLabel(labelKey);
 			var valueLabel = valueText(value);
-			var valueWidth = Mathf.Min(120f, Mathf.Max(70f, valueLabel.GetWidthCached() + 8f));
+			var valueWidth = Mathf.Min(120f, Mathf.Max(70f, TextWidth(valueLabel, GameFont.Small) + 8f));
 			var labelWidth = ctx.Width - valueWidth - 8f;
-			var labelHeight = TextHeight(label, labelWidth, GameFont.Tiny);
+			var labelHeight = TextHeight(label, labelWidth, GameFont.Small);
 			var noteHeight = NoteHeight(note, ctx.Width);
-			var row = ctx.GetRect(labelHeight + 28f + noteHeight + 8f);
+			var row = ctx.GetRect(labelHeight + 30f + noteHeight + 8f);
 
-			DrawControlHover(row, labelKey, helpKey);
-			DrawText(new Rect(row.x, row.y, labelWidth, labelHeight), label, GameFont.Tiny, enabled ? Color.white : Color.gray);
-			DrawText(new Rect(row.xMax - valueWidth, row.y, valueWidth, labelHeight), valueLabel, GameFont.Tiny, enabled ? Color.white : Color.gray, TextAnchor.UpperRight);
+			DrawControlHover(row, labelKey, helpKey, helpExtra);
+			DrawText(new Rect(row.x, row.y, labelWidth, labelHeight), label, GameFont.Small, enabled ? Color.white : DisabledTextColor);
+			DrawText(new Rect(row.xMax - valueWidth, row.y, valueWidth, labelHeight), valueLabel, GameFont.Small, enabled ? Color.white : DisabledTextColor, TextAnchor.UpperRight);
 
-			var sliderRect = new Rect(row.x, row.y + labelHeight + 3f, row.width, 20f);
+			var sliderRect = new Rect(row.x, row.y + labelHeight + 5f, row.width, 20f);
 			var oldEnabled = GUI.enabled;
 			GUI.enabled = enabled;
 			var newValue = GUI.HorizontalSlider(sliderRect, value, min, max);
@@ -478,10 +630,10 @@ namespace CameraPlus
 			if (enabled)
 				setter(newValue);
 
-			DrawNote(note, row.x, sliderRect.yMax + 2f, row.width);
+			DrawNote(note, row.x, sliderRect.yMax + 2f, row.width, noteColor ?? DisabledTextColor);
 		}
 
-		void DrawIntSlider(SettingsUiContext ctx, string labelKey, int value, int min, int max, Func<int, string> valueText, Action<int> setter, string helpKey, bool enabled = true, string note = null, bool clearMarkerState = false)
+		void DrawIntSlider(SettingsUiContext ctx, string labelKey, int value, int min, int max, Func<int, string> valueText, Action<int> setter, string helpKey, bool enabled = true, string note = null, bool clearMarkerState = false, Color? noteColor = null, string helpExtra = null)
 		{
 			DrawFloatSlider(ctx, labelKey, value, min, max, f => valueText(Mathf.RoundToInt(f)), f =>
 			{
@@ -492,40 +644,40 @@ namespace CameraPlus
 					if (clearMarkerState)
 						Caches.ClearMarkerState();
 				}
-			}, helpKey, enabled, note);
+			}, helpKey, enabled, note, noteColor, helpExtra);
 		}
 
-		void DrawCheckbox(SettingsUiContext ctx, string labelKey, ref bool value, string helpKey, bool enabled = true, string note = null, Action changed = null, float indent = 0f)
+		void DrawCheckbox(SettingsUiContext ctx, string labelKey, ref bool value, string helpKey, bool enabled = true, string note = null, Action changed = null, float indent = 0f, Color? noteColor = null, string helpExtra = null)
 		{
-			var label = labelKey.Translate().ToString();
+			var label = ControlLabel(labelKey);
 			var labelWidth = ctx.Width - indent - 32f;
-			var labelHeight = Mathf.Max(24f, TextHeight(label, labelWidth, GameFont.Tiny));
+			var labelHeight = Mathf.Max(28f, TextHeight(label, labelWidth, GameFont.Small));
 			var noteHeight = NoteHeight(note, labelWidth);
 			var row = ctx.GetRect(labelHeight + noteHeight + 8f);
 			var contentRect = new Rect(row.x + indent, row.y, row.width - indent, row.height);
 			var lineRect = new Rect(contentRect.x, contentRect.y, contentRect.width, labelHeight);
 
-			DrawControlHover(contentRect, labelKey, helpKey);
-			Widgets.CheckboxDraw(contentRect.x, contentRect.y + 2f, value, enabled == false, 24f, null, null);
-			DrawText(new Rect(contentRect.x + 30f, contentRect.y, labelWidth, labelHeight), label, GameFont.Tiny, enabled ? Color.white : Color.gray);
+			DrawControlHover(contentRect, labelKey, helpKey, helpExtra);
+			Widgets.CheckboxDraw(contentRect.x, contentRect.y + (labelHeight - 24f) / 2f, value, enabled == false, 24f, null, null);
+			DrawText(new Rect(contentRect.x + 30f, contentRect.y, labelWidth, labelHeight), label, GameFont.Small, enabled ? Color.white : DisabledTextColor, TextAnchor.MiddleLeft);
 			if (enabled && Widgets.ButtonInvisible(lineRect))
 			{
 				value = !value;
 				changed?.Invoke();
 			}
-			DrawNote(note, contentRect.x + 30f, contentRect.y + labelHeight + 1f, labelWidth);
+			DrawNote(note, contentRect.x + 30f, contentRect.y + labelHeight + 1f, labelWidth, noteColor ?? DisabledTextColor);
 		}
 
-		void DrawRadio(SettingsUiContext ctx, string labelKey, bool chosen, string helpKey, Action select, bool enabled = true)
+		void DrawRadio(SettingsUiContext ctx, string labelKey, bool chosen, string helpKey, Action select, bool enabled = true, string helpExtra = null)
 		{
 			var label = labelKey.Translate().ToString();
 			var labelWidth = ctx.Width - 32f;
-			var labelHeight = Mathf.Max(24f, TextHeight(label, labelWidth, GameFont.Tiny));
-			var row = ctx.GetRect(labelHeight + 4f);
+			var labelHeight = Mathf.Max(28f, TextHeight(label, labelWidth, GameFont.Small));
+			var row = ctx.GetRect(labelHeight + 6f);
 
-			DrawControlHover(row, labelKey, helpKey);
-			var clickedCircle = Widgets.RadioButton(row.x, row.y + 2f, chosen, enabled == false);
-			DrawText(new Rect(row.x + 30f, row.y, labelWidth, labelHeight), label, GameFont.Tiny, enabled ? Color.white : Color.gray);
+			DrawControlHover(row, labelKey, helpKey, helpExtra);
+			var clickedCircle = Widgets.RadioButton(row.x, row.y + (labelHeight - 24f) / 2f, chosen, enabled == false);
+			DrawText(new Rect(row.x + 30f, row.y, labelWidth, labelHeight), label, GameFont.Small, enabled ? Color.white : DisabledTextColor, TextAnchor.MiddleLeft);
 			var clickedLabel = enabled && Widgets.ButtonInvisible(new Rect(row.x + 30f, row.y, labelWidth, labelHeight));
 			if ((clickedCircle || clickedLabel) && enabled)
 				select();
@@ -536,32 +688,49 @@ namespace CameraPlus
 			var topic = TopicFor(selectedTopic);
 			var titleKey = hoveredHelpTitleKey ?? topic.LabelKey;
 			var bodyKey = hoveredHelpBodyKey ?? topic.HelpKey;
+			var title = titleKey.NullOrEmpty() ? null : titleKey.Translate().ToString();
+			var body = bodyKey.NullOrEmpty() ? null : bodyKey.Translate().ToString();
+			var extra = hoveredHelpExtraText;
+
+			if (title.NullOrEmpty() && body.NullOrEmpty() && extra.NullOrEmpty())
+			{
+				DrawText(rect, "SettingsHelp_Title".Translate().ToString(), GameFont.Small, Color.white, TextAnchor.MiddleCenter);
+				return;
+			}
+
 			var y = rect.y;
+			if (title.NullOrEmpty() == false)
+			{
+				var about = "SettingsHelp_About".Translate(title).ToString();
+				var aboutHeight = TextHeight(about, rect.width, GameFont.Small);
+				DrawText(new Rect(rect.x, y, rect.width, aboutHeight), about, GameFont.Small, Color.white);
+				y += aboutHeight + 10f;
+			}
 
-			DrawText(new Rect(rect.x, y, rect.width, 28f), "SettingsHelp_Title".Translate().ToString(), GameFont.Small, Color.white);
-			y += 32f;
+			if (body.NullOrEmpty() == false && y < rect.yMax)
+			{
+				var bodyHeight = TextHeight(body, rect.width, GameFont.Small);
+				DrawText(new Rect(rect.x, y, rect.width, Mathf.Min(bodyHeight, rect.yMax - y)), body, GameFont.Small, Color.white);
+				y += bodyHeight + 10f;
+			}
 
-			var about = "SettingsHelp_About".Translate(titleKey.Translate()).ToString();
-			var aboutHeight = TextHeight(about, rect.width, GameFont.Tiny);
-			DrawText(new Rect(rect.x, y, rect.width, aboutHeight), about, GameFont.Tiny, Color.white);
-			y += aboutHeight + 8f;
-
-			var body = bodyKey.Translate().ToString();
-			DrawText(new Rect(rect.x, y, rect.width, rect.yMax - y), body, GameFont.Tiny, Color.gray);
+			if (extra.NullOrEmpty() == false && y < rect.yMax)
+				DrawText(new Rect(rect.x, y, rect.width, rect.yMax - y), extra, GameFont.Small, RuleNoteColor);
 		}
 
-		void SetHelp(string titleKey, string bodyKey)
+		void SetHelp(string titleKey, string bodyKey, string extraText = null)
 		{
 			hoveredHelpTitleKey = titleKey;
 			hoveredHelpBodyKey = bodyKey;
+			hoveredHelpExtraText = extraText;
 		}
 
-		void DrawControlHover(Rect rect, string titleKey, string helpKey)
+		void DrawControlHover(Rect rect, string titleKey, string helpKey, string extraText = null)
 		{
 			if (Mouse.IsOver(rect))
 			{
 				DrawFill(rect, new Color(1f, 1f, 1f, 0.035f));
-				SetHelp(titleKey, helpKey);
+				SetHelp(titleKey, helpKey, extraText);
 			}
 		}
 
@@ -579,14 +748,17 @@ namespace CameraPlus
 		static string PercentValue(float value)
 			=> $"{Math.Round(value * 100, 0)}%";
 
+		static string ControlLabel(string key)
+			=> key.Translate("").ToString();
+
 		static float NoteHeight(string note, float width)
 			=> note.NullOrEmpty() ? 0f : TextHeight(note, width, GameFont.Tiny) + 2f;
 
-		static void DrawNote(string note, float x, float y, float width)
+		static void DrawNote(string note, float x, float y, float width, Color color)
 		{
 			if (note.NullOrEmpty())
 				return;
-			DrawText(new Rect(x, y, width, TextHeight(note, width, GameFont.Tiny)), note, GameFont.Tiny, Color.gray);
+			DrawText(new Rect(x, y, width, TextHeight(note, width, GameFont.Tiny)), note, GameFont.Tiny, color);
 		}
 
 		static float TextHeight(string text, float width, GameFont font)
@@ -600,6 +772,21 @@ namespace CameraPlus
 			Text.WordWrap = oldWrap;
 			return Mathf.Ceil(height);
 		}
+
+		static float TextWidth(string text, GameFont font)
+		{
+			var oldFont = Text.Font;
+			Text.Font = font;
+			var width = Text.CalcSize(text).x;
+			Text.Font = oldFont;
+			return Mathf.Ceil(width);
+		}
+
+		static float TextLineHeight(GameFont font)
+			=> TextHeight("Ag", 9999f, font);
+
+		static Texture2D TopicIcon(SettingsTopic topic)
+			=> topic.IconPath.NullOrEmpty() ? null : ContentFinder<Texture2D>.Get(topic.IconPath, false);
 
 		static void DrawText(Rect rect, string text, GameFont font, Color color, TextAnchor anchor = TextAnchor.UpperLeft)
 		{
@@ -626,11 +813,12 @@ namespace CameraPlus
 			GUI.color = oldColor;
 		}
 
-		readonly struct SettingsTopic(SettingsTopicId id, string labelKey, string helpKey)
+		readonly struct SettingsTopic(SettingsTopicId id, string labelKey, string helpKey, string iconPath = null)
 		{
 			public readonly SettingsTopicId Id = id;
 			public readonly string LabelKey = labelKey;
 			public readonly string HelpKey = helpKey;
+			public readonly string IconPath = iconPath;
 		}
 
 		readonly struct SettingsGroup(SettingsGroupId id, SettingsTopicId topic, string titleKey, string helpKey)
@@ -641,14 +829,15 @@ namespace CameraPlus
 			public readonly string HelpKey = helpKey;
 		}
 
-		sealed class SettingsUiContext(float width)
+		sealed class SettingsUiContext(float x, float width)
 		{
+			readonly float x = x;
 			public float Width { get; } = width;
 			public float CurY { get; private set; }
 
 			public Rect GetRect(float height)
 			{
-				var rect = new Rect(0f, CurY, Width, height);
+				var rect = new Rect(x, CurY, Width, height);
 				CurY += height;
 				return rect;
 			}
@@ -670,7 +859,8 @@ namespace CameraPlus
 			Markers,
 			Animals,
 			Edges,
-			Appearance
+			Appearance,
+			Shortcuts
 		}
 
 		enum SettingsGroupId
@@ -685,7 +875,8 @@ namespace CameraPlus
 			MarkerStyle,
 			AnimalPolicy,
 			EdgeIndicators,
-			MarkerAppearance
+			MarkerAppearance,
+			KeyboardShortcuts
 		}
 	}
 }

@@ -243,3 +243,4 @@ ModelManifest.xml
 
 # macOS
 .DS_Store
+__MACOSX/

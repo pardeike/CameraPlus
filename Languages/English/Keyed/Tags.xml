@@ -146,7 +146,7 @@
 	<NotPlayerFactionTag>Not player faction</NotPlayerFactionTag>
 
 	<PredatorHuntTag>Hunting as predator</PredatorHuntTag>
-	<NotPredatorHuntTag>Not hunting as pedator</NotPredatorHuntTag>
+	<NotPredatorHuntTag>Not hunting as predator</NotPredatorHuntTag>
 
 	<SelfShutdownTag>Shutdown</SelfShutdownTag>
 	<NotSelfShutdownTag>Not shutdown</NotSelfShutdownTag>

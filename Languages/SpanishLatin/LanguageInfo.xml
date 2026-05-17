@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LanguageInfo>
 	<friendlyNameNative>Español (Latino)</friendlyNameNative>
-	<friendlyNameEnglish>Spanish</friendlyNameEnglish>
+	<friendlyNameEnglish>Spanish (Latin American)</friendlyNameEnglish>
 	<canBeTiny>true</canBeTiny>
 	<languageWorkerClass>LanguageWorker_Spanish</languageWorkerClass>
 	<credits>

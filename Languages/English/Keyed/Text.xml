@@ -18,10 +18,10 @@
     <ScreenEdgeDollyFrictionLabel>Edge scroll factor</ScreenEdgeDollyFrictionLabel>
     <HideNamesWhenZoomedOut>Hide name labels when zoomed out</HideNamesWhenZoomedOut>
     <Pixel>Pixel</Pixel>
-    <HidePawnLabelBelow>Hide pawn labels below: </HidePawnLabelBelow>
-    <HideThingLabelBelow>Hide stack labels below: </HideThingLabelBelow>
-    <HideDeadPawnsBelow>Hide dead pawns below: </HideDeadPawnsBelow>
-    <ShowMarkerBelow>Show as marker below: </ShowMarkerBelow>
+    <HidePawnLabelBelow>Hide pawn labels below:</HidePawnLabelBelow>
+    <HideThingLabelBelow>Hide stack labels below:</HideThingLabelBelow>
+    <HideDeadPawnsBelow>Hide dead pawns below:</HideDeadPawnsBelow>
+    <ShowMarkerBelow>Show as marker below:</ShowMarkerBelow>
     <DotStyle>Dot style{0}</DotStyle>
     <VanillaDefault>Vanilla default</VanillaDefault>
     <ClassicDots>Camera+ dots</ClassicDots>
@@ -46,6 +46,7 @@
     <SettingsTopic_Animals>Animals</SettingsTopic_Animals>
     <SettingsTopic_Edges>Edges</SettingsTopic_Edges>
     <SettingsTopic_Appearance>Appearance</SettingsTopic_Appearance>
+    <SettingsTopic_Keyboard>Keyboard</SettingsTopic_Keyboard>
     <SettingsTopic_Advanced>Advanced</SettingsTopic_Advanced>
     <SettingsGroup_ZoomRange>Zoom range</SettingsGroup_ZoomRange>
     <SettingsGroup_ZoomCurve>Zoom curve</SettingsGroup_ZoomCurve>
@@ -60,57 +61,76 @@
     <SettingsGroup_MarkerAppearance>Marker appearance</SettingsGroup_MarkerAppearance>
     <SettingsGroup_AdvancedActions>Advanced actions</SettingsGroup_AdvancedActions>
     <SettingsHelp_Title>Help</SettingsHelp_Title>
-    <SettingsHelp_About>About {0}</SettingsHelp_About>
+    <SettingsHelp_About>{0}</SettingsHelp_About>
     <SettingsNote_OverriddenByRule>Overridden by {0} rule.</SettingsNote_OverriddenByRule>
     <SettingsNote_OverriddenByRules>Overridden by {0} rules.</SettingsNote_OverriddenByRules>
     <SettingsNote_RequiresCameraMarkers>Requires a Camera+ marker style.</SettingsNote_RequiresCameraMarkers>
     <SettingsNote_RequiresEdgeIndicators>Requires edge indicators.</SettingsNote_RequiresEdgeIndicators>
-    <SettingsHelp_All>Use All for the familiar full list, or pick a topic to narrow the settings.</SettingsHelp_All>
-    <SettingsHelp_Zoom>Visual zoom range and how quickly zoom changes across it.</SettingsHelp_Zoom>
-    <SettingsHelp_Movement>Normal camera movement speed and screen-edge scrolling are separate.</SettingsHelp_Movement>
-    <SettingsHelp_Audio>Adjusts listener height for world sounds. It does not change visual zoom.</SettingsHelp_Audio>
-    <SettingsHelp_Camera>Direct camera behavior that is not tied to labels or markers.</SettingsHelp_Camera>
-    <SettingsHelp_Labels>Controls when pawn, stack, and dead-pawn labels are hidden or revealed.</SettingsHelp_Labels>
-    <SettingsHelp_Markers>Global marker style for pawns not matched by rules.</SettingsHelp_Markers>
-    <SettingsHelp_Animals>Global animal marker policy. Untamed animals are gated before default rules.</SettingsHelp_Animals>
-    <SettingsHelp_Edges>Off-screen markers are independent from in-map pawn replacement.</SettingsHelp_Edges>
-    <SettingsHelp_Appearance>Marker scale, edge spacing, and outline thickness.</SettingsHelp_Appearance>
-    <SettingsHelp_Advanced>Shortcuts and rules are separate dialogs.</SettingsHelp_Advanced>
-    <SettingsHelp_ZoomRange>Sets the visual closest and furthest Camera+ zoom.</SettingsHelp_ZoomRange>
-    <SettingsHelp_ZoomCurve>Changes how zoom accelerates between the range limits.</SettingsHelp_ZoomCurve>
-    <SettingsHelp_MovementSpeed>Controls ordinary camera movement at each zoom end.</SettingsHelp_MovementSpeed>
-    <SettingsHelp_EdgeScroll>Controls screen-edge scrolling separately from normal movement.</SettingsHelp_EdgeScroll>
-    <SettingsHelp_CameraBehavior>Camera toggles that apply immediately while playing.</SettingsHelp_CameraBehavior>
-    <SettingsHelp_AudioListener>Controls how close world sounds feel without changing visual zoom.</SettingsHelp_AudioListener>
-    <SettingsHelp_LabelVisibility>Label thresholds only apply when Camera+ controls marker rendering.</SettingsHelp_LabelVisibility>
-    <SettingsHelp_MarkerStyle>Default marker replacement for pawns not styled by rules.</SettingsHelp_MarkerStyle>
-    <SettingsHelp_AnimalPolicy>Controls which animals are eligible and which marker family they use.</SettingsHelp_AnimalPolicy>
-    <SettingsHelp_EdgeIndicators>Controls off-screen markers and animal color fallback.</SettingsHelp_EdgeIndicators>
-    <SettingsHelp_MarkerAppearance>Visual scale and spacing after marker selection.</SettingsHelp_MarkerAppearance>
-    <SettingsHelp_AdvancedActions>Open shortcuts or the rule editor without changing basic settings.</SettingsHelp_AdvancedActions>
-    <SettingsHelp_ZoomedInPercent>How far Camera+ can zoom in visually.</SettingsHelp_ZoomedInPercent>
-    <SettingsHelp_ZoomedOutPercent>How far Camera+ can zoom out visually.</SettingsHelp_ZoomedOutPercent>
-    <SettingsHelp_Exponentiality>Higher values make zoom speed change more strongly across the range.</SettingsHelp_Exponentiality>
-    <SettingsHelp_ZoomedInDollyPercent>Camera movement speed near the closest zoom.</SettingsHelp_ZoomedInDollyPercent>
-    <SettingsHelp_ZoomedOutDollyPercent>Camera movement speed near the furthest zoom.</SettingsHelp_ZoomedOutDollyPercent>
-    <SettingsHelp_ZoomedInEdgeScroll>Screen-edge scroll speed near the closest zoom.</SettingsHelp_ZoomedInEdgeScroll>
-    <SettingsHelp_ZoomedOutEdgeScroll>Screen-edge scroll speed near the furthest zoom.</SettingsHelp_ZoomedOutEdgeScroll>
-    <SettingsHelp_ZoomToMouse>Keeps the map point under the cursor stable while zooming.</SettingsHelp_ZoomToMouse>
-    <SettingsHelp_DisableCameraShake>Suppresses vanilla camera shake.</SettingsHelp_DisableCameraShake>
-    <SettingsHelp_SoundNearness>Moves the audio listener toward vanilla close height for local sounds.</SettingsHelp_SoundNearness>
-    <SettingsHelp_MouseRevealsLabels>Shows labels near the mouse while Camera+ would otherwise hide them.</SettingsHelp_MouseRevealsLabels>
-    <SettingsHelp_HidePawnLabelBelow>Hides pawn labels once cells are smaller than this size.</SettingsHelp_HidePawnLabelBelow>
-    <SettingsHelp_HideThingLabelBelow>Hides stack labels once cells are smaller than this size.</SettingsHelp_HideThingLabelBelow>
-    <SettingsHelp_HideDeadPawnsBelow>Hides dead pawn rendering below this cell size.</SettingsHelp_HideDeadPawnsBelow>
-    <SettingsHelp_DotStyle>Default marker mode. Rules can override it for matching pawns.</SettingsHelp_DotStyle>
-    <SettingsHelp_ShowMarkerBelow>Cell size threshold where Camera+ replaces pawn bodies with markers.</SettingsHelp_ShowMarkerBelow>
-    <SettingsHelp_AnimalMarkerStyle>Animal marker family and inclusion behavior.</SettingsHelp_AnimalMarkerStyle>
-    <SettingsHelp_IncludeNotTamedAnimals>Includes unnamed wild animals before default animal rules are checked.</SettingsHelp_IncludeNotTamedAnimals>
-    <SettingsHelp_AnimalEdgeColors>When animal rule fill is transparent, edge indicators use the animal body color.</SettingsHelp_AnimalEdgeColors>
-    <SettingsHelp_DotSilhouetteSize>Scales in-map dots and silhouettes.</SettingsHelp_DotSilhouetteSize>
-    <SettingsHelp_EdgeDotSize>Scales off-screen edge markers.</SettingsHelp_EdgeDotSize>
-    <SettingsHelp_EdgeDistanceFactor>Moves edge markers nearer to or farther from the screen border.</SettingsHelp_EdgeDistanceFactor>
-    <SettingsHelp_OutlineSize>Changes marker outline width and rebuilds marker materials.</SettingsHelp_OutlineSize>
+    <SettingsHelp_RuleOverrideByRule>One matching rule currently uses its own value for this setting. Pawns that match that rule follow the rule; pawns that do not match it still use this setting.</SettingsHelp_RuleOverrideByRule>
+    <SettingsHelp_RuleOverrideByRules>{0} matching rules currently use their own values for this setting. Pawns that match those rules follow the rules; pawns that do not match them still use this setting.</SettingsHelp_RuleOverrideByRules>
+    <SettingsHelp_RuleMarkerStyleByRule>One matching rule currently chooses a different marker style. That rule can switch matching pawns to vanilla drawing, dots, silhouettes, a custom marker, or no marker; this setting remains the fallback for other pawns.</SettingsHelp_RuleMarkerStyleByRule>
+    <SettingsHelp_RuleMarkerStyleByRules>{0} matching rules currently choose different marker styles. Those rules can switch matching pawns to vanilla drawing, dots, silhouettes, custom markers, or no marker; this setting remains the fallback for other pawns.</SettingsHelp_RuleMarkerStyleByRules>
+    <SettingsHelp_RuleMarkerThresholdByRule>One matching rule currently has its own marker threshold. Matching pawns switch at that rule's cell size; rules set to default still use this slider.</SettingsHelp_RuleMarkerThresholdByRule>
+    <SettingsHelp_RuleMarkerThresholdByRules>{0} matching rules currently have their own marker thresholds. Matching pawns switch at the rule's cell size; rules set to default still use this slider.</SettingsHelp_RuleMarkerThresholdByRules>
+    <SettingsHelp_RuleSizeMultiplierByRule>One matching rule currently has its own size multiplier. Final marker size is this global size multiplied by the rule value for matching pawns.</SettingsHelp_RuleSizeMultiplierByRule>
+    <SettingsHelp_RuleSizeMultiplierByRules>{0} matching rules currently have their own size multipliers. Final marker size is this global size multiplied by the rule value for matching pawns.</SettingsHelp_RuleSizeMultiplierByRules>
+    <SettingsHelp_RuleInsideMarkerByRule>One matching rule currently disables in-map markers. For pawns that match it, marker style and marker threshold do not draw an in-map marker; edge indicators can still draw if the rule allows them.</SettingsHelp_RuleInsideMarkerByRule>
+    <SettingsHelp_RuleInsideMarkerByRules>{0} matching rules currently disable in-map markers. For pawns that match them, marker style and marker threshold do not draw an in-map marker; edge indicators can still draw if the rules allow them.</SettingsHelp_RuleInsideMarkerByRules>
+    <SettingsHelp_RuleEdgeDisabledByStyleByRule>One matching rule currently uses the Off marker style. That suppresses both in-map and edge markers for matching pawns, even when edge indicators are enabled globally or by the rule.</SettingsHelp_RuleEdgeDisabledByStyleByRule>
+    <SettingsHelp_RuleEdgeDisabledByStyleByRules>{0} matching rules currently use the Off marker style. That suppresses both in-map and edge markers for matching pawns, even when edge indicators are enabled globally or by the rule.</SettingsHelp_RuleEdgeDisabledByStyleByRules>
+    <SettingsHelp_RuleAnimalEdgeColorByRule>One matching rule currently has an explicit normal or selected fill color. Pawn-colored animal edge indicators only replace transparent rule fills, so matching animals keep that rule fill instead of using their pawn color.</SettingsHelp_RuleAnimalEdgeColorByRule>
+    <SettingsHelp_RuleAnimalEdgeColorByRules>{0} matching rules currently have explicit normal or selected fill colors. Pawn-colored animal edge indicators only replace transparent rule fills, so matching animals keep those rule fills instead of using their pawn colors.</SettingsHelp_RuleAnimalEdgeColorByRules>
+    <SettingsHelp_All>Shows every setting in the familiar order, but with more room and inline help. Use this when you already know roughly where a setting lives.&#10;&#10;Pick a topic on the left when you want a shorter page with less scrolling.</SettingsHelp_All>
+    <SettingsHelp_Zoom>Camera+ changes how RimWorld's camera size turns into the view you see. These settings define the visual zoom range and how mouse-wheel movement travels through it.&#10;&#10;The closest and furthest zoom values also define the endpoints used by movement-speed and edge-scroll tuning.</SettingsHelp_Zoom>
+    <SettingsHelp_Movement>Panning and edge scrolling feel different at very close and very far zoom levels, so Camera+ lets you tune them separately.&#10;&#10;These values are applied across the current zoom range. If you change the zoom range first, revisit movement only if the endpoints feel wrong.</SettingsHelp_Movement>
+    <SettingsHelp_Audio>RimWorld places world sounds relative to the camera. At extreme zoom-out, sounds can feel too far away even when the visual zoom is useful.&#10;&#10;This adjusts the audio listener only. It does not change what the camera shows.</SettingsHelp_Audio>
+    <SettingsHelp_Camera>Small camera behavior switches that apply while playing. They are independent from label and marker rules, so changing them will not alter pawn marker styling.</SettingsHelp_Camera>
+    <SettingsHelp_Labels>Camera+ can hide labels when pawns become visually small, then reveal them near the mouse when needed.&#10;&#10;These controls depend on a Camera+ marker style. The marker threshold can also hide pawn labels because a pawn that has become a marker no longer needs its normal label.</SettingsHelp_Labels>
+    <SettingsHelp_Markers>Choose what Camera+ draws instead of full pawn bodies at low zoom.&#10;&#10;These settings are defaults for pawns without a matching rule. They also decide whether the label and marker-threshold controls below are active.</SettingsHelp_Markers>
+    <SettingsHelp_Animals>Animal defaults are separated because colony animals, wild animals, and named pets often need different visibility.&#10;&#10;This policy runs before animal marker rules. If animals are excluded here, animal rules do not get a chance to style them.</SettingsHelp_Animals>
+    <SettingsHelp_Edges>Edge indicators show off-screen pawns at the edge of the monitor. They are separate from in-map silhouettes and dots, so a pawn can still have an edge marker even when its map marker behavior differs.&#10;&#10;The animal color option below only matters when edge indicators are enabled.</SettingsHelp_Edges>
+    <SettingsHelp_Appearance>Fine-tunes marker size, edge position, and outline thickness after the marker style is chosen.&#10;&#10;Size and outline can also be adjusted by matching rules. Rule size is a multiplier; rule outline width replaces the global outline width.</SettingsHelp_Appearance>
+    <SettingsHelp_Shortcuts>Configure Camera+ key combinations here instead of opening a separate dialog.&#10;&#10;Modifier slots may be empty. View slots always use the number keys 1 through 9.</SettingsHelp_Shortcuts>
+    <SettingsHelp_Advanced>Rules remain in their own editor because they have many columns and need more horizontal space than the main settings list.</SettingsHelp_Advanced>
+    <SettingsHelp_ZoomRange>Defines the closest and furthest visual zoom that Camera+ allows.&#10;&#10;A wider range gives more freedom, but very far zoom levels make more pawns, things, and markers visible at once. Movement-speed and edge-scroll endpoint settings use this same range.</SettingsHelp_ZoomRange>
+    <SettingsHelp_ZoomCurve>Controls how the zoom wheel moves between the closest and furthest points.&#10;&#10;Use a flatter curve for predictable movement, or a stronger curve when you want more precision at one end of the zoom range.</SettingsHelp_ZoomCurve>
+    <SettingsHelp_MovementSpeed>Normal camera movement can feel too fast when zoomed in and too slow when zoomed out.&#10;&#10;Tune both ends together until keyboard or mouse-drag panning feels consistent across the zoom range selected above.</SettingsHelp_MovementSpeed>
+    <SettingsHelp_EdgeScroll>Screen-edge scrolling is tuned separately from normal movement because it is usually used for broad map travel.&#10;&#10;These values also use the zoom range endpoints. If the camera races away when the cursor touches the edge, lower these values first.</SettingsHelp_EdgeScroll>
+    <SettingsHelp_CameraBehavior>Immediate camera toggles. These affect how the camera reacts to input or game effects, not how pawns and labels are drawn.</SettingsHelp_CameraBehavior>
+    <SettingsHelp_AudioListener>Controls how close world sounds feel when using Camera+ zoom levels.&#10;&#10;Raise it if distant map activity becomes too quiet or detached; lower it if the whole map sounds unnaturally close.</SettingsHelp_AudioListener>
+    <SettingsHelp_LabelVisibility>Label thresholds are based on on-screen cell size, not the named zoom percentage.&#10;&#10;These settings only matter while Camera+ controls marker rendering. Marker style and marker threshold decide whether pawn bodies are replaced, which can also hide normal pawn labels.</SettingsHelp_LabelVisibility>
+    <SettingsHelp_MarkerStyle>Default marker replacement for pawns that are not matched by a rule.&#10;&#10;Use vanilla when you want Camera+ zoom behavior without replacing pawn bodies; use dots or silhouettes when far zoom should stay readable. Vanilla mode disables the dependent label and marker-threshold controls.</SettingsHelp_MarkerStyle>
+    <SettingsHelp_AnimalPolicy>Controls which animals are eligible for marker handling and which default marker family they use.&#10;&#10;This is useful for keeping colony animals visible while reducing wild-animal clutter. Excluded animals also skip animal marker rules.</SettingsHelp_AnimalPolicy>
+    <SettingsHelp_EdgeIndicators>Controls whether off-screen pawn markers are drawn and whether animal edge markers can inherit pawn colors.&#10;&#10;The color option depends on this switch and is most visible when animal rule fills are transparent.</SettingsHelp_EdgeIndicators>
+    <SettingsHelp_MarkerAppearance>Adjusts the visual footprint of dots, silhouettes, and edge indicators.&#10;&#10;Use these after choosing marker behavior; they are polish controls, not filtering rules. Matching rules can multiply marker size or replace outline width.</SettingsHelp_MarkerAppearance>
+    <SettingsHelp_KeyboardShortcuts>Camera+ shortcuts combine one or two optional modifier keys with a main key.&#10;&#10;The settings shortcut has a configurable main key. Loading and saving camera views always use number keys 1 through 9.</SettingsHelp_KeyboardShortcuts>
+    <SettingsHelp_AdvancedActions>Rules remain in a separate editor because the rule table needs its own layout and interaction model.</SettingsHelp_AdvancedActions>
+    <SettingsHelp_ZoomedInPercent>Sets the closest visual zoom. Smaller values allow a closer view.&#10;&#10;This is also the close endpoint for movement-speed and edge-scroll tuning. If you change it while a map is loaded, Camera+ updates the active camera range immediately.</SettingsHelp_ZoomedInPercent>
+    <SettingsHelp_ZoomedOutPercent>Sets the furthest visual zoom. Larger values let you see more of the map at once.&#10;&#10;This is also the far endpoint for movement-speed and edge-scroll tuning. Very far zoom levels can increase how much marker and label work is visible in a frame.</SettingsHelp_ZoomedOutPercent>
+    <SettingsHelp_Exponentiality>Off gives a flatter, more linear zoom feel. Higher values reshape the wheel response so one end of the range gets finer control while the other moves faster.</SettingsHelp_Exponentiality>
+    <SettingsHelp_ZoomedInDollyPercent>Camera movement speed near the closest zoom endpoint.&#10;&#10;Lower this if fine inspection feels twitchy; raise it if close-up movement feels heavy. The endpoint itself is set in Zoom range.</SettingsHelp_ZoomedInDollyPercent>
+    <SettingsHelp_ZoomedOutDollyPercent>Camera movement speed near the furthest zoom endpoint.&#10;&#10;Raise this if crossing the map feels slow while zoomed out; lower it if small inputs jump too far. The endpoint itself is set in Zoom range.</SettingsHelp_ZoomedOutDollyPercent>
+    <SettingsHelp_ZoomedInEdgeScroll>Screen-edge scrolling near the closest zoom endpoint.&#10;&#10;Keep this conservative if you use the edge of the screen while inspecting pawns or buildings. The endpoint itself is set in Zoom range.</SettingsHelp_ZoomedInEdgeScroll>
+    <SettingsHelp_ZoomedOutEdgeScroll>Screen-edge scrolling near the furthest zoom endpoint.&#10;&#10;This is mostly about long-distance map travel, so it can often be higher than the close-zoom value. The endpoint itself is set in Zoom range.</SettingsHelp_ZoomedOutEdgeScroll>
+    <SettingsHelp_ZoomToMouse>Keeps the map point under the cursor stable while zooming.&#10;&#10;This makes it easier to inspect a specific pawn, building, or event without repeatedly re-centering the camera.</SettingsHelp_ZoomToMouse>
+    <SettingsHelp_DisableCameraShake>Suppresses vanilla camera shake events.&#10;&#10;This only affects camera movement; it does not remove visual effects that are drawn inside the world.</SettingsHelp_DisableCameraShake>
+    <SettingsHelp_SoundNearness>Blends the audio listener back toward RimWorld's close-camera sound position.&#10;&#10;Increase it when zoomed-out play makes local events sound too distant.</SettingsHelp_SoundNearness>
+    <SettingsHelp_MouseRevealsLabels>When labels are hidden by zoom, labels near the mouse can temporarily return.&#10;&#10;For pawn markers this also keeps the pawn under the cursor from being replaced by its marker, so quick inspection still feels natural.</SettingsHelp_MouseRevealsLabels>
+    <SettingsHelp_HidePawnLabelBelow>Pawn labels are hidden once map cells become smaller than this many screen pixels.&#10;&#10;Higher values hide earlier while zooming out. Pawn labels can also disappear when Show as marker below starts replacing bodies with markers.</SettingsHelp_HidePawnLabelBelow>
+    <SettingsHelp_HideThingLabelBelow>Stack labels are hidden once map cells become smaller than this many screen pixels.&#10;&#10;Use a higher value when item labels dominate the screen at far zoom. This is independent from pawn marker style once Camera+ marker rendering is active.</SettingsHelp_HideThingLabelBelow>
+    <SettingsHelp_HideDeadPawnsBelow>Dead pawn rendering is hidden below this cell size.&#10;&#10;This can reduce visual clutter after fights while keeping living pawn markers readable. It is grouped with label visibility because it removes far-zoom visual noise rather than changing marker style.</SettingsHelp_HideDeadPawnsBelow>
+    <SettingsHelp_DotStyle>Chooses the default way Camera+ replaces pawn bodies at low zoom.&#10;&#10;This setting also controls whether the dependent label and marker-threshold settings are active. Choose the fallback style you want for pawns that are not handled by a rule.</SettingsHelp_DotStyle>
+    <SettingsHelp_ShowMarkerBelow>The screen-cell size where Camera+ starts replacing pawn bodies with markers.&#10;&#10;Higher values switch to markers sooner; lower values keep full pawn bodies visible longer. When replacement starts, normal pawn labels are hidden unless mouse reveal brings them back.</SettingsHelp_ShowMarkerBelow>
+    <SettingsHelp_AnimalMarkerStyle>Chooses the default marker family for animals.&#10;&#10;Use this with the untamed animal option to decide whether wildlife should be visible, quieter, or absent from default markers. Hiding animals also prevents animal rules from styling them.</SettingsHelp_AnimalMarkerStyle>
+    <SettingsHelp_IncludeNotTamedAnimals>Allows unnamed wild animals into default animal marker handling.&#10;&#10;Turn this off on maps where wildlife creates too much marker noise or too much work at far zoom. It has no practical effect while the animal policy hides animals entirely.</SettingsHelp_IncludeNotTamedAnimals>
+    <SettingsHelp_AnimalEdgeColors>When enabled, animal edge indicators can follow pawn colors instead of staying plain.&#10;&#10;This requires edge indicators. It mainly changes animal rules whose fill color is transparent; rules with an explicit fill color keep that fill.</SettingsHelp_AnimalEdgeColors>
+    <SettingsHelp_DotSilhouetteSize>Scales in-map dots and silhouettes.&#10;&#10;Use this when markers are readable but feel too dominant or too small compared with terrain and buildings. Matching rules can multiply this size for their pawns.</SettingsHelp_DotSilhouetteSize>
+    <SettingsHelp_EdgeDotSize>Scales off-screen edge indicators.&#10;&#10;This does not change their distance from the edge, only the size of the marker itself. Matching rules can multiply this size with the same rule size value used for in-map markers.</SettingsHelp_EdgeDotSize>
+    <SettingsHelp_EdgeDistanceFactor>Moves edge indicators closer to or farther from the screen border.&#10;&#10;Increase it if markers sit too close to UI or the monitor edge; decrease it if they intrude too far into the map view.</SettingsHelp_EdgeDistanceFactor>
+    <SettingsHelp_OutlineSize>Changes the outline thickness around Camera+ markers.&#10;&#10;Stronger outlines improve contrast on busy terrain, but can make dense groups feel heavier. Matching rules can use their own outline width instead of this global value.</SettingsHelp_OutlineSize>
+    <SettingsHelp_SettingsShortcut>The rightmost button is the main settings key. The buttons to its left are optional modifiers.&#10;&#10;Left-click the main key to capture a key. Right-click it to reset or clear the binding.</SettingsHelp_SettingsShortcut>
+    <SettingsHelp_LoadShortcut>Loads saved camera views 1 through 9 while the selected modifiers are held.&#10;&#10;The number keys are fixed so the shortcut stays quick to use during play.</SettingsHelp_LoadShortcut>
+    <SettingsHelp_SaveShortcut>Saves the current camera view into slots 1 through 9 while the selected modifiers are held.&#10;&#10;Use a different modifier combination from loading so saving a view is deliberate.</SettingsHelp_SaveShortcut>
     <KeyLeftShift>Left Shift</KeyLeftShift>
     <KeyLeftAlt>Left Alt</KeyLeftAlt>
     <KeyLeftControl>Left Ctrl</KeyLeftControl>
