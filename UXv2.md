@@ -2,7 +2,7 @@
 
 This document specifies the next main settings UI for Camera+. It is meant to be implementation guidance, not a loose design sketch.
 
-The goal is to make the main Camera+ mod settings dialog readable, educational, familiar to current users, and robust in longer translations while keeping the existing RimWorld mod settings window size. The rules, shortcut, color picker, and customization sub-dialogs stay separate.
+The goal is to make the main Camera+ mod settings dialog readable, educational, familiar to current users, and robust in longer translations while keeping the existing RimWorld mod settings window size. The rule editor, color picker, and rule customization sub-dialogs stay separate. Keyboard shortcut settings are inline in the main dialog so the old extra shortcut button is no longer needed.
 
 ## Why This Exists
 
@@ -26,7 +26,7 @@ Rules:
 - Keep existing setting concepts and defaults recognizable.
 - Keep familiar labels where they are already clear enough.
 - Rename labels only when the current wording is misleading or too cramped to explain the real behavior.
-- Keep the default `All` view close to the current mental order: zoom, movement, camera behavior, audio, labels, markers, animals, edge indicators, appearance, then advanced actions.
+- Keep the default `All` view close to the current mental order: zoom, movement, camera behavior, audio, labels, markers, animals, edge indicators, appearance, then keyboard shortcuts.
 - Keep `Keyboard shortcuts`, `Rules`, and `Restore defaults` easy to find from the first screen.
 - Do not move rule editing into the main settings flow.
 - Do not introduce new user-facing setting categories unless they help map existing settings to a clearer structure.
@@ -43,7 +43,8 @@ Examples:
 - Keep using RimWorld's normal mod settings window. Do not require a larger custom settings window for this pass.
 - The useful content area is limited by `Dialog_ModSettings`; the design must fit roughly inside the existing `900 x 700` window.
 - Refactor only the main Camera+ settings dialog in this pass.
-- Keep `Keyboard shortcuts`, `Rules`, color picking, and rule editing in their existing sub-dialogs.
+- Keep `Rules`, color picking, and rule editing in their existing sub-dialogs.
+- Move keyboard shortcut settings into the main dialog as a normal settings topic.
 - Do not change settings serialization solely for UX v2.
 - Do not make the rule editor carry basic settings explanations. The main dialog should explain the global settings.
 - Prefer clear wrapped text over compact English-only label tricks.
@@ -60,7 +61,7 @@ The top row should be outside the three-column layout:
 
 - left or center: optional small title/status area if useful;
 - right: `Restore defaults`;
-- nearby: `Keyboard shortcuts` and `Rules`.
+- nearby: `Rules`.
 
 The top row action buttons are commands, not settings. They must stay visible regardless of the selected topic.
 
@@ -92,7 +93,7 @@ Use these topic ids and labels for the first implementation:
 | `animals` | `Animals` | Animal marker policy and untamed animal inclusion. |
 | `edges` | `Edges` | Edge indicators and edge-color behavior. |
 | `appearance` | `Appearance` | Marker sizes, edge distance, and outline width. |
-| `advanced` | `Advanced` | Links/actions that do not fit a normal setting group. |
+| `keyboard` | `Keyboard` | Keyboard shortcut settings for opening settings and saving/loading views. |
 
 Selection behavior:
 
@@ -127,7 +128,7 @@ Canonical group order:
 9. `animal-policy`
 10. `edge-indicators`
 11. `marker-appearance`
-12. `advanced-actions`
+12. `keyboard-shortcuts`
 
 ### Zoom Range
 
@@ -343,24 +344,26 @@ Help intent:
 
 - Explain that these are visual scale/spacing settings after marker selection has already happened.
 
-### Advanced Actions
+### Keyboard Shortcuts
 
-Topic: `advanced`
+Topic: `keyboard`
 
-Controls/actions:
+Controls:
 
-- Keyboard shortcuts
-- Rules for new games / rules saved with game
-- Restore defaults if it is not only in the top row
+- Camera+ settings shortcut
+- Load view shortcut
+- Save view shortcut
 
 Behavior:
 
-- These actions should remain outside topic filtering if implemented in the top or bottom action row.
-- The `advanced` topic can still explain what the sub-dialogs are for.
+- Shortcut rows live in the main settings column and use the same key picker controls as the old shortcut window.
+- Labels should align vertically with their shortcut buttons.
+- `Rules` and `Restore defaults` remain outside topic filtering in the top action row.
 
 Help intent:
 
-- Explain that rules are advanced styling and exceptions, not the main way to understand Camera+ defaults.
+- Explain that view slots use number keys plus the configured modifier keys.
+- Explain that this only changes Camera+ shortcuts, not RimWorld's general keyboard bindings.
 
 ## Control Patterns
 
@@ -457,7 +460,7 @@ Recommended first-pass help topics:
 | `help.animals` | Global animal marker policy and untamed animal gate. |
 | `help.edges` | Off-screen markers; independent from in-map replacement. |
 | `help.appearance` | Marker size, edge spacing, and outline width. |
-| `help.advanced` | Shortcuts and rule editor entry points. |
+| `help.shortcuts` | Shortcut keys for settings and saved views. |
 
 ## Translation Policy
 
@@ -577,8 +580,10 @@ For v1, use one scroll position and reset it to zero on topic change.
 | `clippedRelativeSize` | Marker Appearance |
 | `clippedBorderDistanceFactor` | Marker Appearance |
 | `outlineFactor` | Marker Appearance |
-| shortcut dialog button | Advanced Actions / top action row |
-| rules dialog button | Advanced Actions / top action row |
+| `cameraSettingsKey` / `cameraSettingsMod` | Keyboard Shortcuts |
+| `cameraSettingsLoad` | Keyboard Shortcuts |
+| `cameraSettingsSave` | Keyboard Shortcuts |
+| rules dialog button | top action row |
 | restore defaults button | top action row |
 
 ## Relationship To FIX.md
@@ -617,7 +622,7 @@ Recommended sequencing:
 - No custom resizable settings window.
 - No live preview panel.
 - No rule editor redesign.
-- No shortcut dialog redesign.
+- No separate shortcut dialog redesign. Keyboard shortcut rows move into the main dialog and keep the existing key picking behavior.
 - No migration of existing settings names solely for UX.
 - No new advanced rule capabilities just to explain main settings.
 - No requirement to complete all translations before the English UX is implemented and validated.
@@ -629,7 +634,7 @@ The UX v2 implementation is done when:
 - The main settings dialog uses left navigation, middle scroll content, and right contextual help.
 - `All` shows every settings group in the canonical order.
 - Each topic filters to the correct group or groups.
-- `Keyboard shortcuts`, `Rules`, and `Restore defaults` remain visible and usable outside filtered content.
+- `Keyboard shortcuts` are available as a left-column topic and appear in `All`; `Rules` and `Restore defaults` remain visible and usable outside filtered content.
 - Existing users can find all current main-dialog settings from the `All` view without learning new feature names.
 - Long labels in existing non-English languages wrap without overlapping controls.
 - Override notes are displayed as secondary text, not label suffixes.
@@ -637,7 +642,7 @@ The UX v2 implementation is done when:
 - Restore defaults leaves every radio group with a visible selected value.
 - Help text updates on hover/focus and falls back to topic help.
 - Existing settings still read/write the same fields.
-- The rule editor and shortcut dialog still open as before.
+- The rule editor still opens as before, and the inline shortcut key picker still works.
 
 ## Manual Test Plan
 
@@ -651,7 +656,7 @@ Run these after implementing UX v2:
 6. Move the mouse over empty space; confirm help returns to the selected topic.
 7. Change every setting once and confirm the value persists after closing and reopening settings.
 8. Click `Restore defaults` and confirm radio groups visibly select defaults.
-9. Open `Keyboard shortcuts`.
+9. Select the `Keyboard` topic and confirm shortcut rows are visible and aligned.
 10. Open `Rules` from the main menu and from a loaded save.
 11. In English, confirm familiar settings are still easy to locate from the `All` view and from their topics.
 12. After translations are added, test German, French, Russian, Japanese, Chinese Simplified, Chinese Traditional, Spanish, and Spanish Latin for label wrapping.
