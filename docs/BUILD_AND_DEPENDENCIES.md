@@ -19,7 +19,7 @@ Release builds write:
 The project also has a `CopyToRimworld` MSBuild target that runs when `RIMWORLD_MOD_DIR` is set. That target:
 
 - deletes `1.6/Assemblies/0Harmony.dll`.
-- copies version folders, metadata, defs, languages, resources, sounds, textures, license, load folders, and README into `$(RIMWORLD_MOD_DIR)\CameraPlus`.
+- copies version folders, metadata, defs, languages, resources, sounds, textures, license, load folders, README, and README image assets into `$(RIMWORLD_MOD_DIR)\CameraPlus`.
 - zips that copied mod folder as `$(RIMWORLD_MOD_DIR)\CameraPlus.zip`.
 
 On macOS with a Unix shell, MSBuild still prints Windows-style path separators in the target body because the project file uses backslashes.
