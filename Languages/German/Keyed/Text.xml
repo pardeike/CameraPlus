@@ -36,6 +36,81 @@
 	<MouseRevealsLabels>Maus enthüllt Schilder{0}</MouseRevealsLabels>
 	<EdgeIndicators>Kantenindikatoren{0}</EdgeIndicators>
 	<PawnColoredEdgeIndicators>Tier-Randfarben</PawnColoredEdgeIndicators>
+	<SettingsTopic_All>Alle</SettingsTopic_All>
+	<SettingsTopic_Zoom>Zoom</SettingsTopic_Zoom>
+	<SettingsTopic_Movement>Bewegung</SettingsTopic_Movement>
+	<SettingsTopic_Audio>Audio</SettingsTopic_Audio>
+	<SettingsTopic_Camera>Kamera</SettingsTopic_Camera>
+	<SettingsTopic_Labels>Schilder</SettingsTopic_Labels>
+	<SettingsTopic_Markers>Marker</SettingsTopic_Markers>
+	<SettingsTopic_Animals>Tiere</SettingsTopic_Animals>
+	<SettingsTopic_Edges>Ränder</SettingsTopic_Edges>
+	<SettingsTopic_Appearance>Aussehen</SettingsTopic_Appearance>
+	<SettingsTopic_Advanced>Erweitert</SettingsTopic_Advanced>
+	<SettingsGroup_ZoomRange>Zoombereich</SettingsGroup_ZoomRange>
+	<SettingsGroup_ZoomCurve>Zoomkurve</SettingsGroup_ZoomCurve>
+	<SettingsGroup_MovementSpeed>Bewegungsgeschwindigkeit</SettingsGroup_MovementSpeed>
+	<SettingsGroup_EdgeScroll>Rand-Scrollen</SettingsGroup_EdgeScroll>
+	<SettingsGroup_CameraBehavior>Kameraverhalten</SettingsGroup_CameraBehavior>
+	<SettingsGroup_AudioListener>Audio-Listener</SettingsGroup_AudioListener>
+	<SettingsGroup_LabelVisibility>Sichtbarkeit der Schilder</SettingsGroup_LabelVisibility>
+	<SettingsGroup_MarkerStyle>Markerstil</SettingsGroup_MarkerStyle>
+	<SettingsGroup_AnimalPolicy>Tier-Regelung</SettingsGroup_AnimalPolicy>
+	<SettingsGroup_EdgeIndicators>Randindikatoren</SettingsGroup_EdgeIndicators>
+	<SettingsGroup_MarkerAppearance>Marker-Aussehen</SettingsGroup_MarkerAppearance>
+	<SettingsGroup_AdvancedActions>Erweiterte Aktionen</SettingsGroup_AdvancedActions>
+	<SettingsHelp_Title>Hilfe</SettingsHelp_Title>
+	<SettingsHelp_About>Über {0}</SettingsHelp_About>
+	<SettingsNote_OverriddenByRule>Durch {0} Regel überschrieben.</SettingsNote_OverriddenByRule>
+	<SettingsNote_OverriddenByRules>Durch {0} Regeln überschrieben.</SettingsNote_OverriddenByRules>
+	<SettingsNote_RequiresCameraMarkers>Benötigt einen Camera+ Markerstil.</SettingsNote_RequiresCameraMarkers>
+	<SettingsNote_RequiresEdgeIndicators>Benötigt Randindikatoren.</SettingsNote_RequiresEdgeIndicators>
+	<SettingsHelp_All>Alle zeigt die bekannte vollständige Liste; ein Thema grenzt die Einstellungen ein.</SettingsHelp_All>
+	<SettingsHelp_Zoom>Visueller Zoombereich und wie schnell sich der Zoom darin ändert.</SettingsHelp_Zoom>
+	<SettingsHelp_Movement>Normale Kamerabewegung und Rand-Scrollen sind getrennt.</SettingsHelp_Movement>
+	<SettingsHelp_Audio>Passt die Listener-Höhe für Weltgeräusche an. Der visuelle Zoom bleibt gleich.</SettingsHelp_Audio>
+	<SettingsHelp_Camera>Direktes Kameraverhalten, unabhängig von Schildern und Markern.</SettingsHelp_Camera>
+	<SettingsHelp_Labels>Steuert, wann Bauern-, Stapel- und Leichen-Schilder ausgeblendet oder enthüllt werden.</SettingsHelp_Labels>
+	<SettingsHelp_Markers>Globaler Markerstil für Bauern, die nicht von Regeln erfasst werden.</SettingsHelp_Markers>
+	<SettingsHelp_Animals>Globale Tiermarker-Regelung. Ungezähmte Tiere werden vor Standardregeln gefiltert.</SettingsHelp_Animals>
+	<SettingsHelp_Edges>Offscreen-Marker sind unabhängig vom Ersetzen der Bauern auf der Karte.</SettingsHelp_Edges>
+	<SettingsHelp_Appearance>Markergröße, Randabstand und Konturbreite.</SettingsHelp_Appearance>
+	<SettingsHelp_Advanced>Tastenkombinationen und Regeln öffnen separate Dialoge.</SettingsHelp_Advanced>
+	<SettingsHelp_ZoomRange>Legt den nächsten und weitesten visuellen Camera+ Zoom fest.</SettingsHelp_ZoomRange>
+	<SettingsHelp_ZoomCurve>Ändert die Zoombeschleunigung zwischen den Grenzen.</SettingsHelp_ZoomCurve>
+	<SettingsHelp_MovementSpeed>Steuert normale Kamerabewegung an beiden Zoomenden.</SettingsHelp_MovementSpeed>
+	<SettingsHelp_EdgeScroll>Steuert Rand-Scrollen getrennt von normaler Bewegung.</SettingsHelp_EdgeScroll>
+	<SettingsHelp_CameraBehavior>Kamera-Schalter, die im Spiel sofort wirken.</SettingsHelp_CameraBehavior>
+	<SettingsHelp_AudioListener>Bestimmt, wie nah Weltgeräusche wirken, ohne den visuellen Zoom zu ändern.</SettingsHelp_AudioListener>
+	<SettingsHelp_LabelVisibility>Schildergrenzen gelten nur, wenn Camera+ Marker rendert.</SettingsHelp_LabelVisibility>
+	<SettingsHelp_MarkerStyle>Standard-Markerersatz für Bauern ohne passende Regel.</SettingsHelp_MarkerStyle>
+	<SettingsHelp_AnimalPolicy>Steuert, welche Tiere einbezogen werden und welche Markerfamilie sie nutzen.</SettingsHelp_AnimalPolicy>
+	<SettingsHelp_EdgeIndicators>Steuert Offscreen-Marker und die Tierfarb-Fallbacks.</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_MarkerAppearance>Visuelle Größe und Abstände nach der Markerauswahl.</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_AdvancedActions>Öffnet Tastenkombinationen oder Regeln, ohne Grundeinstellungen zu ändern.</SettingsHelp_AdvancedActions>
+	<SettingsHelp_ZoomedInPercent>Wie weit Camera+ visuell hineinzoomen kann.</SettingsHelp_ZoomedInPercent>
+	<SettingsHelp_ZoomedOutPercent>Wie weit Camera+ visuell herauszoomen kann.</SettingsHelp_ZoomedOutPercent>
+	<SettingsHelp_Exponentiality>Höhere Werte ändern die Zoomgeschwindigkeit stärker über den Bereich.</SettingsHelp_Exponentiality>
+	<SettingsHelp_ZoomedInDollyPercent>Kamerabewegung nahe dem nächsten Zoom.</SettingsHelp_ZoomedInDollyPercent>
+	<SettingsHelp_ZoomedOutDollyPercent>Kamerabewegung nahe dem weitesten Zoom.</SettingsHelp_ZoomedOutDollyPercent>
+	<SettingsHelp_ZoomedInEdgeScroll>Rand-Scroll-Geschwindigkeit nahe dem nächsten Zoom.</SettingsHelp_ZoomedInEdgeScroll>
+	<SettingsHelp_ZoomedOutEdgeScroll>Rand-Scroll-Geschwindigkeit nahe dem weitesten Zoom.</SettingsHelp_ZoomedOutEdgeScroll>
+	<SettingsHelp_ZoomToMouse>Hält den Kartenpunkt unter der Maus beim Zoomen stabil.</SettingsHelp_ZoomToMouse>
+	<SettingsHelp_DisableCameraShake>Unterdrückt das normale Kamerawackeln.</SettingsHelp_DisableCameraShake>
+	<SettingsHelp_SoundNearness>Bewegt den Audio-Listener für lokale Geräusche zur Vanilla-Nahhöhe.</SettingsHelp_SoundNearness>
+	<SettingsHelp_MouseRevealsLabels>Zeigt Schilder nahe der Maus, wenn Camera+ sie sonst ausblenden würde.</SettingsHelp_MouseRevealsLabels>
+	<SettingsHelp_HidePawnLabelBelow>Blendet Bauern-Schilder aus, wenn Zellen kleiner als dieser Wert sind.</SettingsHelp_HidePawnLabelBelow>
+	<SettingsHelp_HideThingLabelBelow>Blendet Stapel-Schilder aus, wenn Zellen kleiner als dieser Wert sind.</SettingsHelp_HideThingLabelBelow>
+	<SettingsHelp_HideDeadPawnsBelow>Blendet tote Bauern unter dieser Zellgröße aus.</SettingsHelp_HideDeadPawnsBelow>
+	<SettingsHelp_DotStyle>Standard-Markermodus. Regeln können ihn für passende Bauern überschreiben.</SettingsHelp_DotStyle>
+	<SettingsHelp_ShowMarkerBelow>Zellgröße, ab der Camera+ Bauern durch Marker ersetzt.</SettingsHelp_ShowMarkerBelow>
+	<SettingsHelp_AnimalMarkerStyle>Markerfamilie und Einbeziehung von Tieren.</SettingsHelp_AnimalMarkerStyle>
+	<SettingsHelp_IncludeNotTamedAnimals>Bezieht namenlose Wildtiere ein, bevor Standard-Tierregeln geprüft werden.</SettingsHelp_IncludeNotTamedAnimals>
+	<SettingsHelp_AnimalEdgeColors>Bei transparenter Tierfüllung nutzen Randindikatoren die Körperfarbe des Tiers.</SettingsHelp_AnimalEdgeColors>
+	<SettingsHelp_DotSilhouetteSize>Skaliert Punkte und Silhouetten auf der Karte.</SettingsHelp_DotSilhouetteSize>
+	<SettingsHelp_EdgeDotSize>Skaliert Offscreen-Randmarker.</SettingsHelp_EdgeDotSize>
+	<SettingsHelp_EdgeDistanceFactor>Verschiebt Randmarker näher an oder weiter vom Bildschirmrand.</SettingsHelp_EdgeDistanceFactor>
+	<SettingsHelp_OutlineSize>Ändert die Konturbreite und baut Marker-Materialien neu.</SettingsHelp_OutlineSize>
 	<KeyLeftShift>Linke Umschalttaste</KeyLeftShift>
 	<KeyLeftAlt>Linke Alt-Taste</KeyLeftAlt>
 	<KeyLeftControl>Linke Strg-Taste</KeyLeftControl>

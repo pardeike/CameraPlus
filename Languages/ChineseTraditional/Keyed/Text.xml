@@ -36,6 +36,81 @@
 	<MouseRevealsLabels>鼠標顯示標籤{0}</MouseRevealsLabels>
 	<EdgeIndicators>邊緣指示器{0}</EdgeIndicators>
 	<PawnColoredEdgeIndicators>動物邊緣顏色</PawnColoredEdgeIndicators>
+	<SettingsTopic_All>全部</SettingsTopic_All>
+	<SettingsTopic_Zoom>縮放</SettingsTopic_Zoom>
+	<SettingsTopic_Movement>移動</SettingsTopic_Movement>
+	<SettingsTopic_Audio>音訊</SettingsTopic_Audio>
+	<SettingsTopic_Camera>鏡頭</SettingsTopic_Camera>
+	<SettingsTopic_Labels>標籤</SettingsTopic_Labels>
+	<SettingsTopic_Markers>標記</SettingsTopic_Markers>
+	<SettingsTopic_Animals>動物</SettingsTopic_Animals>
+	<SettingsTopic_Edges>邊緣</SettingsTopic_Edges>
+	<SettingsTopic_Appearance>外觀</SettingsTopic_Appearance>
+	<SettingsTopic_Advanced>進階</SettingsTopic_Advanced>
+	<SettingsGroup_ZoomRange>縮放範圍</SettingsGroup_ZoomRange>
+	<SettingsGroup_ZoomCurve>縮放曲線</SettingsGroup_ZoomCurve>
+	<SettingsGroup_MovementSpeed>移動速度</SettingsGroup_MovementSpeed>
+	<SettingsGroup_EdgeScroll>邊緣捲動</SettingsGroup_EdgeScroll>
+	<SettingsGroup_CameraBehavior>鏡頭行為</SettingsGroup_CameraBehavior>
+	<SettingsGroup_AudioListener>音訊監聽器</SettingsGroup_AudioListener>
+	<SettingsGroup_LabelVisibility>標籤顯示</SettingsGroup_LabelVisibility>
+	<SettingsGroup_MarkerStyle>標記樣式</SettingsGroup_MarkerStyle>
+	<SettingsGroup_AnimalPolicy>動物策略</SettingsGroup_AnimalPolicy>
+	<SettingsGroup_EdgeIndicators>邊緣指示器</SettingsGroup_EdgeIndicators>
+	<SettingsGroup_MarkerAppearance>標記外觀</SettingsGroup_MarkerAppearance>
+	<SettingsGroup_AdvancedActions>進階操作</SettingsGroup_AdvancedActions>
+	<SettingsHelp_Title>說明</SettingsHelp_Title>
+	<SettingsHelp_About>關於 {0}</SettingsHelp_About>
+	<SettingsNote_OverriddenByRule>被 {0} 條規則覆寫。</SettingsNote_OverriddenByRule>
+	<SettingsNote_OverriddenByRules>被 {0} 條規則覆寫。</SettingsNote_OverriddenByRules>
+	<SettingsNote_RequiresCameraMarkers>需要 Camera+ 標記樣式。</SettingsNote_RequiresCameraMarkers>
+	<SettingsNote_RequiresEdgeIndicators>需要邊緣指示器。</SettingsNote_RequiresEdgeIndicators>
+	<SettingsHelp_All>全部顯示熟悉的完整清單；選擇主題可縮小範圍。</SettingsHelp_All>
+	<SettingsHelp_Zoom>視覺縮放範圍，以及縮放變化速度。</SettingsHelp_Zoom>
+	<SettingsHelp_Movement>一般鏡頭移動和螢幕邊緣捲動是分開的。</SettingsHelp_Movement>
+	<SettingsHelp_Audio>調整世界聲音的監聽高度，不改變視覺縮放。</SettingsHelp_Audio>
+	<SettingsHelp_Camera>直接的鏡頭行為，與標籤或標記無關。</SettingsHelp_Camera>
+	<SettingsHelp_Labels>控制小人、物品堆和死亡小人的標籤何時隱藏或顯示。</SettingsHelp_Labels>
+	<SettingsHelp_Markers>未被規則符合的小人使用的全域標記樣式。</SettingsHelp_Markers>
+	<SettingsHelp_Animals>全域動物標記策略。未馴服動物會先於預設規則被過濾。</SettingsHelp_Animals>
+	<SettingsHelp_Edges>螢幕外標記獨立於地圖內小人替換。</SettingsHelp_Edges>
+	<SettingsHelp_Appearance>標記縮放、邊緣距離和輪廓粗細。</SettingsHelp_Appearance>
+	<SettingsHelp_Advanced>快捷鍵和規則會開啟獨立視窗。</SettingsHelp_Advanced>
+	<SettingsHelp_ZoomRange>設定 Camera+ 最近和最遠的視覺縮放。</SettingsHelp_ZoomRange>
+	<SettingsHelp_ZoomCurve>改變縮放在範圍內的加速方式。</SettingsHelp_ZoomCurve>
+	<SettingsHelp_MovementSpeed>控制兩個縮放端點的一般鏡頭移動速度。</SettingsHelp_MovementSpeed>
+	<SettingsHelp_EdgeScroll>單獨控制螢幕邊緣捲動。</SettingsHelp_EdgeScroll>
+	<SettingsHelp_CameraBehavior>在遊戲中立即生效的鏡頭開關。</SettingsHelp_CameraBehavior>
+	<SettingsHelp_AudioListener>控制世界聲音聽起來有多近，不改變視覺縮放。</SettingsHelp_AudioListener>
+	<SettingsHelp_LabelVisibility>標籤閾值只在 Camera+ 控制標記渲染時生效。</SettingsHelp_LabelVisibility>
+	<SettingsHelp_MarkerStyle>沒有符合規則的小人的預設標記替換方式。</SettingsHelp_MarkerStyle>
+	<SettingsHelp_AnimalPolicy>控制哪些動物可用以及使用哪種標記系列。</SettingsHelp_AnimalPolicy>
+	<SettingsHelp_EdgeIndicators>控制螢幕外標記和動物顏色回退。</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_MarkerAppearance>選擇標記後的視覺縮放和間距。</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_AdvancedActions>開啟快捷鍵或規則，不改變基本設定。</SettingsHelp_AdvancedActions>
+	<SettingsHelp_ZoomedInPercent>Camera+ 視覺上能放大的程度。</SettingsHelp_ZoomedInPercent>
+	<SettingsHelp_ZoomedOutPercent>Camera+ 視覺上能縮小的程度。</SettingsHelp_ZoomedOutPercent>
+	<SettingsHelp_Exponentiality>值越高，縮放速度在範圍內變化越明顯。</SettingsHelp_Exponentiality>
+	<SettingsHelp_ZoomedInDollyPercent>接近最近縮放時的鏡頭移動速度。</SettingsHelp_ZoomedInDollyPercent>
+	<SettingsHelp_ZoomedOutDollyPercent>接近最遠縮放時的鏡頭移動速度。</SettingsHelp_ZoomedOutDollyPercent>
+	<SettingsHelp_ZoomedInEdgeScroll>接近最近縮放時的邊緣捲動速度。</SettingsHelp_ZoomedInEdgeScroll>
+	<SettingsHelp_ZoomedOutEdgeScroll>接近最遠縮放時的邊緣捲動速度。</SettingsHelp_ZoomedOutEdgeScroll>
+	<SettingsHelp_ZoomToMouse>縮放時保持滑鼠下的地圖點穩定。</SettingsHelp_ZoomToMouse>
+	<SettingsHelp_DisableCameraShake>關閉原版鏡頭震動。</SettingsHelp_DisableCameraShake>
+	<SettingsHelp_SoundNearness>將音訊監聽器移向原版近距離高度，以改善本地聲音。</SettingsHelp_SoundNearness>
+	<SettingsHelp_MouseRevealsLabels>當 Camera+ 會隱藏標籤時，在滑鼠附近顯示標籤。</SettingsHelp_MouseRevealsLabels>
+	<SettingsHelp_HidePawnLabelBelow>當格子小於此大小時隱藏小人標籤。</SettingsHelp_HidePawnLabelBelow>
+	<SettingsHelp_HideThingLabelBelow>當格子小於此大小時隱藏物品堆標籤。</SettingsHelp_HideThingLabelBelow>
+	<SettingsHelp_HideDeadPawnsBelow>在此格子大小以下隱藏死亡小人渲染。</SettingsHelp_HideDeadPawnsBelow>
+	<SettingsHelp_DotStyle>預設標記模式。規則可覆寫符合的小人。</SettingsHelp_DotStyle>
+	<SettingsHelp_ShowMarkerBelow>Camera+ 開始用標記替換小人身體的格子閾值。</SettingsHelp_ShowMarkerBelow>
+	<SettingsHelp_AnimalMarkerStyle>動物標記系列和包含行為。</SettingsHelp_AnimalMarkerStyle>
+	<SettingsHelp_IncludeNotTamedAnimals>在檢查預設動物規則前包含未命名野生動物。</SettingsHelp_IncludeNotTamedAnimals>
+	<SettingsHelp_AnimalEdgeColors>動物規則填充透明時，邊緣指示器使用動物身體顏色。</SettingsHelp_AnimalEdgeColors>
+	<SettingsHelp_DotSilhouetteSize>縮放地圖內的點和剪影。</SettingsHelp_DotSilhouetteSize>
+	<SettingsHelp_EdgeDotSize>縮放螢幕外邊緣標記。</SettingsHelp_EdgeDotSize>
+	<SettingsHelp_EdgeDistanceFactor>將邊緣標記移近或移離螢幕邊緣。</SettingsHelp_EdgeDistanceFactor>
+	<SettingsHelp_OutlineSize>改變標記輪廓寬度並重建材質。</SettingsHelp_OutlineSize>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>

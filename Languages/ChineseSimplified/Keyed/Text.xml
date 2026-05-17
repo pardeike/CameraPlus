@@ -36,6 +36,81 @@
 	<MouseRevealsLabels>鼠标显示标签{0}</MouseRevealsLabels>
 	<EdgeIndicators>边缘指示器{0}</EdgeIndicators>
 	<PawnColoredEdgeIndicators>动物边缘颜色</PawnColoredEdgeIndicators>
+	<SettingsTopic_All>全部</SettingsTopic_All>
+	<SettingsTopic_Zoom>缩放</SettingsTopic_Zoom>
+	<SettingsTopic_Movement>移动</SettingsTopic_Movement>
+	<SettingsTopic_Audio>音频</SettingsTopic_Audio>
+	<SettingsTopic_Camera>镜头</SettingsTopic_Camera>
+	<SettingsTopic_Labels>标签</SettingsTopic_Labels>
+	<SettingsTopic_Markers>标记</SettingsTopic_Markers>
+	<SettingsTopic_Animals>动物</SettingsTopic_Animals>
+	<SettingsTopic_Edges>边缘</SettingsTopic_Edges>
+	<SettingsTopic_Appearance>外观</SettingsTopic_Appearance>
+	<SettingsTopic_Advanced>高级</SettingsTopic_Advanced>
+	<SettingsGroup_ZoomRange>缩放范围</SettingsGroup_ZoomRange>
+	<SettingsGroup_ZoomCurve>缩放曲线</SettingsGroup_ZoomCurve>
+	<SettingsGroup_MovementSpeed>移动速度</SettingsGroup_MovementSpeed>
+	<SettingsGroup_EdgeScroll>边缘滚动</SettingsGroup_EdgeScroll>
+	<SettingsGroup_CameraBehavior>镜头行为</SettingsGroup_CameraBehavior>
+	<SettingsGroup_AudioListener>音频监听器</SettingsGroup_AudioListener>
+	<SettingsGroup_LabelVisibility>标签显示</SettingsGroup_LabelVisibility>
+	<SettingsGroup_MarkerStyle>标记样式</SettingsGroup_MarkerStyle>
+	<SettingsGroup_AnimalPolicy>动物策略</SettingsGroup_AnimalPolicy>
+	<SettingsGroup_EdgeIndicators>边缘指示器</SettingsGroup_EdgeIndicators>
+	<SettingsGroup_MarkerAppearance>标记外观</SettingsGroup_MarkerAppearance>
+	<SettingsGroup_AdvancedActions>高级操作</SettingsGroup_AdvancedActions>
+	<SettingsHelp_Title>帮助</SettingsHelp_Title>
+	<SettingsHelp_About>关于 {0}</SettingsHelp_About>
+	<SettingsNote_OverriddenByRule>被 {0} 条规则覆盖。</SettingsNote_OverriddenByRule>
+	<SettingsNote_OverriddenByRules>被 {0} 条规则覆盖。</SettingsNote_OverriddenByRules>
+	<SettingsNote_RequiresCameraMarkers>需要 Camera+ 标记样式。</SettingsNote_RequiresCameraMarkers>
+	<SettingsNote_RequiresEdgeIndicators>需要边缘指示器。</SettingsNote_RequiresEdgeIndicators>
+	<SettingsHelp_All>全部显示熟悉的完整列表；选择主题可缩小范围。</SettingsHelp_All>
+	<SettingsHelp_Zoom>视觉缩放范围，以及缩放变化的速度。</SettingsHelp_Zoom>
+	<SettingsHelp_Movement>普通镜头移动和屏幕边缘滚动是分开的。</SettingsHelp_Movement>
+	<SettingsHelp_Audio>调整世界声音的监听高度，不改变视觉缩放。</SettingsHelp_Audio>
+	<SettingsHelp_Camera>直接的镜头行为，与标签或标记无关。</SettingsHelp_Camera>
+	<SettingsHelp_Labels>控制小人、物品堆和死亡小人的标签何时隐藏或显示。</SettingsHelp_Labels>
+	<SettingsHelp_Markers>未被规则匹配的小人使用的全局标记样式。</SettingsHelp_Markers>
+	<SettingsHelp_Animals>全局动物标记策略。未驯服动物会先于默认规则被过滤。</SettingsHelp_Animals>
+	<SettingsHelp_Edges>屏幕外标记独立于地图内小人替换。</SettingsHelp_Edges>
+	<SettingsHelp_Appearance>标记缩放、边缘距离和轮廓粗细。</SettingsHelp_Appearance>
+	<SettingsHelp_Advanced>快捷键和规则会打开独立窗口。</SettingsHelp_Advanced>
+	<SettingsHelp_ZoomRange>设置 Camera+ 最近和最远的视觉缩放。</SettingsHelp_ZoomRange>
+	<SettingsHelp_ZoomCurve>改变缩放在范围内的加速方式。</SettingsHelp_ZoomCurve>
+	<SettingsHelp_MovementSpeed>控制两个缩放端点的普通镜头移动速度。</SettingsHelp_MovementSpeed>
+	<SettingsHelp_EdgeScroll>单独控制屏幕边缘滚动。</SettingsHelp_EdgeScroll>
+	<SettingsHelp_CameraBehavior>在游戏中立即生效的镜头开关。</SettingsHelp_CameraBehavior>
+	<SettingsHelp_AudioListener>控制世界声音听起来有多近，不改变视觉缩放。</SettingsHelp_AudioListener>
+	<SettingsHelp_LabelVisibility>标签阈值只在 Camera+ 控制标记渲染时生效。</SettingsHelp_LabelVisibility>
+	<SettingsHelp_MarkerStyle>没有匹配规则的小人的默认标记替换方式。</SettingsHelp_MarkerStyle>
+	<SettingsHelp_AnimalPolicy>控制哪些动物可用以及使用哪种标记系列。</SettingsHelp_AnimalPolicy>
+	<SettingsHelp_EdgeIndicators>控制屏幕外标记和动物颜色回退。</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_MarkerAppearance>选择标记后的视觉缩放和间距。</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_AdvancedActions>打开快捷键或规则，不改变基本设置。</SettingsHelp_AdvancedActions>
+	<SettingsHelp_ZoomedInPercent>Camera+ 视觉上能放大的程度。</SettingsHelp_ZoomedInPercent>
+	<SettingsHelp_ZoomedOutPercent>Camera+ 视觉上能缩小的程度。</SettingsHelp_ZoomedOutPercent>
+	<SettingsHelp_Exponentiality>值越高，缩放速度在范围内变化越明显。</SettingsHelp_Exponentiality>
+	<SettingsHelp_ZoomedInDollyPercent>接近最近缩放时的镜头移动速度。</SettingsHelp_ZoomedInDollyPercent>
+	<SettingsHelp_ZoomedOutDollyPercent>接近最远缩放时的镜头移动速度。</SettingsHelp_ZoomedOutDollyPercent>
+	<SettingsHelp_ZoomedInEdgeScroll>接近最近缩放时的边缘滚动速度。</SettingsHelp_ZoomedInEdgeScroll>
+	<SettingsHelp_ZoomedOutEdgeScroll>接近最远缩放时的边缘滚动速度。</SettingsHelp_ZoomedOutEdgeScroll>
+	<SettingsHelp_ZoomToMouse>缩放时保持鼠标下的地图点稳定。</SettingsHelp_ZoomToMouse>
+	<SettingsHelp_DisableCameraShake>关闭原版镜头震动。</SettingsHelp_DisableCameraShake>
+	<SettingsHelp_SoundNearness>将音频监听器移向原版近距离高度，以改善本地声音。</SettingsHelp_SoundNearness>
+	<SettingsHelp_MouseRevealsLabels>当 Camera+ 会隐藏标签时，在鼠标附近显示标签。</SettingsHelp_MouseRevealsLabels>
+	<SettingsHelp_HidePawnLabelBelow>当单元格小于此大小时隐藏小人标签。</SettingsHelp_HidePawnLabelBelow>
+	<SettingsHelp_HideThingLabelBelow>当单元格小于此大小时隐藏物品堆标签。</SettingsHelp_HideThingLabelBelow>
+	<SettingsHelp_HideDeadPawnsBelow>在此单元格大小以下隐藏死亡小人渲染。</SettingsHelp_HideDeadPawnsBelow>
+	<SettingsHelp_DotStyle>默认标记模式。规则可覆盖匹配的小人。</SettingsHelp_DotStyle>
+	<SettingsHelp_ShowMarkerBelow>Camera+ 开始用标记替换小人身体的单元格阈值。</SettingsHelp_ShowMarkerBelow>
+	<SettingsHelp_AnimalMarkerStyle>动物标记系列和包含行为。</SettingsHelp_AnimalMarkerStyle>
+	<SettingsHelp_IncludeNotTamedAnimals>在检查默认动物规则前包含未命名野生动物。</SettingsHelp_IncludeNotTamedAnimals>
+	<SettingsHelp_AnimalEdgeColors>动物规则填充透明时，边缘指示器使用动物身体颜色。</SettingsHelp_AnimalEdgeColors>
+	<SettingsHelp_DotSilhouetteSize>缩放地图内的点和剪影。</SettingsHelp_DotSilhouetteSize>
+	<SettingsHelp_EdgeDotSize>缩放屏幕外边缘标记。</SettingsHelp_EdgeDotSize>
+	<SettingsHelp_EdgeDistanceFactor>将边缘标记移近或移离屏幕边缘。</SettingsHelp_EdgeDistanceFactor>
+	<SettingsHelp_OutlineSize>改变标记轮廓宽度并重建材质。</SettingsHelp_OutlineSize>
 	<KeyLeftShift>左 Shift</KeyLeftShift>
 	<KeyLeftAlt>左 Alt</KeyLeftAlt>
 	<KeyLeftControl>左 Ctrl</KeyLeftControl>

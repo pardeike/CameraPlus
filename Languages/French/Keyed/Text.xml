@@ -36,6 +36,81 @@
 	<MouseRevealsLabels>La souris révèle les étiquettes{0}</MouseRevealsLabels>
 	<EdgeIndicators>Indicateurs de bord{0}</EdgeIndicators>
 	<PawnColoredEdgeIndicators>Couleurs de bord animales</PawnColoredEdgeIndicators>
+	<SettingsTopic_All>Tout</SettingsTopic_All>
+	<SettingsTopic_Zoom>Zoom</SettingsTopic_Zoom>
+	<SettingsTopic_Movement>Mouvement</SettingsTopic_Movement>
+	<SettingsTopic_Audio>Audio</SettingsTopic_Audio>
+	<SettingsTopic_Camera>Caméra</SettingsTopic_Camera>
+	<SettingsTopic_Labels>Étiquettes</SettingsTopic_Labels>
+	<SettingsTopic_Markers>Marqueurs</SettingsTopic_Markers>
+	<SettingsTopic_Animals>Animaux</SettingsTopic_Animals>
+	<SettingsTopic_Edges>Bords</SettingsTopic_Edges>
+	<SettingsTopic_Appearance>Apparence</SettingsTopic_Appearance>
+	<SettingsTopic_Advanced>Avancé</SettingsTopic_Advanced>
+	<SettingsGroup_ZoomRange>Plage de zoom</SettingsGroup_ZoomRange>
+	<SettingsGroup_ZoomCurve>Courbe de zoom</SettingsGroup_ZoomCurve>
+	<SettingsGroup_MovementSpeed>Vitesse de mouvement</SettingsGroup_MovementSpeed>
+	<SettingsGroup_EdgeScroll>Défilement de bord</SettingsGroup_EdgeScroll>
+	<SettingsGroup_CameraBehavior>Comportement caméra</SettingsGroup_CameraBehavior>
+	<SettingsGroup_AudioListener>Écoute audio</SettingsGroup_AudioListener>
+	<SettingsGroup_LabelVisibility>Visibilité des étiquettes</SettingsGroup_LabelVisibility>
+	<SettingsGroup_MarkerStyle>Style de marqueur</SettingsGroup_MarkerStyle>
+	<SettingsGroup_AnimalPolicy>Politique animaux</SettingsGroup_AnimalPolicy>
+	<SettingsGroup_EdgeIndicators>Indicateurs de bord</SettingsGroup_EdgeIndicators>
+	<SettingsGroup_MarkerAppearance>Apparence des marqueurs</SettingsGroup_MarkerAppearance>
+	<SettingsGroup_AdvancedActions>Actions avancées</SettingsGroup_AdvancedActions>
+	<SettingsHelp_Title>Aide</SettingsHelp_Title>
+	<SettingsHelp_About>À propos de {0}</SettingsHelp_About>
+	<SettingsNote_OverriddenByRule>Remplacé par {0} règle.</SettingsNote_OverriddenByRule>
+	<SettingsNote_OverriddenByRules>Remplacé par {0} règles.</SettingsNote_OverriddenByRules>
+	<SettingsNote_RequiresCameraMarkers>Nécessite un style de marqueur Camera+.</SettingsNote_RequiresCameraMarkers>
+	<SettingsNote_RequiresEdgeIndicators>Nécessite les indicateurs de bord.</SettingsNote_RequiresEdgeIndicators>
+	<SettingsHelp_All>Tout affiche la liste familière complète ; choisissez un sujet pour filtrer.</SettingsHelp_All>
+	<SettingsHelp_Zoom>Plage de zoom visuel et vitesse de changement du zoom.</SettingsHelp_Zoom>
+	<SettingsHelp_Movement>Le mouvement normal et le défilement de bord sont séparés.</SettingsHelp_Movement>
+	<SettingsHelp_Audio>Ajuste la hauteur d'écoute des sons du monde. Ne change pas le zoom visuel.</SettingsHelp_Audio>
+	<SettingsHelp_Camera>Comportement direct de la caméra, sans lien avec étiquettes ou marqueurs.</SettingsHelp_Camera>
+	<SettingsHelp_Labels>Contrôle quand les étiquettes des pions, piles et morts sont cachées ou révélées.</SettingsHelp_Labels>
+	<SettingsHelp_Markers>Style global des marqueurs pour les pions sans règle correspondante.</SettingsHelp_Markers>
+	<SettingsHelp_Animals>Politique globale des marqueurs animaux. Les animaux sauvages sont filtrés avant les règles par défaut.</SettingsHelp_Animals>
+	<SettingsHelp_Edges>Les marqueurs hors écran sont indépendants du remplacement des pions sur la carte.</SettingsHelp_Edges>
+	<SettingsHelp_Appearance>Échelle des marqueurs, espacement de bord et épaisseur du contour.</SettingsHelp_Appearance>
+	<SettingsHelp_Advanced>Les raccourcis et les règles ouvrent des dialogues séparés.</SettingsHelp_Advanced>
+	<SettingsHelp_ZoomRange>Définit le zoom visuel Camera+ le plus proche et le plus éloigné.</SettingsHelp_ZoomRange>
+	<SettingsHelp_ZoomCurve>Modifie l'accélération du zoom entre les limites.</SettingsHelp_ZoomCurve>
+	<SettingsHelp_MovementSpeed>Contrôle le mouvement normal de la caméra aux deux extrémités du zoom.</SettingsHelp_MovementSpeed>
+	<SettingsHelp_EdgeScroll>Contrôle le défilement de bord séparément du mouvement normal.</SettingsHelp_EdgeScroll>
+	<SettingsHelp_CameraBehavior>Interrupteurs caméra appliqués immédiatement en jeu.</SettingsHelp_CameraBehavior>
+	<SettingsHelp_AudioListener>Contrôle la proximité perçue des sons sans changer le zoom visuel.</SettingsHelp_AudioListener>
+	<SettingsHelp_LabelVisibility>Les seuils d'étiquette ne s'appliquent que si Camera+ contrôle les marqueurs.</SettingsHelp_LabelVisibility>
+	<SettingsHelp_MarkerStyle>Remplacement de marqueur par défaut pour les pions sans règle.</SettingsHelp_MarkerStyle>
+	<SettingsHelp_AnimalPolicy>Contrôle quels animaux sont éligibles et quelle famille de marqueurs ils utilisent.</SettingsHelp_AnimalPolicy>
+	<SettingsHelp_EdgeIndicators>Contrôle les marqueurs hors écran et la couleur animale de secours.</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_MarkerAppearance>Échelle et espacement visuels après le choix du marqueur.</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_AdvancedActions>Ouvre les raccourcis ou les règles sans changer les réglages de base.</SettingsHelp_AdvancedActions>
+	<SettingsHelp_ZoomedInPercent>Distance maximale de zoom visuel vers l'intérieur.</SettingsHelp_ZoomedInPercent>
+	<SettingsHelp_ZoomedOutPercent>Distance maximale de zoom visuel vers l'extérieur.</SettingsHelp_ZoomedOutPercent>
+	<SettingsHelp_Exponentiality>Des valeurs plus hautes changent plus fortement la vitesse du zoom.</SettingsHelp_Exponentiality>
+	<SettingsHelp_ZoomedInDollyPercent>Vitesse de mouvement près du zoom le plus proche.</SettingsHelp_ZoomedInDollyPercent>
+	<SettingsHelp_ZoomedOutDollyPercent>Vitesse de mouvement près du zoom le plus éloigné.</SettingsHelp_ZoomedOutDollyPercent>
+	<SettingsHelp_ZoomedInEdgeScroll>Vitesse de bord près du zoom le plus proche.</SettingsHelp_ZoomedInEdgeScroll>
+	<SettingsHelp_ZoomedOutEdgeScroll>Vitesse de bord près du zoom le plus éloigné.</SettingsHelp_ZoomedOutEdgeScroll>
+	<SettingsHelp_ZoomToMouse>Garde stable le point de carte sous le curseur pendant le zoom.</SettingsHelp_ZoomToMouse>
+	<SettingsHelp_DisableCameraShake>Supprime le tremblement de caméra vanilla.</SettingsHelp_DisableCameraShake>
+	<SettingsHelp_SoundNearness>Déplace l'écoute audio vers la hauteur proche vanilla pour les sons locaux.</SettingsHelp_SoundNearness>
+	<SettingsHelp_MouseRevealsLabels>Affiche les étiquettes près de la souris quand Camera+ les cacherait.</SettingsHelp_MouseRevealsLabels>
+	<SettingsHelp_HidePawnLabelBelow>Cache les étiquettes de pion quand les cellules sont plus petites que cette taille.</SettingsHelp_HidePawnLabelBelow>
+	<SettingsHelp_HideThingLabelBelow>Cache les étiquettes de pile quand les cellules sont plus petites que cette taille.</SettingsHelp_HideThingLabelBelow>
+	<SettingsHelp_HideDeadPawnsBelow>Cache le rendu des pions morts sous cette taille de cellule.</SettingsHelp_HideDeadPawnsBelow>
+	<SettingsHelp_DotStyle>Mode de marqueur par défaut. Les règles peuvent le remplacer.</SettingsHelp_DotStyle>
+	<SettingsHelp_ShowMarkerBelow>Seuil où Camera+ remplace les corps par des marqueurs.</SettingsHelp_ShowMarkerBelow>
+	<SettingsHelp_AnimalMarkerStyle>Famille de marqueurs animaux et comportement d'inclusion.</SettingsHelp_AnimalMarkerStyle>
+	<SettingsHelp_IncludeNotTamedAnimals>Inclut les animaux sauvages sans nom avant les règles animales par défaut.</SettingsHelp_IncludeNotTamedAnimals>
+	<SettingsHelp_AnimalEdgeColors>Si le remplissage animal est transparent, le bord utilise la couleur du corps.</SettingsHelp_AnimalEdgeColors>
+	<SettingsHelp_DotSilhouetteSize>Redimensionne les points et silhouettes sur la carte.</SettingsHelp_DotSilhouetteSize>
+	<SettingsHelp_EdgeDotSize>Redimensionne les marqueurs hors écran.</SettingsHelp_EdgeDotSize>
+	<SettingsHelp_EdgeDistanceFactor>Déplace les marqueurs vers ou depuis le bord de l'écran.</SettingsHelp_EdgeDistanceFactor>
+	<SettingsHelp_OutlineSize>Change la largeur du contour et reconstruit les matériaux.</SettingsHelp_OutlineSize>
 	<KeyLeftShift>Shift gauche</KeyLeftShift>
 	<KeyLeftAlt>Alt gauche</KeyLeftAlt>
 	<KeyLeftControl>Ctrl gauche</KeyLeftControl>

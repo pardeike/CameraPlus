@@ -36,6 +36,81 @@
     <MouseRevealsLabels>Mouse reveals labels{0}</MouseRevealsLabels>
     <EdgeIndicators>Edge indicators{0}</EdgeIndicators>
     <PawnColoredEdgeIndicators>Animal edge colors</PawnColoredEdgeIndicators>
+    <SettingsTopic_All>All</SettingsTopic_All>
+    <SettingsTopic_Zoom>Zoom</SettingsTopic_Zoom>
+    <SettingsTopic_Movement>Movement</SettingsTopic_Movement>
+    <SettingsTopic_Audio>Audio</SettingsTopic_Audio>
+    <SettingsTopic_Camera>Camera</SettingsTopic_Camera>
+    <SettingsTopic_Labels>Labels</SettingsTopic_Labels>
+    <SettingsTopic_Markers>Markers</SettingsTopic_Markers>
+    <SettingsTopic_Animals>Animals</SettingsTopic_Animals>
+    <SettingsTopic_Edges>Edges</SettingsTopic_Edges>
+    <SettingsTopic_Appearance>Appearance</SettingsTopic_Appearance>
+    <SettingsTopic_Advanced>Advanced</SettingsTopic_Advanced>
+    <SettingsGroup_ZoomRange>Zoom range</SettingsGroup_ZoomRange>
+    <SettingsGroup_ZoomCurve>Zoom curve</SettingsGroup_ZoomCurve>
+    <SettingsGroup_MovementSpeed>Movement speed</SettingsGroup_MovementSpeed>
+    <SettingsGroup_EdgeScroll>Edge scroll</SettingsGroup_EdgeScroll>
+    <SettingsGroup_CameraBehavior>Camera behavior</SettingsGroup_CameraBehavior>
+    <SettingsGroup_AudioListener>Audio listener</SettingsGroup_AudioListener>
+    <SettingsGroup_LabelVisibility>Label visibility</SettingsGroup_LabelVisibility>
+    <SettingsGroup_MarkerStyle>Marker style</SettingsGroup_MarkerStyle>
+    <SettingsGroup_AnimalPolicy>Animal policy</SettingsGroup_AnimalPolicy>
+    <SettingsGroup_EdgeIndicators>Edge indicators</SettingsGroup_EdgeIndicators>
+    <SettingsGroup_MarkerAppearance>Marker appearance</SettingsGroup_MarkerAppearance>
+    <SettingsGroup_AdvancedActions>Advanced actions</SettingsGroup_AdvancedActions>
+    <SettingsHelp_Title>Help</SettingsHelp_Title>
+    <SettingsHelp_About>About {0}</SettingsHelp_About>
+    <SettingsNote_OverriddenByRule>Overridden by {0} rule.</SettingsNote_OverriddenByRule>
+    <SettingsNote_OverriddenByRules>Overridden by {0} rules.</SettingsNote_OverriddenByRules>
+    <SettingsNote_RequiresCameraMarkers>Requires a Camera+ marker style.</SettingsNote_RequiresCameraMarkers>
+    <SettingsNote_RequiresEdgeIndicators>Requires edge indicators.</SettingsNote_RequiresEdgeIndicators>
+    <SettingsHelp_All>Use All for the familiar full list, or pick a topic to narrow the settings.</SettingsHelp_All>
+    <SettingsHelp_Zoom>Visual zoom range and how quickly zoom changes across it.</SettingsHelp_Zoom>
+    <SettingsHelp_Movement>Normal camera movement speed and screen-edge scrolling are separate.</SettingsHelp_Movement>
+    <SettingsHelp_Audio>Adjusts listener height for world sounds. It does not change visual zoom.</SettingsHelp_Audio>
+    <SettingsHelp_Camera>Direct camera behavior that is not tied to labels or markers.</SettingsHelp_Camera>
+    <SettingsHelp_Labels>Controls when pawn, stack, and dead-pawn labels are hidden or revealed.</SettingsHelp_Labels>
+    <SettingsHelp_Markers>Global marker style for pawns not matched by rules.</SettingsHelp_Markers>
+    <SettingsHelp_Animals>Global animal marker policy. Untamed animals are gated before default rules.</SettingsHelp_Animals>
+    <SettingsHelp_Edges>Off-screen markers are independent from in-map pawn replacement.</SettingsHelp_Edges>
+    <SettingsHelp_Appearance>Marker scale, edge spacing, and outline thickness.</SettingsHelp_Appearance>
+    <SettingsHelp_Advanced>Shortcuts and rules are separate dialogs.</SettingsHelp_Advanced>
+    <SettingsHelp_ZoomRange>Sets the visual closest and furthest Camera+ zoom.</SettingsHelp_ZoomRange>
+    <SettingsHelp_ZoomCurve>Changes how zoom accelerates between the range limits.</SettingsHelp_ZoomCurve>
+    <SettingsHelp_MovementSpeed>Controls ordinary camera movement at each zoom end.</SettingsHelp_MovementSpeed>
+    <SettingsHelp_EdgeScroll>Controls screen-edge scrolling separately from normal movement.</SettingsHelp_EdgeScroll>
+    <SettingsHelp_CameraBehavior>Camera toggles that apply immediately while playing.</SettingsHelp_CameraBehavior>
+    <SettingsHelp_AudioListener>Controls how close world sounds feel without changing visual zoom.</SettingsHelp_AudioListener>
+    <SettingsHelp_LabelVisibility>Label thresholds only apply when Camera+ controls marker rendering.</SettingsHelp_LabelVisibility>
+    <SettingsHelp_MarkerStyle>Default marker replacement for pawns not styled by rules.</SettingsHelp_MarkerStyle>
+    <SettingsHelp_AnimalPolicy>Controls which animals are eligible and which marker family they use.</SettingsHelp_AnimalPolicy>
+    <SettingsHelp_EdgeIndicators>Controls off-screen markers and animal color fallback.</SettingsHelp_EdgeIndicators>
+    <SettingsHelp_MarkerAppearance>Visual scale and spacing after marker selection.</SettingsHelp_MarkerAppearance>
+    <SettingsHelp_AdvancedActions>Open shortcuts or the rule editor without changing basic settings.</SettingsHelp_AdvancedActions>
+    <SettingsHelp_ZoomedInPercent>How far Camera+ can zoom in visually.</SettingsHelp_ZoomedInPercent>
+    <SettingsHelp_ZoomedOutPercent>How far Camera+ can zoom out visually.</SettingsHelp_ZoomedOutPercent>
+    <SettingsHelp_Exponentiality>Higher values make zoom speed change more strongly across the range.</SettingsHelp_Exponentiality>
+    <SettingsHelp_ZoomedInDollyPercent>Camera movement speed near the closest zoom.</SettingsHelp_ZoomedInDollyPercent>
+    <SettingsHelp_ZoomedOutDollyPercent>Camera movement speed near the furthest zoom.</SettingsHelp_ZoomedOutDollyPercent>
+    <SettingsHelp_ZoomedInEdgeScroll>Screen-edge scroll speed near the closest zoom.</SettingsHelp_ZoomedInEdgeScroll>
+    <SettingsHelp_ZoomedOutEdgeScroll>Screen-edge scroll speed near the furthest zoom.</SettingsHelp_ZoomedOutEdgeScroll>
+    <SettingsHelp_ZoomToMouse>Keeps the map point under the cursor stable while zooming.</SettingsHelp_ZoomToMouse>
+    <SettingsHelp_DisableCameraShake>Suppresses vanilla camera shake.</SettingsHelp_DisableCameraShake>
+    <SettingsHelp_SoundNearness>Moves the audio listener toward vanilla close height for local sounds.</SettingsHelp_SoundNearness>
+    <SettingsHelp_MouseRevealsLabels>Shows labels near the mouse while Camera+ would otherwise hide them.</SettingsHelp_MouseRevealsLabels>
+    <SettingsHelp_HidePawnLabelBelow>Hides pawn labels once cells are smaller than this size.</SettingsHelp_HidePawnLabelBelow>
+    <SettingsHelp_HideThingLabelBelow>Hides stack labels once cells are smaller than this size.</SettingsHelp_HideThingLabelBelow>
+    <SettingsHelp_HideDeadPawnsBelow>Hides dead pawn rendering below this cell size.</SettingsHelp_HideDeadPawnsBelow>
+    <SettingsHelp_DotStyle>Default marker mode. Rules can override it for matching pawns.</SettingsHelp_DotStyle>
+    <SettingsHelp_ShowMarkerBelow>Cell size threshold where Camera+ replaces pawn bodies with markers.</SettingsHelp_ShowMarkerBelow>
+    <SettingsHelp_AnimalMarkerStyle>Animal marker family and inclusion behavior.</SettingsHelp_AnimalMarkerStyle>
+    <SettingsHelp_IncludeNotTamedAnimals>Includes unnamed wild animals before default animal rules are checked.</SettingsHelp_IncludeNotTamedAnimals>
+    <SettingsHelp_AnimalEdgeColors>When animal rule fill is transparent, edge indicators use the animal body color.</SettingsHelp_AnimalEdgeColors>
+    <SettingsHelp_DotSilhouetteSize>Scales in-map dots and silhouettes.</SettingsHelp_DotSilhouetteSize>
+    <SettingsHelp_EdgeDotSize>Scales off-screen edge markers.</SettingsHelp_EdgeDotSize>
+    <SettingsHelp_EdgeDistanceFactor>Moves edge markers nearer to or farther from the screen border.</SettingsHelp_EdgeDistanceFactor>
+    <SettingsHelp_OutlineSize>Changes marker outline width and rebuilds marker materials.</SettingsHelp_OutlineSize>
     <KeyLeftShift>Left Shift</KeyLeftShift>
     <KeyLeftAlt>Left Alt</KeyLeftAlt>
     <KeyLeftControl>Left Ctrl</KeyLeftControl>

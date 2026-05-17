@@ -36,6 +36,81 @@
 	<MouseRevealsLabels>Мышь показывает метки{0}</MouseRevealsLabels>
 	<EdgeIndicators>Краевые индикаторы{0}</EdgeIndicators>
 	<PawnColoredEdgeIndicators>Цвета краев животных</PawnColoredEdgeIndicators>
+	<SettingsTopic_All>Все</SettingsTopic_All>
+	<SettingsTopic_Zoom>Масштаб</SettingsTopic_Zoom>
+	<SettingsTopic_Movement>Движение</SettingsTopic_Movement>
+	<SettingsTopic_Audio>Звук</SettingsTopic_Audio>
+	<SettingsTopic_Camera>Камера</SettingsTopic_Camera>
+	<SettingsTopic_Labels>Метки</SettingsTopic_Labels>
+	<SettingsTopic_Markers>Маркеры</SettingsTopic_Markers>
+	<SettingsTopic_Animals>Животные</SettingsTopic_Animals>
+	<SettingsTopic_Edges>Края</SettingsTopic_Edges>
+	<SettingsTopic_Appearance>Вид</SettingsTopic_Appearance>
+	<SettingsTopic_Advanced>Дополн.</SettingsTopic_Advanced>
+	<SettingsGroup_ZoomRange>Диапазон масштаба</SettingsGroup_ZoomRange>
+	<SettingsGroup_ZoomCurve>Кривая масштаба</SettingsGroup_ZoomCurve>
+	<SettingsGroup_MovementSpeed>Скорость движения</SettingsGroup_MovementSpeed>
+	<SettingsGroup_EdgeScroll>Прокрутка у края</SettingsGroup_EdgeScroll>
+	<SettingsGroup_CameraBehavior>Поведение камеры</SettingsGroup_CameraBehavior>
+	<SettingsGroup_AudioListener>Слушатель звука</SettingsGroup_AudioListener>
+	<SettingsGroup_LabelVisibility>Видимость меток</SettingsGroup_LabelVisibility>
+	<SettingsGroup_MarkerStyle>Стиль маркеров</SettingsGroup_MarkerStyle>
+	<SettingsGroup_AnimalPolicy>Маркеры животных</SettingsGroup_AnimalPolicy>
+	<SettingsGroup_EdgeIndicators>Краевые индикаторы</SettingsGroup_EdgeIndicators>
+	<SettingsGroup_MarkerAppearance>Вид маркеров</SettingsGroup_MarkerAppearance>
+	<SettingsGroup_AdvancedActions>Доп. действия</SettingsGroup_AdvancedActions>
+	<SettingsHelp_Title>Справка</SettingsHelp_Title>
+	<SettingsHelp_About>О настройке {0}</SettingsHelp_About>
+	<SettingsNote_OverriddenByRule>Переопределено правилом: {0}.</SettingsNote_OverriddenByRule>
+	<SettingsNote_OverriddenByRules>Переопределено правилами: {0}.</SettingsNote_OverriddenByRules>
+	<SettingsNote_RequiresCameraMarkers>Требуется стиль маркеров Camera+.</SettingsNote_RequiresCameraMarkers>
+	<SettingsNote_RequiresEdgeIndicators>Требуются краевые индикаторы.</SettingsNote_RequiresEdgeIndicators>
+	<SettingsHelp_All>Показывает полный список настроек в знакомом порядке. Выберите тему, чтобы сузить список.</SettingsHelp_All>
+	<SettingsHelp_Zoom>Визуальный диапазон масштаба и скорость изменения масштаба.</SettingsHelp_Zoom>
+	<SettingsHelp_Movement>Обычное движение камеры и прокрутка у края экрана настраиваются отдельно.</SettingsHelp_Movement>
+	<SettingsHelp_Audio>Меняет высоту слушателя звука в мире, не меняя визуальный масштаб.</SettingsHelp_Audio>
+	<SettingsHelp_Camera>Прямые параметры поведения камеры, не связанные с метками или маркерами.</SettingsHelp_Camera>
+	<SettingsHelp_Labels>Управляет тем, когда скрываются или показываются метки пешек, стопок и мертвых пешек.</SettingsHelp_Labels>
+	<SettingsHelp_Markers>Общий стиль маркеров для пешек, которые не попали под правила.</SettingsHelp_Markers>
+	<SettingsHelp_Animals>Общая политика маркеров животных. Неприрученные животные фильтруются до правил по умолчанию.</SettingsHelp_Animals>
+	<SettingsHelp_Edges>Маркеры за пределами экрана независимы от замены пешек на карте.</SettingsHelp_Edges>
+	<SettingsHelp_Appearance>Масштаб маркеров, расстояние от края и ширина контура.</SettingsHelp_Appearance>
+	<SettingsHelp_Advanced>Горячие клавиши и правила открываются в отдельных окнах.</SettingsHelp_Advanced>
+	<SettingsHelp_ZoomRange>Задает ближайший и самый дальний визуальный масштаб Camera+.</SettingsHelp_ZoomRange>
+	<SettingsHelp_ZoomCurve>Меняет то, как ускоряется масштабирование внутри диапазона.</SettingsHelp_ZoomCurve>
+	<SettingsHelp_MovementSpeed>Управляет обычной скоростью движения камеры на обоих концах масштаба.</SettingsHelp_MovementSpeed>
+	<SettingsHelp_EdgeScroll>Отдельно управляет прокруткой при наведении на край экрана.</SettingsHelp_EdgeScroll>
+	<SettingsHelp_CameraBehavior>Переключатели камеры, которые сразу действуют в игре.</SettingsHelp_CameraBehavior>
+	<SettingsHelp_AudioListener>Управляет тем, насколько близко звучит мир, не меняя визуальный масштаб.</SettingsHelp_AudioListener>
+	<SettingsHelp_LabelVisibility>Пороги меток действуют только когда Camera+ управляет отрисовкой маркеров.</SettingsHelp_LabelVisibility>
+	<SettingsHelp_MarkerStyle>Замена маркера по умолчанию для пешек без подходящего правила.</SettingsHelp_MarkerStyle>
+	<SettingsHelp_AnimalPolicy>Управляет тем, какие животные участвуют и какой набор маркеров используется.</SettingsHelp_AnimalPolicy>
+	<SettingsHelp_EdgeIndicators>Управляет маркерами вне экрана и запасным цветом животных.</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_MarkerAppearance>Визуальный масштаб и отступы при использовании маркеров.</SettingsHelp_MarkerAppearance>
+	<SettingsHelp_AdvancedActions>Открывает горячие клавиши или правила, не меняя базовые настройки.</SettingsHelp_AdvancedActions>
+	<SettingsHelp_ZoomedInPercent>Насколько далеко Camera+ может визуально приблизить камеру.</SettingsHelp_ZoomedInPercent>
+	<SettingsHelp_ZoomedOutPercent>Насколько далеко Camera+ может визуально отдалить камеру.</SettingsHelp_ZoomedOutPercent>
+	<SettingsHelp_Exponentiality>Чем выше значение, тем сильнее меняется скорость масштабирования по диапазону.</SettingsHelp_Exponentiality>
+	<SettingsHelp_ZoomedInDollyPercent>Скорость движения камеры рядом с ближайшим масштабом.</SettingsHelp_ZoomedInDollyPercent>
+	<SettingsHelp_ZoomedOutDollyPercent>Скорость движения камеры рядом с дальним масштабом.</SettingsHelp_ZoomedOutDollyPercent>
+	<SettingsHelp_ZoomedInEdgeScroll>Скорость прокрутки у края рядом с ближайшим масштабом.</SettingsHelp_ZoomedInEdgeScroll>
+	<SettingsHelp_ZoomedOutEdgeScroll>Скорость прокрутки у края рядом с дальним масштабом.</SettingsHelp_ZoomedOutEdgeScroll>
+	<SettingsHelp_ZoomToMouse>Удерживает точку карты под мышью стабильной во время масштабирования.</SettingsHelp_ZoomToMouse>
+	<SettingsHelp_DisableCameraShake>Отключает стандартную тряску камеры.</SettingsHelp_DisableCameraShake>
+	<SettingsHelp_SoundNearness>Сдвигает слушатель звука к стандартной ближней высоте, чтобы улучшить локальные звуки.</SettingsHelp_SoundNearness>
+	<SettingsHelp_MouseRevealsLabels>Показывает метки рядом с мышью, когда Camera+ скрывает метки.</SettingsHelp_MouseRevealsLabels>
+	<SettingsHelp_HidePawnLabelBelow>Скрывает метки пешек, когда клетка меньше этого размера.</SettingsHelp_HidePawnLabelBelow>
+	<SettingsHelp_HideThingLabelBelow>Скрывает метки стопок, когда клетка меньше этого размера.</SettingsHelp_HideThingLabelBelow>
+	<SettingsHelp_HideDeadPawnsBelow>Скрывает отрисовку мертвых пешек ниже этого размера клетки.</SettingsHelp_HideDeadPawnsBelow>
+	<SettingsHelp_DotStyle>Режим маркера по умолчанию. Правила могут переопределять совпавших пешек.</SettingsHelp_DotStyle>
+	<SettingsHelp_ShowMarkerBelow>Порог размера клетки, при котором Camera+ начинает заменять тело пешки маркером.</SettingsHelp_ShowMarkerBelow>
+	<SettingsHelp_AnimalMarkerStyle>Набор маркеров животных и поведение включения.</SettingsHelp_AnimalMarkerStyle>
+	<SettingsHelp_IncludeNotTamedAnimals>Включает безымянных диких животных до проверки правил животных по умолчанию.</SettingsHelp_IncludeNotTamedAnimals>
+	<SettingsHelp_AnimalEdgeColors>Если заливка правила животного прозрачна, краевой индикатор использует цвет тела животного.</SettingsHelp_AnimalEdgeColors>
+	<SettingsHelp_DotSilhouetteSize>Масштабирует точки и силуэты на карте.</SettingsHelp_DotSilhouetteSize>
+	<SettingsHelp_EdgeDotSize>Масштабирует краевые маркеры вне экрана.</SettingsHelp_EdgeDotSize>
+	<SettingsHelp_EdgeDistanceFactor>Двигает краевые маркеры ближе к краю экрана или дальше от него.</SettingsHelp_EdgeDistanceFactor>
+	<SettingsHelp_OutlineSize>Меняет ширину контура маркера и перестраивает материалы.</SettingsHelp_OutlineSize>
 	<KeyLeftShift>Левый Shift</KeyLeftShift>
 	<KeyLeftAlt>Левый Alt</KeyLeftAlt>
 	<KeyLeftControl>Левый Ctrl</KeyLeftControl>
