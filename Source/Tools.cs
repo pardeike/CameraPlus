@@ -206,16 +206,16 @@ namespace CameraPlus
 				return;
 			}
 
-			if (pawn.IsColonistPlayerControlled == false)
+			var animalPolicy = AnimalMarkerPolicy.For(pawn);
+			if (animalPolicy.isAnimal)
 			{
-				innerTexture = Assets.innerColonistTexture;
-				outerTexture = Assets.outerColonistTexture;
+				innerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.innerAnimalTexture : Assets.innerColonistTexture;
+				outerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.outerAnimalTexture : Assets.outerColonistTexture;
 				return;
 			}
 
-			var animalPolicy = AnimalMarkerPolicy.For(pawn);
-			innerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.innerAnimalTexture : Assets.innerColonistTexture;
-			outerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.outerAnimalTexture : Assets.outerColonistTexture;
+			innerTexture = Assets.innerColonistTexture;
+			outerTexture = Assets.outerColonistTexture;
 		}
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)

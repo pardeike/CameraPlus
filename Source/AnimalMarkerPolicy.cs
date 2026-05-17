@@ -39,7 +39,7 @@ namespace CameraPlus
 			var isNamed = pawn.Name != null;
 			var isPlayerFaction = pawn.Faction?.IsPlayer ?? false;
 			var included = Settings.customNameStyle != LabelStyle.HideAnimals
-				&& (Settings.includeNotTamedAnimals || isNamed);
+				&& (Settings.includeNotTamedAnimals || isNamed || isPlayerFaction);
 
 			return new AnimalMarkerPolicy(
 				true,
