@@ -51,6 +51,8 @@ namespace CameraPlus
 			if (File.Exists(filePath) == false)
 				Tools.SaveDotConfigs(filePath, defaultDefaultConfig);
 			defaultConfig = Tools.LoadDotConfigs(filePath);
+			if (RuleMigrations.MigrateKnownDefaults(defaultConfig))
+				Tools.SaveDotConfigs(filePath, defaultConfig);
 		}
 
 		public override void ExposeData()
@@ -58,6 +60,7 @@ namespace CameraPlus
 			base.ExposeData();
 			Scribe_Collections.Look(ref dotConfigs, "dotConfigs", LookMode.Deep);
 			dotConfigs ??= [.. defaultConfig];
+			RuleMigrations.MigrateKnownDefaults(dotConfigs);
 		}
 	}
 }
