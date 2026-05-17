@@ -10,6 +10,14 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `World.FinalizeInit` | `CameraSettings.cs` | Postfix | Refreshes `CameraSettings.settings` to the current world's component. | Static pointer correctness after loading worlds. |
 | `Widgets.WidgetsOnGUI` | `CheckBoxPaintingObserver.cs` | Postfix | Observes RimWorld checkbox-painting state so the customization dialog can disable dragging while checkbox painting is active. | GUI event timing only. |
 
+## Cache Lifecycle
+
+| Target | File | Patch | Purpose | Risk |
+| --- | --- | --- | --- | --- |
+| `Game.DeinitAndRemoveMap(Map, bool)` | `MarkerCacheLifecycle.cs` | Prefix | Removes all marker materials for a map before it is discarded. | Cache cleanup ordering; should remain idempotent. |
+| `Pawn.DeSpawn(DestroyMode)` | `MarkerCacheLifecycle.cs` | Prefix | Removes the despawned pawn from `MarkerCache`. | Cache cleanup ordering; should remain idempotent. |
+| `Pawn.Destroy(DestroyMode)` | `MarkerCacheLifecycle.cs` | Prefix | Removes the destroyed pawn from `MarkerCache`. | Cache cleanup ordering; should remain idempotent. |
+
 ## Camera Controls
 
 | Target | File | Patch | Purpose | Risk |
@@ -36,7 +44,15 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `SilhouetteUtility.ShouldDrawSilhouette` | `DotTools.cs` | Prefix | Prevents vanilla silhouettes when CameraPlus markers are active or explicitly off. | Interaction with RimWorld silhouette cache. |
 | `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides pawn labels by marker/zoom/mouse rules. | Hot label path; `truncateToWidth == 9999f` guard matters. |
 
-Perf builds also patch `PawnRenderer.DynamicDrawPhaseAt(DrawPhase, Vector3, Rot4?, bool)` in `PerfRendererPhasePatches.cs`. That prefix is compiled only when `CameraPlusPerf=true`; it skips the vanilla renderer phases for pawns that are already replaced by CameraPlus markers, and records `renderer_phase.skip.*` counters. Keep this out of normal builds until compatibility with layered apparel, weapons, overlays, vehicles, and other renderer patches has been reviewed separately.
+Perf builds add these patches only when `CameraPlusPerf=true`:
+
+| Target | File | Patch | Purpose | Risk |
+| --- | --- | --- | --- | --- |
+| `DynamicDrawManager.DrawDynamicThings` | `PerfSlowGamePatches.cs` | Prefix, `Priority.Last` | Injects configurable busy-wait delay for performance test scenarios. | Test-only slowdown; must stay out of release builds. |
+| `PawnRenderer.RenderPawnInternal(PawnDrawParms)` | `PerfSlowGamePatches.cs` | Reflection target, Prefix, `Priority.Last` | Injects configurable busy-wait delay for performance test scenarios. | Test-only slowdown; private method shape. |
+| `PawnUIOverlay.DrawPawnGUIOverlay` | `PerfSlowGamePatches.cs` | Prefix, `Priority.Last` | Injects configurable busy-wait delay for performance test scenarios. | Test-only slowdown; must stay out of release builds. |
+| `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `PerfSlowGamePatches.cs` | Prefix, `Priority.Last` | Injects configurable busy-wait delay for performance test scenarios. | Test-only slowdown; must stay out of release builds. |
+| `PawnRenderer.DynamicDrawPhaseAt(DrawPhase, Vector3, Rot4?, bool)` | `PerfRendererPhasePatches.cs` | Prefix | Skips vanilla renderer phases for pawns already replaced by CameraPlus markers and records `renderer_phase.skip.*` counters. | Experimental renderer shortcut; keep out of normal builds until compatibility with layered apparel, weapons, overlays, vehicles, and other renderer patches has been reviewed separately. |
 
 ## Snapback And Pause Handling
 

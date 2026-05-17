@@ -160,6 +160,7 @@ CameraPlus has explicit compatibility paths:
 - Optional Save Our Ship 2 support patches background mesh recalculation and material state when present.
 - A Dubs Performance Analyzer name-drawing patch is disabled by patching `Analyzer.Fixes.H_DrawNamesFix:Prefix`.
 - External pawn types can expose `CameraPlusSupport.Methods.GetCameraPlusColors(Pawn)` and `GetCameraPlusMarkers(Pawn)` in their own assembly. `CameraDelegates` discovers these by reflection.
+- [HARMONY_COMPATIBILITY_REVIEW.md](HARMONY_COMPATIBILITY_REVIEW.md) records the 2026-05-17 decompiler/GitHub compatibility pass over these patch targets.
 
 ## Main Architectural Risks
 

@@ -173,14 +173,14 @@ namespace CameraPlus
 				return true;
 			}
 
-			if (pawn.IsColonistPlayerControlled == false)
-				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
-			else if (pawn.IsPlayerControlled == false)
-				GetDefaultColonistColors(selected, Settings.defaultColonistMentalOutline, Settings.defaultColonistMentalFill, Settings.defaultColonistMentalSelectedOutline, Settings.defaultColonistMentalSelectedFill, out innerColor, out outerColor);
-			else if (pawn.Downed)
+			if (pawn.Downed)
 				GetDefaultColonistColors(selected, Settings.defaultColonistDownedOutline, Settings.defaultColonistDownedFill, Settings.defaultColonistDownedSelectedOutline, Settings.defaultColonistDownedSelectedFill, out innerColor, out outerColor);
 			else if (pawn.Drafted)
 				GetDefaultColonistColors(selected, Settings.defaultColonistDraftedOutline, Settings.defaultColonistDraftedFill, Settings.defaultColonistDraftedSelectedOutline, Settings.defaultColonistDraftedSelectedFill, out innerColor, out outerColor);
+			else if (pawn.MentalStateDef != null || pawn.IsPlayerControlled == false && pawn.IsColonistPlayerControlled)
+				GetDefaultColonistColors(selected, Settings.defaultColonistMentalOutline, Settings.defaultColonistMentalFill, Settings.defaultColonistMentalSelectedOutline, Settings.defaultColonistMentalSelectedFill, out innerColor, out outerColor);
+			else if (pawn.IsColonistPlayerControlled == false)
+				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 			else
 				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 
