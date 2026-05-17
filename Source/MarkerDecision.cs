@@ -17,6 +17,7 @@ namespace CameraPlus
 		public readonly bool suppressVanilla;
 		public readonly bool hasMarkerColors;
 		public readonly DotStyle mode;
+		public readonly AnimalMarkerPolicy animalPolicy;
 
 		MarkerDecision(
 			Pawn pawn,
@@ -27,7 +28,8 @@ namespace CameraPlus
 			bool drawInside,
 			bool suppressVanilla,
 			bool hasMarkerColors,
-			DotStyle mode)
+			DotStyle mode,
+			AnimalMarkerPolicy animalPolicy)
 		{
 			this.pawn = pawn;
 			this.dotConfig = dotConfig;
@@ -38,6 +40,7 @@ namespace CameraPlus
 			this.suppressVanilla = suppressVanilla;
 			this.hasMarkerColors = hasMarkerColors;
 			this.mode = mode;
+			this.animalPolicy = animalPolicy;
 		}
 
 		public bool canDrawInsideMarker
@@ -58,19 +61,13 @@ namespace CameraPlus
 
 		public static MarkerDecision For(Pawn pawn, DotConfig dotConfig)
 		{
-			if (pawn == null || Tools.IsHiddenFromPlayer(pawn))
-				return new MarkerDecision(pawn, dotConfig, true, false, false, false, false, false, dotConfig?.mode ?? Settings.dotStyle);
-
+			var animalPolicy = AnimalMarkerPolicy.For(pawn);
 			var mode = dotConfig?.mode ?? Settings.dotStyle;
-			var isAnimal = pawn.RaceProps.Animal;
-			var isNamedAnimal = isAnimal && pawn.Name != null;
-			var defaultShow = true;
-			if (isAnimal)
-			{
-				defaultShow = Settings.customNameStyle != LabelStyle.HideAnimals;
-				if (Settings.includeNotTamedAnimals == false && pawn.Name == null && dotConfig == null)
-					defaultShow = false;
-			}
+
+			if (pawn == null || Tools.IsHiddenFromPlayer(pawn))
+				return new MarkerDecision(pawn, dotConfig, true, false, false, false, false, false, mode, animalPolicy);
+
+			var defaultShow = animalPolicy.included;
 
 			var cellSize = FastUI.CurUICellSize;
 			var showBelowPixels = dotConfig?.showBelowPixels ?? Settings.dotSize;
@@ -80,56 +77,32 @@ namespace CameraPlus
 			var mouseReveals = dotConfig?.mouseReveals ?? Settings.mouseOverShowsLabels;
 			var mouseSuppressesMarker = mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f;
 
-			var suppressVanilla = ShouldSuppressVanilla(pawn, dotConfig, mode, cellSize, showBelowPixels, mouseSuppressesMarker, isAnimal, isNamedAnimal);
 			var drawInside = mode > DotStyle.VanillaDefault
 				&& (dotConfig?.useInside ?? true)
 				&& defaultShow
 				&& cellSize <= showBelowPixels
 				&& mouseSuppressesMarker == false;
-			var edgeEnabled = dotConfig?.useEdge ?? (Settings.edgeIndicators && defaultShow);
-			var hasMarkerColors = HasMarkerColors(dotConfig, isNamedAnimal);
+			var hasMarkerColors = HasMarkerColors(animalPolicy);
+			var suppressVanilla = drawInside && hasMarkerColors && CanDrawInsideMarker(mode, dotConfig);
+			var edgeEnabled = defaultShow
+				&& mode != DotStyle.Off
+				&& (dotConfig?.useEdge ?? Settings.edgeIndicators);
 
-			return new MarkerDecision(pawn, dotConfig, false, defaultShow, edgeEnabled, drawInside, suppressVanilla, hasMarkerColors, mode);
+			return new MarkerDecision(pawn, dotConfig, false, defaultShow, edgeEnabled, drawInside, suppressVanilla, hasMarkerColors, mode, animalPolicy);
 		}
 
-		static bool ShouldSuppressVanilla(Pawn pawn, DotConfig dotConfig, DotStyle mode, float cellSize, int showBelowPixels, bool mouseSuppressesMarker, bool isAnimal, bool isNamedAnimal)
+		static bool CanDrawInsideMarker(DotStyle mode, DotConfig dotConfig)
 		{
-			if (dotConfig != null)
-			{
-				if (mode == DotStyle.VanillaDefault)
-					return false;
-
-				if (cellSize > showBelowPixels)
-					return false;
-
-				if (mouseSuppressesMarker)
-					return false;
-
-				return dotConfig.useInside;
-			}
-
-			if (Settings.dotStyle == DotStyle.VanillaDefault)
-				return false;
-
-			if (cellSize > Settings.dotSize)
-				return false;
-
-			if (Settings.customNameStyle == LabelStyle.HideAnimals && isAnimal)
-				return false;
-
-			if (mouseSuppressesMarker)
-				return false;
-
-			return Settings.includeNotTamedAnimals || isAnimal == false || isNamedAnimal;
-		}
-
-		static bool HasMarkerColors(DotConfig dotConfig, bool isNamedAnimal)
-		{
-			if (dotConfig != null)
+			if (mode != DotStyle.Custom)
 				return true;
 
-			return isNamedAnimal == false || Settings.customNameStyle != LabelStyle.HideAnimals;
+			return dotConfig != null
+				&& dotConfig.customDotStyle != null
+				&& Assets.customMarkers.ContainsKey(dotConfig.customDotStyle);
 		}
+
+		static bool HasMarkerColors(AnimalMarkerPolicy animalPolicy)
+			=> animalPolicy.included;
 	}
 
 	static class MarkerDecisionCache
@@ -185,6 +158,12 @@ namespace CameraPlus
 				return;
 
 			frame = currentFrame;
+			cache.Clear();
+		}
+
+		public static void Clear()
+		{
+			frame = -1;
 			cache.Clear();
 		}
 	}

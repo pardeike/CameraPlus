@@ -33,6 +33,14 @@ namespace CameraPlus
 				return true;
 			});
 
+		public static void ClearMarkerState()
+		{
+			dotConfigCache.Clear();
+			shouldShowLabelCache.Clear();
+			MarkerDecisionCache.Clear();
+			MarkerCache.Clear();
+		}
+
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{
 			using var measure = PerfMetrics.Measure("Caches.GetCachedCameraDelegate");

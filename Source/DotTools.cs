@@ -98,12 +98,6 @@ namespace CameraPlus
 				if (thing is Pawn pawn)
 				{
 					var decision = MarkerDecisionCache.Get(pawn);
-					if (decision.dotConfig?.mode == DotStyle.Off)
-					{
-						__result = false;
-						return false;
-					}
-
 					if (decision.suppressVanilla)
 					{
 						__result = false;
@@ -150,6 +144,14 @@ namespace CameraPlus
 			using var measure = PerfMetrics.Measure("DotTools.GetMarkerColors");
 			PerfMetrics.Count("get_marker_colors.calls");
 
+			var animalPolicy = AnimalMarkerPolicy.For(pawn);
+			if (animalPolicy.included == false)
+			{
+				innerColor = default;
+				outerColor = default;
+				return false;
+			}
+
 			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
 
 			if (dotConfig != null)
@@ -173,16 +175,7 @@ namespace CameraPlus
 				}
 			}
 
-			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			var hideAnimalMarkers = Settings.customNameStyle == LabelStyle.HideAnimals;
-			if (isAnimal && hideAnimalMarkers)
-			{
-				innerColor = default;
-				outerColor = default;
-				return false;
-			}
-
-			if (isAnimal || pawn.Faction != Faction.OfPlayer)
+			if (animalPolicy.isAnimal || pawn.Faction != Faction.OfPlayer)
 			{
 				innerColor = Tools.GetMainColor(pawn);
 				outerColor = pawn.Faction == Faction.OfPlayer ? playerNormalOuterColors[selected] : PawnNameColorUtility.PawnNameColorOf(pawn);
@@ -223,7 +216,8 @@ namespace CameraPlus
 			using var measure = PerfMetrics.Measure("DotTools.GetEdgeFillColor");
 			PerfMetrics.Count("get_edge_fill_color.calls");
 
-			if (Settings.pawnColoredEdgeIndicators == false || fillColor.a > 0f || pawn.RaceProps.Animal == false)
+			var animalPolicy = AnimalMarkerPolicy.For(pawn);
+			if (animalPolicy.useAnimalEdgeColor == false || fillColor.a > 0f)
 				return fillColor;
 
 			var pawnColor = Tools.GetMainColor(pawn);

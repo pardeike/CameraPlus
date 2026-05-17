@@ -94,7 +94,9 @@ namespace CameraPlus
 		}
 
 		public static DotConfig GetDotConfig(this Pawn pawn) =>
-			CameraSettings.settings.dotConfigs.FirstOrDefault(dotConfig => dotConfig.conditions.All(condition => condition.Matches(pawn)));
+			AnimalMarkerPolicy.For(pawn).rulesAllowed
+				? CameraSettings.settings.dotConfigs.FirstOrDefault(dotConfig => dotConfig.conditions.All(condition => condition.Matches(pawn)))
+				: null;
 
 		public static string ToHex(this Color color)
 		{

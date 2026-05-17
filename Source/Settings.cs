@@ -123,6 +123,7 @@ namespace CameraPlus
 			{
 				Traverse.IterateFields(new CameraPlusSettings(), Settings, (t1, t2) => t2.SetValue(t1.GetValue()));
 				ApplyCalculatedValues();
+				Caches.ClearMarkerState();
 			}
 
 			float previous;
@@ -247,14 +248,18 @@ namespace CameraPlus
 				_ = list.Label("Animals".Translate());
 				foreach (var label in Enum.GetNames(typeof(LabelStyle)))
 				{
-					if (dotStyle == DotStyle.BetterSilhouettes && label == LabelStyle.AnimalsDifferent.ToString())
-						continue;
 					var val = (LabelStyle)Enum.Parse(typeof(LabelStyle), label);
 					if (list.RadioButton(label.Translate(), customNameStyle == val, 8f))
+					{
 						customNameStyle = val;
+						Caches.ClearMarkerState();
+					}
 				}
 				list.Gap(4f);
+				var oldIncludeNotTamedAnimals = includeNotTamedAnimals;
 				list.CheckboxLabeled("IncludeNotTamedAnimals".Translate(), ref includeNotTamedAnimals);
+				if (oldIncludeNotTamedAnimals != includeNotTamedAnimals)
+					Caches.ClearMarkerState();
 			}
 
 			list.Gap(16f);

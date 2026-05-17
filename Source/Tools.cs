@@ -176,10 +176,9 @@ namespace CameraPlus
 				return;
 			}
 
-			var isAnimal = pawn.RaceProps.Animal;
-			var customAnimalStyle = Settings.customNameStyle == LabelStyle.AnimalsDifferent;
-			innerTexture = isAnimal && customAnimalStyle ? Assets.innerAnimalTexture : Assets.innerColonistTexture;
-			outerTexture = isAnimal && customAnimalStyle ? Assets.outerAnimalTexture : Assets.outerColonistTexture;
+			var animalPolicy = AnimalMarkerPolicy.For(pawn);
+			innerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.innerAnimalTexture : Assets.innerColonistTexture;
+			outerTexture = animalPolicy.useAnimalMarkerTextures ? Assets.outerAnimalTexture : Assets.outerColonistTexture;
 		}
 
 		public static bool ShouldShowLabel(Pawn pawn, Vector2 screenPos = default)

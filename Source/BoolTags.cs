@@ -129,7 +129,11 @@ namespace CameraPlus
 
 	public class CanCastTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.CurJob?.ability?.CanCast ?? false;
+		public override bool Matches(Pawn pawn)
+		{
+			var canCast = pawn.CurJob?.ability?.CanCast ?? false;
+			return Negated ^ canCast;
+		}
 	}
 
 	public class ColonistTag : BoolTag
@@ -249,7 +253,7 @@ namespace CameraPlus
 
 	public class PlayerFactionTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction.IsPlayer;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.Faction?.IsPlayer ?? false);
 	}
 
 	public class PredatorHuntTag : BoolTag
@@ -259,7 +263,7 @@ namespace CameraPlus
 
 	public class SelfShutdownTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.needs.energy.IsSelfShutdown;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.needs?.energy?.IsSelfShutdown ?? false);
 	}
 
 	public class TameTag : BoolTag
