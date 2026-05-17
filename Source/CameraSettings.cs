@@ -13,6 +13,7 @@ namespace CameraPlus
 		public static void Postfix(World __instance)
 		{
 			CameraSettings.settings = __instance.GetComponent<CameraSettings>();
+			Caches.ClearMarkerState();
 		}
 	}
 

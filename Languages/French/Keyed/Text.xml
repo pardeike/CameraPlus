@@ -35,7 +35,7 @@
 	<DisableCameraShake>Désactiver le tremblement de la caméra</DisableCameraShake>
 	<MouseRevealsLabels>La souris révèle les étiquettes{0}</MouseRevealsLabels>
 	<EdgeIndicators>Indicateurs de bord{0}</EdgeIndicators>
-	<PawnColoredEdgeIndicators>Bords couleur pion</PawnColoredEdgeIndicators>
+	<PawnColoredEdgeIndicators>Couleurs de bord animales</PawnColoredEdgeIndicators>
 	<KeyLeftShift>Shift gauche</KeyLeftShift>
 	<KeyLeftAlt>Alt gauche</KeyLeftAlt>
 	<KeyLeftControl>Ctrl gauche</KeyLeftControl>

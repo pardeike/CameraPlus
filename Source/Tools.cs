@@ -15,6 +15,8 @@ namespace CameraPlus
 {
 	class Tools
 	{
+		const string colorPropertyName = "_Color";
+
 		public static bool IsHiddenFromPlayer(Pawn pawn)
 		{
 			if (pawn?.Map == null)
@@ -35,63 +37,98 @@ namespace CameraPlus
 		{
 			using var measure = PerfMetrics.Measure("Tools.GetMainColor");
 			var renderer = pawn.Drawer.renderer;
-			var pawnRenderFlags = renderer.DefaultRenderFlagsNow | PawnRenderFlags.Clothes | PawnRenderFlags.Headgear;
 			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
 			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
 				return Color.clear;
 
 			var graphic = renderer.BodyGraphic;
+			var material = graphic.MatEast ?? graphic.MatSingle;
+			var texture = material?.mainTexture as Texture2D;
+			var tint = EffectiveMaterialTint(material, graphic.color);
 
-			var key = pawn.GetType().FullName + ":" + graphic.path;
+			var key = pawn.GetType().FullName + ":" + graphic.path + ":" + (texture?.GetInstanceID() ?? 0) + ":" + ColorHash(tint);
 			if (Caches.cachedMainColors.TryGetValue(key, out var color) == false)
 			{
 				PerfMetrics.Count("main_color.cache_misses");
-				color = Color.clear;
-
-				if (graphic.color != Color.white)
-				{
-					color = graphic.color;
-					goto SET_COLOR;
-				}
-
-				var material = graphic.MatEast ?? graphic.MatSingle;
-				if (material == null)
-				{
-					color = Color.clear;
-					goto SET_COLOR;
-				}
-
-				var texture = (Texture2D)material.mainTexture;
 				if (texture == null)
-				{
 					color = Color.clear;
-					goto SET_COLOR;
-				}
+				else
+					color = DominantTextureColor(texture);
 
-				var readableTexture = Tools.DownsampleTexture(texture, 16);
+				color = ApplyTint(color, tint);
+
+				Caches.cachedMainColors[key] = color;
+			}
+			return color;
+		}
+
+		static Color DominantTextureColor(Texture2D texture)
+		{
+			var readableTexture = DownsampleTexture(texture, 16);
+			try
+			{
 				var combinedColors = readableTexture
 					.GetPixels32()
 					.Where(c => c.a == 255 && c.r + c.g + c.b > 0)
 					.GroupBy(color => color)
 					.OrderByDescending(group => group.Count())
-					.Select(group => (color: group.Key, hsl: Tools.HSL(group.Key), count: group.Count()))
+					.Select(group => (color: group.Key, hsl: HSL(group.Key), count: group.Count()))
 					.ToList().ToArray(); // Disambiguate ToArray by converting to List first
 				if (combinedColors.Length == 0)
-				{
-					color = Color.clear;
-					goto SET_COLOR;
-				}
+					return Color.clear;
 
 				var colorIndex = combinedColors.FirstIndexOf(tuple => tuple.hsl.s > 0.2 && tuple.hsl.l < 0.8 && tuple.hsl.l > 0.2);
 				if (combinedColors.Length > 0 && colorIndex == 1 && combinedColors[0].hsl.s < 0.2)
-					color = combinedColors[1].color;
-				else
-					color = combinedColors[0].color;
-
-				SET_COLOR:
-				Caches.cachedMainColors[key] = color;
+					return combinedColors[1].color;
+				return combinedColors[0].color;
 			}
+			finally
+			{
+				UnityEngine.Object.Destroy(readableTexture);
+			}
+		}
+
+		static Color ApplyTint(Color color, Color tint)
+		{
+			if (IsWhite(tint))
+				return color;
+
+			if (color.a <= 0f)
+				return tint;
+
+			color.r *= tint.r;
+			color.g *= tint.g;
+			color.b *= tint.b;
+			color.a = 1f;
 			return color;
+		}
+
+		public static Color EffectiveMaterialTint(Material material, Color graphicTint)
+		{
+			var color = graphicTint;
+			if (material != null && material.HasProperty(colorPropertyName))
+			{
+				var materialTint = material.GetColor(colorPropertyName);
+				if (IsWhite(materialTint) == false)
+					color = materialTint;
+			}
+			color.a = 1f;
+			return color;
+		}
+
+		public static bool IsWhite(Color color)
+			=> Mathf.Approximately(color.r, 1f)
+			&& Mathf.Approximately(color.g, 1f)
+			&& Mathf.Approximately(color.b, 1f);
+
+		public static int ColorHash(Color color)
+		{
+			var color32 = (Color32)color;
+			var hash = (int)color32.r;
+			hash = Gen.HashCombineInt(hash, color32.g);
+			hash = Gen.HashCombineInt(hash, color32.b);
+			hash = Gen.HashCombineInt(hash, color32.a);
+			return hash;
 		}
 
 		public static Texture2D DownsampleTexture(Texture2D nonReadableTexture, int n)

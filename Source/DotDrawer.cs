@@ -13,7 +13,13 @@ namespace CameraPlus
 		static readonly Mesh meshEast = MeshPool.GridPlane(Vector2.one);
 		static readonly Mesh meshClipped = MeshPool.GridPlane(Vector2.one / 2);
 		static readonly Quaternion downedRotation = Quaternion.Euler(0, 90, 0);
-		static readonly List<EdgeDrawCommand> edgeDrawCommands = [];
+		static readonly List<EdgeDrawCommand>[] edgeDrawBuckets = [
+			[], // colonists
+			[], // colony animals and player-controlled non-colonists
+			[], // enemies
+			[], // friendlies
+			[], // non-colony animals
+		];
 
 		const float clippedScale = 3f;
 		const float markerScale = 2f;
@@ -30,7 +36,10 @@ namespace CameraPlus
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 			var clippedMarkerMapScale = ClippedMarkerMapScale(borderMarkerSize);
 
-			edgeDrawCommands.Clear();
+			ClearEdgeBuckets();
+			if ((Time.frameCount & 255) == 0)
+				MarkerCache.PruneInvalid();
+
 			var visiblePawns = 0;
 			var markerDraws = 0;
 			var edgeDraws = 0;
@@ -68,7 +77,7 @@ namespace CameraPlus
 				if (useMarkers == false)
 					continue;
 
-				var materials = MarkerCache.MaterialFor(pawn, dotConfig);
+				var materials = MarkerCache.MaterialFor(pawn, dotConfig, decision.canDrawInsideMarker, drawEdge);
 				if (materials == null)
 					continue;
 
@@ -78,7 +87,8 @@ namespace CameraPlus
 					if (materialClipped != null)
 					{
 						var edgeFillColor = DotTools.GetEdgeFillColor(pawn, innerColor);
-						edgeDrawCommands.Add(new EdgeDrawCommand(pawn, dotConfig, materials, edgeVector, edgeFillColor, outerColor));
+						var command = new EdgeDrawCommand(pawn, dotConfig, materials, edgeVector, edgeFillColor, outerColor);
+						edgeDrawBuckets[command.layer].Add(command);
 						edgeDraws++;
 					}
 				}
@@ -122,38 +132,59 @@ namespace CameraPlus
 
 		static void DrawEdges(Vector3 clippedMarkerMapScale)
 		{
-			if (edgeDrawCommands.Count == 0)
+			var edgeDrawCount = EdgeDrawCount();
+			if (edgeDrawCount == 0)
 				return;
 
-			edgeDrawCommands.Sort(CompareEdgeDrawCommands);
-			var altitute = AltitudeLayer.Silhouettes.AltitudeFor() - edgeDrawCommands.Count * edgeAltitudeStep;
-			for (var i = 0; i < edgeDrawCommands.Count; i++)
+			var altitute = AltitudeLayer.Silhouettes.AltitudeFor() - edgeDrawCount * edgeAltitudeStep;
+			for (var layer = edgeDrawBuckets.Length - 1; layer >= 0; layer--)
 			{
-				var command = edgeDrawCommands[i];
-				command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
-				DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
-				altitute += edgeAltitudeStep;
+				var bucket = edgeDrawBuckets[layer];
+				for (var i = 0; i < bucket.Count; i++)
+				{
+					var command = bucket[i];
+					command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
+					DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
+					altitute += edgeAltitudeStep;
+				}
 			}
 
-			edgeDrawCommands.Clear();
+			ClearEdgeBuckets();
 		}
 
-		static int CompareEdgeDrawCommands(EdgeDrawCommand left, EdgeDrawCommand right)
+		static int EdgeDrawCount()
 		{
-			var layerComparison = right.layer.CompareTo(left.layer);
-			return layerComparison != 0 ? layerComparison : right.thingIdNumber.CompareTo(left.thingIdNumber);
+			var count = 0;
+			for (var i = 0; i < edgeDrawBuckets.Length; i++)
+				count += edgeDrawBuckets[i].Count;
+			return count;
+		}
+
+		static void ClearEdgeBuckets()
+		{
+			for (var i = 0; i < edgeDrawBuckets.Length; i++)
+				edgeDrawBuckets[i].Clear();
 		}
 
 		static int EdgeLayerFor(Pawn pawn)
 		{
 			var playerFaction = pawn.Faction?.IsPlayer ?? false;
-			if (pawn.RaceProps.Animal)
-				return playerFaction ? 1 : 4;
-
-			if (pawn.IsColonist || playerFaction)
+			if (pawn.IsColonist)
 				return 0;
 
-			return pawn.HostileTo(Faction.OfPlayer) ? 2 : 3;
+			if (pawn.RaceProps.Animal && playerFaction)
+				return 1;
+
+			if (pawn.IsColonyMechPlayerControlled || pawn.IsPlayerControlled)
+				return 1;
+
+			if (pawn.HostileTo(Faction.OfPlayer))
+				return 2;
+
+			if (pawn.RaceProps.Animal)
+				return 4;
+
+			return 3;
 		}
 
 		readonly struct EdgeDrawCommand(Pawn pawn, DotConfig dotConfig, Materials materials, Vector2 edgeVector, Color fillColor, Color outlineColor)

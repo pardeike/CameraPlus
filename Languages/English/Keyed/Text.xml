@@ -35,7 +35,7 @@
     <DisableCameraShake>Disable camera shake</DisableCameraShake>
     <MouseRevealsLabels>Mouse reveals labels{0}</MouseRevealsLabels>
     <EdgeIndicators>Edge indicators{0}</EdgeIndicators>
-    <PawnColoredEdgeIndicators>Pawn-colored edge indicators</PawnColoredEdgeIndicators>
+    <PawnColoredEdgeIndicators>Animal edge colors</PawnColoredEdgeIndicators>
     <KeyLeftShift>Left Shift</KeyLeftShift>
     <KeyLeftAlt>Left Alt</KeyLeftAlt>
     <KeyLeftControl>Left Ctrl</KeyLeftControl>

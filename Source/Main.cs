@@ -238,79 +238,40 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(CameraDriver), "ApplyPositionToGameObject")]
 	static class CameraDriver_ApplyPositionToGameObject_Patch
 	{
+		const float vanillaCloseCameraHeight = 15f;
+		const float vanillaCameraHeightRange = 50f;
+
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
 
 		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
-			// Step 1: Calculate the effective orthographic size based on the mod's settings.
-			// 'driver.rootSize' is the input zoom level managed by RimWorld's CameraDriver.
-			// 'Tools.LerpRootSize' translates this input into the mod's desired effective orthographic size,
-			// taking into account 'zoomedInPercent', 'zoomedOutPercent', and 'exponentiality'.
 			var newOrthographicSize = Tools.LerpRootSize(driver.rootSize);
-
-			// Apply the calculated orthographic size to the actual Unity camera.
 			camera.orthographicSize = newOrthographicSize;
-			// Update a static variable in CameraPlusMain, likely used by other parts of the mod
-			// that need to know the currently applied orthographic size.
 			orthographicSize = newOrthographicSize;
 
-			// --- START OF FIX: Correctly scale camera's Y position with zoom ---
+			var vanillaHeight = VanillaCameraHeight(driver.rootSize);
+			driver.rootPos.y = Mathf.Max(Mathf.Lerp(vanillaHeight, vanillaCloseCameraHeight, Settings.soundNearness), 0.1f);
 
-			// Step 2: Calculate the ideal Y position (distance of the camera from the game world plane)
-			// that corresponds to the 'newOrthographicSize'.
-			// RimWorld's vanilla CameraDriver typically positions the camera at Y = rootSize * 1.6f + 25.6f.
-			// We adopt this scaling factor to ensure the camera is always at an appropriate distance
-			// for the rendered view size, preventing objects from being clipped or appearing too large/small.
-			float idealY = newOrthographicSize * 1.6f + 25.6f;
-
-			// Get the current camera's transform position to retain its X and Z coordinates.
-			Vector3 currentPos = camera.transform.position;
-
-			// Step 3: Apply the 'soundNearness' setting.
-			// This setting adjusts the camera's Y position to simulate sounds being "nearer"
-			// by pulling the camera closer to the world.
-			// Calculate the Y position corresponding to the mod's 'minRootResult' (closest zoom).
-			// This ensures 'soundNearness' scales correctly with the mod's overall zoom range.
-			float minYForSound = CameraPlusSettings.minRootResult * 1.6f + 25.6f;
-
-			// Linearly interpolate the camera's Y position between the 'idealY' (no soundNearness effect)
-			// and 'minYForSound' (full soundNearness effect).
-			// A 'soundNearness' value of 0 will result in 'idealY', and 1 will result in 'minYForSound'.
-			currentPos.y = Mathf.Lerp(idealY, minYForSound, Settings.soundNearness);
-
-			// Add a safeguard: Ensure the camera's Y position does not drop below a very small positive value.
-			// A zero or negative Y position can lead to rendering artifacts or the camera being inside objects.
-			currentPos.y = Mathf.Max(currentPos.y, 0.1f);
-
-			// Apply the adjusted position back to the camera's transform.
+			var currentPos = driver.rootPos + driver.shaker.ShakeOffset;
 			camera.transform.position = currentPos;
+			if (driver.reverbDummy != null)
+			{
+				var reverbPosition = currentPos;
+				reverbPosition.y = vanillaCloseCameraHeight + vanillaCameraHeightRange;
+				driver.reverbDummy.transform.position = reverbPosition;
+			}
 
-			// --- END OF FIX ---
-
-			// --- ADDITIONAL FIX: Adjust clipping planes for extreme zoom levels ---
-			// At very high zoom levels, we need to adjust the camera's clipping planes
-			// to ensure all objects remain visible and prevent rendering artifacts.
-			
-			// Calculate appropriate clipping planes based on the camera's Y position
-			// Near plane should be close enough to not clip nearby objects
 			camera.nearClipPlane = Mathf.Max(currentPos.y * 0.1f, 1f);
-			
-			// Far plane needs to be far enough to see the entire map at max zoom
-			// We use a multiplier of 2.5 to ensure we can see everything even at extreme zoom
 			camera.farClipPlane = Mathf.Max(currentPos.y * 2.5f, 500f);
-			
-			// Ensure the camera's field of view is properly set for orthographic projection
-			// This helps prevent edge artifacts at extreme zoom levels
-			camera.fieldOfView = 60f; // Standard FOV for RimWorld
-			
-			// --- END OF ADDITIONAL FIX ---
 
-			// Step 4: Update other CameraDriver configuration settings
-			// These values control camera movement speed based on the current zoom level.
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(newOrthographicSize);
 			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(newOrthographicSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(newOrthographicSize);
 		}
+
+		static float VanillaCameraHeight(float rootSize)
+			=> vanillaCloseCameraHeight
+			+ (rootSize - CameraPlusSettings.minRootInput) / (CameraPlusSettings.maxRootInput - CameraPlusSettings.minRootInput) * vanillaCameraHeightRange;
 
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

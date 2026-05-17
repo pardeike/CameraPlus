@@ -14,19 +14,22 @@ namespace CameraPlus
 		public static readonly Dictionary<Pawn, Materials> cache = [];
 		static readonly Dictionary<int, Texture2D> silhouetteTextureCache = [];
 		const float defaultSilhouetteCutoff = 0.5f;
-		const string colorPropertyName = "_Color";
 
 		public static Materials MaterialFor(Pawn pawn)
 			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
 
-		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig)
+		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig, bool needInside = true, bool needEdge = false)
 		{
 			using var measure = PerfMetrics.Measure("MarkerCache.MaterialFor");
+			var inputs = MaterialInputs.For(pawn, dotConfig);
 			if (cache.TryGetValue(pawn, out var materials))
 			{
 				PerfMetrics.Count("marker_cache.hits");
-				if (materials.Matches(dotConfig))
+				if (materials.Matches(inputs.signature))
+				{
+					EnsureMaterials(materials, inputs, needInside, needEdge);
 					return materials;
+				}
 
 				PerfMetrics.Count("marker_cache.refreshes");
 				Remove(pawn);
@@ -34,51 +37,11 @@ namespace CameraPlus
 			else
 				PerfMetrics.Count("marker_cache.misses");
 
-			var outlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
-
-			var silhouette = MaterialAllocator.Create(Assets.BorderedShader);
-			silhouette.name = $"{pawn.ThingID}-silhouette";
-			SetMarkerTexture(silhouette, GetTexture(pawn));
-			silhouette.SetFloat("_OutlineFactor", outlineFactor);
-			silhouette.renderQueue = (int)RenderQueue.Overlay;
-
-			Material custom = null;
-			if (dotConfig?.mode == DotStyle.Custom && Assets.customMarkers.TryGetValue(dotConfig.customDotStyle, out var texture))
-			{
-				custom = MaterialAllocator.Create(Assets.BorderedShader);
-				custom.name = $"{pawn.ThingID}-custom";
-				SetMarkerTexture(custom, texture, canMutateTexture: true);
-				custom.SetFloat("_OutlineFactor", outlineFactor);
-				custom.renderQueue = (int)RenderQueue.Overlay;
-			}
-
-			Material dot = null;
-			Material edgeDot = null;
-			if (DotTools.GetMarkerTextures(pawn, out var dotTexture, out _))
-			{
-				dot = MaterialAllocator.Create(Assets.BorderedShader);
-				dot.name = $"{pawn.ThingID}-dot";
-				SetMarkerTexture(dot, dotTexture, canMutateTexture: true);
-				dot.SetFloat("_OutlineFactor", outlineFactor);
-				dot.renderQueue = (int)RenderQueue.Overlay;
-
-				edgeDot = MaterialAllocator.Create(Assets.BorderedShader);
-				edgeDot.name = $"{pawn.ThingID}-edge-dot";
-				SetMarkerTexture(edgeDot, dotTexture, canMutateTexture: true);
-				edgeDot.SetFloat("_OutlineFactor", outlineFactor);
-				edgeDot.renderQueue = (int)RenderQueue.Overlay;
-			}
-
 			materials = new Materials
 			{
-				dot = dot,
-				edgeDot = edgeDot,
-				silhouette = silhouette,
-				custom = custom,
-				mode = dotConfig?.mode ?? Settings.dotStyle,
-				customDotStyle = dotConfig?.customDotStyle,
-				outlineFactor = outlineFactor
+				signature = inputs.signature
 			};
+			EnsureMaterials(materials, inputs, needInside, needEdge);
 
 			cache.Add(pawn, materials);
 			return materials;
@@ -98,23 +61,95 @@ namespace CameraPlus
 
 		public static void Remove(Pawn pawn)
 		{
-			var dot = cache[pawn].dot;
+			if (pawn == null || cache.TryGetValue(pawn, out var materials) == false)
+				return;
+
+			var dot = materials.dot;
 			if (dot != null)
 				MaterialAllocator.Destroy(dot);
 
-			var edgeDot = cache[pawn].edgeDot;
+			var edgeDot = materials.edgeDot;
 			if (edgeDot != null)
 				MaterialAllocator.Destroy(edgeDot);
 
-			var silhouette = cache[pawn].silhouette;
+			var silhouette = materials.silhouette;
 			if (silhouette != null)
 				MaterialAllocator.Destroy(silhouette);
 
-			var custom = cache[pawn].custom;
+			var custom = materials.custom;
 			if (custom != null)
 				MaterialAllocator.Destroy(custom);
 
 			cache.Remove(pawn);
+		}
+
+		public static void RemoveForMap(Map map)
+		{
+			if (map == null || cache.Count == 0)
+				return;
+
+			var pawns = cache.Keys.ToList();
+			foreach (var pawn in pawns)
+				if (pawn?.Map == map || map.mapPawns.AllPawnsSpawned.Contains(pawn))
+					Remove(pawn);
+		}
+
+		public static void PruneInvalid()
+		{
+			if (cache.Count == 0)
+				return;
+
+			var maps = Find.Maps;
+			if (maps == null || maps.Count == 0)
+			{
+				Clear();
+				return;
+			}
+
+			var livePawns = new HashSet<Pawn>();
+			foreach (var map in maps)
+				foreach (var pawn in map.mapPawns.AllPawnsSpawned)
+					livePawns.Add(pawn);
+
+			var cachedPawns = cache.Keys.ToList();
+			foreach (var pawn in cachedPawns)
+				if (pawn == null || pawn.Destroyed || pawn.Map == null || livePawns.Contains(pawn) == false)
+					Remove(pawn);
+		}
+
+		static void EnsureMaterials(Materials materials, MaterialInputs inputs, bool needInside, bool needEdge)
+		{
+			var mode = inputs.signature.mode;
+			var outlineFactor = inputs.signature.outlineFactor;
+
+			if (needInside)
+			{
+				switch (mode)
+				{
+					case DotStyle.ClassicDots when materials.dot == null && inputs.dotTexture != null:
+						materials.dot = CreateMarkerMaterial(inputs.pawn, "dot", inputs.dotTexture, outlineFactor, canMutateTexture: true);
+						break;
+					case DotStyle.BetterSilhouettes when materials.silhouette == null:
+						materials.silhouette = CreateMarkerMaterial(inputs.pawn, "silhouette", inputs.silhouetteTexture, outlineFactor);
+						break;
+					case DotStyle.Custom when materials.custom == null && inputs.customTexture != null:
+						materials.custom = CreateMarkerMaterial(inputs.pawn, "custom", inputs.customTexture, outlineFactor, canMutateTexture: true);
+						break;
+				}
+			}
+
+			if (needEdge && materials.edgeDot == null && inputs.dotTexture != null)
+				materials.edgeDot = CreateMarkerMaterial(inputs.pawn, "edge-dot", inputs.dotTexture, outlineFactor, canMutateTexture: true);
+		}
+
+		static Material CreateMarkerMaterial(Pawn pawn, string suffix, Texture texture, float outlineFactor, bool canMutateTexture = false)
+		{
+			var material = MaterialAllocator.Create(Assets.BorderedShader);
+			material.name = $"{pawn.ThingID}-{suffix}";
+			SetMarkerTexture(material, texture, canMutateTexture);
+			material.SetFloat("_OutlineFactor", outlineFactor);
+			material.renderQueue = (int)RenderQueue.Overlay;
+			return material;
 		}
 
 		static void SetMarkerTexture(Material material, Texture texture, bool canMutateTexture = false)
@@ -122,6 +157,54 @@ namespace CameraPlus
 			if (canMutateTexture && texture != null)
 				texture.wrapMode = TextureWrapMode.Clamp;
 			material.SetTexture("_MainTex", texture);
+		}
+
+		readonly struct MaterialInputs
+		{
+			public readonly Pawn pawn;
+			public readonly MaterialSignature signature;
+			public readonly Texture dotTexture;
+			public readonly Texture silhouetteTexture;
+			public readonly Texture customTexture;
+
+			MaterialInputs(Pawn pawn, MaterialSignature signature, Texture dotTexture, Texture silhouetteTexture, Texture customTexture)
+			{
+				this.pawn = pawn;
+				this.signature = signature;
+				this.dotTexture = dotTexture;
+				this.silhouetteTexture = silhouetteTexture;
+				this.customTexture = customTexture;
+			}
+
+			public static MaterialInputs For(Pawn pawn, DotConfig dotConfig)
+			{
+				var mode = dotConfig?.mode ?? Settings.dotStyle;
+				var outlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
+
+				Texture dotTexture = null;
+				if (DotTools.GetMarkerTextures(pawn, out var markerTexture, out _))
+					dotTexture = markerTexture;
+
+				Texture silhouetteTexture = null;
+				if (mode == DotStyle.BetterSilhouettes)
+					silhouetteTexture = GetTexture(pawn);
+
+				Texture customTexture = null;
+				if (mode == DotStyle.Custom && Assets.customMarkers.TryGetValue(dotConfig?.customDotStyle, out var texture))
+					customTexture = texture;
+
+				var signature = new MaterialSignature(
+					mode,
+					dotConfig?.customDotStyle,
+					outlineFactor,
+					TextureId(dotTexture),
+					TextureId(silhouetteTexture),
+					TextureId(customTexture));
+				return new MaterialInputs(pawn, signature, dotTexture, silhouetteTexture, customTexture);
+			}
+
+			static int TextureId(Texture texture)
+				=> texture?.GetInstanceID() ?? 0;
 		}
 
 		static Graphic GetSilhouetteGraphic(Pawn pawn)
@@ -173,9 +256,9 @@ namespace CameraPlus
 
 			var cutoff = SilhouetteAlphaCutoff(sourceMaterial);
 			var cutoffByte = Mathf.Clamp(Mathf.RoundToInt(cutoff * byte.MaxValue), 1, byte.MaxValue);
-			var tint = SourceMaterialTint(sourceMaterial, graphicTint);
+			var tint = Tools.EffectiveMaterialTint(sourceMaterial, graphicTint);
 			var key = Gen.HashCombineInt(sourceTexture.GetInstanceID(), cutoffByte);
-			key = Gen.HashCombineInt(key, ColorHash(tint));
+			key = Gen.HashCombineInt(key, Tools.ColorHash(tint));
 			if (silhouetteTextureCache.TryGetValue(key, out var cachedTexture))
 				return cachedTexture;
 
@@ -197,34 +280,6 @@ namespace CameraPlus
 			if (material != null && material.HasProperty("_Cutoff"))
 				return Mathf.Clamp01(material.GetFloat("_Cutoff"));
 			return defaultSilhouetteCutoff;
-		}
-
-		static Color SourceMaterialTint(Material material, Color graphicTint)
-		{
-			var color = graphicTint;
-			if (material != null && material.HasProperty(colorPropertyName))
-			{
-				var materialTint = material.GetColor(colorPropertyName);
-				if (IsWhite(color))
-					color = materialTint;
-			}
-			color.a = 1f;
-			return color;
-		}
-
-		static bool IsWhite(Color color)
-			=> Mathf.Approximately(color.r, 1f)
-			&& Mathf.Approximately(color.g, 1f)
-			&& Mathf.Approximately(color.b, 1f);
-
-		static int ColorHash(Color color)
-		{
-			var color32 = (Color32)color;
-			var hash = (int)color32.r;
-			hash = Gen.HashCombineInt(hash, color32.g);
-			hash = Gen.HashCombineInt(hash, color32.b);
-			hash = Gen.HashCombineInt(hash, color32.a);
-			return hash;
 		}
 
 		static Texture2D CreateCutoutTexture(Texture sourceTexture, int cutoffByte, Color tint)

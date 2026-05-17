@@ -35,6 +35,7 @@ namespace CameraPlus
 
 		public static void ClearMarkerState()
 		{
+			cachedMainColors.Clear();
 			dotConfigCache.Clear();
 			shouldShowLabelCache.Clear();
 			MarkerDecisionCache.Clear();

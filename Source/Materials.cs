@@ -9,9 +9,7 @@ namespace CameraPlus
 		public Material edgeDot;
 		public Material silhouette;
 		public Material custom;
-		public DotStyle mode;
-		public string customDotStyle;
-		public float outlineFactor;
+		public MaterialSignature signature;
 
 		bool colorsApplied;
 		Color fillColor;
@@ -36,15 +34,8 @@ namespace CameraPlus
 			ApplyColors(edgeDot, fill, outline);
 		}
 
-		public bool Matches(DotConfig dotConfig)
-		{
-			var expectedMode = dotConfig?.mode ?? Settings.dotStyle;
-			var expectedCustomDotStyle = dotConfig?.customDotStyle;
-			var expectedOutlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
-			return mode == expectedMode
-				&& customDotStyle == expectedCustomDotStyle
-				&& Mathf.Approximately(outlineFactor, expectedOutlineFactor);
-		}
+		public bool Matches(MaterialSignature expectedSignature)
+			=> signature.Matches(expectedSignature);
 
 		static void ApplyColors(Material material, Color fill, Color outline)
 		{
@@ -54,5 +45,33 @@ namespace CameraPlus
 			material.SetColor("_FillColor", fill);
 			material.SetColor("_OutlineColor", outline);
 		}
+	}
+
+	public readonly struct MaterialSignature
+	{
+		public readonly DotStyle mode;
+		public readonly string customDotStyle;
+		public readonly float outlineFactor;
+		public readonly int dotTextureId;
+		public readonly int silhouetteTextureId;
+		public readonly int customTextureId;
+
+		public MaterialSignature(DotStyle mode, string customDotStyle, float outlineFactor, int dotTextureId, int silhouetteTextureId, int customTextureId)
+		{
+			this.mode = mode;
+			this.customDotStyle = customDotStyle;
+			this.outlineFactor = outlineFactor;
+			this.dotTextureId = dotTextureId;
+			this.silhouetteTextureId = silhouetteTextureId;
+			this.customTextureId = customTextureId;
+		}
+
+		public bool Matches(MaterialSignature other)
+			=> mode == other.mode
+			&& customDotStyle == other.customDotStyle
+			&& Mathf.Approximately(outlineFactor, other.outlineFactor)
+			&& dotTextureId == other.dotTextureId
+			&& silhouetteTextureId == other.silhouetteTextureId
+			&& customTextureId == other.customTextureId;
 	}
 }
