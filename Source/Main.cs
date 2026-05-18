@@ -240,11 +240,30 @@ namespace CameraPlus
 	{
 		const float vanillaCloseCameraHeight = 15f;
 		const float vanillaCameraHeightRange = 50f;
+		const float vanillaNearClipPlane = 0.5f;
 
 		static readonly MethodInfo m_ApplyZoom = SymbolExtensions.GetMethodInfo(() => ApplyZoom(null, null));
 
+		static bool Prefix(CameraDriver __instance)
+		{
+			if (__instance == null)
+				return false;
+
+			try
+			{
+				return __instance.gameObject != null;
+			}
+			catch (NullReferenceException)
+			{
+				return false;
+			}
+		}
+
 		static void ApplyZoom(CameraDriver driver, Camera camera)
 		{
+			if (driver == null || camera == null)
+				return;
+
 			var newOrthographicSize = Tools.LerpRootSize(driver.rootSize);
 			camera.orthographicSize = newOrthographicSize;
 			orthographicSize = newOrthographicSize;
@@ -261,7 +280,7 @@ namespace CameraPlus
 				driver.reverbDummy.transform.position = reverbPosition;
 			}
 
-			camera.nearClipPlane = Mathf.Max(currentPos.y * 0.1f, 1f);
+			camera.nearClipPlane = vanillaNearClipPlane;
 			camera.farClipPlane = Mathf.Max(currentPos.y * 2.5f, 500f);
 
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(newOrthographicSize);
