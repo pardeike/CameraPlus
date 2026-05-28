@@ -10,6 +10,8 @@ namespace CameraPlus
 	{
 		public static readonly Dictionary<string, Color> cachedMainColors = [];
 		public static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = [];
+		static readonly object markerStateClearLock = new();
+		static bool markerStateClearQueued;
 
 		public static readonly QuotaCache<Pawn, int, DotConfig> dotConfigCache
 			= new(60, pawn => pawn.thingIDNumber, pawn => pawn.GetDotConfig());
@@ -34,6 +36,34 @@ namespace CameraPlus
 			});
 
 		public static void ClearMarkerState()
+		{
+			if (UnityData.IsInMainThread)
+			{
+				ClearMarkerStateNow();
+				return;
+			}
+
+			lock (markerStateClearLock)
+			{
+				if (markerStateClearQueued)
+					return;
+				markerStateClearQueued = true;
+			}
+
+			// World.FinalizeInit can run on RimWorld's async long-event thread.
+			// MarkerCache owns Unity materials/textures, so destruction must wait
+			// until LongEventHandler returns to the main Unity thread.
+			LongEventHandler.ExecuteWhenFinished(ClearQueuedMarkerState);
+		}
+
+		static void ClearQueuedMarkerState()
+		{
+			lock (markerStateClearLock)
+				markerStateClearQueued = false;
+			ClearMarkerState();
+		}
+
+		static void ClearMarkerStateNow()
 		{
 			cachedMainColors.Clear();
 			dotConfigCache.Clear();
