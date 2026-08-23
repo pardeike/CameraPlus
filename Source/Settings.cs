@@ -487,23 +487,23 @@ namespace CameraPlus
 
 		void DrawLabelVisibility(SettingsUiContext ctx)
 		{
-			var enabled = dotStyle > DotStyle.VanillaDefault;
-			var note = enabled ? null : "SettingsNote_RequiresCameraMarkers".Translate().ToString();
+			var globalMarkersEnabled = dotStyle > DotStyle.VanillaDefault;
+			var markerNote = globalMarkersEnabled ? null : "SettingsNote_RequiresCameraMarkers".Translate().ToString();
 
-			var mouseRevealRuleCount = enabled ? RuleCount(dc => dc.mouseReveals != mouseOverShowsLabels) : 0;
+			var mouseRevealRuleCount = RuleCount(dc => dc.mouseReveals != mouseOverShowsLabels);
 			var overrideNote = OverrideNote(mouseRevealRuleCount);
-			DrawCheckbox(ctx, "MouseRevealsLabels", ref mouseOverShowsLabels, "SettingsHelp_MouseRevealsLabels", enabled, note ?? overrideNote, Caches.ClearMarkerState, 0f, note == null && overrideNote != null ? RuleNoteColor : DisabledTextColor, RuleOverrideHelp(mouseRevealRuleCount));
+			DrawCheckbox(ctx, "MouseRevealsLabels", ref mouseOverShowsLabels, "SettingsHelp_MouseRevealsLabels", true, overrideNote, Caches.ClearMarkerState, 0f, overrideNote != null ? RuleNoteColor : DisabledTextColor, RuleOverrideHelp(mouseRevealRuleCount));
 			DrawIntSlider(ctx, "HidePawnLabelBelow", hidePawnLabelBelow, 0, 64, PixelValue, value =>
 			{
 				hidePawnLabelBelow = value;
 				Caches.ClearMarkerState();
-			}, "SettingsHelp_HidePawnLabelBelow", enabled, note);
+			}, "SettingsHelp_HidePawnLabelBelow");
 			DrawIntSlider(ctx, "HideThingLabelBelow", hideThingLabelBelow, 0, 64, PixelValue, value =>
 			{
 				hideThingLabelBelow = value;
 				Caches.ClearMarkerState();
-			}, "SettingsHelp_HideThingLabelBelow", enabled, note);
-			DrawIntSlider(ctx, "HideDeadPawnsBelow", hideDeadPawnsBelow, 0, 64, PixelValue, value => hideDeadPawnsBelow = value, "SettingsHelp_HideDeadPawnsBelow", enabled, note);
+			}, "SettingsHelp_HideThingLabelBelow", globalMarkersEnabled, markerNote);
+			DrawIntSlider(ctx, "HideDeadPawnsBelow", hideDeadPawnsBelow, 0, 64, PixelValue, value => hideDeadPawnsBelow = value, "SettingsHelp_HideDeadPawnsBelow", globalMarkersEnabled, markerNote);
 		}
 
 		void DrawMarkerStyle(SettingsUiContext ctx)

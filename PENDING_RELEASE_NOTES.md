@@ -1,1 +1,2 @@
 - Edge scrolling can now be disabled without also disabling keyboard camera movement.
+- Pawn labels now follow matching marker rules, including their marker threshold and mouse-reveal behavior.

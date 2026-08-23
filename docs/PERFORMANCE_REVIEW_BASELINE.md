@@ -44,7 +44,7 @@ Settings and editor UI:
 
 `MarkerDecisionCache` is frame-scoped and stores one marker decision per pawn `thingIDNumber`. It shares the expensive decision work between the dynamic draw postfix and vanilla-rendering suppression prefixes.
 
-`Caches.dotConfigCache` and `Caches.shouldShowLabelCache` are quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
+`Caches.dotConfigCache` is quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
 
 `MarkerCache` holds per-pawn Unity materials and refreshes entries only when the marker mode, custom marker name, or outline factor no longer matches the current rule/settings state. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`.
 

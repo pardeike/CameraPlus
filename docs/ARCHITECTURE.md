@@ -103,8 +103,6 @@ Vanilla rendering suppression is intentional:
 
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 
-`Caches.shouldShowLabelCache` caches label visibility decisions for 60 reads.
-
 `Caches.cachedMainColors` stores sampled main pawn colors by pawn type and body graphic path.
 
 `Caches.cachedCameraDelegates` stores reflection-discovered external integration delegates by pawn runtime type.

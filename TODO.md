@@ -29,10 +29,10 @@ Pawn bodies and markers already use the cached `MarkerDecision`; pawn-label
 suppression still uses global marker settings. Labels must follow the effective
 per-pawn rule without losing the independent `hidePawnLabelBelow` threshold.
 
-- [ ] Base pawn-label marker suppression and mouse reveal on the cached
+- [x] Base pawn-label marker suppression and mouse reveal on the cached
       `MarkerDecision`.
-- [ ] Keep thing/stack labels on their existing global path.
-- [ ] Preserve labels when a custom marker asset is missing.
+- [x] Keep thing/stack labels on their existing global path.
+- [x] Preserve labels when a custom marker asset is missing.
 - [ ] Validate global/rule marker modes, thresholds, mouse reveal, animal
       policy, and missing custom-marker fallback.
 

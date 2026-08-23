@@ -16,25 +16,6 @@ namespace CameraPlus
 		public static readonly QuotaCache<Pawn, int, DotConfig> dotConfigCache
 			= new(60, pawn => pawn.thingIDNumber, pawn => pawn.GetDotConfig());
 
-		public static readonly QuotaCache<Pawn, int, bool> shouldShowLabelCache
-			= new(60, pawn => pawn.thingIDNumber, pawn =>
-			{
-				var len = FastUI.CurUICellSize;
-				if (len <= Settings.hidePawnLabelBelow)
-					return false;
-
-				if (Tools.IsHiddenFromPlayer(pawn))
-					return false;
-
-				if (pawn != null && Settings.customNameStyle == LabelStyle.HideAnimals && pawn.RaceProps.Animal)
-					return true;
-
-				if (pawn != null && len <= Settings.dotSize)
-					return false;
-
-				return true;
-			});
-
 		public static void ClearMarkerState()
 		{
 			if (UnityData.IsInMainThread)
@@ -67,7 +48,6 @@ namespace CameraPlus
 		{
 			cachedMainColors.Clear();
 			dotConfigCache.Clear();
-			shouldShowLabelCache.Clear();
 			MarkerDecisionCache.Clear();
 			MarkerCache.Clear();
 		}

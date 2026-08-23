@@ -15,6 +15,7 @@ namespace CameraPlus
 		public readonly bool edgeEnabled;
 		public readonly bool drawInside;
 		public readonly bool suppressVanilla;
+		public readonly bool revealLabel;
 		public readonly bool hasMarkerColors;
 		public readonly DotStyle mode;
 		public readonly AnimalMarkerPolicy animalPolicy;
@@ -27,6 +28,7 @@ namespace CameraPlus
 			bool edgeEnabled,
 			bool drawInside,
 			bool suppressVanilla,
+			bool revealLabel,
 			bool hasMarkerColors,
 			DotStyle mode,
 			AnimalMarkerPolicy animalPolicy)
@@ -38,6 +40,7 @@ namespace CameraPlus
 			this.edgeEnabled = edgeEnabled;
 			this.drawInside = drawInside;
 			this.suppressVanilla = suppressVanilla;
+			this.revealLabel = revealLabel;
 			this.hasMarkerColors = hasMarkerColors;
 			this.mode = mode;
 			this.animalPolicy = animalPolicy;
@@ -65,7 +68,7 @@ namespace CameraPlus
 			var mode = dotConfig?.mode ?? Settings.dotStyle;
 
 			if (pawn == null || Tools.IsHiddenFromPlayer(pawn))
-				return new MarkerDecision(pawn, dotConfig, true, false, false, false, false, false, mode, animalPolicy);
+				return new MarkerDecision(pawn, dotConfig, true, false, false, false, false, false, false, mode, animalPolicy);
 
 			var defaultShow = animalPolicy.included;
 
@@ -75,20 +78,20 @@ namespace CameraPlus
 				showBelowPixels = Settings.dotSize;
 
 			var mouseReveals = dotConfig?.mouseReveals ?? Settings.mouseOverShowsLabels;
-			var mouseSuppressesMarker = mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f;
+			var revealLabel = mouseReveals && Tools.MouseDistanceSquared(pawn.DrawPos, true) <= 2.25f;
 
 			var drawInside = mode > DotStyle.VanillaDefault
 				&& (dotConfig?.useInside ?? true)
 				&& defaultShow
 				&& cellSize <= showBelowPixels
-				&& mouseSuppressesMarker == false;
+				&& revealLabel == false;
 			var hasMarkerColors = HasMarkerColors(animalPolicy);
 			var suppressVanilla = drawInside && hasMarkerColors && CanDrawInsideMarker(mode, dotConfig);
 			var edgeEnabled = defaultShow
 				&& mode != DotStyle.Off
 				&& (dotConfig?.useEdge ?? Settings.edgeIndicators);
 
-			return new MarkerDecision(pawn, dotConfig, false, defaultShow, edgeEnabled, drawInside, suppressVanilla, hasMarkerColors, mode, animalPolicy);
+			return new MarkerDecision(pawn, dotConfig, false, defaultShow, edgeEnabled, drawInside, suppressVanilla, revealLabel, hasMarkerColors, mode, animalPolicy);
 		}
 
 		static bool CanDrawInsideMarker(DotStyle mode, DotConfig dotConfig)
