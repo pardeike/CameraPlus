@@ -3,3 +3,4 @@
 - Floating damage and event text can now be kept visible independently of pawn marker style.
 - Dead-pawn hiding remains editable when using Vanilla pawn markers.
 - Animal edge colors remain configurable when matching rules enable edge indicators.
+- Shortcut settings now identify disabled and conflicting modifier combinations.

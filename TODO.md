@@ -82,9 +82,9 @@ can still enable an animal edge.
 Two empty modifier slots intentionally disable a shortcut; the settings UI
 must not imply that this creates a modifier-free Tab or number binding.
 
-- [ ] Display the all-empty modifier state as disabled in the row/help text.
-- [ ] Preserve the runtime guards against unmodified Tab/number conflicts.
-- [ ] Warn or document when load and save use the same modifier combination.
+- [x] Display the all-empty modifier state as disabled in the row/help text.
+- [x] Preserve the runtime guards against unmodified Tab/number conflicts.
+- [x] Warn or document when load and save use the same modifier combination.
 
 ## 7. Document the Shift override for zoom-to-mouse
 

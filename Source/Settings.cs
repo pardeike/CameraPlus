@@ -685,6 +685,15 @@ namespace CameraPlus
 
 		void DrawKeyboardShortcuts(SettingsUiContext ctx)
 		{
+			var disabledNote = "SettingsNote_ShortcutDisabled".Translate().ToString();
+			var loadDisabled = ShortcutDisabled(Settings.cameraSettingsLoad);
+			var saveDisabled = ShortcutDisabled(Settings.cameraSettingsSave);
+			var loadSaveConflict = loadDisabled == false
+				&& saveDisabled == false
+				&& Settings.cameraSettingsLoad[0] == Settings.cameraSettingsSave[0]
+				&& Settings.cameraSettingsLoad[1] == Settings.cameraSettingsSave[1];
+			var loadSaveNote = loadSaveConflict ? "SettingsNote_LoadSaveShortcutConflict".Translate().ToString() : null;
+
 			DrawShortcutRow(ctx, "SettingsKey", "SettingsHelp_SettingsShortcut", rect =>
 			{
 				var keyRect = TakeShortcutButton(ref rect);
@@ -693,7 +702,7 @@ namespace CameraPlus
 				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsMod[1], KeyCode.None, code => Settings.cameraSettingsMod[1] = code);
 				var firstModifierRect = TakeShortcutButton(ref rect);
 				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsMod[0], KeyCode.None, code => Settings.cameraSettingsMod[0] = code);
-			});
+			}, ShortcutDisabled(Settings.cameraSettingsMod) ? disabledNote : null);
 
 			DrawShortcutRow(ctx, "LoadModifier", "SettingsHelp_LoadShortcut", rect =>
 			{
@@ -703,7 +712,7 @@ namespace CameraPlus
 				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsLoad[1], KeyCode.None, code => Settings.cameraSettingsLoad[1] = code);
 				var firstModifierRect = TakeShortcutButton(ref rect);
 				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsLoad[0], KeyCode.LeftShift, code => Settings.cameraSettingsLoad[0] = code);
-			});
+			}, loadDisabled ? disabledNote : loadSaveNote);
 
 			DrawShortcutRow(ctx, "SaveModifier", "SettingsHelp_SaveShortcut", rect =>
 			{
@@ -713,19 +722,26 @@ namespace CameraPlus
 				Tools.KeySettingsButton(secondModifierRect, false, Settings.cameraSettingsSave[1], KeyCode.None, code => Settings.cameraSettingsSave[1] = code);
 				var firstModifierRect = TakeShortcutButton(ref rect);
 				Tools.KeySettingsButton(firstModifierRect, false, Settings.cameraSettingsSave[0], KeyCode.LeftAlt, code => Settings.cameraSettingsSave[0] = code);
-			});
+			}, saveDisabled ? disabledNote : loadSaveNote);
 		}
 
-		void DrawShortcutRow(SettingsUiContext ctx, string labelKey, string helpKey, Action<Rect> drawButtons)
+		static bool ShortcutDisabled(KeyCode[] modifiers)
+			=> modifiers[0] == KeyCode.None && modifiers[1] == KeyCode.None;
+
+		void DrawShortcutRow(SettingsUiContext ctx, string labelKey, string helpKey, Action<Rect> drawButtons, string note = null)
 		{
 			var label = labelKey.Translate().ToString();
 			var buttonsWidth = 3f * shortcutButtonWidth + 2f * shortcutButtonSpacing;
 			var labelWidth = ctx.Width - buttonsWidth - 12f;
 			var labelHeight = TextHeight(label, labelWidth, GameFont.Small);
-			var rowHeight = Mathf.Max(shortcutButtonHeight, labelHeight) + 8f;
+			var noteHeight = NoteHeight(note, labelWidth);
+			var textHeight = labelHeight + (noteHeight > 0f ? noteHeight + 2f : 0f);
+			var rowHeight = Mathf.Max(shortcutButtonHeight, textHeight) + 8f;
 			var row = ctx.GetRect(rowHeight);
 			DrawControlHover(row, labelKey, helpKey);
-			DrawText(new Rect(row.x, row.y, labelWidth, row.height), label, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+			var textY = row.y + (row.height - textHeight) / 2f;
+			DrawText(new Rect(row.x, textY, labelWidth, labelHeight), label, GameFont.Small, Color.white, TextAnchor.MiddleLeft);
+			DrawNote(note, row.x, textY + labelHeight + 2f, labelWidth, RuleNoteColor);
 			drawButtons(new Rect(row.xMax - buttonsWidth, row.y + (row.height - shortcutButtonHeight) / 2f, buttonsWidth, shortcutButtonHeight));
 		}
 
