@@ -59,7 +59,7 @@ players.
 is Vanilla, so its settings row must remain enabled and describe its effect on
 corpse bodies and related overlays.
 
-- [ ] Remove the global-marker-style enablement dependency from the row.
+- [x] Remove the global-marker-style enablement dependency from the row.
 - [ ] Validate switching between Vanilla and Camera+ marker styles.
 
 ## 5. Represent rule-enabled animal edge colors correctly

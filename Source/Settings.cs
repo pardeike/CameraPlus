@@ -506,7 +506,7 @@ namespace CameraPlus
 				hideThingLabelBelow = value;
 				Caches.ClearMarkerState();
 			}, "SettingsHelp_HideThingLabelBelow", globalMarkersEnabled, markerNote);
-			DrawIntSlider(ctx, "HideDeadPawnsBelow", hideDeadPawnsBelow, 0, 64, PixelValue, value => hideDeadPawnsBelow = value, "SettingsHelp_HideDeadPawnsBelow", globalMarkersEnabled, markerNote);
+			DrawIntSlider(ctx, "HideDeadPawnsBelow", hideDeadPawnsBelow, 0, 64, PixelValue, value => hideDeadPawnsBelow = value, "SettingsHelp_HideDeadPawnsBelow");
 		}
 
 		void DrawMarkerStyle(SettingsUiContext ctx)

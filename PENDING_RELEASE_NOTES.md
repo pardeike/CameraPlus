@@ -1,3 +1,4 @@
 - Edge scrolling can now be disabled without also disabling keyboard camera movement.
 - Pawn labels now follow matching marker rules, including their marker threshold and mouse-reveal behavior.
 - Floating damage and event text can now be kept visible independently of pawn marker style.
+- Dead-pawn hiding remains editable when using Vanilla pawn markers.
