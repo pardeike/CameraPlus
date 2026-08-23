@@ -18,7 +18,7 @@ Release builds write:
 
 The project also has a `CopyToRimworld` MSBuild target that runs when `RIMWORLD_MOD_DIR` is set. That target:
 
-- deletes `1.6/Assemblies/0Harmony.dll`.
+- removes private `0Harmony.dll` copies and Finder `.DS_Store` metadata from the copied mod before packaging, so Harmony is supplied only by the declared Harmony dependency and the ZIP contains no local filesystem artifacts.
 - copies version folders, metadata, defs, languages, resources, sounds, textures, license, load folders, README, and README image assets into `$(RIMWORLD_MOD_DIR)\CameraPlus`.
 - zips that copied mod folder as `$(RIMWORLD_MOD_DIR)\CameraPlus.zip`.
 

@@ -286,7 +286,10 @@ namespace CameraPlus
 
 		void RestoreDefaults()
 		{
-			Traverse.IterateFields(new CameraPlusSettings(), Settings, (t1, t2) => t2.SetValue(t1.GetValue()));
+			var defaults = new CameraPlusSettings();
+			foreach (var field in AccessTools.GetDeclaredFields(typeof(CameraPlusSettings)))
+				if (field.IsPublic && field.IsStatic == false)
+					field.SetValue(Settings, field.GetValue(defaults));
 			ApplyCalculatedValues();
 			Caches.ClearMarkerState();
 			settingsScrollPosition = Vector2.zero;
@@ -295,9 +298,8 @@ namespace CameraPlus
 		void OpenRulesDialog()
 		{
 			var isInGame = Current.Game != null;
-			var dotConfigDefaults = isInGame ? CameraSettings.defaultConfig : CameraSettings.defaultDefaultConfig;
 			var closeAction = isInGame ? null : new Action(() => Tools.SaveDotConfigs(Tools.DefaultRulesFilePath, CameraSettings.defaultConfig));
-			Find.WindowStack.Add(new Dialog_Customization(CurrentDotConfigs(), dotConfigDefaults, closeAction));
+			Find.WindowStack.Add(new Dialog_Customization(CurrentDotConfigs(), CameraSettings.defaultDefaultConfig, closeAction));
 		}
 
 		void DrawTopicNavigation(Rect rect)

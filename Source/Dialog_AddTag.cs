@@ -20,6 +20,7 @@ namespace CameraPlus
 
 		private readonly Action<ConditionTag> callback;
 		private bool negated;
+		private bool tagsNegated;
 
 		public override Vector2 InitialSize => new(640f, 480f);
 
@@ -29,13 +30,14 @@ namespace CameraPlus
 			doCloseButton = false;
 			doCloseX = true;
 			draggable = true;
-			UpdateNegation();
+			UpdateNegation(negated);
 		}
 
-		void UpdateNegation()
+		void UpdateNegation(bool value)
 		{
 			foreach (var (_, tags, _) in categories)
-				tags.Do(tag => tag.Negated = negated);
+				tags.Do(tag => tag.Negated = value);
+			tagsNegated = value;
 		}
 
 		private void ChooseTag(ChooseTag tag)
@@ -57,6 +59,11 @@ namespace CameraPlus
 
 		public override void DoWindowContents(Rect inRect)
 		{
+			var shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+			var effectiveNegated = negated != shiftHeld;
+			if (tagsNegated != effectiveNegated)
+				UpdateNegation(effectiveNegated);
+
 			var list = new Listing_Standard();
 			list.Begin(inRect);
 
@@ -71,10 +78,13 @@ namespace CameraPlus
 
 			var opposite = "Opposite".Translate();
 			var rect = inRect.BottomPartPixels(24).LeftPartPixels(Text.CalcSize(opposite).x + 34);
-			var oldNegated = negated;
-			Widgets.CheckboxLabeled(rect, opposite, ref negated);
-			if (oldNegated != negated)
-				UpdateNegation();
+			var displayedNegated = effectiveNegated;
+			Widgets.CheckboxLabeled(rect, opposite, ref displayedNegated);
+			if (displayedNegated != effectiveNegated)
+			{
+				negated = displayedNegated != shiftHeld;
+				UpdateNegation(displayedNegated);
+			}
 		}
 	}
 }

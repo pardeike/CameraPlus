@@ -109,7 +109,6 @@
 	</Target>
 
 	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
-		<Delete Files="..\1.6\Assemblies\0Harmony.dll" />
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<ItemGroup>
 			<Copy_11 Include="..\1.1\**" />
@@ -147,6 +146,11 @@
 		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyImgs)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\imgs\%(RecursiveDir)" />
+		<ItemGroup>
+			<PrivateHarmony Include="$(RIMWORLD_MOD_DIR)\$(ModFileName)\**\0Harmony.dll" />
+			<FinderMetadata Include="$(RIMWORLD_MOD_DIR)\$(ModFileName)\**\.DS_Store" />
+		</ItemGroup>
+		<Delete Files="@(PrivateHarmony);@(FinderMetadata)" />
 	</Target>
 
 	<Target Name="ZipMod" AfterTargets="CopyToRimworld" Condition="'$(RIMWORLD_MOD_DIR)' != ''">

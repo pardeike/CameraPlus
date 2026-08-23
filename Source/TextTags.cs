@@ -15,12 +15,12 @@ namespace CameraPlus
 
 	public class PawnNameTag : TextTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ Tools.ContainsCaseInsensitive(pawn.Label, Text);
+		public override bool Matches(Pawn pawn) => Negated ^ Tools.ContainsCaseInsensitive(pawn.Name?.ToStringFull, Text);
 	}
 
 	public class HediffTag : TextTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.health.hediffSet.hediffs.Any(h => Tools.ContainsCaseInsensitive(h.def, Text));
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.health.hediffSet.hediffs.Any(h => Tools.ContainsCaseInsensitive(h.Label, Text));
 	}
 
 	public class ApparelTag : TextTag
@@ -64,6 +64,6 @@ namespace CameraPlus
 
 	public class WeaponTag : TextTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ Tools.ContainsCaseInsensitive(pawn.equipment?.Primary?.def?.label, Text);
+		public override bool Matches(Pawn pawn) => Negated ^ Tools.ContainsCaseInsensitive(pawn.equipment?.Primary?.Label, Text);
 	}
 }

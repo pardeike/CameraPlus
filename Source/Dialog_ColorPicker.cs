@@ -13,9 +13,7 @@ namespace CameraPlus
 		{
 			Init,
 			Nothing,
-			Hues,
-			ColorBed,
-			Swatch
+			Value
 		}
 
 		const string swatchesFileName = "CameraPlusColors.txt";
@@ -47,6 +45,7 @@ namespace CameraPlus
 		Color? draggedColor = null;
 		int draggedSwatch = -1;
 		int targetSwatch = -1;
+		bool colorWheelDragging;
 
 		bool IsDragging => draggedColor.HasValue;
 		public Color CurrentColor
@@ -119,18 +118,16 @@ namespace CameraPlus
 
 			var alphaRect = list.GetRect(alphaSliderHeight).LeftPartPixels(hueSize + spacing + bedSize);
 
-			var hueMaterial = Assets.HuesMaterial;
-			hueMaterial.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(hueRect, Assets.dummyTexture, hueMaterial);
-
-			var bedMaterial = Assets.ColorBedMaterial;
-			bedMaterial.SetFloat("_Hue", hue);
-			GenUI.DrawTextureWithMaterial(bedRect, Assets.dummyTexture, bedMaterial);
-
-			var x = bedRect.xMin + bedRect.width * sat;
-			var y = bedRect.yMax - bedRect.height * light;
-			var cursorRect = new Rect(x - 4, y - 4, 8, 8);
-			GUI.DrawTexture(cursorRect, Assets.colorMarkerTexture, ScaleMode.ScaleToFit);
+			DrawValueSelector(hueRect);
+			var wheelColor = _color;
+			Widgets.HSVColorWheel(bedRect, ref wheelColor, ref colorWheelDragging, light);
+			Color.RGBToHSV(wheelColor, out var wheelHue, out var wheelSat, out _);
+			if (Mathf.Approximately(hue, wheelHue) == false || Mathf.Approximately(sat, wheelSat) == false)
+			{
+				hue = wheelHue;
+				sat = wheelSat;
+				UpdateHSL(hue, sat, light);
+			}
 
 			var oldAlpha = _color.a;
 			var alpha = Widgets.HorizontalSlider(alphaRect, oldAlpha, 0, 1, true);
@@ -150,7 +147,7 @@ namespace CameraPlus
 			var colorRect = list.GetRect(colorHeight);
 			GUI.DrawTexture(colorRect, Assets.editoBackgroundPattern, ScaleMode.StretchToFill);
 			Widgets.DrawBoxSolidWithOutline(colorRect, CurrentColor, IsDragging ? Color.white : borderEmptyColor);
-			if (LeftMouseDown && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing)
+			if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && IsDragging == false && Mouse.IsOver(colorRect) && tracking == Tracking.Nothing && colorWheelDragging == false)
 			{
 				draggedColor = CurrentColor;
 				Event.current.Use();
@@ -173,7 +170,23 @@ namespace CameraPlus
 				Widgets.DrawBoxSolidWithOutline(swatchRect, draggedColor.Value, Color.white);
 			}
 
-			HandleTracking(originalInRect, bedRect, hueRect);
+			HandleTracking(originalInRect, hueRect);
+		}
+
+		void DrawValueSelector(Rect rect)
+		{
+			const int segmentCount = 64;
+			var segmentHeight = rect.height / segmentCount;
+			for (var i = 0; i < segmentCount; i++)
+			{
+				var value = 1f - i / (segmentCount - 1f);
+				var segmentRect = new Rect(rect.x, rect.y + i * segmentHeight, rect.width, segmentHeight + 1f);
+				Widgets.DrawBoxSolid(segmentRect, Color.HSVToRGB(hue, sat, value));
+			}
+
+			var markerY = rect.yMax - rect.height * light;
+			var markerColor = light > 0.5f ? Color.black : Color.white;
+			Widgets.DrawBoxSolid(new Rect(rect.x, markerY - 1f, rect.width, 2f), markerColor);
 		}
 
 		void DoSwatch(Rect swatchesRect, int sx, int sy, ref int draggedTo)
@@ -183,19 +196,19 @@ namespace CameraPlus
 			var ry = swatchesRect.yMin + sy * (size + swatchSpace);
 			var swatchRect = new Rect(rx, ry, size, size);
 			var n = sy * swatchXCount + sx;
-			var over = Mouse.IsOver(swatchRect) && tracking == Tracking.Nothing;
+			var over = Mouse.IsOver(swatchRect) && tracking == Tracking.Nothing && colorWheelDragging == false;
 			if (IsDragging && over)
 				draggedTo = n;
 			var borderColor = swatches[n].HasValue ? borderFullColor : borderEmptyColor;
 			if (swatches[n].HasValue)
 				GUI.DrawTexture(swatchRect, Assets.swatchBackgroundPattern, ScaleMode.StretchToFill);
 			Widgets.DrawBoxSolidWithOutline(swatchRect, swatches[n] ?? Color.clear, draggedTo == n ? Color.white : borderColor);
-			if (LeftMouseDown && IsDragging == false && over)
+			if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && IsDragging == false && over)
 			{
 				draggedColor = swatches[n];
 				draggedSwatch = n;
 			}
-			if (RightMouseDown && over)
+			if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && over)
 				swatches[n] = null;
 			if (Widgets.ButtonInvisible(swatchRect) && swatches[n].HasValue && RightMouseDown == false)
 				CurrentColor = swatches[n].Value;
@@ -221,7 +234,7 @@ namespace CameraPlus
 			File.WriteAllText(path, text);
 		}
 
-		void HandleTracking(Rect inRect, Rect bedRect, Rect hueRect)
+		void HandleTracking(Rect inRect, Rect valueRect)
 		{
 			if (tracking == Tracking.Init)
 				return;
@@ -247,39 +260,21 @@ namespace CameraPlus
 			if (IsDragging)
 				return;
 
-			if (LeftMouseDown && tracking == Tracking.Nothing)
+			var currentEvent = Event.current;
+			if (currentEvent.isMouse && currentEvent.button == 0)
 			{
-				if (Mouse.IsOver(bedRect))
+				if (tracking == Tracking.Value && currentEvent.type == EventType.MouseUp)
 				{
-					tracking = Tracking.ColorBed;
-					Event.current.Use();
+					tracking = Tracking.Nothing;
+					currentEvent.Use();
+					return;
 				}
-				if (Mouse.IsOver(hueRect))
+				if ((currentEvent.type == EventType.MouseDown || currentEvent.type == EventType.MouseDrag) && (tracking == Tracking.Value || Mouse.IsOver(valueRect)))
 				{
-					tracking = Tracking.Hues;
-					Event.current.Use();
-				}
-			}
-
-			var mousePosition = Event.current.mousePosition;
-			switch (tracking)
-			{
-				case Tracking.Hues:
-				{
-					hue = Mathf.Clamp01((mousePosition.y - hueRect.yMin) / hueRect.height);
+					tracking = Tracking.Value;
+					light = 1f - Mathf.Clamp01((currentEvent.mousePosition.y - valueRect.yMin) / valueRect.height);
 					UpdateHSL(hue, sat, light);
-					if (targetSwatch > -1)
-						swatches[targetSwatch] = CurrentColor;
-					break;
-				}
-				case Tracking.ColorBed:
-				{
-					sat = Mathf.Clamp01((mousePosition.x - bedRect.xMin) / bedRect.width);
-					light = 1 - Mathf.Clamp01((mousePosition.y - bedRect.yMin) / bedRect.height);
-					UpdateHSL(hue, sat, light);
-					if (targetSwatch > -1)
-						swatches[targetSwatch] = CurrentColor;
-					break;
+					currentEvent.Use();
 				}
 			}
 		}

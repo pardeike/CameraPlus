@@ -2,7 +2,6 @@
 using RimWorld;
 using System;
 using System.Linq;
-using System.Reflection;
 using Verse;
 
 namespace CameraPlus
@@ -11,7 +10,7 @@ namespace CameraPlus
 
 	public class AncientTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfAncients;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.Faction == Faction.OfAncients || pawn.Faction == Faction.OfAncientsHostile);
 	}
 
 	public class AnimalTag : BoolTag
@@ -31,7 +30,7 @@ namespace CameraPlus
 
 	public class EntityTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfEntities;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.IsEntity;
 	}
 
 	public class GhoulTag : BoolTag
@@ -51,7 +50,7 @@ namespace CameraPlus
 
 	public class InsectTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfInsects;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.RaceProps.Insect;
 	}
 
 	public class MechanoidTag : BoolTag
@@ -71,7 +70,7 @@ namespace CameraPlus
 
 	public class PirateTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Faction == Faction.OfPirates;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.Faction?.def == FactionDefOf.Pirate || pawn.Faction?.def == FactionDefOf.PirateWaster);
 	}
 
 	public class PrisonerTag : BoolTag
@@ -92,7 +91,7 @@ namespace CameraPlus
 	public class VehicleTag : BoolTag
 	{
 		static readonly Type vehicleType = AccessTools.TypeByName("Vehicles.VehiclePawn");
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.GetType() == vehicleType;
+		public override bool Matches(Pawn pawn) => Negated ^ (vehicleType?.IsInstanceOfType(pawn) ?? false);
 	}
 
 	public class WildManTag : BoolTag
@@ -131,7 +130,7 @@ namespace CameraPlus
 	{
 		public override bool Matches(Pawn pawn)
 		{
-			var canCast = pawn.CurJob?.ability?.CanCast ?? false;
+			var canCast = pawn.abilities?.AllAbilitiesForReading.Any(ability => ability.CanCast) ?? false;
 			return Negated ^ canCast;
 		}
 	}
@@ -143,11 +142,7 @@ namespace CameraPlus
 
 	public class ControllableTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ (
-			pawn.MentalStateDef == null
-			|| pawn.OverseerSubject != null && pawn.OverseerSubject.State == OverseerSubjectState.Overseen
-			|| (pawn.mutant?.Def.canBeDrafted ?? false)
-		);
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.IsPlayerControlled;
 	}
 
 	public class CrawlingTag : BoolTag
@@ -187,17 +182,17 @@ namespace CameraPlus
 
 	public class FreeTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.HostFaction == null;
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.IsPrisoner == false && pawn.IsSlave == false);
 	}
 
 	public class GuestTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.GuestStatus != null;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.GuestStatus == GuestStatus.Guest;
 	}
 
 	public class HasWeaponTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.equipment?.Primary != null;
+		public override bool Matches(Pawn pawn) => Negated ^ pawn.equipment?.PrimaryEq?.PrimaryVerb != null;
 	}
 
 	public class HostileTag : BoolTag
@@ -242,8 +237,13 @@ namespace CameraPlus
 
 	public class ModdedTag : BoolTag
 	{
-		static readonly Assembly executingAssembly = Assembly.GetExecutingAssembly();
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.GetType().Assembly != executingAssembly;
+		static bool IsFromMod(Def def) => def?.modContentPack != null && def.modContentPack.IsOfficialMod == false;
+
+		public override bool Matches(Pawn pawn) => Negated ^ (
+			IsFromMod(pawn.kindDef)
+			|| IsFromMod(pawn.def)
+			|| pawn.GetType().Assembly != typeof(Pawn).Assembly
+		);
 	}
 
 	public class OverseenTag : BoolTag
@@ -268,7 +268,7 @@ namespace CameraPlus
 
 	public class TameTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ (pawn.Name != null && (pawn.Faction?.IsPlayer ?? false));
+		public override bool Matches(Pawn pawn) => Negated ^ (pawn.RaceProps.Animal && (pawn.Faction?.def.humanlikeFaction ?? false));
 	}
 
 	public class TeenagerTag : BoolTag

@@ -8,7 +8,7 @@ This document describes the current mod shape as found in the source tree. It is
 - `Source/*.cs` contains all runtime code, Harmony patches, settings UI, marker-rule editing UI, data models, and caches.
 - `1.1` through `1.6` contain versioned RimWorld assembly outputs. The current C# project writes `1.6/Assemblies/CameraPlus.dll`.
 - `About`, `LoadFolders.xml`, `Defs`, `Languages`, `Textures`, `Sounds`, and `Resources` are the RimWorld mod payload.
-- `Resources/{Win64,Linux,MacOS}/effects` are Unity asset bundles loaded at runtime for color picker materials and the bordered marker shader.
+- `Resources/{Win64,Linux,MacOS}/effects` are Unity asset bundles loaded at runtime for the bordered marker shader. The 1.6 color picker uses RimWorld's native HSV wheel instead of bundle materials.
 - `Originals` contains source art and the Unity project used to generate the effects asset bundle.
 
 ## Startup
@@ -130,7 +130,7 @@ Related dialogs:
 
 - `Dialog_AddTag` lists available predicate tags.
 - `Dialog_TagEdit` edits text predicates and negation.
-- `Dialog_ColorPicker` provides HSV color editing and persistent swatches.
+- `Dialog_ColorPicker` provides HSV color editing through RimWorld's native color wheel, a value strip, alpha control, and persistent swatches.
 - `Dialog_CustomizationList_Load` and `Dialog_CustomizationList_Save` load/save XML presets under the CameraPlus config folder.
 - `Dialog_Shortcuts` and `Dialog_AskForKey` edit the keyboard shortcuts.
 - `Dialog_NewVersion` is a first-run-after-version-bump notice.
@@ -139,15 +139,11 @@ Related dialogs:
 
 Static textures in `Textures` are loaded through RimWorld `ContentFinder<Texture2D>`.
 
-The platform-specific `Resources/*/effects` asset bundles provide:
-
-- `ColorBed` material.
-- `Hues` material.
-- `Bordered` shader.
+The platform-specific `Resources/*/effects` asset bundles still contain the legacy picker materials, but the active 1.6 runtime only loads the `Bordered` shader. Marker materials use that shader for fill and outline rendering.
 
 Player custom marker PNG files live in `GenFilePaths.FolderUnderSaveData("CameraPlus")`. A `FileSystemWatcher` reloads PNG files into `Assets.customMarkers`.
 
-Player rule preset XML files also live in the same CameraPlus folder. The default rules file is `CameraPlusDefaultRules.xml` in `GenFilePaths.ConfigFolderPath`.
+Player rule preset XML files also live in the same CameraPlus folder. `CameraPlusDefaultRules.xml` in `GenFilePaths.ConfigFolderPath` is the user-editable preset for new games; the built-in `CameraSettings.defaultDefaultConfig` rules remain the factory baseline used by **Restore defaults** in every rules dialog.
 
 Color swatches are stored in `CameraPlusColors.txt` under `GenFilePaths.ConfigFolderPath`.
 

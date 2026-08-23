@@ -17,14 +17,12 @@ namespace CameraPlus
 		public static string CameraPlusFolderPath => GenFilePaths.FolderUnderSaveData("CameraPlus");
 		static SystemFileSystemWatcher watcher;
 
-		public static readonly Texture2D dummyTexture = new(1, 1);
 		public static readonly Texture2D innerColonistTexture = ContentFinder<Texture2D>.Get("InnerColonistMarker", true);
 		public static readonly Texture2D outerColonistTexture = ContentFinder<Texture2D>.Get("OuterColonistMarker", true);
 		public static readonly Texture2D innerAnimalTexture = ContentFinder<Texture2D>.Get("InnerAnimalMarker", true);
 		public static readonly Texture2D outerAnimalTexture = ContentFinder<Texture2D>.Get("OuterAnimalMarker", true);
 		public static readonly Texture2D innerEntityTexture = ContentFinder<Texture2D>.Get("InnerEntityMarker", true);
 		public static readonly Texture2D outerEntityTexture = ContentFinder<Texture2D>.Get("OuterEntityMarker", true);
-		public static readonly Texture2D colorMarkerTexture = ContentFinder<Texture2D>.Get("ColorMarker", true);
 		public static readonly Texture2D colorBackgroundPattern = ContentFinder<Texture2D>.Get("ColorBackgroundPattern", true);
 		public static readonly Texture2D editoBackgroundPattern = ContentFinder<Texture2D>.Get("EditorBackgroundPattern", true);
 		public static readonly Texture2D swatchBackgroundPattern = ContentFinder<Texture2D>.Get("SwatchBackgroundPattern", true);
@@ -43,7 +41,6 @@ namespace CameraPlus
 		public static Material previewMaterial;
 
 		static bool initialized = false;
-		static Material colorBedMaterial, huesMaterial;
 		static Shader borderedShader;
 
 		[HarmonyPatch(typeof(UIRoot_Entry), nameof(UIRoot_Entry.Init))]
@@ -66,14 +63,6 @@ namespace CameraPlus
 			Log.Message($"CameraPlus: Found mod at {me.Content.RootDir}");
 			var path = Path.Combine(me.Content.RootDir, "Resources", arch, "effects");
 			var assets = AssetBundle.LoadFromFile(path);
-
-			colorBedMaterial = assets.LoadAsset<Material>("ColorBed");
-			if (colorBedMaterial == null)
-				Log.Error("Cannot load ColorBed material from asset bundle.");
-
-			huesMaterial = assets.LoadAsset<Material>("Hues");
-			if (huesMaterial == null)
-				Log.Error("Cannot load Hues material from asset bundle.");
 
 			borderedShader = assets.LoadAsset<Shader>("Bordered");
 			if (borderedShader == null)
@@ -138,8 +127,6 @@ namespace CameraPlus
 			MarkerCache.Clear();
 		}
 
-		public static Material ColorBedMaterial => colorBedMaterial;
-		public static Material HuesMaterial => huesMaterial;
 		public static Shader BorderedShader => borderedShader;
 	}
 }

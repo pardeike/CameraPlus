@@ -247,10 +247,11 @@ namespace CameraPlus
 		}
 
 		public static bool ContainsCaseInsensitive(string source, string fragment)
-			=> source?.IndexOf(fragment, StringComparison.OrdinalIgnoreCase) >= 0;
+			=> string.IsNullOrWhiteSpace(fragment) == false
+				&& source?.IndexOf(fragment, StringComparison.OrdinalIgnoreCase) >= 0;
 
 		public static bool ContainsCaseInsensitive(Def def, string fragment)
-			=> def?.label.IndexOf(fragment, StringComparison.OrdinalIgnoreCase) >= 0;
+			=> ContainsCaseInsensitive(def?.label, fragment);
 
 		public static void ScribeArrays<T>(ref T[] codes, string name, T[] defaults)
 		{
