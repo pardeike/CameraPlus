@@ -451,6 +451,8 @@ namespace CameraPlus.BridgeTools
 			}
 			finally
 			{
+				if (Scribe.mode != LoadSaveMode.Inactive)
+					Scribe.ForceStop();
 				CameraPlusSettings.minRootResult = originalMinRootResult;
 				CameraPlusSettings.maxRootResult = originalMaxRootResult;
 			}
