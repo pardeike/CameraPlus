@@ -20,7 +20,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build
+        run: dotnet build -p:BuildBridgeTools=false
 
       - name: "Refresh tags"
         id: tag

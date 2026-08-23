@@ -10,6 +10,11 @@ dotnet build Source/CameraPlus.csproj -c Release
 
 The current project has no automated test project. Treat a clean build as the minimum check, then use in-game validation for camera, marker, label, and compatibility changes.
 
+Local development builds also produce
+`artifacts/BridgeTools/CameraPlus/CameraPlus.BridgeTools.dll`. This companion
+contains development-only RimBridgeServer validation tools. Release builds set
+`BuildBridgeTools=false`, so the companion is not part of the public mod.
+
 ## Outputs
 
 Release builds write:
@@ -20,6 +25,8 @@ The project also has a `CopyToRimworld` MSBuild target that runs when `RIMWORLD_
 
 - removes private `0Harmony.dll` copies and Finder `.DS_Store` metadata from the copied mod before packaging, so Harmony is supplied only by the declared Harmony dependency and the ZIP contains no local filesystem artifacts.
 - copies version folders, metadata, defs, languages, resources, sounds, textures, license, load folders, README, and README image assets into `$(RIMWORLD_MOD_DIR)\CameraPlus`.
+- copies the matching development companion into the sibling
+  `$(RIMWORLD_MOD_DIR)\..\BridgeTools\CameraPlus` folder.
 - zips that copied mod folder as `$(RIMWORLD_MOD_DIR)\CameraPlus.zip`.
 
 On macOS with a Unix shell, MSBuild still prints Windows-style path separators in the target body because the project file uses backslashes.
