@@ -92,8 +92,8 @@ must not imply that this creates a modifier-free Tab or number binding.
 
 Holding Shift bypasses zoom-to-mouse even when the setting is enabled.
 
-- [ ] Add the Shift bypass to the setting help.
-- [ ] Confirm the modifier remains deliberate and does not conflict with a
+- [x] Add the Shift bypass to the setting help.
+- [x] Confirm the modifier remains deliberate and does not conflict with a
       Camera+ shortcut.
 
 ## 8. Remove dead `stickyMiddleMouse` persistence
