@@ -28,6 +28,7 @@ namespace CameraPlus
 		public int hideThingLabelBelow = 32;
 		public int hideDeadPawnsBelow = 0;
 		public bool mouseOverShowsLabels = true;
+		public bool suppressFloatingText = true;
 		public bool edgeIndicators = true;
 		public bool pawnColoredEdgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
@@ -150,6 +151,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", defaults.hideThingLabelBelow);
 			Scribe_Values.Look(ref hideDeadPawnsBelow, "hideDeadPawnsBelow", defaults.hideDeadPawnsBelow);
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
+			Scribe_Values.Look(ref suppressFloatingText, "suppressFloatingText", dotStyle > DotStyle.VanillaDefault);
 			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
 			Scribe_Values.Look(ref pawnColoredEdgeIndicators, "pawnColoredEdgeIndicators", defaults.pawnColoredEdgeIndicators);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
@@ -493,6 +495,7 @@ namespace CameraPlus
 			var mouseRevealRuleCount = RuleCount(dc => dc.mouseReveals != mouseOverShowsLabels);
 			var overrideNote = OverrideNote(mouseRevealRuleCount);
 			DrawCheckbox(ctx, "MouseRevealsLabels", ref mouseOverShowsLabels, "SettingsHelp_MouseRevealsLabels", true, overrideNote, Caches.ClearMarkerState, 0f, overrideNote != null ? RuleNoteColor : DisabledTextColor, RuleOverrideHelp(mouseRevealRuleCount));
+			DrawCheckbox(ctx, "SuppressFloatingText", ref suppressFloatingText, "SettingsHelp_SuppressFloatingText");
 			DrawIntSlider(ctx, "HidePawnLabelBelow", hidePawnLabelBelow, 0, 64, PixelValue, value =>
 			{
 				hidePawnLabelBelow = value;

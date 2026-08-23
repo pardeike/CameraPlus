@@ -33,7 +33,7 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | Target | File | Patch | Purpose | Risk |
 | --- | --- | --- | --- | --- |
 | `DynamicDrawManager.DrawDynamicThings` | `Main.cs` | Postfix | Draws CameraPlus dots, silhouettes, custom markers, and edge indicators for current map. | Hot path; scans spawned pawns. |
-| `MoteMaker.ThrowText(Vector3, Map, string, Color, float)` | `Main.cs` | Prefix | Suppresses floating text when zoomed out and labels are hidden, except close mouse reveal cases. | User-visible feedback can disappear if thresholds are wrong. |
+| `MoteMaker.ThrowText(Vector3, Map, string, Color, float)` | `Main.cs` | Prefix | Suppresses floating text when its independent setting is enabled and the camera is zoomed out, except close mouse-reveal cases. | User-visible feedback can disappear if the setting or zoom check is wrong. |
 | `OverlayDrawer.RenderForbiddenOverlay` | `Main.cs` | Prefix | Hides corpse forbidden overlays when dead pawns are hidden by zoom threshold. | Overlay suppression can hide information. |
 | `GenMapUI.DrawThingLabel(Vector2, string, Color)` | `Main.cs` | Prefix and transpiler | Hides thing labels by zoom/mouse rules and uses larger fonts when heavily zoomed in. | Label visibility and font selection. |
 | `PawnRenderer.RenderPawnAt(Vector3, Rot4?, bool)` | `DotTools.cs` | Prefix | Suppresses vanilla pawn body draw when a marker should replace it. | Very hot; incorrect decision hides pawns. |

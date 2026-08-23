@@ -110,7 +110,7 @@ namespace CameraPlus
 
 			var settings = Settings;
 
-			if (settings.dotStyle == DotStyle.VanillaDefault)
+			if (settings.suppressFloatingText == false)
 				return true;
 
 			if (Current.cameraDriverInt.CurrentZoom == CameraZoomRange.Closest)

@@ -45,9 +45,9 @@ when a Camera+ marker style is active. Give that behavior an independent,
 clearly named setting, defaulting to the current enabled behavior for existing
 players.
 
-- [ ] Add and persist an explicit floating-text suppression setting.
-- [ ] Stop using marker style as the setting's implicit on/off switch.
-- [ ] Preserve the existing closest-zoom and mouse-reveal behavior while the
+- [x] Add and persist an explicit floating-text suppression setting.
+- [x] Stop using marker style as the setting's implicit on/off switch.
+- [x] Preserve the existing closest-zoom and mouse-reveal behavior while the
       setting is enabled.
 - [ ] Validate enabled/disabled behavior across zoom levels and mouse distance.
 

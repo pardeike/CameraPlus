@@ -94,6 +94,9 @@ Vanilla rendering suppression is intentional:
 
 - Pawn bodies, vehicle pawns, selection brackets, pawn UI overlays, and RimWorld silhouettes can be skipped when CameraPlus markers are active.
 - Pawn and thing labels can be hidden when zoomed out, unless the mouse is close enough to reveal them.
+- General map floating text can be suppressed independently outside RimWorld's
+  closest zoom level, with the global mouse-reveal setting providing a nearby
+  exception.
 - `CameraPlusMain.skipCustomRendering` is a public escape hatch other mods can set temporarily to bypass CameraPlus drawing decisions.
 - Perf builds can additionally patch `PawnRenderer.DynamicDrawPhaseAt` to skip vanilla renderer phases for marker-replaced pawns. That experiment is intentionally behind the `CAMERAPLUS_PERF` compile gate.
 

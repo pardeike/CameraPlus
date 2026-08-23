@@ -34,6 +34,7 @@
     <ZoomToMouse>Zoom to mouse</ZoomToMouse>
     <DisableCameraShake>Disable camera shake</DisableCameraShake>
     <MouseRevealsLabels>Mouse reveals labels{0}</MouseRevealsLabels>
+    <SuppressFloatingText>Suppress floating text when zoomed out</SuppressFloatingText>
     <EdgeIndicators>Edge indicators{0}</EdgeIndicators>
     <PawnColoredEdgeIndicators>Animal edge colors</PawnColoredEdgeIndicators>
     <SettingsTopic_All>All</SettingsTopic_All>
@@ -122,6 +123,7 @@
     <SettingsHelp_DisableCameraShake>Suppresses vanilla camera shake events.&#10;&#10;This only affects camera movement; it does not remove visual effects that are drawn inside the world.</SettingsHelp_DisableCameraShake>
     <SettingsHelp_SoundNearness>Blends the audio listener back toward RimWorld's close-camera sound position.&#10;&#10;Increase it when zoomed-out play makes local events sound too distant.</SettingsHelp_SoundNearness>
     <SettingsHelp_MouseRevealsLabels>When labels are hidden by zoom, labels near the mouse can temporarily return.&#10;&#10;For pawns, a matching rule's mouse-reveal value overrides this default and also keeps that pawn from being replaced by its marker.</SettingsHelp_MouseRevealsLabels>
+    <SettingsHelp_SuppressFloatingText>Hides general map floating text outside RimWorld's closest zoom level. This includes transient feedback such as damage and event text, not only static labels.&#10;&#10;The Mouse reveals labels option also reveals nearby floating text while suppression is enabled. Turn this off to keep all floating feedback visible.</SettingsHelp_SuppressFloatingText>
     <SettingsHelp_HidePawnLabelBelow>Pawn labels are hidden once map cells become smaller than this many screen pixels.&#10;&#10;This threshold is independent of marker style. Pawn labels also disappear while an effective global or matching-rule marker replaces the pawn body.</SettingsHelp_HidePawnLabelBelow>
     <SettingsHelp_HideThingLabelBelow>Stack labels are hidden once map cells become smaller than this many screen pixels.&#10;&#10;Use a higher value when item labels dominate the screen at far zoom. This is independent from pawn marker style once Camera+ marker rendering is active.</SettingsHelp_HideThingLabelBelow>
     <SettingsHelp_HideDeadPawnsBelow>Dead pawn rendering is hidden below this cell size.&#10;&#10;This can reduce visual clutter after fights while keeping living pawn markers readable. It is grouped with label visibility because it removes far-zoom visual noise rather than changing marker style.</SettingsHelp_HideDeadPawnsBelow>
