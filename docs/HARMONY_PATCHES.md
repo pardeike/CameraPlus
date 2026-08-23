@@ -24,7 +24,6 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | --- | --- | --- | --- | --- |
 | `CameraDriver.Update` | `Main.cs` | Prefix and transpiler | Clears camera shake when disabled and replaces `RootSize` assignment with zoom-to-mouse-aware setter. | IL-shape dependency; mod conflicts on `CameraDriver.Update`; null-driver conflict logging. |
 | `TimeControls.DoTimeControlsGUI` | `Main.cs` | Prefix | Handles CameraPlus shortcut keys every GUI pass. | Input handling can consume events used by other UI. |
-| `CameraDriver.CalculateCurInputDollyVect` | `Main.cs` | Postfix | Scales screen-edge panning by current effective zoom. | Affects all edge-scroll movement. |
 | `CameraDriver.CurrentZoom` getter | `Main.cs` | Prefix | Replaces vanilla zoom enum mapping with mapping over CameraPlus' extended zoom range. | Downstream code relying on vanilla zoom bands changes behavior. |
 | `CameraDriver.ApplyPositionToGameObject` | `Main.cs` | Transpiler | Applies mapped orthographic size, camera height, clipping planes, FOV, and movement-speed config. | High-risk transpiler on a core camera method. |
 | `CameraDriver.CurrentViewRect` getter | `Main.cs` | Transpiler | Uses effective mapped root size for view rect calculations. | View culling and UI-to-map calculations can shift if wrong. |

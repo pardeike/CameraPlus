@@ -87,16 +87,6 @@ namespace CameraPlus
 		public static void Prefix() => Tools.HandleHotkeys();
 	}
 
-	[HarmonyPatch(typeof(CameraDriver), "CalculateCurInputDollyVect")]
-	static class CameraDriver_CalculateCurInputDollyVect_Patch
-	{
-		public static void Postfix(ref Vector2 __result)
-		{
-			if (orthographicSize != -1f)
-				__result *= Tools.GetScreenEdgeDollyFactor(orthographicSize);
-		}
-	}
-
 	[HarmonyPatch(typeof(DynamicDrawManager), nameof(DynamicDrawManager.DrawDynamicThings))]
 	static class DynamicDrawManager_DrawDynamicThings_Patch
 	{
@@ -284,7 +274,7 @@ namespace CameraPlus
 			camera.farClipPlane = Mathf.Max(currentPos.y * 2.5f, 500f);
 
 			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(newOrthographicSize);
-			driver.config.dollyRateScreenEdge = Tools.GetDollyRateMouse(newOrthographicSize);
+			driver.config.dollyRateScreenEdge = Tools.GetDollyRateScreenEdge(newOrthographicSize);
 			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(newOrthographicSize);
 		}
 

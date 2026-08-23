@@ -65,7 +65,8 @@ Important camera patches:
 - `CameraDriver.Update` rewrites root-size assignment so zoom-to-mouse can preserve the map position under the cursor.
 - `CameraDriver.CurrentZoom` remaps RimWorld's zoom enum decisions to the extended zoom range.
 - `CameraDriver.CurrentViewRect` replaces uses of raw root size with the mapped size.
-- `CameraDriver.CalculateCurInputDollyVect` scales edge-scroll input.
+- CameraPlus writes independent keyboard and screen-edge rates into
+  `CameraDriver.config`; it does not scale RimWorld's combined input vector.
 - `TimeControls.DoTimeControlsGUI` handles shortcuts.
 - `Game.UpdatePlay`, `TickManager.TogglePaused`, and `UIRoot_Play.UIRootOnGUI` implement the pause-hold snapback feature.
 

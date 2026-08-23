@@ -16,6 +16,8 @@ namespace CameraPlus
 	class Tools
 	{
 		const string colorPropertyName = "_Color";
+		const float zoomedInKeyboardDollyRateAt100Percent = 25f;
+		const float zoomedOutKeyboardDollyRateAt100Percent = 247.5f;
 
 		public static bool IsHiddenFromPlayer(Pawn pawn)
 		{
@@ -329,9 +331,10 @@ namespace CameraPlus
 
 		public static float GetDollyRateKeys(float orthSize)
 		{
-			var f = GetScreenEdgeDollyFactor(orthSize);
-			var zoomedIn = Settings.zoomedInDollyPercent * f / 9f;
-			var zoomedOut = Settings.zoomedOutDollyPercent * f * 1.1f;
+			// Preserve the released 100% keyboard feel without coupling it to
+			// the separately configurable screen-edge multiplier.
+			var zoomedIn = Settings.zoomedInDollyPercent * zoomedInKeyboardDollyRateAt100Percent;
+			var zoomedOut = Settings.zoomedOutDollyPercent * zoomedOutKeyboardDollyRateAt100Percent;
 			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
@@ -342,11 +345,12 @@ namespace CameraPlus
 			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
 		}
 
-		public static float GetDollyRateMouse(float orthSize)
+		public static float GetDollyRateScreenEdge(float orthSize)
 		{
 			var zoomedIn = 1f * Settings.zoomedInDollyPercent;
 			var zoomedOut = 10f * Settings.zoomedOutDollyPercent;
-			return LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
+			var movementBaseline = LerpDoubleSafe(CameraPlusSettings.minRootResult, CameraPlusSettings.maxRootResult, zoomedIn, zoomedOut, orthSize);
+			return movementBaseline * GetScreenEdgeDollyFactor(orthSize);
 		}
 
 		public static float GetDollySpeedDecay(float orthSize)

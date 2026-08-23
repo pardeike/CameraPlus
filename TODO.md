@@ -12,12 +12,12 @@ Edge-scroll values must affect only screen-edge movement. Setting both edge
 endpoints to `0x` must disable edge scrolling without disabling WASD, arrow
 keys, or rebound `MapDolly` keys.
 
-- [ ] Remove edge scaling from the combined
+- [x] Remove edge scaling from the combined
       `CameraDriver.CalculateCurInputDollyVect()` result.
-- [ ] Derive `config.dollyRateKeys` from ordinary movement settings only.
-- [ ] Apply the edge multiplier only to `config.dollyRateScreenEdge`.
-- [ ] Preserve the current default keyboard and edge-scroll feel.
-- [ ] Rename the screen-edge helper and correct the movement/edge help text.
+- [x] Derive `config.dollyRateKeys` from ordinary movement settings only.
+- [x] Apply the edge multiplier only to `config.dollyRateScreenEdge`.
+- [x] Preserve the current default keyboard and edge-scroll calibration.
+- [x] Rename the screen-edge helper and correct the movement/edge help text.
 - [ ] Validate zero/nonzero edge endpoints, close/middle/far zoom, Shift,
       rebound movement keys, and middle-mouse drag.
 

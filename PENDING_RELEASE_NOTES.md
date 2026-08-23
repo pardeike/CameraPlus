@@ -1,0 +1,1 @@
+- Edge scrolling can now be disabled without also disabling keyboard camera movement.
