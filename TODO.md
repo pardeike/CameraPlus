@@ -70,9 +70,9 @@ Animal edge-color rendering already works. The remaining mismatch is that the
 color control is disabled when global edges are off even though a matching rule
 can still enable an animal edge.
 
-- [ ] Keep the color option editable whenever rules may enable edges, or leave
+- [x] Keep the color option editable whenever rules may enable edges, or leave
       it always editable and explain when it matters.
-- [ ] Keep rule-fill override notes accurate when only rules enable edges.
+- [x] Keep rule-fill override notes accurate when only rules enable edges.
 - [ ] Validate global-off/rule-on and global-on/rule-off combinations.
 
 ## 6. Make disabled shortcut bindings explicit

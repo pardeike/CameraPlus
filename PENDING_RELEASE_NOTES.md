@@ -2,3 +2,4 @@
 - Pawn labels now follow matching marker rules, including their marker threshold and mouse-reveal behavior.
 - Floating damage and event text can now be kept visible independently of pawn marker style.
 - Dead-pawn hiding remains editable when using Vanilla pawn markers.
+- Animal edge colors remain configurable when matching rules enable edge indicators.

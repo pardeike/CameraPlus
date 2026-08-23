@@ -546,9 +546,8 @@ namespace CameraPlus
 			var edgeOffStyleRuleCount = RuleCount(dc => dc.mode == DotStyle.Off);
 			var edgeHelp = CombineHelp(RuleOverrideHelp(edgeRuleCount), RuleEdgeDisabledByStyleHelp(edgeOffStyleRuleCount));
 			DrawCheckbox(ctx, "EdgeIndicators", ref edgeIndicators, "SettingsHelp_EdgeIndicators", true, OverrideNote(edgeRuleCount), Caches.ClearMarkerState, 0f, RuleNoteColor, edgeHelp);
-			var note = edgeIndicators ? null : "SettingsNote_RequiresEdgeIndicators".Translate().ToString();
-			var animalEdgeColorRuleCount = edgeIndicators && pawnColoredEdgeIndicators ? RuleCount(dc => dc.fillColor.a > 0f || dc.fillSelectedColor.a > 0f) : 0;
-			DrawCheckbox(ctx, "PawnColoredEdgeIndicators", ref pawnColoredEdgeIndicators, "SettingsHelp_AnimalEdgeColors", edgeIndicators, note, Caches.ClearMarkerState, 18f, helpExtra: RuleAnimalEdgeColorHelp(animalEdgeColorRuleCount));
+			var animalEdgeColorRuleCount = RuleCount(dc => dc.mode != DotStyle.Off && dc.useEdge && (dc.fillColor.a > 0f || dc.fillSelectedColor.a > 0f));
+			DrawCheckbox(ctx, "PawnColoredEdgeIndicators", ref pawnColoredEdgeIndicators, "SettingsHelp_AnimalEdgeColors", true, null, Caches.ClearMarkerState, 18f, helpExtra: RuleAnimalEdgeColorHelp(animalEdgeColorRuleCount));
 		}
 
 		void DrawMarkerAppearance(SettingsUiContext ctx)
