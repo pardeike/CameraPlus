@@ -103,8 +103,8 @@ Holding Shift bypasses zoom-to-mouse even when the setting is enabled.
 The historical custom middle-drag implementation is already gone. Only the
 unused field and settings XML entry remain; neither has a UI or runtime reader.
 
-- [ ] Remove the field and `Scribe_Values.Look` entry.
-- [ ] Remove any remaining production or translation references.
+- [x] Remove the field and `Scribe_Values.Look` entry.
+- [x] Remove any remaining production or translation references.
 - [ ] Verify older settings XML containing `<stickyMiddleMouse>` still loads
       and the obsolete element disappears on the next save.
 - [ ] Confirm ordinary middle-mouse dragging is unchanged.

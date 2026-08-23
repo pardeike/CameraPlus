@@ -18,7 +18,6 @@ namespace CameraPlus
 		public float zoomedInDollyPercent = 1;
 		public float zoomedOutScreenEdgeDollyFactor = 0.5f;
 		public float zoomedInScreenEdgeDollyFactor = 0.5f;
-		public bool stickyMiddleMouse = false;
 		public bool zoomToMouse = true;
 		public bool disableCameraShake = false;
 		public float soundNearness = 0;
@@ -141,7 +140,6 @@ namespace CameraPlus
 			Scribe_Values.Look(ref zoomedInDollyPercent, "zoomedInDollyPercent", defaults.zoomedInDollyPercent);
 			Scribe_Values.Look(ref zoomedOutScreenEdgeDollyFactor, "zoomedOutScreenEdgeDollyFactor", defaults.zoomedOutScreenEdgeDollyFactor);
 			Scribe_Values.Look(ref zoomedInScreenEdgeDollyFactor, "zoomedInScreenEdgeDollyFactor", defaults.zoomedInScreenEdgeDollyFactor);
-			Scribe_Values.Look(ref stickyMiddleMouse, "stickyMiddleMouse", defaults.stickyMiddleMouse);
 			Scribe_Values.Look(ref zoomToMouse, "zoomToMouse", defaults.zoomToMouse);
 			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", defaults.disableCameraShake);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", defaults.soundNearness);
