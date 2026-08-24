@@ -51,10 +51,10 @@ namespace CameraPlus.BridgeTools
 			{
 				channel.uiVisible,
 				channel.overlappingMarkers,
-				channel.uiMinX,
-				channel.uiMaxX,
-				channel.uiMinY,
-				channel.uiMaxY,
+				uiMinX = channel.uiBounds.xMin,
+				uiMaxX = channel.uiBounds.xMax,
+				uiMinY = channel.uiBounds.yMin,
+				uiMaxY = channel.uiBounds.yMax,
 				horizontal = new
 				{
 					observed = channel.observed.x,

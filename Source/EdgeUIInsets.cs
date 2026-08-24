@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -29,24 +30,17 @@ namespace CameraPlus
 	{
 		public readonly bool uiVisible;
 		public readonly bool overlappingMarkers;
-		public readonly float uiMinX;
-		public readonly float uiMaxX;
-		public readonly float uiMinY;
-		public readonly float uiMaxY;
+		public readonly Rect uiBounds;
 		public readonly Vector2 observed;
 		public readonly Vector2 target;
 		public readonly Vector2 current;
 
-		public EdgeUIInsetChannelState(bool uiVisible, bool overlappingMarkers,
-			float uiMinX, float uiMaxX, float uiMinY, float uiMaxY,
+		public EdgeUIInsetChannelState(bool uiVisible, bool overlappingMarkers, Rect uiBounds,
 			Vector2 observed, Vector2 target, Vector2 current)
 		{
 			this.uiVisible = uiVisible;
 			this.overlappingMarkers = overlappingMarkers;
-			this.uiMinX = uiMinX;
-			this.uiMaxX = uiMaxX;
-			this.uiMinY = uiMinY;
-			this.uiMaxY = uiMaxY;
+			this.uiBounds = uiBounds;
 			this.observed = observed;
 			this.target = target;
 			this.current = current;
@@ -96,7 +90,7 @@ namespace CameraPlus
 		internal const float GizmoBottomSpacing = 14f;
 		const float minimumRemainingUI = 80f;
 
-		static readonly System.Collections.Generic.List<EdgeMarkerBounds> markers = new System.Collections.Generic.List<EdgeMarkerBounds>(32);
+		static readonly List<EdgeMarkerBounds> markers = new List<EdgeMarkerBounds>(32);
 		static readonly UIObservation[] uiObservations = new UIObservation[4];
 		static readonly AnimatedInset[] channels =
 		{
@@ -162,38 +156,34 @@ namespace CameraPlus
 				bottomMarkerCount++;
 		}
 
-		internal static void ObserveUI(EdgeUIArea area, float xMin, float xMax, float yMin, float yMax)
+		internal static void ObserveUI(EdgeUIArea area, Rect bounds)
 		{
-			xMin = Mathf.Clamp(xMin, 0f, UI.screenWidth);
-			xMax = Mathf.Clamp(xMax, 0f, UI.screenWidth);
-			yMin = Mathf.Clamp(yMin, 0f, UI.screenHeight);
-			yMax = Mathf.Clamp(yMax, 0f, UI.screenHeight);
+			var xMin = Mathf.Clamp(bounds.xMin, 0f, UI.screenWidth);
+			var xMax = Mathf.Clamp(bounds.xMax, 0f, UI.screenWidth);
+			var yMin = Mathf.Clamp(bounds.yMin, 0f, UI.screenHeight);
+			var yMax = Mathf.Clamp(bounds.yMax, 0f, UI.screenHeight);
 			if (xMax <= xMin || yMax <= yMin)
 				return;
+			bounds = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
 
 			ref var observation = ref uiObservations[(int)area];
 			var frame = Time.frameCount;
 			if (observation.frame != frame)
-				observation = new UIObservation(frame, xMin, xMax, yMin, yMax);
+				observation = new UIObservation(frame, bounds);
 			else
-			{
-				observation.xMin = Mathf.Min(observation.xMin, xMin);
-				observation.xMax = Mathf.Max(observation.xMax, xMax);
-				observation.yMin = Mathf.Min(observation.yMin, yMin);
-				observation.yMax = Mathf.Max(observation.yMax, yMax);
-			}
+				observation.Include(bounds);
 		}
 
-		internal static Matrix4x4 Push(EdgeUIArea area)
+		internal static Matrix4x4 PushMatrix(EdgeUIArea area)
 		{
 			var previous = GUI.matrix;
-			var offset = Offset(area);
+			var offset = CurrentOffset(area);
 			if (Mathf.Abs(offset.x) > settledDistance || Mathf.Abs(offset.y) > settledDistance)
 				GUI.matrix = previous * Matrix4x4.Translate(new Vector3(offset.x, offset.y, 0f));
 			return previous;
 		}
 
-		internal static Vector2 Offset(EdgeUIArea area)
+		internal static Vector2 CurrentOffset(EdgeUIArea area)
 		{
 			UpdateAnimation();
 			var channel = channels[(int)area];
@@ -202,7 +192,7 @@ namespace CameraPlus
 				(IsTop(area) ? 1f : -1f) * channel.vertical.current);
 		}
 
-		internal static Exception Restore(Exception exception, Matrix4x4 previous)
+		internal static Exception RestoreMatrix(Exception exception, Matrix4x4 previous)
 		{
 			GUI.matrix = previous;
 			return exception;
@@ -233,12 +223,11 @@ namespace CameraPlus
 				return;
 
 			var firstLineY = UI.screenHeight - mouseoverBottom;
-			ObserveUI(
-				EdgeUIArea.BottomLeft,
+			ObserveUI(EdgeUIArea.BottomLeft, Rect.MinMaxRect(
 				15f,
-				Mathf.Min(mouseoverRight, UI.screenWidth),
 				firstLineY - (rows - 1) * mouseoverLineHeight,
-				firstLineY + mouseoverLineHeight);
+				Mathf.Min(mouseoverRight, UI.screenWidth),
+				firstLineY + mouseoverLineHeight));
 		}
 
 		static int MouseoverRows()
@@ -303,10 +292,7 @@ namespace CameraPlus
 			return new EdgeUIInsetChannelState(
 				uiVisible,
 				observed.x > 0f || observed.y > 0f,
-				uiVisible ? observation.xMin : 0f,
-				uiVisible ? observation.xMax : 0f,
-				uiVisible ? observation.yMin : 0f,
-				uiVisible ? observation.yMax : 0f,
+				uiVisible ? observation.bounds : default,
 				observed,
 				target,
 				current);
@@ -354,6 +340,7 @@ namespace CameraPlus
 			var ui = uiObservations[(int)area];
 			if (ui.frame < Time.frameCount - 1 || markerObservationFrame < Time.frameCount - 1)
 				return Vector2.zero;
+			var uiBounds = ui.bounds;
 
 			var horizontalEdge = IsLeft(area)
 				? EdgeScreenEdges.Left
@@ -365,11 +352,11 @@ namespace CameraPlus
 				var marker = markers[i];
 				var horizontalClearance = (marker.outsideEdges & horizontalEdge) != 0 ? partiallyOffscreenClearance : 0f;
 				var horizontalWouldOverlap = horizontalEdge == EdgeScreenEdges.Left
-					? marker.bounds.xMax + horizontalClearance > ui.xMin
-					: marker.bounds.xMin - horizontalClearance < ui.xMax;
+					? marker.bounds.xMax + horizontalClearance > uiBounds.xMin
+					: marker.bounds.xMin - horizontalClearance < uiBounds.xMax;
 				if ((marker.edges & horizontalEdge) != 0
-					&& marker.bounds.yMax > ui.yMin
-					&& marker.bounds.yMin < ui.yMax
+					&& marker.bounds.yMax > uiBounds.yMin
+					&& marker.bounds.yMin < uiBounds.yMax
 					&& horizontalWouldOverlap)
 				{
 					var horizontal = horizontalEdge == EdgeScreenEdges.Left
@@ -381,11 +368,11 @@ namespace CameraPlus
 
 				var verticalClearance = (marker.outsideEdges & verticalEdge) != 0 ? partiallyOffscreenClearance : 0f;
 				var verticalWouldOverlap = verticalEdge == EdgeScreenEdges.Top
-					? marker.bounds.yMax + verticalClearance > ui.yMin
-					: marker.bounds.yMin - verticalClearance < ui.yMax;
+					? marker.bounds.yMax + verticalClearance > uiBounds.yMin
+					: marker.bounds.yMin - verticalClearance < uiBounds.yMax;
 				if ((marker.edges & verticalEdge) != 0
-					&& marker.bounds.xMax > ui.xMin
-					&& marker.bounds.xMin < ui.xMax
+					&& marker.bounds.xMax > uiBounds.xMin
+					&& marker.bounds.xMin < uiBounds.xMax
 					&& verticalWouldOverlap)
 				{
 					var verticalScreenDepth = verticalEdge == EdgeScreenEdges.Top
@@ -441,19 +428,19 @@ namespace CameraPlus
 		struct UIObservation
 		{
 			public int frame;
-			public float xMin;
-			public float xMax;
-			public float yMin;
-			public float yMax;
+			public Rect bounds;
 
-			public UIObservation(int frame, float xMin, float xMax, float yMin, float yMax)
+			public UIObservation(int frame, Rect bounds)
 			{
 				this.frame = frame;
-				this.xMin = xMin;
-				this.xMax = xMax;
-				this.yMin = yMin;
-				this.yMax = yMax;
+				this.bounds = bounds;
 			}
+
+			public void Include(Rect other) => bounds = Rect.MinMaxRect(
+				Mathf.Min(bounds.xMin, other.xMin),
+				Mathf.Min(bounds.yMin, other.yMin),
+				Mathf.Max(bounds.xMax, other.xMax),
+				Mathf.Max(bounds.yMax, other.yMax));
 		}
 
 		sealed class AnimatedInset
@@ -477,7 +464,7 @@ namespace CameraPlus
 	static class ResourceReadoutEdgeInsetPatch
 	{
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.TopLeft);
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushMatrix(EdgeUIArea.TopLeft);
 
 		[HarmonyPriority(Priority.Last)]
 		static void Postfix(float ___lastDrawnHeight)
@@ -486,16 +473,15 @@ namespace CameraPlus
 				return;
 			var x = Prefs.ResourceReadoutCategorized ? 2f : 7f;
 			var width = Prefs.ResourceReadoutCategorized ? 124f : 110f;
-			EdgeUIInsets.ObserveUI(
-				EdgeUIArea.TopLeft,
+			EdgeUIInsets.ObserveUI(EdgeUIArea.TopLeft, new Rect(
 				x,
-				x + width,
 				7f,
-				7f + Mathf.Min(___lastDrawnHeight, UI.screenHeight - 207f));
+				width,
+				Mathf.Min(___lastDrawnHeight, UI.screenHeight - 207f)));
 		}
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.RestoreMatrix(__exception, __state);
 	}
 
 	[HarmonyPatch(typeof(Message), nameof(Message.CalculateRect))]
@@ -504,7 +490,7 @@ namespace CameraPlus
 		[HarmonyPriority(Priority.First)]
 		static void Prefix(ref float x, ref float y, out Vector2 __state)
 		{
-			__state = EdgeUIInsets.Offset(EdgeUIArea.TopLeft);
+			__state = EdgeUIInsets.CurrentOffset(EdgeUIArea.TopLeft);
 			x += __state.x;
 			y += __state.y;
 		}
@@ -517,10 +503,7 @@ namespace CameraPlus
 
 			EdgeUIInsets.ObserveUI(
 				EdgeUIArea.TopLeft,
-				__result.xMin - __state.x,
-				__result.xMax - __state.x,
-				__result.yMin - __state.y,
-				__result.yMax - __state.y);
+				new Rect(__result.position - __state, __result.size));
 		}
 	}
 
@@ -528,42 +511,41 @@ namespace CameraPlus
 	static class MouseoverReadoutEdgeInsetPatch
 	{
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomLeft);
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushMatrix(EdgeUIArea.BottomLeft);
 
 		[HarmonyPriority(Priority.Last)]
 		static void Postfix() => EdgeUIInsets.ObserveMouseoverReadout();
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.RestoreMatrix(__exception, __state);
 	}
 
 	[HarmonyPatch(typeof(GlobalControls), nameof(GlobalControls.GlobalControlsOnGUI))]
 	static class GlobalControlsEdgeInsetPatch
 	{
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomRight);
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushMatrix(EdgeUIArea.BottomRight);
 
 		[HarmonyPriority(Priority.Last)]
 		static void Postfix()
 		{
 			if (Event.current.type != EventType.Layout)
-				EdgeUIInsets.ObserveUI(
-					EdgeUIArea.BottomRight,
+				EdgeUIInsets.ObserveUI(EdgeUIArea.BottomRight, Rect.MinMaxRect(
 					Mathf.Max(0f, UI.screenWidth - 300f),
-					UI.screenWidth,
 					Find.LetterStack.LastTopY,
-					UI.screenHeight - EdgeUIInsets.MainButtonsHeight);
+					UI.screenWidth,
+					UI.screenHeight - EdgeUIInsets.MainButtonsHeight));
 		}
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.RestoreMatrix(__exception, __state);
 	}
 
 	[HarmonyPatch(typeof(AlertsReadout), nameof(AlertsReadout.AlertsReadoutOnGUI))]
 	static class AlertsReadoutEdgeInsetPatch
 	{
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomRight);
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushMatrix(EdgeUIArea.BottomRight);
 
 		[HarmonyPriority(Priority.Last)]
 		static void Postfix(AlertsReadout __instance, float ___lastFinalY)
@@ -572,23 +554,22 @@ namespace CameraPlus
 				return;
 			var height = __instance.AlertsHeight;
 			if (height > 0f)
-				EdgeUIInsets.ObserveUI(
-					EdgeUIArea.BottomRight,
+				EdgeUIInsets.ObserveUI(EdgeUIArea.BottomRight, Rect.MinMaxRect(
 					Mathf.Max(0f, UI.screenWidth - 154f),
-					UI.screenWidth,
 					Find.LetterStack.LastTopY - height,
-					___lastFinalY);
+					UI.screenWidth,
+					___lastFinalY));
 		}
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.RestoreMatrix(__exception, __state);
 	}
 
 	[HarmonyPatch(typeof(MapGizmoUtility), nameof(MapGizmoUtility.MapUIOnGUI))]
 	static class MapGizmoEdgeInsetPatch
 	{
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomRight);
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushMatrix(EdgeUIArea.BottomRight);
 
 		[HarmonyPriority(Priority.Last)]
 		static void Postfix()
@@ -600,16 +581,15 @@ namespace CameraPlus
 				var inspectPane = Find.WindowStack.WindowOfType<IInspectPane>();
 				if (inspectPane != null)
 					x += InspectPaneUtility.PaneWidthFor(inspectPane);
-				EdgeUIInsets.ObserveUI(
-					EdgeUIArea.BottomRight,
+				EdgeUIInsets.ObserveUI(EdgeUIArea.BottomRight, Rect.MinMaxRect(
 					x,
-					Mathf.Max(x, UI.screenWidth - 147f),
 					UI.screenHeight - height,
-					UI.screenHeight - EdgeUIInsets.MainButtonsHeight - EdgeUIInsets.GizmoBottomSpacing);
+					Mathf.Max(x, UI.screenWidth - 147f),
+					UI.screenHeight - EdgeUIInsets.MainButtonsHeight - EdgeUIInsets.GizmoBottomSpacing));
 			}
 		}
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.RestoreMatrix(__exception, __state);
 	}
 }
