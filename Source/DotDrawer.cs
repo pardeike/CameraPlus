@@ -173,7 +173,7 @@ namespace CameraPlus
 			var contract = borderMarkerSize.x * Settings.clippedBorderDistanceFactor;
 			var screenCenter = new Vector2(
 				Mathf.Lerp(contract, UI.screenWidth - contract, Mathf.InverseLerp(viewRect.xMin, viewRect.xMax, command.edgeVector.x)),
-				Mathf.Lerp(contract + 36f, UI.screenHeight - contract, Mathf.InverseLerp(viewRect.yMin, viewRect.yMax, command.edgeVector.y)));
+				Mathf.Lerp(UI.screenHeight - contract - 36f, contract, Mathf.InverseLerp(viewRect.yMin, viewRect.yMax, command.edgeVector.y)));
 			var relativeSize = Mathf.Abs(Settings.clippedRelativeSize * (command.dotConfig?.relativeSize ?? 1f));
 			var quadSize = borderMarkerSize * (meshClipped.bounds.size.x * clippedScale * relativeSize);
 			var visible = command.materials.edgeVisualBounds.For(command.outlineColor);
