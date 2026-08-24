@@ -153,23 +153,21 @@ namespace CameraPlus
 			ClearEdgeBuckets();
 		}
 
-		static EdgeScreenSide VerticalScreenSide(Vector2 point, Rect viewRect)
+		static EdgeScreenSide VerticalScreenSide(Vector2 screenCenter, float visibleWidth, float contract)
 		{
-			var leftDistance = Mathf.Abs(point.x - viewRect.xMin);
-			var rightDistance = Mathf.Abs(point.x - viewRect.xMax);
+			var leftDistance = Mathf.Abs(screenCenter.x - contract);
+			var rightDistance = Mathf.Abs(screenCenter.x - (UI.screenWidth - contract));
 			var horizontalDistance = Mathf.Min(leftDistance, rightDistance);
-			var verticalDistance = Mathf.Min(Mathf.Abs(point.y - viewRect.yMin), Mathf.Abs(point.y - viewRect.yMax));
-			if (horizontalDistance > verticalDistance)
+			var verticalDistance = Mathf.Min(
+				Mathf.Abs(screenCenter.y - contract),
+				Mathf.Abs(screenCenter.y - (UI.screenHeight - contract - 36f)));
+			if (horizontalDistance > verticalDistance + visibleWidth / 2f)
 				return EdgeScreenSide.None;
 			return leftDistance <= rightDistance ? EdgeScreenSide.Left : EdgeScreenSide.Right;
 		}
 
 		static void ObserveEdgeBounds(EdgeDrawCommand command, Rect viewRect, Vector2 borderMarkerSize)
 		{
-			var side = VerticalScreenSide(command.edgeVector, viewRect);
-			if (side == EdgeScreenSide.None)
-				return;
-
 			var contract = borderMarkerSize.x * Settings.clippedBorderDistanceFactor;
 			var screenCenter = new Vector2(
 				Mathf.Lerp(contract, UI.screenWidth - contract, Mathf.InverseLerp(viewRect.xMin, viewRect.xMax, command.edgeVector.x)),
@@ -182,6 +180,7 @@ namespace CameraPlus
 				screenCenter.y + (visible.yMin - 0.5f) * quadSize.y,
 				screenCenter.x + (visible.xMax - 0.5f) * quadSize.x,
 				screenCenter.y + (visible.yMax - 0.5f) * quadSize.y);
+			var side = VerticalScreenSide(screenCenter, screenBounds.width, contract);
 			EdgeUIInsets.ObserveMarker(side, screenBounds);
 		}
 
