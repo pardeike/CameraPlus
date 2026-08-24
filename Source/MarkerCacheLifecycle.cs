@@ -1,4 +1,5 @@
 using HarmonyLib;
+using RimWorld;
 using Verse;
 
 namespace CameraPlus
@@ -27,6 +28,16 @@ namespace CameraPlus
 		static void Prefix(Pawn __instance)
 		{
 			MarkerCache.Remove(__instance);
+		}
+	}
+
+	[HarmonyPatch(typeof(SilhouetteUtility), nameof(SilhouetteUtility.NotifyGraphicDirty))]
+	static class SilhouetteUtility_NotifyGraphicDirty_Patch
+	{
+		static void Postfix(Thing thing)
+		{
+			if (thing is Pawn pawn)
+				MarkerCache.Remove(pawn);
 		}
 	}
 }

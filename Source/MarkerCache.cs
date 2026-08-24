@@ -31,14 +31,27 @@ namespace CameraPlus
 		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig, bool needInside = true, bool needEdge = false, bool needEdgeBounds = false)
 		{
 			using var measure = PerfMetrics.Measure("MarkerCache.MaterialFor");
-			var inputs = MaterialInputs.For(pawn, dotConfig);
+			var mode = dotConfig?.mode ?? Settings.dotStyle;
+			var customDotStyle = dotConfig?.customDotStyle;
+			var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings.outlineFactor);
+			var westFacing = mode == DotStyle.BetterSilhouettes && pawn.Rotation == Rot4.West;
 			if (cache.TryGetValue(pawn, out var materials))
 			{
 				PerfMetrics.Count("marker_cache.hits");
-				if (materials.Matches(inputs.signature))
+				if (materials.MatchesConfiguration(mode, customDotStyle, outlineFactor, westFacing))
 				{
-					EnsureMaterials(materials, inputs, needInside, needEdge, needEdgeBounds);
-					return materials;
+					// RimWorld invalidates ordinary silhouette materials through NotifyGraphicDirty.
+					// Mod integrations that return dynamic marker textures keep the old per-frame check.
+					if (materials.dynamicMarkerTextures == false && materials.NeedsPreparation(mode, needInside, needEdge, needEdgeBounds) == false)
+						return materials;
+
+					var currentInputs = MaterialInputs.For(pawn, dotConfig);
+					if (materials.Matches(currentInputs.signature))
+					{
+						materials.dynamicMarkerTextures = currentInputs.dynamicMarkerTextures;
+						EnsureMaterials(materials, currentInputs, needInside, needEdge, needEdgeBounds);
+						return materials;
+					}
 				}
 
 				PerfMetrics.Count("marker_cache.refreshes");
@@ -47,9 +60,11 @@ namespace CameraPlus
 			else
 				PerfMetrics.Count("marker_cache.misses");
 
+			var inputs = MaterialInputs.For(pawn, dotConfig);
 			materials = new Materials
 			{
-				signature = inputs.signature
+				signature = inputs.signature,
+				dynamicMarkerTextures = inputs.dynamicMarkerTextures
 			};
 			EnsureMaterials(materials, inputs, needInside, needEdge, needEdgeBounds);
 
@@ -546,14 +561,16 @@ namespace CameraPlus
 			public readonly Texture dotTexture;
 			public readonly Texture silhouetteTexture;
 			public readonly Texture customTexture;
+			public readonly bool dynamicMarkerTextures;
 
-			MaterialInputs(Pawn pawn, MaterialSignature signature, Texture dotTexture, Texture silhouetteTexture, Texture customTexture)
+			MaterialInputs(Pawn pawn, MaterialSignature signature, Texture dotTexture, Texture silhouetteTexture, Texture customTexture, bool dynamicMarkerTextures)
 			{
 				this.pawn = pawn;
 				this.signature = signature;
 				this.dotTexture = dotTexture;
 				this.silhouetteTexture = silhouetteTexture;
 				this.customTexture = customTexture;
+				this.dynamicMarkerTextures = dynamicMarkerTextures;
 			}
 
 			public static MaterialInputs For(Pawn pawn, DotConfig dotConfig)
@@ -562,7 +579,7 @@ namespace CameraPlus
 				var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings.outlineFactor);
 
 				Texture dotTexture = null;
-				if (DotTools.GetMarkerTextures(pawn, out var markerTexture, out _))
+				if (DotTools.GetMarkerTextures(pawn, out var markerTexture, out _, out var dynamicMarkerTextures))
 					dotTexture = markerTexture;
 
 				Texture silhouetteTexture = null;
@@ -579,8 +596,9 @@ namespace CameraPlus
 					outlineFactor,
 					TextureId(dotTexture),
 					TextureId(silhouetteTexture),
-					TextureId(customTexture));
-				return new MaterialInputs(pawn, signature, dotTexture, silhouetteTexture, customTexture);
+					TextureId(customTexture),
+					mode == DotStyle.BetterSilhouettes && pawn.Rotation == Rot4.West);
+				return new MaterialInputs(pawn, signature, dotTexture, silhouetteTexture, customTexture, dynamicMarkerTextures);
 			}
 
 			static int TextureId(Texture texture)

@@ -208,9 +208,13 @@ namespace CameraPlus
 		}
 
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
+			=> GetMarkerTextures(pawn, out innerTexture, out outerTexture, out _);
+
+		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture, out bool dynamicMarkerTextures)
 		{
 			using var measure = PerfMetrics.Measure("DotTools.GetMarkerTextures");
 			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
+			dynamicMarkerTextures = cameraDelegate.GetCameraMarkers != null;
 			if (cameraDelegate.GetCameraMarkers != null)
 			{
 				var textures = cameraDelegate.GetCameraMarkers(pawn);

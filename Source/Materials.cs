@@ -12,6 +12,7 @@ namespace CameraPlus
 		public Material silhouette;
 		public Material custom;
 		public MaterialSignature signature;
+		public bool dynamicMarkerTextures;
 
 		bool colorsApplied;
 		Color fillColor;
@@ -38,6 +39,25 @@ namespace CameraPlus
 
 		public bool Matches(MaterialSignature expectedSignature)
 			=> signature.Matches(expectedSignature);
+
+		public bool MatchesConfiguration(DotStyle mode, string customDotStyle, float outlineFactor, bool westFacing)
+			=> signature.MatchesConfiguration(mode, customDotStyle, outlineFactor, westFacing);
+
+		public bool NeedsPreparation(DotStyle mode, bool needInside, bool needEdge, bool needEdgeBounds)
+		{
+			if (needInside)
+			{
+				if (mode == DotStyle.ClassicDots && dot == null)
+					return true;
+				if (mode == DotStyle.BetterSilhouettes && silhouette == null)
+					return true;
+				if (mode == DotStyle.Custom && custom == null)
+					return true;
+			}
+
+			return needEdge && edgeDot == null
+				|| needEdgeBounds && edgeVisualBoundsReady == false;
+		}
 
 		static void ApplyColors(Material material, Color fill, Color outline)
 		{
@@ -76,8 +96,9 @@ namespace CameraPlus
 		public readonly int dotTextureId;
 		public readonly int silhouetteTextureId;
 		public readonly int customTextureId;
+		public readonly bool westFacing;
 
-		public MaterialSignature(DotStyle mode, string customDotStyle, float outlineFactor, int dotTextureId, int silhouetteTextureId, int customTextureId)
+		public MaterialSignature(DotStyle mode, string customDotStyle, float outlineFactor, int dotTextureId, int silhouetteTextureId, int customTextureId, bool westFacing)
 		{
 			this.mode = mode;
 			this.customDotStyle = customDotStyle;
@@ -85,12 +106,17 @@ namespace CameraPlus
 			this.dotTextureId = dotTextureId;
 			this.silhouetteTextureId = silhouetteTextureId;
 			this.customTextureId = customTextureId;
+			this.westFacing = westFacing;
 		}
 
+		public bool MatchesConfiguration(DotStyle expectedMode, string expectedCustomDotStyle, float expectedOutlineFactor, bool expectedWestFacing)
+			=> mode == expectedMode
+			&& customDotStyle == expectedCustomDotStyle
+			&& Mathf.Approximately(outlineFactor, expectedOutlineFactor)
+			&& westFacing == expectedWestFacing;
+
 		public bool Matches(MaterialSignature other)
-			=> mode == other.mode
-			&& customDotStyle == other.customDotStyle
-			&& Mathf.Approximately(outlineFactor, other.outlineFactor)
+			=> MatchesConfiguration(other.mode, other.customDotStyle, other.outlineFactor, other.westFacing)
 			&& dotTextureId == other.dotTextureId
 			&& silhouetteTextureId == other.silhouetteTextureId
 			&& customTextureId == other.customTextureId;
