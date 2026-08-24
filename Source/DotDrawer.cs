@@ -25,6 +25,7 @@ namespace CameraPlus
 		const float markerScale = 2f;
 		const float markerSizeScaler = 2f;
 		const float edgeAltitudeStep = 0.0001f;
+		const float bottomMarkerBarOffset = 36f;
 
 		public static void DrawDots(Map map)
 		{
@@ -153,17 +154,21 @@ namespace CameraPlus
 			ClearEdgeBuckets();
 		}
 
-		static EdgeScreenSide VerticalScreenSide(Vector2 screenCenter, float visibleWidth, float contract)
+		static EdgeScreenEdges ScreenEdges(Vector2 screenCenter, Vector2 visibleSize, float contract)
 		{
 			var leftDistance = Mathf.Abs(screenCenter.x - contract);
 			var rightDistance = Mathf.Abs(screenCenter.x - (UI.screenWidth - contract));
 			var horizontalDistance = Mathf.Min(leftDistance, rightDistance);
-			var verticalDistance = Mathf.Min(
-				Mathf.Abs(screenCenter.y - contract),
-				Mathf.Abs(screenCenter.y - (UI.screenHeight - contract - 36f)));
-			if (horizontalDistance > verticalDistance + visibleWidth / 2f)
-				return EdgeScreenSide.None;
-			return leftDistance <= rightDistance ? EdgeScreenSide.Left : EdgeScreenSide.Right;
+			var topDistance = Mathf.Abs(screenCenter.y - contract);
+			var bottomDistance = Mathf.Abs(screenCenter.y - (UI.screenHeight - contract - bottomMarkerBarOffset));
+			var verticalDistance = Mathf.Min(topDistance, bottomDistance);
+
+			var edges = EdgeScreenEdges.None;
+			if (horizontalDistance <= verticalDistance + visibleSize.x / 2f)
+				edges |= leftDistance <= rightDistance ? EdgeScreenEdges.Left : EdgeScreenEdges.Right;
+			if (verticalDistance <= horizontalDistance + visibleSize.y / 2f)
+				edges |= topDistance <= bottomDistance ? EdgeScreenEdges.Top : EdgeScreenEdges.Bottom;
+			return edges;
 		}
 
 		static void ObserveEdgeBounds(EdgeDrawCommand command, Rect viewRect, Vector2 borderMarkerSize)
@@ -171,7 +176,7 @@ namespace CameraPlus
 			var contract = borderMarkerSize.x * Settings.clippedBorderDistanceFactor;
 			var screenCenter = new Vector2(
 				Mathf.Lerp(contract, UI.screenWidth - contract, Mathf.InverseLerp(viewRect.xMin, viewRect.xMax, command.edgeVector.x)),
-				Mathf.Lerp(UI.screenHeight - contract - 36f, contract, Mathf.InverseLerp(viewRect.yMin, viewRect.yMax, command.edgeVector.y)));
+				Mathf.Lerp(UI.screenHeight - contract - bottomMarkerBarOffset, contract, Mathf.InverseLerp(viewRect.yMin, viewRect.yMax, command.edgeVector.y)));
 			var relativeSize = Mathf.Abs(Settings.clippedRelativeSize * (command.dotConfig?.relativeSize ?? 1f));
 			var quadSize = borderMarkerSize * (meshClipped.bounds.size.x * clippedScale * relativeSize);
 			var visible = command.materials.edgeVisualBounds.For(command.outlineColor);
@@ -180,8 +185,15 @@ namespace CameraPlus
 				screenCenter.y + (visible.yMin - 0.5f) * quadSize.y,
 				screenCenter.x + (visible.xMax - 0.5f) * quadSize.x,
 				screenCenter.y + (visible.yMax - 0.5f) * quadSize.y);
-			var side = VerticalScreenSide(screenCenter, screenBounds.width, contract);
-			EdgeUIInsets.ObserveMarker(side, screenBounds);
+			var edges = ScreenEdges(screenCenter, screenBounds.size, contract);
+			var normalScreenDepth = new Vector2(
+				(edges & EdgeScreenEdges.Left) != 0
+					? contract + (visible.xMax - 0.5f) * quadSize.x
+					: contract - (visible.xMin - 0.5f) * quadSize.x,
+				(edges & EdgeScreenEdges.Top) != 0
+					? contract + (visible.yMax - 0.5f) * quadSize.y
+					: contract + bottomMarkerBarOffset - (visible.yMin - 0.5f) * quadSize.y);
+			EdgeUIInsets.ObserveMarker(edges, screenBounds, normalScreenDepth);
 		}
 
 		static int EdgeDrawCount()
@@ -232,7 +244,7 @@ namespace CameraPlus
 
 		private static Rect RealViewRect(float contract)
 		{
-			var p1 = UI.UIToMapPosition(contract, contract + 36); // 36 is bottom bar
+			var p1 = UI.UIToMapPosition(contract, contract + bottomMarkerBarOffset);
 			var wh = UI.UIToMapPosition(UI.screenWidth - contract, UI.screenHeight - contract) - p1;
 			return new Rect(p1.x, p1.z, wh.x, wh.z);
 		}

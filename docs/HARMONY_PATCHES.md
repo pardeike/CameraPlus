@@ -45,15 +45,15 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 
 ## Edge Marker Interface Clearance
 
-These patches save the current `GUI.matrix` in a first-priority prefix, apply one of four independently animated area insets, and restore the exact saved matrix in a last-priority finalizer. A last-priority postfix passively records the vanilla region's current vertical bounds for collision decisions on the next frame. They move each complete vanilla drawing method without transpilers or rewriting its internal screen-edge calculations.
+These patches save the current `GUI.matrix` in a first-priority prefix, apply one of four independently animated two-axis area offsets, and restore the exact saved matrix in a last-priority finalizer. A last-priority postfix passively records the vanilla region's current rectangle for collision decisions on the next frame. Side markers are tested against its vertical span and top or bottom markers against its horizontal span. Bottom corner offsets are measured from the top of the 35-pixel main-tab bar rather than the physical screen edge, so the reserved bar height is not counted twice. They move each complete vanilla drawing method without transpilers or rewriting its internal screen-edge calculations.
 
 | Target | File | Patch | Purpose | Risk |
 | --- | --- | --- | --- | --- |
-| `ResourceReadout.ResourceReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the top-left resource list only when a marker overlaps its observed height. | Compatibility with other patches that intentionally replace the GUI matrix inside the same method. |
-| `MouseoverReadout.MouseoverReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-left mouseover readout only when a marker overlaps its current row range. | Same scoped GUI-matrix compatibility risk. |
-| `GlobalControls.GlobalControlsOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-right play controls, date/weather details, and letters only when their combined observed region overlaps markers. | Broad but UI-only method; affects other controls drawn inside this method. |
-| `AlertsReadout.AlertsReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the top-right alert stack only when a marker overlaps its observed bounds. | Same scoped GUI-matrix compatibility risk. |
-| `MapGizmoUtility.MapUIOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Adds selected-object gizmos to the bottom-right observed region and moves them with that channel. | May move gizmos supplied by other mods through the vanilla grid, which is intentional for clearance. |
+| `ResourceReadout.ResourceReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the top-left resource list horizontally for left markers and vertically for top markers that intersect its observed rectangle. | Compatibility with other patches that intentionally replace the GUI matrix inside the same method. |
+| `MouseoverReadout.MouseoverReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-left mouseover readout horizontally for left markers and vertically for bottom markers that intersect its current row rectangle. | Same scoped GUI-matrix compatibility risk. |
+| `GlobalControls.GlobalControlsOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-right play controls, date/weather details, and letters horizontally for right markers and vertically for bottom markers that intersect their combined observed rectangle. | Broad but UI-only method; affects other controls drawn inside this method. |
+| `AlertsReadout.AlertsReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Adds the alert stack to the bottom-right observation and moves it with the status text and controls as one visual block. | Same scoped GUI-matrix compatibility risk. |
+| `MapGizmoUtility.MapUIOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Adds the actual vanilla gizmo-grid span to the bottom-right observed rectangle and moves the grid with that channel. | May move gizmos supplied by other mods through the vanilla grid, which is intentional for clearance. |
 
 Perf builds add these patches only when `CameraPlusPerf=true`:
 

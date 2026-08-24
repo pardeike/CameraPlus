@@ -77,7 +77,7 @@ Marker rendering is split across three layers:
 - `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
 - `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
-- `EdgeUIInsets` compares visible marker spans with four independently animated vanilla-interface regions: top-left, bottom-left, top-right, and bottom-right. Markers in unused vertical space do not move the interface.
+- `EdgeUIInsets` compares visible marker rectangles with independently animated vanilla-interface groups. The resource list and mouseover readout keep separate left-side channels; alerts, status text, controls, and gizmos share one bottom-right channel so the continuous right-side stack moves as a unit. Markers outside a group's opposite-axis span do not move it.
 - `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture, generates padded radial outline masks per source texture and outline width, and measures the prepared textures once so clearance follows visible pixels rather than transparent quad padding.
 
 The normal draw flow is:
@@ -90,7 +90,7 @@ The normal draw flow is:
 6. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
 7. `MarkerCache.MaterialFor(pawn, dotConfig)` creates or refreshes the marker materials.
 8. `DotDrawer` draws edge markers for off-screen pawns and in-map markers when zoom thresholds apply.
-9. For left and right edges, `DotDrawer` records each marker's allocation-free logical-screen span from its cached visible texture bounds. `EdgeUIInsets` compares those spans with the vanilla UI regions observed during the previous GUI pass and updates only the overlapping area's animation target.
+9. For all four edges, `DotDrawer` records each marker's allocation-free logical-screen rectangle from its cached visible texture bounds. `EdgeUIInsets` compares those rectangles with the vanilla UI groups observed during the previous GUI pass and updates only an overlapping group's horizontal and/or vertical animation target. Each axis is capped at that marker's normal single-edge depth, so moving around a corner can activate the second axis without amplifying the first. A marker partly outside the physical screen adds 6 logical pixels of clearance from the moved UI. Bottom groups use the top of RimWorld's main-tab bar as their reference edge so that the bar's reserved height is not counted twice.
 
 Vanilla rendering suppression is intentional:
 
@@ -106,7 +106,7 @@ Vanilla rendering suppression is intentional:
 
 `FastUI` caches expensive UI coordinate and cell-size reads per frame.
 
-`EdgeUIInsets` reuses two marker-span lists and holds one frame of passive vanilla-UI observations plus four short-lived, smoothed inset values. It does not cache pawns or textures. The span calculation uses the already-known orthographic view rectangle and cached marker bounds, so steady-state rendering adds no per-marker camera projections, texture transfers, or allocations.
+`EdgeUIInsets` reuses one marker-rectangle list and holds one frame of passive vanilla-UI observations plus four short-lived, two-axis smoothed offsets. It does not cache pawns or textures. The rectangle calculation uses the already-known orthographic view rectangle and cached marker bounds, so steady-state rendering adds no per-marker camera projections, texture transfers, or allocations.
 
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 
@@ -122,7 +122,7 @@ Vanilla rendering suppression is intentional:
 
 `CameraPlusSettings.DoWindowContents()` draws the main mod settings UI. It exposes zoom limits, zoom curve, movement tuning, marker style defaults, label thresholds, animal behavior, shortcut editor access, and marker-rule editor access.
 
-The edge settings include an enabled-by-default option that keeps RimWorld's resource and mouseover readouts clear on the left, and its global controls, alerts, letters, and selected-object gizmos clear on the right. Top-left, bottom-left, top-right, and bottom-right move independently. Each area follows the visible inner edge of the largest marker whose vertical span overlaps that area's passively observed bounds—including per-rule size and interface scale—and eases back when the overlap clears. A marker in unused vertical space between the top and bottom UI regions has no effect. The main bottom button bar is not moved because edge markers are already contracted above it.
+The edge settings include an enabled-by-default option that keeps RimWorld's resource and mouseover readouts, global controls, alerts, letters, and selected-object gizmos clear of markers. The two left-side groups move independently, while the right-side alerts, status text, controls, and gizmos move as one visual block. Side markers are compared with each group's observed vertical span, while top and bottom markers are compared with its observed horizontal span. Each group follows the marker's final visible edge after edge-distance settings, per-rule size, and interface scale, then eases back independently on each axis. A marker in unused space outside a group's opposite-axis span has no effect. When settings place part of a marker outside the screen, the moved UI keeps an additional 6 logical pixels of clearance from its visible inner edge.
 
 The marker-rule editor is `Dialog_Customization`. It is a custom table-like editor for `DotConfig` rows. It supports:
 

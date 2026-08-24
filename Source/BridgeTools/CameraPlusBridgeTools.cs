@@ -17,8 +17,8 @@ namespace CameraPlus.BridgeTools
 
 		[Tool(
 			"cameraplus/get_edge_ui_insets",
-			Description = "Read CameraPlus's four live RimWorld interface insets for edge markers.",
-			ResultDescription = "Returns the observed UI ranges and independently animated top-left, bottom-left, top-right, and bottom-right insets.")]
+			Description = "Read CameraPlus's four live two-axis RimWorld interface insets for edge markers.",
+			ResultDescription = "Returns marker counts, observed UI rectangles, and independently animated horizontal and vertical offsets for the four corner interface regions.")]
 		public static object GetEdgeUiInsets()
 		{
 			if (Current.ProgramState != ProgramState.Playing || Find.CurrentMap == null || CameraPlusMain.Settings == null)
@@ -37,6 +37,8 @@ namespace CameraPlus.BridgeTools
 				state.enabled,
 				state.leftMarkerCount,
 				state.rightMarkerCount,
+				state.topMarkerCount,
+				state.bottomMarkerCount,
 				topLeft = EdgeInsetChannel(state.topLeft),
 				bottomLeft = EdgeInsetChannel(state.bottomLeft),
 				topRight = EdgeInsetChannel(state.topRight),
@@ -49,11 +51,22 @@ namespace CameraPlus.BridgeTools
 			{
 				channel.uiVisible,
 				channel.overlappingMarkers,
+				channel.uiMinX,
+				channel.uiMaxX,
 				channel.uiMinY,
 				channel.uiMaxY,
-				channel.observed,
-				channel.target,
-				channel.current
+				horizontal = new
+				{
+					observed = channel.observed.x,
+					target = channel.target.x,
+					current = channel.current.x
+				},
+				vertical = new
+				{
+					observed = channel.observed.y,
+					target = channel.target.y,
+					current = channel.current.y
+				}
 			};
 
 		[Tool(

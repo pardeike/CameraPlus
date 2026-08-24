@@ -61,7 +61,7 @@ Likely candidates to verify with profiling:
 - `Tools.GetMainColor()`, especially texture downsampling and pixel grouping on cache misses.
 - `MarkerCache.MaterialFor()`, especially material creation/destruction cadence and cache key lifetime.
 - `CameraDelegates` reflection for new pawn runtime types.
-- Edge-marker span comparison when unusually many pawns are simultaneously clipped to one side.
+- Edge-marker rectangle comparison when unusually many pawns are simultaneously clipped across the four sides.
 - File watcher reload behavior for custom marker PNGs.
 
 ## Verified First-Pass Fixes
@@ -92,7 +92,7 @@ Verified during the follow-up performance pass:
 
 The perf-gated run on `CameraPlusPerf_962Pawns_EdgeDots` reached the 600-draw snapshot with `962` visible pawns, `962` marker draws, and active edge dots. `DotDrawer.DrawDots` averaged `2342.038 us` and `DynamicDrawManager.DrawDynamicThings.Postfix` averaged `2343.504 us` in that snapshot. The production build still does not include the renderer-phase skip.
 
-The later dynamic vanilla-UI clearance remains bounded to the largest marker on each occupied vertical edge. It adds at most eight `UI.MapToUIPosition()` projections per frame instead of projecting every edge marker.
+The dynamic vanilla-UI clearance reuses one marker-rectangle buffer and performs only scalar overlap comparisons for a small fixed set of UI channels. Marker rectangles come from the existing orthographic view mapping and cached visible texture bounds, so it adds no per-marker `UI.MapToUIPosition()` projection, texture transfer, or steady-state allocation.
 
 ## Correctness Constraints For Optimization
 

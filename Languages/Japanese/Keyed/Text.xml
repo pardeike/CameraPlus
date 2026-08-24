@@ -108,7 +108,7 @@
   <SettingsHelp_MarkerStyle>ルールに一致しないポーンの既定マーカー置換です.&#10;&#10;Camera+のズームだけを使い,ポーン本体を置換したくない場合はバニラを選びます.遠いズームで読みやすくしたい場合はドットやシルエットを使います.バニラは依存するラベルとしきい値項目を無効にします.</SettingsHelp_MarkerStyle>
   <SettingsHelp_AnimalPolicy>どの動物をマーカー処理の対象にし,どの既定マーカー系列を使うかを制御します.&#10;&#10;コロニー動物を見えるままにしつつ,野生動物の散らかりを抑えるのに使えます.除外された動物は動物マーカールールも通りません.</SettingsHelp_AnimalPolicy>
   <SettingsHelp_EdgeIndicators>画面外ポーンマーカーを描くか,動物の端マーカーがポーン色を引き継げるかを制御します.&#10;&#10;色オプションはこの切り替えに依存し,動物ルールの塗りが透明な時に最も目立ちます.</SettingsHelp_EdgeIndicators>
-  <SettingsHelp_IndentVanillaUIForEdgeMarkers>RimWorldの左上、左下、右上、右下の各UI領域は、その領域の高さにCamera+マーカーが重なる場合だけ内側へ移動します。各領域は独立して、ルールごとのサイズとUIスケールを含む最大の重なったマーカーの見える端に追従し、重なりがなくなると滑らかに戻ります。UI領域間の空きスペースにあるマーカーは何も移動しません。オフにするとRimWorldのUIは画面端に固定されます。</SettingsHelp_IndentVanillaUIForEdgeMarkers>
+  <SettingsHelp_IndentVanillaUIForEdgeMarkers>エッジマーカーが近くのRimWorld UIと重なる場合にだけ、UIを移動します。オフにするとUIは固定されます。</SettingsHelp_IndentVanillaUIForEdgeMarkers>
   <SettingsHelp_MarkerAppearance>ドット,シルエット,端インジケーターの見た目の占有量を調整します.&#10;&#10;マーカー動作を選んだ後の仕上げ用で,フィルタールールではありません.一致ルールはマーカーサイズを掛けたり,アウトライン幅を置き換えたりできます.</SettingsHelp_MarkerAppearance>
   <SettingsHelp_DefaultColonistMarkerColors>Camera+ が内蔵のプレイヤーポーン色を使うとき,入植者マーカーのアウトライン色と塗りつぶし色のデフォルトを設定します.&#10;&#10;これは予備の色であり,ルール色ではありません.一致ルール,他のModが渡すマーカー色,動物のポーン色処理は,それぞれの対象ポーンに独自の色を使えます.</SettingsHelp_DefaultColonistMarkerColors>
   <SettingsHelp_KeyboardShortcuts>Camera+ショートカットは,1つまたは2つの任意の修飾キーと主キーを組み合わせます.&#10;&#10;設定ショートカットの主キーは変更できます.ビューの読み込みと保存は常に数字キー1から9を使います.</SettingsHelp_KeyboardShortcuts>

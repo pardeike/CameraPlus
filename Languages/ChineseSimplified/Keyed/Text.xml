@@ -108,7 +108,7 @@
 	<SettingsHelp_MarkerStyle>未被规则匹配的小人的默认标记替换方式。&#10;&#10;想要 Camera+ 缩放行为但不替换小人身体时使用原版；想让远缩放保持可读时使用圆点或剪影。原版模式会禁用依赖的标签和标记阈值控制项。</SettingsHelp_MarkerStyle>
 	<SettingsHelp_AnimalPolicy>控制哪些动物可参与标记处理，以及它们使用哪种默认标记系列。&#10;&#10;这有助于保留殖民地动物可见性，同时减少野生动物杂乱。被排除的动物也会跳过动物标记规则。</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>控制是否绘制屏幕外小人标记，以及动物边缘标记是否可继承小人颜色。&#10;&#10;颜色选项依赖此开关，并且在动物规则填充透明时最明显。</SettingsHelp_EdgeIndicators>
-	<SettingsHelp_IndentVanillaUIForEdgeMarkers>仅当 Camera+ 标记在垂直方向与对应区域重叠时，才会将 RimWorld 界面的左上、左下、右上或右下区域向内移动。四个区域独立动画，并跟随与其重叠的最大标记的可见边缘，同时考虑各规则的大小和界面缩放；重叠消失后会平滑回位。位于各界面区域之间空白处的标记不会移动任何内容。关闭此项可让 RimWorld 界面固定在屏幕边缘。</SettingsHelp_IndentVanillaUIForEdgeMarkers>
+		<SettingsHelp_IndentVanillaUIForEdgeMarkers>仅在边缘标记会与附近的 RimWorld 界面重叠时移动界面。关闭此项可让界面保持固定。</SettingsHelp_IndentVanillaUIForEdgeMarkers>
 	<SettingsHelp_MarkerAppearance>调整圆点、剪影和边缘指示器的视觉占用。&#10;&#10;选择标记行为后再使用这些设置；它们是外观调校，不是过滤规则。匹配规则可以乘以标记大小，或替代轮廓宽度。</SettingsHelp_MarkerAppearance>
 	<SettingsHelp_DefaultColonistMarkerColors>设置 Camera+ 使用内置玩家 pawn 颜色时，殖民者标记轮廓和填充的默认颜色。&#10;&#10;这些是备用颜色，不是规则颜色。匹配规则、其他 mod 提供的标记颜色以及动物 pawn 颜色处理仍可为它们控制的 pawn 提供自己的颜色。</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+ 快捷键会把一个或两个可选修饰键与主键组合。&#10;&#10;设置快捷键的主键可配置。载入和保存镜头视图始终使用数字键 1 到 9。</SettingsHelp_KeyboardShortcuts>
