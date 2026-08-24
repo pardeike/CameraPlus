@@ -186,19 +186,20 @@ namespace CameraPlus
 
 		internal static Matrix4x4 Push(EdgeUIArea area)
 		{
-			UpdateAnimation();
 			var previous = GUI.matrix;
-			var channel = channels[(int)area];
-			if (Mathf.Abs(channel.horizontal.current) > settledDistance || Mathf.Abs(channel.vertical.current) > settledDistance)
-			{
-				var horizontalDirection = IsLeft(area) ? 1f : -1f;
-				var verticalDirection = IsTop(area) ? 1f : -1f;
-				GUI.matrix = previous * Matrix4x4.Translate(new Vector3(
-					horizontalDirection * channel.horizontal.current,
-					verticalDirection * channel.vertical.current,
-					0f));
-			}
+			var offset = Offset(area);
+			if (Mathf.Abs(offset.x) > settledDistance || Mathf.Abs(offset.y) > settledDistance)
+				GUI.matrix = previous * Matrix4x4.Translate(new Vector3(offset.x, offset.y, 0f));
 			return previous;
+		}
+
+		internal static Vector2 Offset(EdgeUIArea area)
+		{
+			UpdateAnimation();
+			var channel = channels[(int)area];
+			return new Vector2(
+				(IsLeft(area) ? 1f : -1f) * channel.horizontal.current,
+				(IsTop(area) ? 1f : -1f) * channel.vertical.current);
 		}
 
 		internal static Exception Restore(Exception exception, Matrix4x4 previous)
@@ -495,6 +496,32 @@ namespace CameraPlus
 
 		[HarmonyPriority(Priority.Last)]
 		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+	}
+
+	[HarmonyPatch(typeof(Message), nameof(Message.CalculateRect))]
+	static class MessageEdgeInsetPatch
+	{
+		[HarmonyPriority(Priority.First)]
+		static void Prefix(ref float x, ref float y, out Vector2 __state)
+		{
+			__state = EdgeUIInsets.Offset(EdgeUIArea.TopLeft);
+			x += __state.x;
+			y += __state.y;
+		}
+
+		[HarmonyPriority(Priority.Last)]
+		static void Postfix(Rect __result, Vector2 __state)
+		{
+			if (Event.current.type == EventType.Layout)
+				return;
+
+			EdgeUIInsets.ObserveUI(
+				EdgeUIArea.TopLeft,
+				__result.xMin - __state.x,
+				__result.xMax - __state.x,
+				__result.yMin - __state.y,
+				__result.yMax - __state.y);
+		}
 	}
 
 	[HarmonyPatch(typeof(MouseoverReadout), nameof(MouseoverReadout.MouseoverReadoutOnGUI))]
