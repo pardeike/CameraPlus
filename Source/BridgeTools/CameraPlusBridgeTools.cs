@@ -83,6 +83,7 @@ namespace CameraPlus.BridgeTools
 			var floatingText = ValidateFloatingText();
 			var deadPawns = ValidateDeadPawns();
 			var animalEdges = ValidateAnimalEdges();
+			var markerCaches = ValidateMarkerCaches();
 			var shortcuts = ValidateShortcuts();
 			var shiftZoom = ValidateShiftZoom();
 			var obsoleteSettings = ValidateObsoleteSettings();
@@ -94,6 +95,7 @@ namespace CameraPlus.BridgeTools
 					&& floatingText.success
 					&& deadPawns.success
 					&& animalEdges.success
+					&& markerCaches.success
 					&& shortcuts.success
 					&& shiftZoom.success
 					&& obsoleteSettings.success,
@@ -104,6 +106,7 @@ namespace CameraPlus.BridgeTools
 				floatingText,
 				deadPawns,
 				animalEdges,
+				markerCaches,
 				shortcuts,
 				shiftZoom,
 				obsoleteSettings
@@ -441,6 +444,48 @@ namespace CameraPlus.BridgeTools
 				if (animal.Destroyed == false)
 					animal.Destroy(DestroyMode.Vanish);
 				Caches.ClearMarkerState();
+			}
+		}
+
+		static ValidationCase ValidateMarkerCaches()
+		{
+			var pawn = Find.CurrentMap.mapPawns.AllPawnsSpawned.FirstOrDefault(candidate => candidate?.Drawer?.renderer != null);
+			if (pawn == null)
+				return new ValidationCase(false, new { error = "The test map has no renderable pawn." });
+
+			var originalRotation = pawn.Rotation;
+			var dotConfig = new DotConfig { mode = DotStyle.BetterSilhouettes, useInside = true, useEdge = true };
+			try
+			{
+				pawn.Rotation = Rot4.East;
+				Caches.RemovePawnMainColor(pawn);
+				MarkerCache.Remove(pawn);
+				Tools.GetMainColor(pawn);
+				var eastMaterials = MarkerCache.MaterialFor(pawn, dotConfig, needInside: true, needEdge: true);
+				var populated = Caches.cachedPawnMainColors.ContainsKey(pawn) && MarkerCache.cache.ContainsKey(pawn);
+
+				SilhouetteUtility.NotifyGraphicDirty(pawn);
+				var graphicDirtyInvalidates = Caches.cachedPawnMainColors.ContainsKey(pawn) == false
+					&& MarkerCache.cache.ContainsKey(pawn) == false;
+
+				Tools.GetMainColor(pawn);
+				var refreshedEastMaterials = MarkerCache.MaterialFor(pawn, dotConfig, needInside: true, needEdge: true);
+				var repopulated = Caches.cachedPawnMainColors.ContainsKey(pawn) && MarkerCache.cache.ContainsKey(pawn);
+
+				pawn.Rotation = Rot4.West;
+				var westMaterials = MarkerCache.MaterialFor(pawn, dotConfig, needInside: true, needEdge: true);
+				var rotationRefreshes = ReferenceEquals(refreshedEastMaterials, westMaterials) == false
+					&& refreshedEastMaterials.signature.westFacing == false
+					&& westMaterials.signature.westFacing;
+
+				return new ValidationCase(
+					populated && graphicDirtyInvalidates && repopulated && rotationRefreshes,
+					new { pawn = pawn.LabelShortCap, populated, graphicDirtyInvalidates, repopulated, rotationRefreshes });
+			}
+			finally
+			{
+				pawn.Rotation = originalRotation;
+				SilhouetteUtility.NotifyGraphicDirty(pawn);
 			}
 		}
 
