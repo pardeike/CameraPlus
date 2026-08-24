@@ -46,8 +46,8 @@ namespace CameraPlus
 	internal static class EdgeUIInsets
 	{
 		const float noMarkerHoldSeconds = 0.15f;
-		const float expandSmoothTime = 0.10f;
-		const float retractSmoothTime = 0.20f;
+		const float expandSmoothTime = 0.10f / 1.5f;
+		const float retractSmoothTime = 0.20f / 1.5f;
 		const float settledDistance = 0.05f;
 
 		static int observationFrame = -1;
