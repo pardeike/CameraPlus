@@ -7,9 +7,9 @@ This document describes the current mod shape as found in the source tree. It is
 - `Source/CameraPlus.csproj` builds the mod assembly for RimWorld 1.6.
 - `Source/*.cs` contains all runtime code, Harmony patches, settings UI, marker-rule editing UI, data models, and caches.
 - `1.1` through `1.6` contain versioned RimWorld assembly outputs. The current C# project writes `1.6/Assemblies/CameraPlus.dll`.
-- `About`, `LoadFolders.xml`, `Defs`, `Languages`, `Textures`, `Sounds`, and `Resources` are the RimWorld mod payload.
-- `Resources/{Win64,Linux,MacOS}/effects` are Unity asset bundles loaded at runtime for the bordered marker shader. The 1.6 color picker uses RimWorld's native HSV wheel instead of bundle materials.
-- `Originals` contains source art and the Unity project used to generate the effects asset bundle.
+- `About`, `LoadFolders.xml`, `Defs`, `Languages`, `Textures`, and `Sounds` are shared RimWorld mod payload.
+- Root `Resources/{Win64,Linux,MacOS}/effects` and `Originals/Effects` are frozen legacy assets for RimWorld 1.5 and earlier. Those bundles still contain the legacy color-picker materials and bordered shader expected by the older assemblies.
+- `1.6/Resources/{Win64,Linux,MacOS}/effects` contains the 1.6-only marker shaders. `Originals/Effects-1.6` is their isolated Unity source project.
 
 ## Startup
 
@@ -147,7 +147,7 @@ Related dialogs:
 
 Static textures in `Textures` are loaded through RimWorld `ContentFinder<Texture2D>`.
 
-The platform-specific `Resources/*/effects` asset bundles contain the `Bordered` marker shader and the hidden `OutlineMask` generator shader. `OutlineMask` prepares guarded source copies and builds each radial mask once with jump-flood GPU passes; `Bordered` then composites fill over outline with premultiplied alpha to avoid edge halos and quad-edge bleed.
+The platform-specific `1.6/Resources/*/effects` asset bundles contain the `Bordered` marker shader and the hidden `OutlineMask` generator shader. `OutlineMask` prepares guarded source copies and builds each radial mask once with jump-flood GPU passes; `Bordered` then composites fill over outline with premultiplied alpha to avoid edge halos and quad-edge bleed. The 1.6 assembly loads this versioned path directly so rebuilding it cannot alter the shared bundles used by older assemblies.
 
 Player custom marker PNG files live in `GenFilePaths.FolderUnderSaveData("CameraPlus")`. A `FileSystemWatcher` reloads PNG files into `Assets.customMarkers`.
 

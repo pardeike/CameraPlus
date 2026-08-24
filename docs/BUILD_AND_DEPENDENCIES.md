@@ -22,6 +22,15 @@ Release builds write:
 
 - `1.6/Assemblies/CameraPlus.dll`
 
+RimWorld 1.6 effects are built separately from `Originals/Effects-1.6` with
+Unity `2019.4.30f1`. Run **Assets > Export Camera+ 1.6 Effects** or invoke
+`CameraPlus16AssetBundles.BuildAll`; it writes distinct bundles to
+`1.6/Resources/{Win64,Linux,MacOS}/effects`.
+
+Root `Resources` and `Originals/Effects` are frozen legacy content for RimWorld
+1.5 and earlier. The 1.6 exporter and runtime loader must never write to or load
+from those paths.
+
 The project also has a `CopyToRimworld` MSBuild target that runs when `RIMWORLD_MOD_DIR` is set. That target:
 
 - removes private `0Harmony.dll` copies and Finder `.DS_Store` metadata from the copied mod before packaging, so Harmony is supplied only by the declared Harmony dependency and the ZIP contains no local filesystem artifacts.
@@ -95,4 +104,5 @@ Important payload directories:
 - `Languages`: keyed translations for settings and marker tags.
 - `Textures`: marker/editor UI textures loaded through `ContentFinder`.
 - `Sounds`: snapback audio clips.
-- `Resources`: platform-specific Unity asset bundles.
+- `Resources`: frozen platform-specific Unity bundles for RimWorld 1.5 and earlier.
+- `1.6/Resources`: 1.6-only platform-specific Unity bundles.

@@ -14,6 +14,7 @@ Start here before making non-trivial changes:
 - Build from the repository root with `dotnet build Source/CameraPlus.csproj -c Release` after C# or dependency changes.
 - The release build writes the tracked mod assembly at `1.6/Assemblies/CameraPlus.dll`. If `RIMWORLD_MOD_DIR` is set, the build also copies the mod into that RimWorld Mods directory and creates a zip there.
 - Do not remove older version folders (`1.1` through `1.6`) unless the release packaging strategy is changed deliberately. `LoadFolders.xml` still points RimWorld at the per-version folders.
+- Treat `1.1` through `1.5`, root `Resources`, and `Originals/Effects` as frozen legacy content. RimWorld 1.6 rendering assets belong only in `1.6/Resources` and `Originals/Effects-1.6`; never rebuild or edit the legacy paths for a 1.6 change.
 - Keep Harmony patch changes narrow. A single patch can affect camera movement, all pawn rendering, all pawn labels, or other popular mods.
 - Treat `Source/Main.cs`, `Source/DotTools.cs`, `Source/DotDrawer.cs`, `Source/MarkerCache.cs`, `Source/Caches.cs`, and `Source/FastUI.cs` as performance-sensitive. These run during camera updates, GUI frames, dynamic drawing, or per-pawn rendering.
 - For UI or visible in-game validation on macOS, prefer the local `regionshot` workflow when screenshots or app/window inspection are needed.

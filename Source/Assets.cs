@@ -62,7 +62,7 @@ namespace CameraPlus
 
 			var me = LoadedModManager.GetMod<CameraPlusMain>();
 			Log.Message($"CameraPlus: Found mod at {me.Content.RootDir}");
-			var path = Path.Combine(me.Content.RootDir, "Resources", arch, "effects");
+			var path = Path.Combine(me.Content.RootDir, "1.6", "Resources", arch, "effects");
 			var assets = AssetBundle.LoadFromFile(path);
 
 			borderedShader = assets.LoadAsset<Shader>("Bordered");
