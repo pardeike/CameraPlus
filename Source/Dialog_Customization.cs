@@ -344,8 +344,10 @@ namespace CameraPlus
 
 		static int Px(int v, int d) => Mathf.Max(-1, v + d);
 		static float Pc(float v, float d) => Mathf.Max(0, v + d);
+		static float Outline(float v, float d) => DotConfig.ClampOutlineFactor(v + d);
 		static void DeltaInt(object v, int delta, int step, ref int val) => val = Mathf.Max(-1, (int)v + delta * step);
 		static void DeltaFloat(object v, float delta, float step, ref float val) => val = Mathf.Max(0, (float)v + delta * step);
+		static void DeltaOutline(object v, int delta, ref float val) => val = DotConfig.ClampOutlineFactor((float)v + delta * 0.01f);
 
 		static void ColorEditorRow(Listing_Standard list, int row, List<DotConfig> dotConfigs)
 		{
@@ -363,7 +365,7 @@ namespace CameraPlus
 			DrawCheckbox(columnRects[5], ref dotConfig.mouseReveals);
 			DrawStepper(columnRects[6], ref dotConfig.showBelowPixels, v => Px(v, 1), v => Px(v, -1), (v, d) => DeltaInt(v, d, 1, ref dotConfig.showBelowPixels), v => v == -1 ? "default" : $"{v} px");
 			DrawStepper(columnRects[7], ref dotConfig.relativeSize, v => Pc(v, 0.01f), v => Pc(v, -0.01f), (v, d) => DeltaFloat(v, d, 0.01f, ref dotConfig.relativeSize), v => $"{(int)(v * 100 + 0.5f)}%");
-			DrawStepper(columnRects[8], ref dotConfig.outlineFactor, v => Pc(v, 0.01f), v => Pc(v, -0.01f), (v, d) => DeltaFloat(v, d, 0.01f, ref dotConfig.outlineFactor), v => $"{(int)(v * 100 + 0.5f)}%");
+			DrawStepper(columnRects[8], ref dotConfig.outlineFactor, v => Outline(v, 0.01f), v => Outline(v, -0.01f), (v, d) => DeltaOutline(v, d, ref dotConfig.outlineFactor), v => $"{(int)(v * 100 + 0.5f)}%");
 
 			var dragStartRect = actionButtons.TopPartPixels(actionButtonsWidth);
 			var mouseOver = Mouse.IsOver(dragStartRect);

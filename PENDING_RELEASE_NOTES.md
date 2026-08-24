@@ -5,6 +5,6 @@
 - Animal edge colors remain configurable when matching rules enable edge indicators.
 - Shortcut settings now identify disabled and conflicting modifier combinations.
 - Zoom-to-mouse help now explains that holding Shift temporarily zooms around the camera center.
-- Marker outlines stay clean and free of halos or repeated texture copies at high interface scales.
+- Marker outlines stay clean and stable at high interface scales, even with extreme custom settings.
 - Nearby RimWorld map-interface elements now move smoothly only when their visible content would overlap an edge marker. The right-side information stack moves as one block, spacing follows the marker's final visible position without adding extra displacement around corners, and the behavior can be disabled in the edge-indicator settings.
 - Older supported RimWorld versions keep their original marker and color-picker rendering.

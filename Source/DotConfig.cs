@@ -7,6 +7,8 @@ namespace CameraPlus
 {
 	public class DotConfig : IExposable
 	{
+		internal const float MaxOutlineFactor = 0.4f;
+
 		public List<ConditionTag> conditions = [];
 		public DotStyle mode = DotStyle.BetterSilhouettes;
 		public string customDotStyle = null;
@@ -77,7 +79,14 @@ namespace CameraPlus
 			Scribe_Values.Look(ref relativeSize, "relativeSize", 1);
 			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1);
 			Scribe_Values.Look(ref mouseReveals, "mouseReveals", true);
+			if (Scribe.mode == LoadSaveMode.PostLoadInit)
+				outlineFactor = ClampOutlineFactor(outlineFactor);
 		}
+
+		internal static float ClampOutlineFactor(float value)
+			=> float.IsNaN(value) || float.IsInfinity(value)
+				? 0f
+				: Mathf.Clamp(value, 0f, MaxOutlineFactor);
 
 		public static DotConfig ToDotConfig(string xml)
 		{

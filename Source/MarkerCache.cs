@@ -21,6 +21,9 @@ namespace CameraPlus
 		static Material outlineGeneratorMaterial;
 		const float defaultSilhouetteCutoff = 0.5f;
 		const int markerTextureGuardPixels = 2;
+		const int maxGeneratedTextureDimension = 4096;
+		const long maxMarkerTexturePixels = 16L * 1024L * 1024L;
+		const long maxOutlineTexturePixels = 4L * 1024L * 1024L;
 
 		public static Materials MaterialFor(Pawn pawn)
 			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
@@ -178,6 +181,7 @@ namespace CameraPlus
 
 		static MarkerVisualBounds VisualBoundsFor(Texture sourceTexture, float outlineFactor, Material material)
 		{
+			outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			var factorKey = Mathf.RoundToInt(outlineFactor * 10_000f);
 			var key = Gen.HashCombineInt(sourceTexture.GetInstanceID(), factorKey);
 			if (markerVisualBoundsCache.TryGetValue(key, out var cached))
@@ -217,12 +221,16 @@ namespace CameraPlus
 		{
 			if (texture == null || texture.width <= 0 || texture.height <= 0)
 				throw new InvalidOperationException("Marker texture is missing or empty.");
+			ValidateGeneratedTextureSize("bounds readback", texture.name, texture.width, texture.height, maxOutlineTexturePixels);
 
 			var previous = RenderTexture.active;
-			var temporary = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+			RenderTexture temporary = null;
 			Texture2D readable = null;
 			try
 			{
+				temporary = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+				if (temporary == null || temporary.IsCreated() == false)
+					throw new InvalidOperationException($"GPU creation failed for marker bounds readback '{texture.name}' ({texture.width}x{texture.height}).");
 				Graphics.Blit(texture, temporary);
 				RenderTexture.active = temporary;
 				readable = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false, true);
@@ -261,7 +269,8 @@ namespace CameraPlus
 				if (readable != null)
 					UnityEngine.Object.Destroy(readable);
 				RenderTexture.active = previous;
-				RenderTexture.ReleaseTemporary(temporary);
+				if (temporary != null)
+					RenderTexture.ReleaseTemporary(temporary);
 			}
 		}
 
@@ -290,6 +299,7 @@ namespace CameraPlus
 
 		static Material CreateMarkerMaterial(Pawn pawn, string suffix, Texture texture, float outlineFactor, bool canMutateTexture = false)
 		{
+			outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			var material = MaterialAllocator.Create(Assets.BorderedShader);
 			material.name = $"{pawn.ThingID}-{suffix}";
 			SetMarkerTextures(material, texture, outlineFactor, canMutateTexture);
@@ -355,8 +365,11 @@ namespace CameraPlus
 			if (Assets.OutlineMaskShader == null)
 				throw new InvalidOperationException("The OutlineMask shader is not loaded.");
 
+			if (sourceWidth > int.MaxValue - 2 * markerTextureGuardPixels || sourceHeight > int.MaxValue - 2 * markerTextureGuardPixels)
+				throw new InvalidOperationException($"Marker texture '{sourceTexture.name}' is too large.");
 			var width = sourceWidth + 2 * markerTextureGuardPixels;
 			var height = sourceHeight + 2 * markerTextureGuardPixels;
+			ValidateGeneratedTextureSize("marker", sourceTexture.name, width, height, maxMarkerTexturePixels);
 			outlineGeneratorMaterial ??= MaterialAllocator.Create(Assets.OutlineMaskShader);
 			outlineGeneratorMaterial.SetVector("_SourceUVScale", new Vector4((float)width / sourceWidth, (float)height / sourceHeight, 0f, 0f));
 			var markerTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default)
@@ -371,7 +384,8 @@ namespace CameraPlus
 
 			try
 			{
-				markerTexture.Create();
+				if (markerTexture.Create() == false)
+					throw new InvalidOperationException($"GPU creation failed for marker texture '{sourceTexture.name}' ({width}x{height}).");
 				Graphics.Blit(sourceTexture, markerTexture, outlineGeneratorMaterial, 3);
 				return markerTexture;
 			}
@@ -385,6 +399,7 @@ namespace CameraPlus
 
 		static Texture OutlineTextureFor(Texture sourceTexture, float outlineFactor)
 		{
+			outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			if (sourceTexture == null || outlineFactor <= 0f)
 				return sourceTexture;
 
@@ -420,18 +435,30 @@ namespace CameraPlus
 			if (Assets.OutlineMaskShader == null)
 				throw new InvalidOperationException("The OutlineMask shader is not loaded.");
 
+			outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			var paddedScale = 1f + 2f * outlineFactor;
-			var width = Mathf.CeilToInt(sourceWidth * paddedScale);
-			var height = Mathf.CeilToInt(sourceHeight * paddedScale);
+			var widthValue = Math.Ceiling(sourceWidth * (double)paddedScale);
+			var heightValue = Math.Ceiling(sourceHeight * (double)paddedScale);
+			if (widthValue > int.MaxValue || heightValue > int.MaxValue)
+				throw new InvalidOperationException($"Outline texture '{sourceTexture.name}' is too large.");
+			var width = (int)widthValue;
+			var height = (int)heightValue;
+			ValidateGeneratedTextureSize("outline", sourceTexture.name, width, height, maxOutlineTexturePixels);
 			var sourceUVScale = new Vector4((float)width / sourceWidth, (float)height / sourceHeight, 0f, 0f);
 			outlineGeneratorMaterial ??= MaterialAllocator.Create(Assets.OutlineMaskShader);
 			outlineGeneratorMaterial.SetVector("_SourceUVScale", sourceUVScale);
-			var nearestA = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
-			var nearestB = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
 			var previous = RenderTexture.active;
+			RenderTexture nearestA = null;
+			RenderTexture nearestB = null;
 			RenderTexture outlineTexture = null;
 			try
 			{
+				nearestA = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+				if (nearestA == null || nearestA.IsCreated() == false)
+					throw new InvalidOperationException($"GPU creation failed for temporary outline texture '{sourceTexture.name}' ({width}x{height}).");
+				nearestB = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+				if (nearestB == null || nearestB.IsCreated() == false)
+					throw new InvalidOperationException($"GPU creation failed for temporary outline texture '{sourceTexture.name}' ({width}x{height}).");
 				nearestA.filterMode = FilterMode.Point;
 				nearestA.wrapMode = TextureWrapMode.Clamp;
 				nearestB.filterMode = FilterMode.Point;
@@ -456,7 +483,8 @@ namespace CameraPlus
 					useMipMap = false,
 					autoGenerateMips = false
 				};
-				outlineTexture.Create();
+				if (outlineTexture.Create() == false)
+					throw new InvalidOperationException($"GPU creation failed for outline texture '{sourceTexture.name}' ({width}x{height}).");
 				outlineGeneratorMaterial.SetFloat("_OutlineFactor", outlineFactor);
 				Graphics.Blit(current, outlineTexture, outlineGeneratorMaterial, 2);
 				return outlineTexture;
@@ -473,9 +501,23 @@ namespace CameraPlus
 			finally
 			{
 				RenderTexture.active = previous;
-				RenderTexture.ReleaseTemporary(nearestA);
-				RenderTexture.ReleaseTemporary(nearestB);
+				if (nearestA != null)
+					RenderTexture.ReleaseTemporary(nearestA);
+				if (nearestB != null)
+					RenderTexture.ReleaseTemporary(nearestB);
 			}
+		}
+
+		static void ValidateGeneratedTextureSize(string kind, string sourceName, int width, int height, long maxPixels)
+		{
+			var hardwareLimit = SystemInfo.maxTextureSize;
+			var maxDimension = hardwareLimit > 0
+				? Mathf.Min(hardwareLimit, maxGeneratedTextureDimension)
+				: maxGeneratedTextureDimension;
+			var pixels = (long)width * height;
+			if (width <= 0 || height <= 0 || width > maxDimension || height > maxDimension || pixels > maxPixels)
+				throw new InvalidOperationException(
+					$"Generated {kind} texture for '{sourceName}' would be {width}x{height}; limit is {maxDimension} pixels per side and {maxPixels} total pixels.");
 		}
 
 		readonly struct MaterialInputs
@@ -498,7 +540,7 @@ namespace CameraPlus
 			public static MaterialInputs For(Pawn pawn, DotConfig dotConfig)
 			{
 				var mode = dotConfig?.mode ?? Settings.dotStyle;
-				var outlineFactor = dotConfig?.outlineFactor ?? Settings.outlineFactor;
+				var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings.outlineFactor);
 
 				Texture dotTexture = null;
 				if (DotTools.GetMarkerTextures(pawn, out var markerTexture, out _))

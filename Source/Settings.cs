@@ -160,6 +160,8 @@ namespace CameraPlus
 			Scribe_Values.Look(ref clippedRelativeSize, "clippedRelativeSize", defaults.clippedRelativeSize);
 			Scribe_Values.Look(ref clippedBorderDistanceFactor, "clippedBorderDistanceFactor", defaults.clippedBorderDistanceFactor);
 			Scribe_Values.Look(ref outlineFactor, "outlineFactor", defaults.outlineFactor);
+			if (Scribe.mode == LoadSaveMode.PostLoadInit)
+				outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			Scribe_Values.Look(ref defaultColonistNormalOutline, "defaultColonistNormalOutline", defaults.defaultColonistNormalOutline);
 			Scribe_Values.Look(ref defaultColonistNormalFill, "defaultColonistNormalFill", defaults.defaultColonistNormalFill);
 			Scribe_Values.Look(ref defaultColonistNormalSelectedOutline, "defaultColonistNormalSelectedOutline", defaults.defaultColonistNormalSelectedOutline);
@@ -560,7 +562,7 @@ namespace CameraPlus
 			DrawFloatSlider(ctx, "EdgeDistanceFactor", clippedBorderDistanceFactor, 0f, 2f, PercentValue, value => clippedBorderDistanceFactor = value, "SettingsHelp_EdgeDistanceFactor");
 			var outlineRuleCount = RuleCount(dc => Mathf.Approximately(dc.outlineFactor, outlineFactor) == false);
 			var outlineNote = OverrideNote(outlineRuleCount);
-			DrawFloatSlider(ctx, "OutlineSize", outlineFactor, 0f, 0.4f, PercentValue, value =>
+			DrawFloatSlider(ctx, "OutlineSize", outlineFactor, 0f, DotConfig.MaxOutlineFactor, PercentValue, value =>
 			{
 				if (Mathf.Approximately(outlineFactor, value) == false)
 					MarkerCache.Clear();
