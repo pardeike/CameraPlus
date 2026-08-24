@@ -12,7 +12,8 @@ The current project has no automated test project. Treat a clean build as the mi
 
 Local development builds also produce
 `artifacts/BridgeTools/CameraPlus/CameraPlus.BridgeTools.dll`. This companion
-contains development-only RimBridgeServer validation tools. Release builds set
+contains development-only RimBridgeServer validation tools, including live
+readback of the animated edge-marker UI insets. Release builds set
 `BuildBridgeTools=false`, so the companion is not part of the public mod.
 
 ## Outputs

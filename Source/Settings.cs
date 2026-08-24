@@ -29,6 +29,7 @@ namespace CameraPlus
 		public bool mouseOverShowsLabels = true;
 		public bool suppressFloatingText = true;
 		public bool edgeIndicators = true;
+		public bool indentVanillaUIForEdgeMarkers = true;
 		public bool pawnColoredEdgeIndicators = true;
 		public LabelStyle customNameStyle = LabelStyle.AnimalsDifferent;
 		public bool includeNotTamedAnimals = true;
@@ -151,6 +152,7 @@ namespace CameraPlus
 			Scribe_Values.Look(ref mouseOverShowsLabels, "mouseOverShowsLabels", defaults.mouseOverShowsLabels);
 			Scribe_Values.Look(ref suppressFloatingText, "suppressFloatingText", dotStyle > DotStyle.VanillaDefault);
 			Scribe_Values.Look(ref edgeIndicators, "edgeIndicators", defaults.edgeIndicators);
+			Scribe_Values.Look(ref indentVanillaUIForEdgeMarkers, "indentVanillaUIForEdgeMarkers", defaults.indentVanillaUIForEdgeMarkers);
 			Scribe_Values.Look(ref pawnColoredEdgeIndicators, "pawnColoredEdgeIndicators", defaults.pawnColoredEdgeIndicators);
 			Scribe_Values.Look(ref customNameStyle, "customNameStyle", defaults.customNameStyle);
 			Scribe_Values.Look(ref includeNotTamedAnimals, "includeNotTamedAnimals", defaults.includeNotTamedAnimals);
@@ -544,6 +546,7 @@ namespace CameraPlus
 			var edgeOffStyleRuleCount = RuleCount(dc => dc.mode == DotStyle.Off);
 			var edgeHelp = CombineHelp(RuleOverrideHelp(edgeRuleCount), RuleEdgeDisabledByStyleHelp(edgeOffStyleRuleCount));
 			DrawCheckbox(ctx, "EdgeIndicators", ref edgeIndicators, "SettingsHelp_EdgeIndicators", true, OverrideNote(edgeRuleCount), Caches.ClearMarkerState, 0f, RuleNoteColor, edgeHelp);
+			DrawCheckbox(ctx, "IndentVanillaUIForEdgeMarkers", ref indentVanillaUIForEdgeMarkers, "SettingsHelp_IndentVanillaUIForEdgeMarkers", true, indent: 18f);
 			var animalEdgeColorRuleCount = RuleCount(dc => dc.mode != DotStyle.Off && dc.useEdge && (dc.fillColor.a > 0f || dc.fillSelectedColor.a > 0f));
 			DrawCheckbox(ctx, "PawnColoredEdgeIndicators", ref pawnColoredEdgeIndicators, "SettingsHelp_AnimalEdgeColors", true, null, Caches.ClearMarkerState, 18f, helpExtra: RuleAnimalEdgeColorHelp(animalEdgeColorRuleCount));
 		}

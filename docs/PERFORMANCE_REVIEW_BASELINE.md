@@ -91,6 +91,8 @@ Verified during the follow-up performance pass:
 
 The perf-gated run on `CameraPlusPerf_962Pawns_EdgeDots` reached the 600-draw snapshot with `962` visible pawns, `962` marker draws, and active edge dots. `DotDrawer.DrawDots` averaged `2342.038 us` and `DynamicDrawManager.DrawDynamicThings.Postfix` averaged `2343.504 us` in that snapshot. The production build still does not include the renderer-phase skip.
 
+The later dynamic vanilla-UI clearance remains bounded to the largest marker on each occupied vertical edge. It adds at most eight `UI.MapToUIPosition()` projections per frame instead of projecting every edge marker.
+
 ## Correctness Constraints For Optimization
 
 Do not break these behaviors while optimizing:

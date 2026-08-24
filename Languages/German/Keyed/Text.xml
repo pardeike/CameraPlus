@@ -35,6 +35,7 @@
 	<DisableCameraShake>Kamerawackeln deaktivieren</DisableCameraShake>
 	<MouseRevealsLabels>Maus enthüllt Schilder{0}</MouseRevealsLabels>
 	<EdgeIndicators>Kantenindikatoren{0}</EdgeIndicators>
+	<IndentVanillaUIForEdgeMarkers>RimWorld-Oberfläche von Randmarkern freihalten</IndentVanillaUIForEdgeMarkers>
 	<PawnColoredEdgeIndicators>Tier-Randfarben</PawnColoredEdgeIndicators>
 	<SettingsTopic_All>Alle</SettingsTopic_All>
 	<SettingsTopic_Zoom>Zoom</SettingsTopic_Zoom>
@@ -107,6 +108,7 @@
 	<SettingsHelp_MarkerStyle>Standard-Markerersatz für Bauern ohne passende Regel.&#10;&#10;Nutzen Sie Vanilla, wenn Sie Camera+-Zoom ohne Körperersatz wollen; nutzen Sie Punkte oder Silhouetten, wenn weiter Zoom lesbar bleiben soll. Vanilla deaktiviert die abhängigen Schilder- und Markergrenzen-Einstellungen.</SettingsHelp_MarkerStyle>
 	<SettingsHelp_AnimalPolicy>Steuert, welche Tiere für Markerbehandlung infrage kommen und welche Standard-Markerfamilie sie nutzen.&#10;&#10;Nützlich, um Kolonietiere sichtbar zu halten und Wildtier-Rauschen zu reduzieren. Ausgeschlossene Tiere überspringen auch Tiermarker-Regeln.</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>Steuert, ob Offscreen-Bauernmarker gezeichnet werden und ob Tier-Randmarker Bauernfarben übernehmen können.&#10;&#10;Die Farboption hängt von diesem Schalter ab und ist am deutlichsten bei transparenten Tierregel-Füllungen.</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_IndentVanillaUIForEdgeMarkers>Verschiebt RimWorlds Bedienelemente und Anzeigen auf jeder Seite nur dann nach innen, wenn Camera+-Marker den jeweiligen Rand belegen. Der Abstand folgt dem größten tatsächlich gezeichneten Marker einschließlich Regelgröße und Oberflächenskalierung und gleitet zurück, sobald der Rand frei ist. Deaktivieren Sie dies, um RimWorlds Oberfläche fest an den Bildschirmrändern zu lassen.</SettingsHelp_IndentVanillaUIForEdgeMarkers>
 	<SettingsHelp_MarkerAppearance>Passt die visuelle Fläche von Punkten, Silhouetten und Randindikatoren an.&#10;&#10;Nutzen Sie dies nach der Wahl des Markerverhaltens; es sind Feineinstellungen, keine Filterregeln. Passende Regeln können Markergröße multiplizieren oder Konturbreite ersetzen.</SettingsHelp_MarkerAppearance>
 	<SettingsHelp_DefaultColonistMarkerColors>Legt die Standardfarben für Kontur und Füllung von Kolonistenmarkern fest, wenn Camera+ seine eingebauten Spielerbauern-Farben verwendet.&#10;&#10;Das sind Rückfallfarben, keine Regelfarben. Passende Regeln, eigene Markerfarben anderer Mods und Tierfarben können für die von ihnen gesteuerten Bauern weiterhin eigene Farben liefern.</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+-Tastenkombinationen verbinden eine oder zwei optionale Modifikatortasten mit einer Haupttaste.&#10;&#10;Die Haupttaste für Einstellungen ist konfigurierbar. Laden und Speichern von Kameraansichten nutzt immer die Zahlentasten 1 bis 9.</SettingsHelp_KeyboardShortcuts>

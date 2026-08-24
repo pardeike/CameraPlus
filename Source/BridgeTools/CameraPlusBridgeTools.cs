@@ -16,6 +16,36 @@ namespace CameraPlus.BridgeTools
 		const string harmonyOwner = "net.pardeike.rimworld.mod.camera+";
 
 		[Tool(
+			"cameraplus/get_edge_ui_insets",
+			Description = "Read CameraPlus's live left and right RimWorld interface insets for edge markers.",
+			ResultDescription = "Returns whether the setting is enabled, marker observations, target insets, animated insets, interface scale, and screen width.")]
+		public static object GetEdgeUiInsets()
+		{
+			if (Current.ProgramState != ProgramState.Playing || Find.CurrentMap == null || CameraPlusMain.Settings == null)
+				return new { success = false, error = "A playable map and loaded CameraPlus settings are required." };
+
+			var state = EdgeUIInsets.State();
+			return new
+			{
+				success = true,
+				modVersion = typeof(CameraPlusMain).Assembly.GetName().Version?.ToString() ?? string.Empty,
+				mapId = Find.CurrentMap.uniqueID,
+				frame = Time.frameCount,
+				uiScale = Prefs.UIScale,
+				screenWidth = UI.screenWidth,
+				state.enabled,
+				state.leftMarkers,
+				state.rightMarkers,
+				state.leftObserved,
+				state.rightObserved,
+				state.leftTarget,
+				state.rightTarget,
+				state.leftCurrent,
+				state.rightCurrent
+			};
+		}
+
+		[Tool(
 			"cameraplus/validate_todo_runtime",
 			Description = "Run CameraPlus's live semantic checks for the current TODO behavior slices against a playable map.",
 			ResultDescription = "Returns a pass/fail result and evidence for movement, labels, floating text, dead pawns, animal edges, shortcuts, Shift zoom behavior, and obsolete settings XML.")]

@@ -122,7 +122,7 @@ namespace CameraPlus
 				}
 			}
 
-			DrawEdges(clippedMarkerMapScale);
+			DrawEdges(clippedMarkerMapScale, viewRect);
 
 			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
 			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
@@ -130,13 +130,17 @@ namespace CameraPlus
 			PerfMetrics.FlushIfNeeded();
 		}
 
-		static void DrawEdges(Vector3 clippedMarkerMapScale)
+		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect)
 		{
 			var edgeDrawCount = EdgeDrawCount();
 			if (edgeDrawCount == 0)
 				return;
 
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor() - edgeDrawCount * edgeAltitudeStep;
+			var largestLeftScale = 0f;
+			var largestRightScale = 0f;
+			var largestLeftMatrix = default(Matrix4x4);
+			var largestRightMatrix = default(Matrix4x4);
 			for (var layer = edgeDrawBuckets.Length - 1; layer >= 0; layer--)
 			{
 				var bucket = edgeDrawBuckets[layer];
@@ -144,12 +148,58 @@ namespace CameraPlus
 				{
 					var command = bucket[i];
 					command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
-					DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
+					var matrix = DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
+					var commandScale = Mathf.Abs(Settings.clippedRelativeSize * (command.dotConfig?.relativeSize ?? 1f));
+					switch (VerticalScreenSide(command.edgeVector, viewRect))
+					{
+						case EdgeScreenSide.Left when commandScale > largestLeftScale:
+							largestLeftScale = commandScale;
+							largestLeftMatrix = matrix;
+							break;
+						case EdgeScreenSide.Right when commandScale > largestRightScale:
+							largestRightScale = commandScale;
+							largestRightMatrix = matrix;
+							break;
+					}
 					altitute += edgeAltitudeStep;
 				}
 			}
 
+			ObserveEdgeBounds(EdgeScreenSide.Left, largestLeftScale, largestLeftMatrix);
+			ObserveEdgeBounds(EdgeScreenSide.Right, largestRightScale, largestRightMatrix);
 			ClearEdgeBuckets();
+		}
+
+		static EdgeScreenSide VerticalScreenSide(Vector2 point, Rect viewRect)
+		{
+			var leftDistance = Mathf.Abs(point.x - viewRect.xMin);
+			var rightDistance = Mathf.Abs(point.x - viewRect.xMax);
+			var horizontalDistance = Mathf.Min(leftDistance, rightDistance);
+			var verticalDistance = Mathf.Min(Mathf.Abs(point.y - viewRect.yMin), Mathf.Abs(point.y - viewRect.yMax));
+			if (horizontalDistance > verticalDistance)
+				return EdgeScreenSide.None;
+			return leftDistance <= rightDistance ? EdgeScreenSide.Left : EdgeScreenSide.Right;
+		}
+
+		static void ObserveEdgeBounds(EdgeScreenSide side, float markerScale, Matrix4x4 matrix)
+		{
+			if (markerScale <= 0f)
+				return;
+
+			var bounds = meshClipped.bounds;
+			var minX = float.MaxValue;
+			var maxX = float.MinValue;
+			for (var x = 0; x < 2; x++)
+			{
+				for (var z = 0; z < 2; z++)
+				{
+					var local = new Vector3(x == 0 ? bounds.min.x : bounds.max.x, bounds.center.y, z == 0 ? bounds.min.z : bounds.max.z);
+					var screenX = UI.MapToUIPosition(matrix.MultiplyPoint3x4(local)).x;
+					minX = Mathf.Min(minX, screenX);
+					maxX = Mathf.Max(maxX, screenX);
+				}
+			}
+			EdgeUIInsets.Observe(side, minX, maxX);
 		}
 
 		static int EdgeDrawCount()
@@ -230,13 +280,14 @@ namespace CameraPlus
 			return (center + delta * scale, true);
 		}
 
-		private static void DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
+		private static Matrix4x4 DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
 		{
 			using var measure = PerfMetrics.Measure("DotDrawer.DrawClipped");
 			var pos = vec.ToVector3();
 			pos.y = altitute;
 			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
+			return matrixClipped;
 		}
 
 		private static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)

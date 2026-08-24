@@ -43,6 +43,18 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `SilhouetteUtility.ShouldDrawSilhouette` | `DotTools.cs` | Prefix | Prevents vanilla silhouettes when CameraPlus markers are active or explicitly off. | Interaction with RimWorld silhouette cache. |
 | `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides pawn labels by marker/zoom/mouse rules. | Hot label path; `truncateToWidth == 9999f` guard matters. |
 
+## Edge Marker Interface Clearance
+
+These patches save the current `GUI.matrix` in a first-priority prefix, apply the independently animated inset for that screen side, and restore the exact saved matrix in a last-priority finalizer. They move each complete vanilla drawing method without rewriting its internal screen-edge calculations.
+
+| Target | File | Patch | Purpose | Risk |
+| --- | --- | --- | --- | --- |
+| `ResourceReadout.ResourceReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the left resource list right while left-edge markers are present. | Compatibility with other patches that intentionally replace the GUI matrix inside the same method. |
+| `MouseoverReadout.MouseoverReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the lower-left mouseover readout right while left-edge markers are present. | Same scoped GUI-matrix compatibility risk. |
+| `GlobalControls.GlobalControlsOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves right-side play controls, time, date, weather, temperature, and letters left while right-edge markers are present. | Broad but UI-only method; affects other controls drawn inside this method. |
+| `AlertsReadout.AlertsReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the alert stack left while right-edge markers are present. | Same scoped GUI-matrix compatibility risk. |
+| `MapGizmoUtility.MapUIOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves selected-object gizmos left while right-edge markers are present. | May move gizmos supplied by other mods through the vanilla grid, which is intentional for clearance. |
+
 Perf builds add these patches only when `CameraPlusPerf=true`:
 
 | Target | File | Patch | Purpose | Risk |

@@ -77,6 +77,7 @@ Marker rendering is split across three layers:
 - `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
 - `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
+- `EdgeUIInsets` tracks the widest marker actually drawn on each vertical screen edge and smoothly moves the nearby vanilla interface inward while that edge is occupied.
 - `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture and generates padded radial outline masks per source texture and outline width.
 
 The normal draw flow is:
@@ -89,6 +90,7 @@ The normal draw flow is:
 6. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
 7. `MarkerCache.MaterialFor(pawn, dotConfig)` creates or refreshes the marker materials.
 8. `DotDrawer` draws edge markers for off-screen pawns and in-map markers when zoom thresholds apply.
+9. For left and right edges, `DotDrawer` projects only the largest rendered marker quad back to logical UI coordinates. `EdgeUIInsets` turns that footprint into a per-side target gap and animates the vanilla interface toward it.
 
 Vanilla rendering suppression is intentional:
 
@@ -104,6 +106,8 @@ Vanilla rendering suppression is intentional:
 
 `FastUI` caches expensive UI coordinate and cell-size reads per frame.
 
+`EdgeUIInsets` holds one frame of marker-footprint observations plus short-lived, smoothed left and right inset values. It does not cache pawns or textures. The renderer submits at most one quad observation per occupied vertical edge each frame, regardless of pawn count.
+
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 
 `Caches.cachedMainColors` stores sampled main pawn colors by pawn type and body graphic path.
@@ -117,6 +121,8 @@ Vanilla rendering suppression is intentional:
 ## Settings And Editor UI
 
 `CameraPlusSettings.DoWindowContents()` draws the main mod settings UI. It exposes zoom limits, zoom curve, movement tuning, marker style defaults, label thresholds, animal behavior, shortcut editor access, and marker-rule editor access.
+
+The edge settings include an enabled-by-default option that keeps RimWorld's resource and mouseover readouts clear on the left, and its global controls, alerts, and selected-object gizmos clear on the right. Each side moves independently, follows the largest marker actually rendered there—including per-rule size and interface scale—and eases back to its vanilla position when that edge clears. The main bottom button bar is not moved because edge markers are already contracted above it.
 
 The marker-rule editor is `Dialog_Customization`. It is a custom table-like editor for `DotConfig` rows. It supports:
 

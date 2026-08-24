@@ -6,3 +6,4 @@
 - Shortcut settings now identify disabled and conflicting modifier combinations.
 - Zoom-to-mouse help now explains that holding Shift temporarily zooms around the camera center.
 - Marker outlines stay clean and free of halos or repeated texture copies at high interface scales.
+- RimWorld's left and right map interface now moves smoothly out of the way of edge markers, following the largest marker actually drawn on each occupied side; this can be disabled in the edge-indicator settings.

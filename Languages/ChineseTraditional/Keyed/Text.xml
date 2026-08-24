@@ -35,6 +35,7 @@
 	<DisableCameraShake>禁用相機抖動</DisableCameraShake>
 	<MouseRevealsLabels>鼠標顯示標籤{0}</MouseRevealsLabels>
 	<EdgeIndicators>邊緣指示器{0}</EdgeIndicators>
+	<IndentVanillaUIForEdgeMarkers>避免邊緣標記遮擋 RimWorld 介面</IndentVanillaUIForEdgeMarkers>
 	<PawnColoredEdgeIndicators>動物邊緣顏色</PawnColoredEdgeIndicators>
 	<SettingsTopic_All>全部</SettingsTopic_All>
 	<SettingsTopic_Zoom>縮放</SettingsTopic_Zoom>
@@ -107,6 +108,7 @@
 	<SettingsHelp_MarkerStyle>未被規則符合的小人的預設標記替換方式。&#10;&#10;想要 Camera+ 縮放行為但不替換小人身體時使用原版；想讓遠縮放保持可讀時使用圓點或剪影。原版模式會停用依賴的標籤和標記閾值控制項。</SettingsHelp_MarkerStyle>
 	<SettingsHelp_AnimalPolicy>控制哪些動物可參與標記處理，以及它們使用哪種預設標記系列。&#10;&#10;這有助於保留殖民地動物可見性，同時減少野生動物雜亂。被排除的動物也會跳過動物標記規則。</SettingsHelp_AnimalPolicy>
 	<SettingsHelp_EdgeIndicators>控制是否繪製螢幕外小人標記，以及動物邊緣標記是否可繼承小人顏色。&#10;&#10;顏色選項依賴此開關，並且在動物規則填充透明時最明顯。</SettingsHelp_EdgeIndicators>
+	<SettingsHelp_IndentVanillaUIForEdgeMarkers>僅當 Camera+ 標記佔據某一側邊緣時，才將該側的 RimWorld 控制項和資訊欄向內移動。間距會跟隨實際繪製的最大標記，包括各規則的大小和介面縮放；邊緣空出後會平滑回位。關閉此項可讓 RimWorld 介面固定在螢幕邊緣。</SettingsHelp_IndentVanillaUIForEdgeMarkers>
 	<SettingsHelp_MarkerAppearance>調整圓點、剪影和邊緣指示器的視覺佔用。&#10;&#10;選擇標記行為後再使用這些設定；它們是外觀調校，不是過濾規則。符合規則可以乘以標記大小，或替代輪廓寬度。</SettingsHelp_MarkerAppearance>
 	<SettingsHelp_DefaultColonistMarkerColors>設定 Camera+ 使用內建玩家 pawn 顏色時，殖民者標記輪廓和填充的預設顏色。&#10;&#10;這些是備用顏色，不是規則顏色。符合規則、其他 mod 提供的標記顏色，以及動物 pawn 顏色處理仍可為它們控制的 pawn 提供自己的顏色。</SettingsHelp_DefaultColonistMarkerColors>
 	<SettingsHelp_KeyboardShortcuts>Camera+ 快捷鍵會把一個或兩個可選修飾鍵與主鍵組合。&#10;&#10;設定快捷鍵的主鍵可設定。載入和儲存鏡頭視角一律使用數字鍵 1 到 9。</SettingsHelp_KeyboardShortcuts>
