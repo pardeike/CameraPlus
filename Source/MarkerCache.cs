@@ -13,7 +13,13 @@ namespace CameraPlus
 	{
 		public static readonly Dictionary<Pawn, Materials> cache = [];
 		static readonly Dictionary<int, Texture2D> silhouetteTextureCache = [];
+		static readonly Dictionary<int, RenderTexture> markerTextureCache = [];
+		static readonly Dictionary<int, RenderTexture> outlineTextureCache = [];
+		static readonly HashSet<int> failedMarkerTextureKeys = [];
+		static readonly HashSet<int> failedOutlineTextureKeys = [];
+		static Material outlineGeneratorMaterial;
 		const float defaultSilhouetteCutoff = 0.5f;
+		const int markerTextureGuardPixels = 2;
 
 		public static Materials MaterialFor(Pawn pawn)
 			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
@@ -57,6 +63,29 @@ namespace CameraPlus
 			foreach (var texture in silhouetteTextureCache.Values)
 				UnityEngine.Object.Destroy(texture);
 			silhouetteTextureCache.Clear();
+
+			ReleaseRenderTextures(markerTextureCache.Values);
+			markerTextureCache.Clear();
+			failedMarkerTextureKeys.Clear();
+
+			ReleaseRenderTextures(outlineTextureCache.Values);
+			outlineTextureCache.Clear();
+			failedOutlineTextureKeys.Clear();
+
+			if (outlineGeneratorMaterial != null)
+			{
+				MaterialAllocator.Destroy(outlineGeneratorMaterial);
+				outlineGeneratorMaterial = null;
+			}
+		}
+
+		static void ReleaseRenderTextures(IEnumerable<RenderTexture> textures)
+		{
+			foreach (var texture in textures)
+			{
+				texture.Release();
+				UnityEngine.Object.Destroy(texture);
+			}
 		}
 
 		public static void Remove(Pawn pawn)
@@ -146,17 +175,190 @@ namespace CameraPlus
 		{
 			var material = MaterialAllocator.Create(Assets.BorderedShader);
 			material.name = $"{pawn.ThingID}-{suffix}";
-			SetMarkerTexture(material, texture, canMutateTexture);
+			SetMarkerTextures(material, texture, outlineFactor, canMutateTexture);
 			material.SetFloat("_OutlineFactor", outlineFactor);
 			material.renderQueue = (int)RenderQueue.Overlay;
 			return material;
 		}
 
-		static void SetMarkerTexture(Material material, Texture texture, bool canMutateTexture = false)
+		static void SetMarkerTextures(Material material, Texture texture, float outlineFactor, bool canMutateTexture = false)
 		{
 			if (canMutateTexture && texture != null)
 				texture.wrapMode = TextureWrapMode.Clamp;
-			material.SetTexture("_MainTex", texture);
+
+			var markerTexture = MarkerTextureFor(texture);
+			material.SetTexture("_MainTex", markerTexture);
+			var markerUVScale = texture == null || markerTexture == null
+				? new Vector4(1f, 1f, 0f, 0f)
+				: new Vector4((float)texture.width / markerTexture.width, (float)texture.height / markerTexture.height, 0f, 0f);
+			material.SetVector("_MainUVScale", markerUVScale);
+
+			var outlineTexture = OutlineTextureFor(texture, outlineFactor);
+			material.SetTexture("_OutlineTex", outlineTexture);
+			var outlineUVScale = texture == null || outlineTexture == null
+				? new Vector4(1f, 1f, 0f, 0f)
+				: new Vector4((float)texture.width / outlineTexture.width, (float)texture.height / outlineTexture.height, 0f, 0f);
+			material.SetVector("_OutlineUVScale", outlineUVScale);
+		}
+
+		static Texture MarkerTextureFor(Texture sourceTexture)
+		{
+			if (sourceTexture == null)
+				return null;
+
+			var key = sourceTexture.GetInstanceID();
+			if (markerTextureCache.TryGetValue(key, out var cachedTexture))
+				return cachedTexture;
+			if (failedMarkerTextureKeys.Contains(key))
+				return sourceTexture;
+
+			try
+			{
+				cachedTexture = CreateMarkerTexture(sourceTexture);
+				markerTextureCache[key] = cachedTexture;
+				PerfMetrics.Count("marker_texture.cache_misses");
+				return cachedTexture;
+			}
+			catch (Exception exception)
+			{
+				failedMarkerTextureKeys.Add(key);
+				Log.Warning($"CameraPlus failed to prepare marker texture '{sourceTexture.name}': {exception}");
+				return sourceTexture;
+			}
+		}
+
+		// Copy once on the GPU into transparent guard pixels without mipmaps. Projected map
+		// quads can otherwise pull opaque alpha from the source texture's generated mip levels.
+		static RenderTexture CreateMarkerTexture(Texture sourceTexture)
+		{
+			var sourceWidth = sourceTexture.width;
+			var sourceHeight = sourceTexture.height;
+			if (sourceWidth <= 0 || sourceHeight <= 0)
+				throw new InvalidOperationException($"Invalid marker texture size {sourceWidth}x{sourceHeight}.");
+			if (Assets.OutlineMaskShader == null)
+				throw new InvalidOperationException("The OutlineMask shader is not loaded.");
+
+			var width = sourceWidth + 2 * markerTextureGuardPixels;
+			var height = sourceHeight + 2 * markerTextureGuardPixels;
+			outlineGeneratorMaterial ??= MaterialAllocator.Create(Assets.OutlineMaskShader);
+			outlineGeneratorMaterial.SetVector("_SourceUVScale", new Vector4((float)width / sourceWidth, (float)height / sourceHeight, 0f, 0f));
+			var markerTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default)
+			{
+				name = $"{sourceTexture.name}-CameraPlusMarker",
+				wrapMode = TextureWrapMode.Clamp,
+				filterMode = FilterMode.Bilinear,
+				anisoLevel = 0,
+				useMipMap = false,
+				autoGenerateMips = false
+			};
+
+			try
+			{
+				markerTexture.Create();
+				Graphics.Blit(sourceTexture, markerTexture, outlineGeneratorMaterial, 3);
+				return markerTexture;
+			}
+			catch
+			{
+				markerTexture.Release();
+				UnityEngine.Object.Destroy(markerTexture);
+				throw;
+			}
+		}
+
+		static Texture OutlineTextureFor(Texture sourceTexture, float outlineFactor)
+		{
+			if (sourceTexture == null || outlineFactor <= 0f)
+				return sourceTexture;
+
+			var factorKey = Mathf.RoundToInt(outlineFactor * 10_000f);
+			var key = Gen.HashCombineInt(sourceTexture.GetInstanceID(), factorKey);
+			if (outlineTextureCache.TryGetValue(key, out var cachedTexture))
+				return cachedTexture;
+			if (failedOutlineTextureKeys.Contains(key))
+				return sourceTexture;
+
+			try
+			{
+				cachedTexture = CreateOutlineTexture(sourceTexture, outlineFactor);
+				outlineTextureCache[key] = cachedTexture;
+				PerfMetrics.Count("outline_texture.cache_misses");
+				return cachedTexture;
+			}
+			catch (Exception exception)
+			{
+				failedOutlineTextureKeys.Add(key);
+				Log.Warning($"CameraPlus failed to prepare marker outline texture '{sourceTexture.name}': {exception}");
+				return sourceTexture;
+			}
+		}
+
+		// Generate the radial mask once on the GPU; normal marker draws only sample the cached result.
+		static RenderTexture CreateOutlineTexture(Texture sourceTexture, float outlineFactor)
+		{
+			var sourceWidth = sourceTexture.width;
+			var sourceHeight = sourceTexture.height;
+			if (sourceWidth <= 0 || sourceHeight <= 0)
+				throw new InvalidOperationException($"Invalid marker texture size {sourceWidth}x{sourceHeight}.");
+			if (Assets.OutlineMaskShader == null)
+				throw new InvalidOperationException("The OutlineMask shader is not loaded.");
+
+			var paddedScale = 1f + 2f * outlineFactor;
+			var width = Mathf.CeilToInt(sourceWidth * paddedScale);
+			var height = Mathf.CeilToInt(sourceHeight * paddedScale);
+			var sourceUVScale = new Vector4((float)width / sourceWidth, (float)height / sourceHeight, 0f, 0f);
+			outlineGeneratorMaterial ??= MaterialAllocator.Create(Assets.OutlineMaskShader);
+			outlineGeneratorMaterial.SetVector("_SourceUVScale", sourceUVScale);
+			var nearestA = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+			var nearestB = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
+			var previous = RenderTexture.active;
+			RenderTexture outlineTexture = null;
+			try
+			{
+				nearestA.filterMode = FilterMode.Point;
+				nearestA.wrapMode = TextureWrapMode.Clamp;
+				nearestB.filterMode = FilterMode.Point;
+				nearestB.wrapMode = TextureWrapMode.Clamp;
+
+				Graphics.Blit(sourceTexture, nearestA, outlineGeneratorMaterial, 0);
+				var current = nearestA;
+				var next = nearestB;
+				for (var step = Mathf.NextPowerOfTwo(Mathf.Max(width, height)) / 2; step >= 1; step /= 2)
+				{
+					outlineGeneratorMaterial.SetFloat("_Step", step);
+					Graphics.Blit(current, next, outlineGeneratorMaterial, 1);
+					(current, next) = (next, current);
+				}
+
+				outlineTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear)
+				{
+					name = $"{sourceTexture.name}-CameraPlusOutline",
+					wrapMode = TextureWrapMode.Clamp,
+					filterMode = sourceTexture.filterMode,
+					anisoLevel = sourceTexture.anisoLevel,
+					useMipMap = false,
+					autoGenerateMips = false
+				};
+				outlineTexture.Create();
+				outlineGeneratorMaterial.SetFloat("_OutlineFactor", outlineFactor);
+				Graphics.Blit(current, outlineTexture, outlineGeneratorMaterial, 2);
+				return outlineTexture;
+			}
+			catch
+			{
+				if (outlineTexture != null)
+				{
+					outlineTexture.Release();
+					UnityEngine.Object.Destroy(outlineTexture);
+				}
+				throw;
+			}
+			finally
+			{
+				RenderTexture.active = previous;
+				RenderTexture.ReleaseTemporary(nearestA);
+				RenderTexture.ReleaseTemporary(nearestB);
+			}
 		}
 
 		readonly struct MaterialInputs

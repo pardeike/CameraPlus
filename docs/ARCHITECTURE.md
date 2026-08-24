@@ -42,7 +42,7 @@ See [BUILD_AND_DEPENDENCIES.md](BUILD_AND_DEPENDENCIES.md) for the exact command
 
 `DotConfig` in `Source/DotConfig.cs` represents one marker rule. A rule contains:
 
-- `conditions`: all must match the pawn.
+- `conditions`: all must match the pawn. An empty condition list matches every pawn, so a tagless rule is a global catch-all; the first matching rule wins.
 - `mode`: off, vanilla, classic dots, silhouettes, or custom marker image.
 - colors for normal and selected states.
 - map marker, edge marker, mouse reveal, size threshold, relative size, and outline settings.
@@ -77,7 +77,7 @@ Marker rendering is split across three layers:
 - `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
 - `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
-- `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures.
+- `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture and generates padded radial outline masks per source texture and outline width.
 
 The normal draw flow is:
 
@@ -112,7 +112,7 @@ Vanilla rendering suppression is intentional:
 
 `MarkerDecisionCache` stores the computed marker decision by `thingIDNumber` for the current Unity frame. It exists so the dynamic draw postfix and the vanilla-rendering suppression prefixes can share the same rule lookup and zoom/mouse decision work.
 
-`MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, and outline factor still match the current rule/settings state. It owns `MaterialAllocator.Destroy()` cleanup when entries are invalidated or the cache is cleared. Custom marker PNG reloads clear this cache so stale custom marker materials are not reused.
+`MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, and outline factor still match the current rule/settings state. Its shared texture cache stores a guarded, non-mipmapped GPU copy per source texture to prevent sub-pixel edge bleed, while its outline cache stores GPU-generated `RenderTexture` masks by source texture and outline width. Normal marker draws sample those two prepared textures once each. It owns material and render-texture cleanup when entries are invalidated or the cache is cleared. Custom marker PNG reloads clear these caches so stale custom marker materials are not reused.
 
 ## Settings And Editor UI
 
@@ -141,7 +141,7 @@ Related dialogs:
 
 Static textures in `Textures` are loaded through RimWorld `ContentFinder<Texture2D>`.
 
-The platform-specific `Resources/*/effects` asset bundles still contain the legacy picker materials, but the active 1.6 runtime only loads the `Bordered` shader. Marker materials use that shader for fill and outline rendering.
+The platform-specific `Resources/*/effects` asset bundles contain the `Bordered` marker shader and the hidden `OutlineMask` generator shader. `OutlineMask` prepares guarded source copies and builds each radial mask once with jump-flood GPU passes; `Bordered` then composites fill over outline with premultiplied alpha to avoid edge halos and quad-edge bleed.
 
 Player custom marker PNG files live in `GenFilePaths.FolderUnderSaveData("CameraPlus")`. A `FileSystemWatcher` reloads PNG files into `Assets.customMarkers`.
 

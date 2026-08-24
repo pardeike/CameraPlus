@@ -3,10 +3,12 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _MainUVScale ("Main UV Scale", Vector) = (1,1,0,0)
+        _OutlineTex ("Outline Texture", 2D) = "white" {}
+        _OutlineUVScale ("Outline UV Scale", Vector) = (1,1,0,0)
         _FillColor ("Fill Color", Color) = (1,0,0,1)
         _OutlineColor ("Outline Color", Color) = (1,1,1,1)
         _OutlineFactor ("Outline Factor", Range(0,0.2)) = 0.075
-        _Quality ("Quality", Range(4,32)) = 32
         _ShrinkFactor ("ShrinkFactor", Range(1,10)) = 4
     }
     SubShader
@@ -17,7 +19,7 @@
             "Queue"="Transparent"
         }
 
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend One OneMinusSrcAlpha
         ZWrite Off
         LOD 100
 
@@ -42,10 +44,12 @@
             };
 
             sampler2D _MainTex;
+            float2 _MainUVScale;
+            sampler2D _OutlineTex;
+            float2 _OutlineUVScale;
             float4 _FillColor;
             float4 _OutlineColor;
             float _OutlineFactor;
-            int _Quality;
             float _ShrinkFactor;
 
             v2f vert (appdata v)
@@ -61,30 +65,24 @@
             {
                 fixed4 mainCol = float4(0,0,0,0);
                 float2 baseUV = i.uv;
-                if (baseUV.x >= 0 && baseUV.x <= 1 && baseUV.y >= 0 && baseUV.y <= 1)
-                    mainCol = tex2D(_MainTex, baseUV);
+                float2 mainUV = (baseUV - 0.5) * _MainUVScale + 0.5;
+                if (mainUV.x >= 0 && mainUV.x <= 1 && mainUV.y >= 0 && mainUV.y <= 1)
+                    mainCol = tex2D(_MainTex, mainUV);
 
                 mainCol.rgb = lerp(mainCol.rgb, _FillColor.rgb, _FillColor.a);
                 if (_OutlineFactor == 0)
-						  return mainCol;
+                    return fixed4(mainCol.rgb * mainCol.a, mainCol.a);
 
-                // Outline creation by sampling around the current pixel in a circle
                 float outlineAlpha = 0;
-                float factor = 2 * 3.14159265359 / _Quality;
-                for(int j = 0; j < _Quality; j++)
-                {
-                    float angle = j * factor;
-                    float2 loc = baseUV + _OutlineFactor * float2(cos(angle), sin(angle));
-                    if (loc.x >= 0 && loc.x <= 1 && loc.y >= 0 && loc.y <= 1)
-                        outlineAlpha = max(outlineAlpha, tex2D(_MainTex, loc).a);
-                }
+                float2 outlineUV = (baseUV - 0.5) * _OutlineUVScale + 0.5;
+                if (outlineUV.x >= 0 && outlineUV.x <= 1 && outlineUV.y >= 0 && outlineUV.y <= 1)
+                    outlineAlpha = tex2D(_OutlineTex, outlineUV).a;
 
-                // Apply the maximum alpha from the sampled texture points for the outline
-                fixed4 outlineCol = _OutlineColor;
-                outlineCol.a *= outlineAlpha;
-
-                // Combine the outline and the fill, ensuring fill overlays outline
-                return (fixed4)lerp(outlineCol, mainCol, mainCol.a);
+                float fillAlpha = mainCol.a;
+                float visibleOutlineAlpha = outlineAlpha * _OutlineColor.a * (1 - fillAlpha);
+                float combinedAlpha = fillAlpha + visibleOutlineAlpha;
+                fixed3 combinedColor = mainCol.rgb * fillAlpha + _OutlineColor.rgb * visibleOutlineAlpha;
+                return fixed4(combinedColor, combinedAlpha);
             }
             ENDCG
         }

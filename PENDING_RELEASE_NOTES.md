@@ -5,3 +5,4 @@
 - Animal edge colors remain configurable when matching rules enable edge indicators.
 - Shortcut settings now identify disabled and conflicting modifier combinations.
 - Zoom-to-mouse help now explains that holding Shift temporarily zooms around the camera center.
+- Marker outlines stay clean and free of halos or repeated texture copies at high interface scales.

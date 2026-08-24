@@ -42,6 +42,7 @@ namespace CameraPlus
 
 		static bool initialized = false;
 		static Shader borderedShader;
+		static Shader outlineMaskShader;
 
 		[HarmonyPatch(typeof(UIRoot_Entry), nameof(UIRoot_Entry.Init))]
 		[HarmonyPostfix]
@@ -67,9 +68,13 @@ namespace CameraPlus
 			borderedShader = assets.LoadAsset<Shader>("Bordered");
 			if (borderedShader == null)
 				Log.Error("Cannot load Bordered shader from asset bundle.");
+			outlineMaskShader = assets.LoadAsset<Shader>("OutlineMask");
+			if (outlineMaskShader == null)
+				Log.Error("Cannot load OutlineMask shader from asset bundle.");
 
 			previewMaterial = MaterialAllocator.Create(borderedShader);
-			previewMaterial.SetTexture("_MainTex", outerColonistTexture);
+			previewMaterial.SetTexture("_MainTex", innerColonistTexture);
+			previewMaterial.SetTexture("_OutlineTex", outerColonistTexture);
 			previewMaterial.renderQueue = (int)RenderQueue.Overlay;
 
 			var newestVersion = new CameraPlusSettings().currentVersion;
@@ -128,5 +133,6 @@ namespace CameraPlus
 		}
 
 		public static Shader BorderedShader => borderedShader;
+		public static Shader OutlineMaskShader => outlineMaskShader;
 	}
 }
