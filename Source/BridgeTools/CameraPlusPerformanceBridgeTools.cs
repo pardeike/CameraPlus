@@ -33,7 +33,8 @@ namespace CameraPlus.BridgeTools
 			[ToolParameter(Description = "Warm-up duration before each measured sample in milliseconds.", DefaultValue = 1000)] int warmupMs = 1000,
 			[ToolParameter(Description = "Minimum synthetic CPU delay per game tick in microseconds.", DefaultValue = 500)] int minimumTickDelayUs = 500,
 			[ToolParameter(Description = "Maximum synthetic CPU delay per game tick in microseconds.", DefaultValue = 2500)] int maximumTickDelayUs = 2500,
-			[ToolParameter(Description = "Length of one deterministic low-to-high-to-low load wave in game ticks.", DefaultValue = 300)] int wavePeriodTicks = 300)
+			[ToolParameter(Description = "Length of one deterministic low-to-high-to-low load wave in game ticks.", DefaultValue = 300)] int wavePeriodTicks = 300,
+			[ToolParameter(Description = "Reverse which rendering mode runs first at each speed to balance order-sensitive comparisons.", DefaultValue = false)] bool reverseOrder = false)
 		{
 			if (string.IsNullOrWhiteSpace(saveName))
 				return new { success = false, stage = "validate", error = "saveName is required." };
@@ -69,7 +70,7 @@ namespace CameraPlus.BridgeTools
 				{
 					var speed = speeds[speedIndex];
 					stage = $"{speed.ToLowerInvariant()}.pair";
-					var cameraFirst = (speedIndex & 1) != 0;
+					var cameraFirst = ((speedIndex & 1) != 0) != reverseOrder;
 					object cameraPlus;
 					object vanilla;
 
@@ -84,7 +85,7 @@ namespace CameraPlus.BridgeTools
 						cameraPlus = await RunSampleAsync(ctx, cancellationToken, saveName, speed, true, durationMs, warmupMs, minimumTickDelayUs, maximumTickDelayUs, wavePeriodTicks);
 					}
 
-					results.Add(new { speedLevel = speedIndex + 1, speed, cameraPlus, vanillaRendering = vanilla });
+					results.Add(new { speedLevel = speedIndex + 1, speed, cameraPlusFirst = cameraFirst, cameraPlus, vanillaRendering = vanilla });
 				}
 
 				stage = "complete";
@@ -96,6 +97,7 @@ namespace CameraPlus.BridgeTools
 					saveName,
 					pawnCount = Find.CurrentMap?.mapPawns?.AllPawnsSpawned?.Count ?? 0,
 					load = new { minimumTickDelayUs, maximumTickDelayUs, wavePeriodTicks },
+					reverseOrder,
 					durationMs,
 					warmupMs,
 					results
