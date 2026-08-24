@@ -248,7 +248,7 @@ namespace CameraPlus
 			try
 			{
 				temporary = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-				if (temporary == null || temporary.IsCreated() == false)
+				if (temporary == null || (temporary.IsCreated() == false && temporary.Create() == false))
 					throw new InvalidOperationException($"GPU creation failed for marker bounds readback '{texture.name}' ({texture.width}x{texture.height}).");
 				Graphics.Blit(texture, temporary);
 				RenderTexture.active = temporary;
@@ -473,10 +473,10 @@ namespace CameraPlus
 			try
 			{
 				nearestA = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
-				if (nearestA == null || nearestA.IsCreated() == false)
+				if (nearestA == null || (nearestA.IsCreated() == false && nearestA.Create() == false))
 					throw new InvalidOperationException($"GPU creation failed for temporary outline texture '{sourceTexture.name}' ({width}x{height}).");
 				nearestB = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Linear);
-				if (nearestB == null || nearestB.IsCreated() == false)
+				if (nearestB == null || (nearestB.IsCreated() == false && nearestB.Create() == false))
 					throw new InvalidOperationException($"GPU creation failed for temporary outline texture '{sourceTexture.name}' ({width}x{height}).");
 				nearestA.filterMode = FilterMode.Point;
 				nearestA.wrapMode = TextureWrapMode.Clamp;
