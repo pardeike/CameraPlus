@@ -47,11 +47,11 @@ Settings and editor UI:
 
 `Caches.dotConfigCache` is quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
 
-`MarkerCache` holds per-pawn Unity materials and refreshes entries only when the marker mode, custom marker name, or outline factor no longer matches the current rule/settings state. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`. Each source texture also gets one guarded, non-mipmapped GPU copy shared by every material, preventing sub-pixel edge bleed without adding steady-state samples. Radial outline masks are generated once on the GPU per source texture and outline width, then retained as GPU-only `RenderTexture` entries; steady-state outlined marker fragments use two texture samples instead of the former circular loop's maximum of 33. Outline values, dimensions, and total pixels are bounded before any render texture is allocated, and failed GPU creation is treated as a cacheable fallback instead of a usable texture.
+`MarkerCache` holds per-pawn Unity materials. Ordinary pawn graphics use RimWorld's `SilhouetteUtility.NotifyGraphicDirty` as their invalidation boundary, with a cheap facing-direction check for east/west silhouette selection; dynamic marker providers retain per-frame texture validation. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`. Each source texture also gets one guarded, non-mipmapped GPU copy shared by every material, preventing sub-pixel edge bleed without adding steady-state samples. Radial outline masks are generated once on the GPU per source texture and outline width, then retained as GPU-only `RenderTexture` entries; steady-state outlined marker fragments use two texture samples instead of the former circular loop's maximum of 33. Outline values, dimensions, and total pixels are bounded before any render texture is allocated, and failed GPU creation is treated as a cacheable fallback instead of a usable texture.
 
 Turning interface clearance off skips marker-bound calculation, texture-bound readback, passive UI observations, and the duplicate mouseover cell scan. Re-enabling it measures each missing edge texture once, then returns to the cached steady-state path.
 
-`cachedMainColors` stores sampled texture colors by pawn runtime type and body graphic path. This avoids repeated texture readback/downsampling after the first sample for a graphic.
+`cachedMainColors` shares sampled texture colors between identical body graphics. A per-pawn cache avoids render-tree and material inspection on steady-state frames and is invalidated by RimWorld's graphics-dirty notification and pawn/map lifecycle events.
 
 `cachedCameraDelegates` stores reflection-discovered optional integration methods by pawn runtime type.
 
@@ -96,6 +96,17 @@ Verified during the follow-up performance pass:
 The perf-gated run on `CameraPlusPerf_962Pawns_EdgeDots` reached the 600-draw snapshot with `962` visible pawns, `962` marker draws, and active edge dots. `DotDrawer.DrawDots` averaged `2342.038 us` and `DynamicDrawManager.DrawDynamicThings.Postfix` averaged `2343.504 us` in that snapshot. The production build still does not include the renderer-phase skip.
 
 The dynamic vanilla-UI clearance reuses one marker-rectangle buffer and performs only scalar overlap comparisons for a small fixed set of UI channels. Marker rectangles come from the existing orthographic view mapping and cached visible texture bounds, so it adds no per-marker `UI.MapToUIPosition()` projection, texture transfer, or steady-state allocation.
+
+## Verified 962-Pawn Hot-Path Pass
+
+Verified with the normal 3.4.6 build, RimBridgeServer, and Dubs Performance Analyzer on `CameraPlusPerf_962Pawns_EdgeDots`:
+
+- Cached marker hits no longer rebuild RimWorld silhouette inputs every frame. Dynamic marker providers still validate their textures each frame.
+- Pawn body colors use the same graphics-dirty lifecycle for steady-state caching.
+- Edge materials skip repeated shader color writes when their colors are unchanged.
+- The RimBridge benchmark reloads the fixture for each sample, applies a deterministic 0.5-2.5 ms fluctuating delay per tick, and supports both A/B orders.
+- Across six balanced final runs at speed levels 1-4, `DotDrawer.DrawDots` averaged 2.24-2.40 ms/frame. The earlier unoptimized matrix averaged 5.30 ms/frame across those speeds, for a 56% reduction in the directly measured marker path.
+- The benchmark's comparison side keeps CameraPlus loaded but enables its public custom-rendering bypass, restoring vanilla pawn rendering. It isolates CameraPlus marker overhead; it is not evidence for a completely unloaded-mod baseline.
 
 ## Correctness Constraints For Optimization
 

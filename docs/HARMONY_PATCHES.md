@@ -17,6 +17,7 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `Game.DeinitAndRemoveMap(Map, bool)` | `MarkerCacheLifecycle.cs` | Prefix | Removes all marker materials for a map before it is discarded. | Cache cleanup ordering; should remain idempotent. |
 | `Pawn.DeSpawn(DestroyMode)` | `MarkerCacheLifecycle.cs` | Prefix | Removes the despawned pawn from `MarkerCache`. | Cache cleanup ordering; should remain idempotent. |
 | `Pawn.Destroy(DestroyMode)` | `MarkerCacheLifecycle.cs` | Prefix | Removes the destroyed pawn from `MarkerCache`. | Cache cleanup ordering; should remain idempotent. |
+| `SilhouetteUtility.NotifyGraphicDirty(Thing)` | `MarkerCacheLifecycle.cs` | Postfix | Invalidates a pawn's marker materials and sampled body color when RimWorld invalidates its graphics. | Must stay aligned with RimWorld's graphics-dirty lifecycle. |
 
 ## Camera Controls
 
