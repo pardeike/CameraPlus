@@ -9,6 +9,7 @@ namespace CameraPlus
 	{
 		static void Prefix(Map map)
 		{
+			Caches.ClearPawnMainColors();
 			MarkerCache.RemoveForMap(map);
 		}
 	}
@@ -18,6 +19,7 @@ namespace CameraPlus
 	{
 		static void Prefix(Pawn __instance)
 		{
+			Caches.RemovePawnMainColor(__instance);
 			MarkerCache.Remove(__instance);
 		}
 	}
@@ -27,6 +29,7 @@ namespace CameraPlus
 	{
 		static void Prefix(Pawn __instance)
 		{
+			Caches.RemovePawnMainColor(__instance);
 			MarkerCache.Remove(__instance);
 		}
 	}
@@ -37,7 +40,10 @@ namespace CameraPlus
 		static void Postfix(Thing thing)
 		{
 			if (thing is Pawn pawn)
+			{
+				Caches.RemovePawnMainColor(pawn);
 				MarkerCache.Remove(pawn);
+			}
 		}
 	}
 }

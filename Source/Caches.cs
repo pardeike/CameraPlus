@@ -9,6 +9,7 @@ namespace CameraPlus
 	class Caches
 	{
 		public static readonly Dictionary<string, Color> cachedMainColors = [];
+		public static readonly Dictionary<Pawn, Color> cachedPawnMainColors = [];
 		public static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = [];
 		static readonly object markerStateClearLock = new();
 		static bool markerStateClearQueued;
@@ -47,10 +48,20 @@ namespace CameraPlus
 		static void ClearMarkerStateNow()
 		{
 			cachedMainColors.Clear();
+			cachedPawnMainColors.Clear();
 			dotConfigCache.Clear();
 			MarkerDecisionCache.Clear();
 			MarkerCache.Clear();
 		}
+
+		public static void RemovePawnMainColor(Pawn pawn)
+		{
+			if (pawn != null)
+				cachedPawnMainColors.Remove(pawn);
+		}
+
+		public static void ClearPawnMainColors()
+			=> cachedPawnMainColors.Clear();
 
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{

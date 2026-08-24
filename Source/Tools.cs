@@ -38,6 +38,9 @@ namespace CameraPlus
 		public static Color GetMainColor(Pawn pawn)
 		{
 			using var measure = PerfMetrics.Measure("Tools.GetMainColor");
+			if (Caches.cachedPawnMainColors.TryGetValue(pawn, out var color))
+				return color;
+
 			var renderer = pawn.Drawer.renderer;
 			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
 			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
@@ -49,7 +52,7 @@ namespace CameraPlus
 			var tint = EffectiveMaterialTint(material, graphic.color);
 
 			var key = pawn.GetType().FullName + ":" + graphic.path + ":" + (texture?.GetInstanceID() ?? 0) + ":" + ColorHash(tint);
-			if (Caches.cachedMainColors.TryGetValue(key, out var color) == false)
+			if (Caches.cachedMainColors.TryGetValue(key, out color) == false)
 			{
 				PerfMetrics.Count("main_color.cache_misses");
 				if (texture == null)
@@ -61,6 +64,7 @@ namespace CameraPlus
 
 				Caches.cachedMainColors[key] = color;
 			}
+			Caches.cachedPawnMainColors[pawn] = color;
 			return color;
 		}
 

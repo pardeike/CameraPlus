@@ -17,6 +17,9 @@ namespace CameraPlus
 		bool colorsApplied;
 		Color fillColor;
 		Color outlineColor;
+		bool edgeColorsApplied;
+		Color edgeFillColor;
+		Color edgeOutlineColor;
 
 		public void ApplyColors(Color fill, Color outline)
 		{
@@ -34,6 +37,12 @@ namespace CameraPlus
 
 		public void ApplyEdgeColors(Color fill, Color outline)
 		{
+			if (edgeColorsApplied && fill == edgeFillColor && outline == edgeOutlineColor)
+				return;
+
+			edgeColorsApplied = true;
+			edgeFillColor = fill;
+			edgeOutlineColor = outline;
 			ApplyColors(edgeDot, fill, outline);
 		}
 
