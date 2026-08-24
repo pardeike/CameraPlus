@@ -122,7 +122,7 @@ namespace CameraPlus
 				}
 			}
 
-			DrawEdges(clippedMarkerMapScale, viewRect);
+			DrawEdges(clippedMarkerMapScale, viewRect, borderMarkerSize);
 
 			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
 			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
@@ -130,17 +130,13 @@ namespace CameraPlus
 			PerfMetrics.FlushIfNeeded();
 		}
 
-		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect)
+		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect, Vector2 borderMarkerSize)
 		{
 			var edgeDrawCount = EdgeDrawCount();
 			if (edgeDrawCount == 0)
 				return;
 
 			var altitute = AltitudeLayer.Silhouettes.AltitudeFor() - edgeDrawCount * edgeAltitudeStep;
-			var largestLeftScale = 0f;
-			var largestRightScale = 0f;
-			var largestLeftMatrix = default(Matrix4x4);
-			var largestRightMatrix = default(Matrix4x4);
 			for (var layer = edgeDrawBuckets.Length - 1; layer >= 0; layer--)
 			{
 				var bucket = edgeDrawBuckets[layer];
@@ -148,25 +144,12 @@ namespace CameraPlus
 				{
 					var command = bucket[i];
 					command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
-					var matrix = DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
-					var commandScale = Mathf.Abs(Settings.clippedRelativeSize * (command.dotConfig?.relativeSize ?? 1f));
-					switch (VerticalScreenSide(command.edgeVector, viewRect))
-					{
-						case EdgeScreenSide.Left when commandScale > largestLeftScale:
-							largestLeftScale = commandScale;
-							largestLeftMatrix = matrix;
-							break;
-						case EdgeScreenSide.Right when commandScale > largestRightScale:
-							largestRightScale = commandScale;
-							largestRightMatrix = matrix;
-							break;
-					}
+					DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
+					ObserveEdgeBounds(command, viewRect, borderMarkerSize);
 					altitute += edgeAltitudeStep;
 				}
 			}
 
-			ObserveEdgeBounds(EdgeScreenSide.Left, largestLeftScale, largestLeftMatrix);
-			ObserveEdgeBounds(EdgeScreenSide.Right, largestRightScale, largestRightMatrix);
 			ClearEdgeBuckets();
 		}
 
@@ -181,25 +164,25 @@ namespace CameraPlus
 			return leftDistance <= rightDistance ? EdgeScreenSide.Left : EdgeScreenSide.Right;
 		}
 
-		static void ObserveEdgeBounds(EdgeScreenSide side, float markerScale, Matrix4x4 matrix)
+		static void ObserveEdgeBounds(EdgeDrawCommand command, Rect viewRect, Vector2 borderMarkerSize)
 		{
-			if (markerScale <= 0f)
+			var side = VerticalScreenSide(command.edgeVector, viewRect);
+			if (side == EdgeScreenSide.None)
 				return;
 
-			var bounds = meshClipped.bounds;
-			var minX = float.MaxValue;
-			var maxX = float.MinValue;
-			for (var x = 0; x < 2; x++)
-			{
-				for (var z = 0; z < 2; z++)
-				{
-					var local = new Vector3(x == 0 ? bounds.min.x : bounds.max.x, bounds.center.y, z == 0 ? bounds.min.z : bounds.max.z);
-					var screenX = UI.MapToUIPosition(matrix.MultiplyPoint3x4(local)).x;
-					minX = Mathf.Min(minX, screenX);
-					maxX = Mathf.Max(maxX, screenX);
-				}
-			}
-			EdgeUIInsets.Observe(side, minX, maxX);
+			var contract = borderMarkerSize.x * Settings.clippedBorderDistanceFactor;
+			var screenCenter = new Vector2(
+				Mathf.Lerp(contract, UI.screenWidth - contract, Mathf.InverseLerp(viewRect.xMin, viewRect.xMax, command.edgeVector.x)),
+				Mathf.Lerp(contract + 36f, UI.screenHeight - contract, Mathf.InverseLerp(viewRect.yMin, viewRect.yMax, command.edgeVector.y)));
+			var relativeSize = Mathf.Abs(Settings.clippedRelativeSize * (command.dotConfig?.relativeSize ?? 1f));
+			var quadSize = borderMarkerSize * (meshClipped.bounds.size.x * clippedScale * relativeSize);
+			var visible = command.materials.edgeVisualBounds.For(command.outlineColor);
+			var screenBounds = Rect.MinMaxRect(
+				screenCenter.x + (visible.xMin - 0.5f) * quadSize.x,
+				screenCenter.y + (visible.yMin - 0.5f) * quadSize.y,
+				screenCenter.x + (visible.xMax - 0.5f) * quadSize.x,
+				screenCenter.y + (visible.yMax - 0.5f) * quadSize.y);
+			EdgeUIInsets.ObserveMarker(side, screenBounds);
 		}
 
 		static int EdgeDrawCount()
@@ -280,14 +263,13 @@ namespace CameraPlus
 			return (center + delta * scale, true);
 		}
 
-		private static Matrix4x4 DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
+		private static void DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
 		{
 			using var measure = PerfMetrics.Measure("DotDrawer.DrawClipped");
 			var pos = vec.ToVector3();
 			pos.y = altitute;
 			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
-			return matrixClipped;
 		}
 
 		private static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)

@@ -7,6 +7,7 @@ namespace CameraPlus
 	{
 		public Material dot;
 		public Material edgeDot;
+		public MarkerVisualBounds edgeVisualBounds = MarkerVisualBounds.Full;
 		public Material silhouette;
 		public Material custom;
 		public MaterialSignature signature;
@@ -45,6 +46,25 @@ namespace CameraPlus
 			material.SetColor("_FillColor", fill);
 			material.SetColor("_OutlineColor", outline);
 		}
+	}
+
+	public readonly struct MarkerVisualBounds
+	{
+		public static readonly MarkerVisualBounds Full = new MarkerVisualBounds(
+			new Rect(0f, 0f, 1f, 1f),
+			new Rect(0f, 0f, 1f, 1f));
+
+		public readonly Rect fill;
+		public readonly Rect outlined;
+
+		public MarkerVisualBounds(Rect fill, Rect outlined)
+		{
+			this.fill = fill;
+			this.outlined = outlined;
+		}
+
+		public Rect For(Color outlineColor)
+			=> outlineColor.a > 0.001f ? outlined : fill;
 	}
 
 	public readonly struct MaterialSignature

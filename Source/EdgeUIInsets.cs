@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using HarmonyLib;
 using RimWorld;
 using UnityEngine;
@@ -16,30 +14,58 @@ namespace CameraPlus
 		Right
 	}
 
+	internal enum EdgeUIArea
+	{
+		TopLeft,
+		BottomLeft,
+		TopRight,
+		BottomRight
+	}
+
+	internal readonly struct EdgeUIInsetChannelState
+	{
+		public readonly bool uiVisible;
+		public readonly bool overlappingMarkers;
+		public readonly float uiMinY;
+		public readonly float uiMaxY;
+		public readonly float observed;
+		public readonly float target;
+		public readonly float current;
+
+		public EdgeUIInsetChannelState(bool uiVisible, bool overlappingMarkers, float uiMinY, float uiMaxY,
+			float observed, float target, float current)
+		{
+			this.uiVisible = uiVisible;
+			this.overlappingMarkers = overlappingMarkers;
+			this.uiMinY = uiMinY;
+			this.uiMaxY = uiMaxY;
+			this.observed = observed;
+			this.target = target;
+			this.current = current;
+		}
+	}
+
 	internal readonly struct EdgeUIInsetState
 	{
 		public readonly bool enabled;
-		public readonly bool leftMarkers;
-		public readonly bool rightMarkers;
-		public readonly float leftObserved;
-		public readonly float rightObserved;
-		public readonly float leftTarget;
-		public readonly float rightTarget;
-		public readonly float leftCurrent;
-		public readonly float rightCurrent;
+		public readonly int leftMarkerCount;
+		public readonly int rightMarkerCount;
+		public readonly EdgeUIInsetChannelState topLeft;
+		public readonly EdgeUIInsetChannelState bottomLeft;
+		public readonly EdgeUIInsetChannelState topRight;
+		public readonly EdgeUIInsetChannelState bottomRight;
 
-		public EdgeUIInsetState(bool enabled, bool leftMarkers, bool rightMarkers, float leftObserved, float rightObserved,
-			float leftTarget, float rightTarget, float leftCurrent, float rightCurrent)
+		public EdgeUIInsetState(bool enabled, int leftMarkerCount, int rightMarkerCount,
+			EdgeUIInsetChannelState topLeft, EdgeUIInsetChannelState bottomLeft,
+			EdgeUIInsetChannelState topRight, EdgeUIInsetChannelState bottomRight)
 		{
 			this.enabled = enabled;
-			this.leftMarkers = leftMarkers;
-			this.rightMarkers = rightMarkers;
-			this.leftObserved = leftObserved;
-			this.rightObserved = rightObserved;
-			this.leftTarget = leftTarget;
-			this.rightTarget = rightTarget;
-			this.leftCurrent = leftCurrent;
-			this.rightCurrent = rightCurrent;
+			this.leftMarkerCount = leftMarkerCount;
+			this.rightMarkerCount = rightMarkerCount;
+			this.topLeft = topLeft;
+			this.bottomLeft = bottomLeft;
+			this.topRight = topRight;
+			this.bottomRight = bottomRight;
 		}
 	}
 
@@ -49,87 +75,180 @@ namespace CameraPlus
 		const float expandSmoothTime = 0.10f / 1.5f;
 		const float retractSmoothTime = 0.20f / 1.5f;
 		const float settledDistance = 0.05f;
+		const float mouseoverLineHeight = 19f;
+		const float mouseoverBottom = 65f;
 
-		static int observationFrame = -1;
+		static readonly System.Collections.Generic.List<EdgeMarkerSpan> leftMarkers = new System.Collections.Generic.List<EdgeMarkerSpan>(16);
+		static readonly System.Collections.Generic.List<EdgeMarkerSpan> rightMarkers = new System.Collections.Generic.List<EdgeMarkerSpan>(16);
+		static readonly UIObservation[] uiObservations = new UIObservation[4];
+		static readonly AnimatedInset[] channels =
+		{
+			new AnimatedInset(),
+			new AnimatedInset(),
+			new AnimatedInset(),
+			new AnimatedInset()
+		};
+
+		static int markerObservationFrame = -1;
 		static int animationFrame = -1;
-		static float observationLeft;
-		static float observationRight;
-		static float recentLeft;
-		static float recentRight;
-		static float lastLeftSeen = -100f;
-		static float lastRightSeen = -100f;
 		static float lastAnimationTime = -1f;
-		static float targetLeft;
-		static float targetRight;
-		static float currentLeft;
-		static float currentRight;
-		static float velocityLeft;
-		static float velocityRight;
 
-		internal static void Observe(EdgeScreenSide side, float screenMinX, float screenMaxX)
+		internal static void ObserveMarker(EdgeScreenSide side, Rect screenBounds)
 		{
 			if (side == EdgeScreenSide.None || Settings?.indentVanillaUIForEdgeMarkers != true)
 				return;
 
 			var frame = Time.frameCount;
-			if (observationFrame != frame)
+			if (markerObservationFrame != frame)
 			{
-				observationFrame = frame;
-				observationLeft = 0f;
-				observationRight = 0f;
+				markerObservationFrame = frame;
+				leftMarkers.Clear();
+				rightMarkers.Clear();
 			}
 
-			var maxInset = Mathf.Max(0f, UI.screenWidth - 80f);
-			var now = Time.realtimeSinceStartup;
-			if (side == EdgeScreenSide.Left)
-			{
-				observationLeft = Mathf.Max(observationLeft, Mathf.Clamp(screenMaxX, 0f, maxInset));
-				recentLeft = observationLeft;
-				lastLeftSeen = now;
-			}
+			var inset = side == EdgeScreenSide.Left
+				? screenBounds.xMax
+				: UI.screenWidth - screenBounds.xMin;
+			inset = Mathf.Clamp(inset, 0f, Mathf.Max(0f, UI.screenWidth - 80f));
+			var yMin = Mathf.Clamp(screenBounds.yMin, 0f, UI.screenHeight);
+			var yMax = Mathf.Clamp(screenBounds.yMax, 0f, UI.screenHeight);
+			if (inset <= 0f || yMax <= yMin)
+				return;
+
+			var span = new EdgeMarkerSpan(yMin, yMax, inset);
+			(side == EdgeScreenSide.Left ? leftMarkers : rightMarkers).Add(span);
+		}
+
+		internal static void ObserveUI(EdgeUIArea area, float yMin, float yMax)
+		{
+			yMin = Mathf.Clamp(yMin, 0f, UI.screenHeight);
+			yMax = Mathf.Clamp(yMax, 0f, UI.screenHeight);
+			if (yMax <= yMin)
+				return;
+
+			ref var observation = ref uiObservations[(int)area];
+			var frame = Time.frameCount;
+			if (observation.frame != frame)
+				observation = new UIObservation(frame, yMin, yMax);
 			else
 			{
-				observationRight = Mathf.Max(observationRight, Mathf.Clamp(UI.screenWidth - screenMinX, 0f, maxInset));
-				recentRight = observationRight;
-				lastRightSeen = now;
+				observation.yMin = Mathf.Min(observation.yMin, yMin);
+				observation.yMax = Mathf.Max(observation.yMax, yMax);
 			}
 		}
 
-		internal static Matrix4x4 PushLeft()
+		internal static Matrix4x4 Push(EdgeUIArea area)
 		{
 			UpdateAnimation();
-			return Push(currentLeft);
+			var previous = GUI.matrix;
+			var inset = channels[(int)area].current;
+			if (Mathf.Abs(inset) > settledDistance)
+			{
+				var direction = area == EdgeUIArea.TopLeft || area == EdgeUIArea.BottomLeft ? 1f : -1f;
+				GUI.matrix = previous * Matrix4x4.Translate(new Vector3(direction * inset, 0f, 0f));
+			}
+			return previous;
 		}
 
-		internal static Matrix4x4 PushRight()
+		internal static Exception Restore(Exception exception, Matrix4x4 previous)
 		{
-			UpdateAnimation();
-			return Push(-currentRight);
+			GUI.matrix = previous;
+			return exception;
 		}
 
 		internal static EdgeUIInsetState State()
 		{
 			UpdateAnimation();
-			var now = Time.realtimeSinceStartup;
-			var enabled = Settings?.indentVanillaUIForEdgeMarkers == true;
 			return new EdgeUIInsetState(
-				enabled,
-				enabled && now - lastLeftSeen <= noMarkerHoldSeconds,
-				enabled && now - lastRightSeen <= noMarkerHoldSeconds,
-				observationFrame >= Time.frameCount - 1 ? observationLeft : 0f,
-				observationFrame >= Time.frameCount - 1 ? observationRight : 0f,
-				targetLeft,
-				targetRight,
-				currentLeft,
-				currentRight);
+				Settings?.indentVanillaUIForEdgeMarkers == true,
+				markerObservationFrame >= Time.frameCount - 1 ? leftMarkers.Count : 0,
+				markerObservationFrame >= Time.frameCount - 1 ? rightMarkers.Count : 0,
+				ChannelState(EdgeUIArea.TopLeft),
+				ChannelState(EdgeUIArea.BottomLeft),
+				ChannelState(EdgeUIArea.TopRight),
+				ChannelState(EdgeUIArea.BottomRight));
 		}
 
-		static Matrix4x4 Push(float x)
+		internal static void ObserveMouseoverReadout()
 		{
-			var previous = GUI.matrix;
-			if (Mathf.Abs(x) > settledDistance)
-				GUI.matrix = previous * Matrix4x4.Translate(new Vector3(x, 0f, 0f));
-			return previous;
+			if (Event.current.type != EventType.Repaint || Find.MainTabsRoot.OpenTab != null)
+				return;
+
+			var rows = MouseoverRows();
+			if (rows <= 0)
+				return;
+
+			var firstLineY = UI.screenHeight - mouseoverBottom;
+			ObserveUI(
+				EdgeUIArea.BottomLeft,
+				firstLineY - (rows - 1) * mouseoverLineHeight,
+				firstLineY + mouseoverLineHeight);
+		}
+
+		static int MouseoverRows()
+		{
+			var map = Find.CurrentMap;
+			if (map == null)
+				return 0;
+
+			var cell = UI.MouseCell();
+			if (cell.InBounds(map) == false)
+				return 0;
+			if (cell.Fogged(map))
+				return 1;
+
+			var rows = 2;
+			if (map.Biome.inVacuum)
+				rows++;
+			if (cell.GetZone(map) != null)
+				rows++;
+			if (map.snowGrid.GetDepth(cell) > 0.03f)
+				rows++;
+			if (ModsConfig.OdysseyActive && map.sandGrid.GetDepth(cell) > 0.03f)
+				rows++;
+
+			var things = cell.GetThingList(map);
+			for (var i = 0; i < things.Count; i++)
+			{
+				var thing = things[i];
+				var proxy = thing.TryGetComp<CompSelectProxy>();
+				if (proxy?.thingToSelect != null)
+					thing = proxy.thingToSelect;
+				if (thing.def.category != ThingCategory.Mote && (!(thing is Pawn pawn) || pawn.IsHiddenFromPlayer() == false))
+					rows++;
+			}
+
+			if (cell.GetRoof(map) != null)
+				rows++;
+			if (map.gasGrid.AnyGasAt(cell))
+			{
+				if (map.gasGrid.DensityAt(cell, GasType.BlindSmoke) > 0)
+					rows++;
+				if (map.gasGrid.DensityAt(cell, GasType.ToxGas) > 0)
+					rows++;
+				if (map.gasGrid.DensityAt(cell, GasType.RotStink) > 0)
+					rows++;
+				if (map.gasGrid.DensityAt(cell, GasType.DeadlifeDust) > 0)
+					rows++;
+			}
+			if (ModsConfig.OdysseyActive && map.waterBodyTracker.TryGetWaterBodyAt(cell, out var body) && body.HasFish)
+				rows++;
+			return rows;
+		}
+
+		static EdgeUIInsetChannelState ChannelState(EdgeUIArea area)
+		{
+			var channel = channels[(int)area];
+			var observation = uiObservations[(int)area];
+			var uiVisible = observation.frame >= Time.frameCount - 1;
+			return new EdgeUIInsetChannelState(
+				uiVisible,
+				channel.observed > 0f,
+				uiVisible ? observation.yMin : 0f,
+				uiVisible ? observation.yMax : 0f,
+				channel.observed,
+				channel.target,
+				channel.current);
 		}
 
 		static void UpdateAnimation()
@@ -142,21 +261,41 @@ namespace CameraPlus
 			var now = Time.realtimeSinceStartup;
 			var deltaTime = lastAnimationTime < 0f ? 0f : Mathf.Clamp(now - lastAnimationTime, 0f, 0.1f);
 			lastAnimationTime = now;
-
 			var enabled = Settings?.indentVanillaUIForEdgeMarkers == true && skipCustomRendering == false;
-			targetLeft = DesiredInset(enabled, now, lastLeftSeen, observationLeft, recentLeft);
-			targetRight = DesiredInset(enabled, now, lastRightSeen, observationRight, recentRight);
-			currentLeft = Smooth(currentLeft, targetLeft, ref velocityLeft, deltaTime);
-			currentRight = Smooth(currentRight, targetRight, ref velocityRight, deltaTime);
+
+			for (var i = 0; i < channels.Length; i++)
+			{
+				var channel = channels[i];
+				channel.observed = OverlappingInset((EdgeUIArea)i);
+				if (channel.observed > 0f)
+				{
+					channel.recent = channel.observed;
+					channel.lastSeen = now;
+				}
+				channel.target = enabled
+					? channel.observed > 0f
+						? channel.observed
+						: now - channel.lastSeen <= noMarkerHoldSeconds ? channel.recent : 0f
+					: 0f;
+				channel.current = Smooth(channel.current, channel.target, ref channel.velocity, deltaTime);
+			}
 		}
 
-		static float DesiredInset(bool enabled, float now, float lastSeen, float currentObservation, float recentObservation)
+		static float OverlappingInset(EdgeUIArea area)
 		{
-			if (enabled == false)
+			var ui = uiObservations[(int)area];
+			if (ui.frame < Time.frameCount - 1 || markerObservationFrame < Time.frameCount - 1)
 				return 0f;
-			if (observationFrame >= Time.frameCount - 1 && currentObservation > 0f)
-				return currentObservation;
-			return now - lastSeen <= noMarkerHoldSeconds ? recentObservation : 0f;
+
+			var markers = area == EdgeUIArea.TopLeft || area == EdgeUIArea.BottomLeft ? leftMarkers : rightMarkers;
+			var inset = 0f;
+			for (var i = 0; i < markers.Count; i++)
+			{
+				var marker = markers[i];
+				if (marker.yMax > ui.yMin && marker.yMin < ui.yMax)
+					inset = Mathf.Max(inset, marker.inset);
+			}
+			return inset;
 		}
 
 		static float Smooth(float current, float target, ref float velocity, float deltaTime)
@@ -172,46 +311,129 @@ namespace CameraPlus
 			}
 			return result;
 		}
+
+		readonly struct EdgeMarkerSpan
+		{
+			public readonly float yMin;
+			public readonly float yMax;
+			public readonly float inset;
+
+			public EdgeMarkerSpan(float yMin, float yMax, float inset)
+			{
+				this.yMin = yMin;
+				this.yMax = yMax;
+				this.inset = inset;
+			}
+		}
+
+		struct UIObservation
+		{
+			public int frame;
+			public float yMin;
+			public float yMax;
+
+			public UIObservation(int frame, float yMin, float yMax)
+			{
+				this.frame = frame;
+				this.yMin = yMin;
+				this.yMax = yMax;
+			}
+		}
+
+		sealed class AnimatedInset
+		{
+			public float observed;
+			public float recent;
+			public float lastSeen = -100f;
+			public float target;
+			public float current;
+			public float velocity;
+		}
 	}
 
-	[HarmonyPatch]
-	static class LeftEdgeUIInsetPatch
+	[HarmonyPatch(typeof(ResourceReadout), nameof(ResourceReadout.ResourceReadoutOnGUI))]
+	static class ResourceReadoutEdgeInsetPatch
 	{
-		static IEnumerable<MethodBase> TargetMethods()
-		{
-			yield return AccessTools.Method(typeof(ResourceReadout), nameof(ResourceReadout.ResourceReadoutOnGUI));
-			yield return AccessTools.Method(typeof(MouseoverReadout), nameof(MouseoverReadout.MouseoverReadoutOnGUI));
-		}
-
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushLeft();
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.TopLeft);
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state)
+		static void Postfix(float ___lastDrawnHeight)
 		{
-			GUI.matrix = __state;
-			return __exception;
+			if (Event.current.type == EventType.Layout || Current.ProgramState != ProgramState.Playing || Find.MainTabsRoot.OpenTab == MainButtonDefOf.Menu)
+				return;
+			EdgeUIInsets.ObserveUI(EdgeUIArea.TopLeft, 7f, 7f + Mathf.Min(___lastDrawnHeight, UI.screenHeight - 207f));
 		}
+
+		[HarmonyPriority(Priority.Last)]
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
 	}
 
-	[HarmonyPatch]
-	static class RightEdgeUIInsetPatch
+	[HarmonyPatch(typeof(MouseoverReadout), nameof(MouseoverReadout.MouseoverReadoutOnGUI))]
+	static class MouseoverReadoutEdgeInsetPatch
 	{
-		static IEnumerable<MethodBase> TargetMethods()
-		{
-			yield return AccessTools.Method(typeof(GlobalControls), nameof(GlobalControls.GlobalControlsOnGUI));
-			yield return AccessTools.Method(typeof(AlertsReadout), nameof(AlertsReadout.AlertsReadoutOnGUI));
-			yield return AccessTools.Method(typeof(MapGizmoUtility), nameof(MapGizmoUtility.MapUIOnGUI));
-		}
-
 		[HarmonyPriority(Priority.First)]
-		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.PushRight();
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomLeft);
 
 		[HarmonyPriority(Priority.Last)]
-		static Exception Finalizer(Exception __exception, Matrix4x4 __state)
+		static void Postfix() => EdgeUIInsets.ObserveMouseoverReadout();
+
+		[HarmonyPriority(Priority.Last)]
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+	}
+
+	[HarmonyPatch(typeof(GlobalControls), nameof(GlobalControls.GlobalControlsOnGUI))]
+	static class GlobalControlsEdgeInsetPatch
+	{
+		[HarmonyPriority(Priority.First)]
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomRight);
+
+		[HarmonyPriority(Priority.Last)]
+		static void Postfix()
 		{
-			GUI.matrix = __state;
-			return __exception;
+			if (Event.current.type != EventType.Layout)
+				EdgeUIInsets.ObserveUI(EdgeUIArea.BottomRight, Find.LetterStack.LastTopY, UI.screenHeight);
 		}
+
+		[HarmonyPriority(Priority.Last)]
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+	}
+
+	[HarmonyPatch(typeof(AlertsReadout), nameof(AlertsReadout.AlertsReadoutOnGUI))]
+	static class AlertsReadoutEdgeInsetPatch
+	{
+		[HarmonyPriority(Priority.First)]
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.TopRight);
+
+		[HarmonyPriority(Priority.Last)]
+		static void Postfix(AlertsReadout __instance, float ___lastFinalY)
+		{
+			if (Event.current.type == EventType.Layout || Event.current.type == EventType.MouseDrag)
+				return;
+			var height = __instance.AlertsHeight;
+			if (height > 0f)
+				EdgeUIInsets.ObserveUI(EdgeUIArea.TopRight, Find.LetterStack.LastTopY - height, ___lastFinalY);
+		}
+
+		[HarmonyPriority(Priority.Last)]
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
+	}
+
+	[HarmonyPatch(typeof(MapGizmoUtility), nameof(MapGizmoUtility.MapUIOnGUI))]
+	static class MapGizmoEdgeInsetPatch
+	{
+		[HarmonyPriority(Priority.First)]
+		static void Prefix(out Matrix4x4 __state) => __state = EdgeUIInsets.Push(EdgeUIArea.BottomRight);
+
+		[HarmonyPriority(Priority.Last)]
+		static void Postfix()
+		{
+			var height = GizmoGridDrawer.HeightDrawnRecently;
+			if (height > 0f)
+				EdgeUIInsets.ObserveUI(EdgeUIArea.BottomRight, UI.screenHeight - height, UI.screenHeight);
+		}
+
+		[HarmonyPriority(Priority.Last)]
+		static Exception Finalizer(Exception __exception, Matrix4x4 __state) => EdgeUIInsets.Restore(__exception, __state);
 	}
 }

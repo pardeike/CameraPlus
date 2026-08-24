@@ -15,6 +15,7 @@ namespace CameraPlus
 		static readonly Dictionary<int, Texture2D> silhouetteTextureCache = [];
 		static readonly Dictionary<int, RenderTexture> markerTextureCache = [];
 		static readonly Dictionary<int, RenderTexture> outlineTextureCache = [];
+		static readonly Dictionary<int, MarkerVisualBounds> markerVisualBoundsCache = [];
 		static readonly HashSet<int> failedMarkerTextureKeys = [];
 		static readonly HashSet<int> failedOutlineTextureKeys = [];
 		static Material outlineGeneratorMaterial;
@@ -71,6 +72,7 @@ namespace CameraPlus
 			ReleaseRenderTextures(outlineTextureCache.Values);
 			outlineTextureCache.Clear();
 			failedOutlineTextureKeys.Clear();
+			markerVisualBoundsCache.Clear();
 
 			if (outlineGeneratorMaterial != null)
 			{
@@ -168,8 +170,123 @@ namespace CameraPlus
 			}
 
 			if (needEdge && materials.edgeDot == null && inputs.dotTexture != null)
+			{
 				materials.edgeDot = CreateMarkerMaterial(inputs.pawn, "edge-dot", inputs.dotTexture, outlineFactor, canMutateTexture: true);
+				materials.edgeVisualBounds = VisualBoundsFor(inputs.dotTexture, outlineFactor, materials.edgeDot);
+			}
 		}
+
+		static MarkerVisualBounds VisualBoundsFor(Texture sourceTexture, float outlineFactor, Material material)
+		{
+			var factorKey = Mathf.RoundToInt(outlineFactor * 10_000f);
+			var key = Gen.HashCombineInt(sourceTexture.GetInstanceID(), factorKey);
+			if (markerVisualBoundsCache.TryGetValue(key, out var cached))
+				return cached;
+
+			try
+			{
+				var shaderUVScale = 1f + outlineFactor * 4f;
+				var mainTexture = material.GetTexture("_MainTex");
+				var mainScale = material.GetVector("_MainUVScale");
+				var fillTextureBounds = AlphaBounds(mainTexture);
+				var fillBounds = MeshBounds(fillTextureBounds, mainScale, shaderUVScale);
+
+				var outlinedBounds = fillBounds;
+				if (outlineFactor > 0f)
+				{
+					var outlineTexture = material.GetTexture("_OutlineTex");
+					var outlineScale = material.GetVector("_OutlineUVScale");
+					var outlineTextureBounds = AlphaBounds(outlineTexture);
+					outlinedBounds = Union(fillBounds, MeshBounds(outlineTextureBounds, outlineScale, shaderUVScale));
+				}
+
+				cached = new MarkerVisualBounds(fillBounds, outlinedBounds);
+				markerVisualBoundsCache[key] = cached;
+				PerfMetrics.Count("marker_visual_bounds.cache_misses");
+				return cached;
+			}
+			catch (Exception exception)
+			{
+				Log.Warning($"CameraPlus failed to measure visible marker bounds '{sourceTexture.name}': {exception}");
+				markerVisualBoundsCache[key] = MarkerVisualBounds.Full;
+				return MarkerVisualBounds.Full;
+			}
+		}
+
+		static Rect AlphaBounds(Texture texture)
+		{
+			if (texture == null || texture.width <= 0 || texture.height <= 0)
+				throw new InvalidOperationException("Marker texture is missing or empty.");
+
+			var previous = RenderTexture.active;
+			var temporary = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+			Texture2D readable = null;
+			try
+			{
+				Graphics.Blit(texture, temporary);
+				RenderTexture.active = temporary;
+				readable = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, false, true);
+				readable.ReadPixels(new Rect(0f, 0f, texture.width, texture.height), 0, 0, false);
+				var pixels = readable.GetPixels32();
+				var minX = texture.width;
+				var minY = texture.height;
+				var maxX = -1;
+				var maxY = -1;
+				for (var y = 0; y < texture.height; y++)
+				{
+					var row = y * texture.width;
+					for (var x = 0; x < texture.width; x++)
+					{
+						if (pixels[row + x].a == 0)
+							continue;
+						minX = Mathf.Min(minX, x);
+						minY = Mathf.Min(minY, y);
+						maxX = Mathf.Max(maxX, x);
+						maxY = Mathf.Max(maxY, y);
+					}
+				}
+
+				if (maxX < 0)
+					return new Rect(0.5f, 0.5f, 0f, 0f);
+
+				// Bilinear filtering reaches half a texel past the outer non-transparent samples.
+				var xMin = Mathf.Max(0f, (minX - 0.5f) / texture.width);
+				var yMin = Mathf.Max(0f, (minY - 0.5f) / texture.height);
+				var xMax = Mathf.Min(1f, (maxX + 1.5f) / texture.width);
+				var yMax = Mathf.Min(1f, (maxY + 1.5f) / texture.height);
+				return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
+			}
+			finally
+			{
+				if (readable != null)
+					UnityEngine.Object.Destroy(readable);
+				RenderTexture.active = previous;
+				RenderTexture.ReleaseTemporary(temporary);
+			}
+		}
+
+		static Rect MeshBounds(Rect textureBounds, Vector4 textureScale, float shaderUVScale)
+		{
+			if (textureScale.x <= 0f || textureScale.y <= 0f || shaderUVScale <= 0f)
+				return new Rect(0f, 0f, 1f, 1f);
+
+			var xMin = 0.5f + (textureBounds.xMin - 0.5f) / textureScale.x / shaderUVScale;
+			var xMax = 0.5f + (textureBounds.xMax - 0.5f) / textureScale.x / shaderUVScale;
+			var yMin = 0.5f + (textureBounds.yMin - 0.5f) / textureScale.y / shaderUVScale;
+			var yMax = 0.5f + (textureBounds.yMax - 0.5f) / textureScale.y / shaderUVScale;
+			return Rect.MinMaxRect(
+				Mathf.Clamp01(xMin),
+				Mathf.Clamp01(yMin),
+				Mathf.Clamp01(xMax),
+				Mathf.Clamp01(yMax));
+		}
+
+		static Rect Union(Rect first, Rect second)
+			=> Rect.MinMaxRect(
+				Mathf.Min(first.xMin, second.xMin),
+				Mathf.Min(first.yMin, second.yMin),
+				Mathf.Max(first.xMax, second.xMax),
+				Mathf.Max(first.yMax, second.yMax));
 
 		static Material CreateMarkerMaterial(Pawn pawn, string suffix, Texture texture, float outlineFactor, bool canMutateTexture = false)
 		{

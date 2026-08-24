@@ -77,8 +77,8 @@ Marker rendering is split across three layers:
 - `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
 - `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
-- `EdgeUIInsets` tracks the widest marker actually drawn on each vertical screen edge and smoothly moves the nearby vanilla interface inward while that edge is occupied.
-- `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture and generates padded radial outline masks per source texture and outline width.
+- `EdgeUIInsets` compares visible marker spans with four independently animated vanilla-interface regions: top-left, bottom-left, top-right, and bottom-right. Markers in unused vertical space do not move the interface.
+- `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture, generates padded radial outline masks per source texture and outline width, and measures the prepared textures once so clearance follows visible pixels rather than transparent quad padding.
 
 The normal draw flow is:
 
@@ -90,7 +90,7 @@ The normal draw flow is:
 6. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
 7. `MarkerCache.MaterialFor(pawn, dotConfig)` creates or refreshes the marker materials.
 8. `DotDrawer` draws edge markers for off-screen pawns and in-map markers when zoom thresholds apply.
-9. For left and right edges, `DotDrawer` projects only the largest rendered marker quad back to logical UI coordinates. `EdgeUIInsets` turns that footprint into a per-side target gap and animates the vanilla interface toward it.
+9. For left and right edges, `DotDrawer` records each marker's allocation-free logical-screen span from its cached visible texture bounds. `EdgeUIInsets` compares those spans with the vanilla UI regions observed during the previous GUI pass and updates only the overlapping area's animation target.
 
 Vanilla rendering suppression is intentional:
 
@@ -106,7 +106,7 @@ Vanilla rendering suppression is intentional:
 
 `FastUI` caches expensive UI coordinate and cell-size reads per frame.
 
-`EdgeUIInsets` holds one frame of marker-footprint observations plus short-lived, smoothed left and right inset values. It does not cache pawns or textures. The renderer submits at most one quad observation per occupied vertical edge each frame, regardless of pawn count.
+`EdgeUIInsets` reuses two marker-span lists and holds one frame of passive vanilla-UI observations plus four short-lived, smoothed inset values. It does not cache pawns or textures. The span calculation uses the already-known orthographic view rectangle and cached marker bounds, so steady-state rendering adds no per-marker camera projections, texture transfers, or allocations.
 
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 
@@ -116,13 +116,13 @@ Vanilla rendering suppression is intentional:
 
 `MarkerDecisionCache` stores the computed marker decision by `thingIDNumber` for the current Unity frame. It exists so the dynamic draw postfix and the vanilla-rendering suppression prefixes can share the same rule lookup and zoom/mouse decision work.
 
-`MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, and outline factor still match the current rule/settings state. Its shared texture cache stores a guarded, non-mipmapped GPU copy per source texture to prevent sub-pixel edge bleed, while its outline cache stores GPU-generated `RenderTexture` masks by source texture and outline width. Normal marker draws sample those two prepared textures once each. It owns material and render-texture cleanup when entries are invalidated or the cache is cleared. Custom marker PNG reloads clear these caches so stale custom marker materials are not reused.
+`MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, and outline factor still match the current rule/settings state. Its shared texture cache stores a guarded, non-mipmapped GPU copy per source texture to prevent sub-pixel edge bleed, while its outline cache stores GPU-generated `RenderTexture` masks by source texture and outline width. Normal marker draws sample those two prepared textures once each. A one-time alpha-bounds readback per source texture and outline width is cached alongside them; no readback occurs during steady-state marker drawing. It owns material and render-texture cleanup when entries are invalidated or the cache is cleared. Custom marker PNG reloads clear these caches so stale custom marker materials are not reused.
 
 ## Settings And Editor UI
 
 `CameraPlusSettings.DoWindowContents()` draws the main mod settings UI. It exposes zoom limits, zoom curve, movement tuning, marker style defaults, label thresholds, animal behavior, shortcut editor access, and marker-rule editor access.
 
-The edge settings include an enabled-by-default option that keeps RimWorld's resource and mouseover readouts clear on the left, and its global controls, alerts, and selected-object gizmos clear on the right. Each side moves independently, follows the largest marker actually rendered there—including per-rule size and interface scale—and eases back to its vanilla position when that edge clears. The main bottom button bar is not moved because edge markers are already contracted above it.
+The edge settings include an enabled-by-default option that keeps RimWorld's resource and mouseover readouts clear on the left, and its global controls, alerts, letters, and selected-object gizmos clear on the right. Top-left, bottom-left, top-right, and bottom-right move independently. Each area follows the visible inner edge of the largest marker whose vertical span overlaps that area's passively observed bounds—including per-rule size and interface scale—and eases back when the overlap clears. A marker in unused vertical space between the top and bottom UI regions has no effect. The main bottom button bar is not moved because edge markers are already contracted above it.
 
 The marker-rule editor is `Dialog_Customization`. It is a custom table-like editor for `DotConfig` rows. It supports:
 

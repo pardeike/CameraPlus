@@ -17,8 +17,8 @@ namespace CameraPlus.BridgeTools
 
 		[Tool(
 			"cameraplus/get_edge_ui_insets",
-			Description = "Read CameraPlus's live left and right RimWorld interface insets for edge markers.",
-			ResultDescription = "Returns whether the setting is enabled, marker observations, target insets, animated insets, interface scale, and screen width.")]
+			Description = "Read CameraPlus's four live RimWorld interface insets for edge markers.",
+			ResultDescription = "Returns the observed UI ranges and independently animated top-left, bottom-left, top-right, and bottom-right insets.")]
 		public static object GetEdgeUiInsets()
 		{
 			if (Current.ProgramState != ProgramState.Playing || Find.CurrentMap == null || CameraPlusMain.Settings == null)
@@ -33,17 +33,28 @@ namespace CameraPlus.BridgeTools
 				frame = Time.frameCount,
 				uiScale = Prefs.UIScale,
 				screenWidth = UI.screenWidth,
+				screenHeight = UI.screenHeight,
 				state.enabled,
-				state.leftMarkers,
-				state.rightMarkers,
-				state.leftObserved,
-				state.rightObserved,
-				state.leftTarget,
-				state.rightTarget,
-				state.leftCurrent,
-				state.rightCurrent
+				state.leftMarkerCount,
+				state.rightMarkerCount,
+				topLeft = EdgeInsetChannel(state.topLeft),
+				bottomLeft = EdgeInsetChannel(state.bottomLeft),
+				topRight = EdgeInsetChannel(state.topRight),
+				bottomRight = EdgeInsetChannel(state.bottomRight)
 			};
 		}
+
+		static object EdgeInsetChannel(EdgeUIInsetChannelState channel)
+			=> new
+			{
+				channel.uiVisible,
+				channel.overlappingMarkers,
+				channel.uiMinY,
+				channel.uiMaxY,
+				channel.observed,
+				channel.target,
+				channel.current
+			};
 
 		[Tool(
 			"cameraplus/validate_todo_runtime",

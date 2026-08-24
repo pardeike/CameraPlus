@@ -61,7 +61,7 @@ Likely candidates to verify with profiling:
 - `Tools.GetMainColor()`, especially texture downsampling and pixel grouping on cache misses.
 - `MarkerCache.MaterialFor()`, especially material creation/destruction cadence and cache key lifetime.
 - `CameraDelegates` reflection for new pawn runtime types.
-- Repeated `UI.MapToUIPosition()` and `UI.UIToMapPosition()` calls in edge-marker calculations.
+- Edge-marker span comparison when unusually many pawns are simultaneously clipped to one side.
 - File watcher reload behavior for custom marker PNGs.
 
 ## Verified First-Pass Fixes
@@ -73,6 +73,7 @@ Verified during the 2026-05-15 prep pass:
 - Changed quota-cache hits to mutate cache entries instead of replacing dictionary values every request.
 - Cached per-material marker colors so `_FillColor` and `_OutlineColor` are only set when the colors change.
 - Replaced per-edge UI conversion scale work with one per-frame clipped-marker map scale.
+- Replaced per-marker camera projections for interface clearance with allocation-free orthographic screen-span math and cached visible texture bounds.
 - Replaced normalized edge ray intersection with direct rectangle scale math.
 - Preserved render state in `Tools.DownsampleTexture()` by restoring the previous active `RenderTexture`.
 - Converted raw RimWorld silhouette textures into cached cutout-mask textures before drawing them with the Camera+ bordered shader.

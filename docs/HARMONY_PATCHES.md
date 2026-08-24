@@ -45,15 +45,15 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 
 ## Edge Marker Interface Clearance
 
-These patches save the current `GUI.matrix` in a first-priority prefix, apply the independently animated inset for that screen side, and restore the exact saved matrix in a last-priority finalizer. They move each complete vanilla drawing method without rewriting its internal screen-edge calculations.
+These patches save the current `GUI.matrix` in a first-priority prefix, apply one of four independently animated area insets, and restore the exact saved matrix in a last-priority finalizer. A last-priority postfix passively records the vanilla region's current vertical bounds for collision decisions on the next frame. They move each complete vanilla drawing method without transpilers or rewriting its internal screen-edge calculations.
 
 | Target | File | Patch | Purpose | Risk |
 | --- | --- | --- | --- | --- |
-| `ResourceReadout.ResourceReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the left resource list right while left-edge markers are present. | Compatibility with other patches that intentionally replace the GUI matrix inside the same method. |
-| `MouseoverReadout.MouseoverReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the lower-left mouseover readout right while left-edge markers are present. | Same scoped GUI-matrix compatibility risk. |
-| `GlobalControls.GlobalControlsOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves right-side play controls, time, date, weather, temperature, and letters left while right-edge markers are present. | Broad but UI-only method; affects other controls drawn inside this method. |
-| `AlertsReadout.AlertsReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves the alert stack left while right-edge markers are present. | Same scoped GUI-matrix compatibility risk. |
-| `MapGizmoUtility.MapUIOnGUI` | `EdgeUIInsets.cs` | Prefix and finalizer | Moves selected-object gizmos left while right-edge markers are present. | May move gizmos supplied by other mods through the vanilla grid, which is intentional for clearance. |
+| `ResourceReadout.ResourceReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the top-left resource list only when a marker overlaps its observed height. | Compatibility with other patches that intentionally replace the GUI matrix inside the same method. |
+| `MouseoverReadout.MouseoverReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-left mouseover readout only when a marker overlaps its current row range. | Same scoped GUI-matrix compatibility risk. |
+| `GlobalControls.GlobalControlsOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the bottom-right play controls, date/weather details, and letters only when their combined observed region overlaps markers. | Broad but UI-only method; affects other controls drawn inside this method. |
+| `AlertsReadout.AlertsReadoutOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Moves the top-right alert stack only when a marker overlaps its observed bounds. | Same scoped GUI-matrix compatibility risk. |
+| `MapGizmoUtility.MapUIOnGUI` | `EdgeUIInsets.cs` | Prefix, postfix, and finalizer | Adds selected-object gizmos to the bottom-right observed region and moves them with that channel. | May move gizmos supplied by other mods through the vanilla grid, which is intentional for clearance. |
 
 Perf builds add these patches only when `CameraPlusPerf=true`:
 
