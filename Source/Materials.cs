@@ -8,6 +8,7 @@ namespace CameraPlus
 		public Material dot;
 		public Material edgeDot;
 		public MarkerVisualBounds edgeVisualBounds = MarkerVisualBounds.Full;
+		public bool edgeVisualBoundsReady;
 		public Material silhouette;
 		public Material custom;
 		public MaterialSignature signature;

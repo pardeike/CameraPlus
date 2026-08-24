@@ -28,7 +28,7 @@ namespace CameraPlus
 		public static Materials MaterialFor(Pawn pawn)
 			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
 
-		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig, bool needInside = true, bool needEdge = false)
+		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig, bool needInside = true, bool needEdge = false, bool needEdgeBounds = false)
 		{
 			using var measure = PerfMetrics.Measure("MarkerCache.MaterialFor");
 			var inputs = MaterialInputs.For(pawn, dotConfig);
@@ -37,7 +37,7 @@ namespace CameraPlus
 				PerfMetrics.Count("marker_cache.hits");
 				if (materials.Matches(inputs.signature))
 				{
-					EnsureMaterials(materials, inputs, needInside, needEdge);
+					EnsureMaterials(materials, inputs, needInside, needEdge, needEdgeBounds);
 					return materials;
 				}
 
@@ -51,7 +51,7 @@ namespace CameraPlus
 			{
 				signature = inputs.signature
 			};
-			EnsureMaterials(materials, inputs, needInside, needEdge);
+			EnsureMaterials(materials, inputs, needInside, needEdge, needEdgeBounds);
 
 			cache.Add(pawn, materials);
 			return materials;
@@ -167,7 +167,7 @@ namespace CameraPlus
 					Remove(pawn);
 		}
 
-		static void EnsureMaterials(Materials materials, MaterialInputs inputs, bool needInside, bool needEdge)
+		static void EnsureMaterials(Materials materials, MaterialInputs inputs, bool needInside, bool needEdge, bool needEdgeBounds)
 		{
 			var mode = inputs.signature.mode;
 			var outlineFactor = inputs.signature.outlineFactor;
@@ -189,9 +189,12 @@ namespace CameraPlus
 			}
 
 			if (needEdge && materials.edgeDot == null && inputs.dotTexture != null)
-			{
 				materials.edgeDot = CreateMarkerMaterial(inputs.pawn, "edge-dot", inputs.dotTexture, outlineFactor, canMutateTexture: true);
+
+			if (needEdgeBounds && materials.edgeVisualBoundsReady == false && materials.edgeDot != null && inputs.dotTexture != null)
+			{
 				materials.edgeVisualBounds = VisualBoundsFor(inputs.dotTexture, outlineFactor, materials.edgeDot);
+				materials.edgeVisualBoundsReady = true;
 			}
 		}
 

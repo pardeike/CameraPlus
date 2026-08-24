@@ -36,6 +36,7 @@ namespace CameraPlus
 			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
 			var clippedMarkerMapScale = ClippedMarkerMapScale(borderMarkerSize);
+			var observeEdgeUI = EdgeUIInsets.Enabled;
 
 			ClearEdgeBuckets();
 			if ((Time.frameCount & 255) == 0)
@@ -78,7 +79,7 @@ namespace CameraPlus
 				if (useMarkers == false)
 					continue;
 
-				var materials = MarkerCache.MaterialFor(pawn, dotConfig, decision.canDrawInsideMarker, drawEdge);
+				var materials = MarkerCache.MaterialFor(pawn, dotConfig, decision.canDrawInsideMarker, drawEdge, drawEdge && observeEdgeUI);
 				if (materials == null)
 					continue;
 
@@ -123,7 +124,7 @@ namespace CameraPlus
 				}
 			}
 
-			DrawEdges(clippedMarkerMapScale, viewRect, borderMarkerSize);
+			DrawEdges(clippedMarkerMapScale, viewRect, borderMarkerSize, observeEdgeUI);
 
 			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
 			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
@@ -131,7 +132,7 @@ namespace CameraPlus
 			PerfMetrics.FlushIfNeeded();
 		}
 
-		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect, Vector2 borderMarkerSize)
+		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect, Vector2 borderMarkerSize, bool observeEdgeUI)
 		{
 			var edgeDrawCount = EdgeDrawCount();
 			if (edgeDrawCount == 0)
@@ -146,7 +147,8 @@ namespace CameraPlus
 					var command = bucket[i];
 					command.materials.ApplyEdgeColors(command.fillColor, command.outlineColor);
 					DrawClipped(clippedMarkerMapScale, command.dotConfig, altitute, command.edgeVector, command.materials.edgeDot);
-					ObserveEdgeBounds(command, viewRect, borderMarkerSize);
+					if (observeEdgeUI)
+						ObserveEdgeBounds(command, viewRect, borderMarkerSize);
 					altitute += edgeAltitudeStep;
 				}
 			}

@@ -106,7 +106,7 @@ Vanilla rendering suppression is intentional:
 
 `FastUI` caches expensive UI coordinate and cell-size reads per frame.
 
-`EdgeUIInsets` reuses one marker-rectangle list and holds one frame of passive vanilla-UI observations plus four short-lived, two-axis smoothed offsets. It does not cache pawns or textures. The rectangle calculation uses the already-known orthographic view rectangle and cached marker bounds, so steady-state rendering adds no per-marker camera projections, texture transfers, or allocations.
+`EdgeUIInsets` reuses one marker-rectangle list and holds one frame of passive vanilla-UI observations plus four short-lived, two-axis smoothed offsets. It does not cache pawns or textures. The rectangle calculation uses the already-known orthographic view rectangle and cached marker bounds, so steady-state rendering adds no per-marker camera projections, texture transfers, or allocations. When interface clearance is disabled, marker rectangles and mouseover rows are not inspected, and visible texture bounds remain lazy until the feature is enabled.
 
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 

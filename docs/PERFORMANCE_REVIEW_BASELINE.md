@@ -49,6 +49,8 @@ Settings and editor UI:
 
 `MarkerCache` holds per-pawn Unity materials and refreshes entries only when the marker mode, custom marker name, or outline factor no longer matches the current rule/settings state. It destroys old materials through `MaterialAllocator.Destroy()`. Better-silhouette textures are copied into cutout-mask textures before they are passed into the Camera+ bordered shader, because RimWorld's silhouette path relies on alpha cutout behavior that Camera+ otherwise loses when it reuses only `material.mainTexture`. Each source texture also gets one guarded, non-mipmapped GPU copy shared by every material, preventing sub-pixel edge bleed without adding steady-state samples. Radial outline masks are generated once on the GPU per source texture and outline width, then retained as GPU-only `RenderTexture` entries; steady-state outlined marker fragments use two texture samples instead of the former circular loop's maximum of 33. Outline values, dimensions, and total pixels are bounded before any render texture is allocated, and failed GPU creation is treated as a cacheable fallback instead of a usable texture.
 
+Turning interface clearance off skips marker-bound calculation, texture-bound readback, passive UI observations, and the duplicate mouseover cell scan. Re-enabling it measures each missing edge texture once, then returns to the cached steady-state path.
+
 `cachedMainColors` stores sampled texture colors by pawn runtime type and body graphic path. This avoids repeated texture readback/downsampling after the first sample for a graphic.
 
 `cachedCameraDelegates` stores reflection-discovered optional integration methods by pawn runtime type.

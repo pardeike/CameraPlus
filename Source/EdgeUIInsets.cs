@@ -107,10 +107,11 @@ namespace CameraPlus
 		static int bottomMarkerCount;
 		static int animationFrame = -1;
 		static float lastAnimationTime = -1f;
+		internal static bool Enabled => Settings?.indentVanillaUIForEdgeMarkers == true && skipCustomRendering == false;
 
 		internal static void ObserveMarker(EdgeScreenEdges edges, Rect screenBounds, Vector2 normalScreenDepth)
 		{
-			if (edges == EdgeScreenEdges.None || Settings?.indentVanillaUIForEdgeMarkers != true)
+			if (edges == EdgeScreenEdges.None || Enabled == false)
 				return;
 
 			var frame = Time.frameCount;
@@ -158,6 +159,9 @@ namespace CameraPlus
 
 		internal static void ObserveUI(EdgeUIArea area, Rect bounds)
 		{
+			if (Enabled == false)
+				return;
+
 			var xMin = Mathf.Clamp(bounds.xMin, 0f, UI.screenWidth);
 			var xMax = Mathf.Clamp(bounds.xMax, 0f, UI.screenWidth);
 			var yMin = Mathf.Clamp(bounds.yMin, 0f, UI.screenHeight);
@@ -202,7 +206,7 @@ namespace CameraPlus
 		{
 			UpdateAnimation();
 			return new EdgeUIInsetState(
-				Settings?.indentVanillaUIForEdgeMarkers == true,
+				Enabled,
 				markerObservationFrame >= Time.frameCount - 1 ? leftMarkerCount : 0,
 				markerObservationFrame >= Time.frameCount - 1 ? rightMarkerCount : 0,
 				markerObservationFrame >= Time.frameCount - 1 ? topMarkerCount : 0,
@@ -215,7 +219,11 @@ namespace CameraPlus
 
 		internal static void ObserveMouseoverReadout()
 		{
-			if (Event.current.type != EventType.Repaint || Find.MainTabsRoot.OpenTab != null)
+			if (Enabled == false
+				|| markerObservationFrame < Time.frameCount - 1
+				|| markers.Count == 0
+				|| Event.current.type != EventType.Repaint
+				|| Find.MainTabsRoot.OpenTab != null)
 				return;
 
 			var rows = MouseoverRows();
@@ -308,7 +316,7 @@ namespace CameraPlus
 			var now = Time.realtimeSinceStartup;
 			var deltaTime = lastAnimationTime < 0f ? 0f : Mathf.Clamp(now - lastAnimationTime, 0f, 0.1f);
 			lastAnimationTime = now;
-			var enabled = Settings?.indentVanillaUIForEdgeMarkers == true && skipCustomRendering == false;
+			var enabled = Enabled;
 
 			for (var i = 0; i < channels.Length; i++)
 			{
