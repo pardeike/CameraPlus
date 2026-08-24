@@ -35,6 +35,7 @@ These are lower volume than per-pawn rendering but central to user feel. Regress
 Settings and editor UI:
 
 - `Dialog_Customization.DoWindowContents()` clears `Caches.dotConfigCache` every tick while the rule editor is open.
+- The rule editor tracks outline cache keys and invalidates outline materials and masks only when those values change.
 - The editor performs per-row layout and color/mode UI work.
 - This is less critical during gameplay, but it can matter for users with many custom rules.
 

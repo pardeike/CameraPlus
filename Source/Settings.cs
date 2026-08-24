@@ -565,7 +565,7 @@ namespace CameraPlus
 			DrawFloatSlider(ctx, "OutlineSize", outlineFactor, 0f, DotConfig.MaxOutlineFactor, PercentValue, value =>
 			{
 				if (Mathf.Approximately(outlineFactor, value) == false)
-					MarkerCache.Clear();
+					MarkerCache.InvalidateOutlines();
 				outlineFactor = value;
 			}, "SettingsHelp_OutlineSize", note: outlineNote, noteColor: outlineNote != null ? RuleNoteColor : DisabledTextColor, helpExtra: RuleOverrideHelp(outlineRuleCount));
 			ctx.Gap(14f);

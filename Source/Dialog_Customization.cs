@@ -32,6 +32,7 @@ namespace CameraPlus
 		private Action closeAction;
 		private List<DotConfig> dotConfigDefaults;
 		private List<DotConfig> dotConfigs;
+		private readonly List<int> outlineFactorKeys = [];
 
 		public override Vector2 InitialSize => new(dialogWidth, dialogHeight);
 		private readonly int observerId;
@@ -88,10 +89,12 @@ namespace CameraPlus
 			resizeable = true;
 			currentWindow = this;
 			observerId = CheckBoxPaintingObserver.Register(checkboxPainting => draggable = checkboxPainting == false);
+			RememberOutlineFactors();
 		}
 
 		public override void PreClose()
 		{
+			InvalidateOutlinesIfChanged();
 			base.PreClose();
 			CheckBoxPaintingObserver.Unregister(observerId);
 		}
@@ -116,6 +119,7 @@ namespace CameraPlus
 
 		public void Tick()
 		{
+			InvalidateOutlinesIfChanged();
 			Caches.dotConfigCache.Clear();
 
 			if (Input.GetMouseButton(0) == false)
@@ -159,6 +163,33 @@ namespace CameraPlus
 				DrawMouseAttachment(Assets.valueChangerMouseAttachment);
 			}
 		}
+
+		void InvalidateOutlinesIfChanged()
+		{
+			var changed = outlineFactorKeys.Count != dotConfigs.Count;
+			if (changed == false)
+				for (var i = 0; i < dotConfigs.Count; i++)
+					if (outlineFactorKeys[i] != OutlineFactorKey(dotConfigs[i]))
+					{
+						changed = true;
+						break;
+					}
+
+			if (changed == false)
+				return;
+			RememberOutlineFactors();
+			MarkerCache.InvalidateOutlines();
+		}
+
+		void RememberOutlineFactors()
+		{
+			outlineFactorKeys.Clear();
+			for (var i = 0; i < dotConfigs.Count; i++)
+				outlineFactorKeys.Add(OutlineFactorKey(dotConfigs[i]));
+		}
+
+		static int OutlineFactorKey(DotConfig config)
+			=> Mathf.RoundToInt(DotConfig.ClampOutlineFactor(config?.outlineFactor ?? 0f) * 10_000f);
 
 		static bool ShouldInsert(float curY, int row)
 			=> row > -1

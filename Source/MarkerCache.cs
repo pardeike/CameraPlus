@@ -59,10 +59,7 @@ namespace CameraPlus
 
 		public static void Clear()
 		{
-			var pawns = cache.Keys.ToList();
-			foreach (var pawn in pawns)
-				Remove(pawn);
-			cache.Clear();
+			ClearMaterials();
 
 			foreach (var texture in silhouetteTextureCache.Values)
 				UnityEngine.Object.Destroy(texture);
@@ -72,16 +69,35 @@ namespace CameraPlus
 			markerTextureCache.Clear();
 			failedMarkerTextureKeys.Clear();
 
-			ReleaseRenderTextures(outlineTextureCache.Values);
-			outlineTextureCache.Clear();
-			failedOutlineTextureKeys.Clear();
-			markerVisualBoundsCache.Clear();
+			ClearOutlineTextures();
 
 			if (outlineGeneratorMaterial != null)
 			{
 				MaterialAllocator.Destroy(outlineGeneratorMaterial);
 				outlineGeneratorMaterial = null;
 			}
+		}
+
+		internal static void InvalidateOutlines()
+		{
+			ClearMaterials();
+			ClearOutlineTextures();
+		}
+
+		static void ClearMaterials()
+		{
+			var pawns = cache.Keys.ToList();
+			foreach (var pawn in pawns)
+				Remove(pawn);
+			cache.Clear();
+		}
+
+		static void ClearOutlineTextures()
+		{
+			ReleaseRenderTextures(outlineTextureCache.Values);
+			outlineTextureCache.Clear();
+			failedOutlineTextureKeys.Clear();
+			markerVisualBoundsCache.Clear();
 		}
 
 		static void ReleaseRenderTextures(IEnumerable<RenderTexture> textures)
