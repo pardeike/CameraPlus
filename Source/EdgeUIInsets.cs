@@ -45,7 +45,6 @@ namespace CameraPlus
 
 	internal static class EdgeUIInsets
 	{
-		const float readabilityGap = 6f;
 		const float noMarkerHoldSeconds = 0.15f;
 		const float expandSmoothTime = 0.10f;
 		const float retractSmoothTime = 0.20f;
@@ -84,13 +83,13 @@ namespace CameraPlus
 			var now = Time.realtimeSinceStartup;
 			if (side == EdgeScreenSide.Left)
 			{
-				observationLeft = Mathf.Max(observationLeft, Mathf.Clamp(screenMaxX + readabilityGap, 0f, maxInset));
+				observationLeft = Mathf.Max(observationLeft, Mathf.Clamp(screenMaxX, 0f, maxInset));
 				recentLeft = observationLeft;
 				lastLeftSeen = now;
 			}
 			else
 			{
-				observationRight = Mathf.Max(observationRight, Mathf.Clamp(UI.screenWidth - screenMinX + readabilityGap, 0f, maxInset));
+				observationRight = Mathf.Max(observationRight, Mathf.Clamp(UI.screenWidth - screenMinX, 0f, maxInset));
 				recentRight = observationRight;
 				lastRightSeen = now;
 			}
