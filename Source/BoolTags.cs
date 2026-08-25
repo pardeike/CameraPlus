@@ -142,7 +142,7 @@ namespace CameraPlus
 
 	public class ControllableTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.IsPlayerControlled;
+		public override bool Matches(Pawn pawn) => Negated ^ Tools.IsPlayerControlledForMarker(pawn);
 	}
 
 	public class CrawlingTag : BoolTag
@@ -167,7 +167,7 @@ namespace CameraPlus
 
 	public class DraftedTag : BoolTag
 	{
-		public override bool Matches(Pawn pawn) => Negated ^ pawn.Drafted;
+		public override bool Matches(Pawn pawn) => Negated ^ Tools.IsDraftedForMarker(pawn);
 	}
 
 	public class ExitingMapTag : BoolTag

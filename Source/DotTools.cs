@@ -180,7 +180,7 @@ namespace CameraPlus
 
 			if (pawn.health?.Downed == true)
 				GetDefaultColonistColors(selected, Settings.defaultColonistDownedOutline, Settings.defaultColonistDownedFill, Settings.defaultColonistDownedSelectedOutline, Settings.defaultColonistDownedSelectedFill, out innerColor, out outerColor);
-			else if (pawn.Drafted)
+			else if (Tools.IsDraftedForMarker(pawn))
 				GetDefaultColonistColors(selected, Settings.defaultColonistDraftedOutline, Settings.defaultColonistDraftedFill, Settings.defaultColonistDraftedSelectedOutline, Settings.defaultColonistDraftedSelectedFill, out innerColor, out outerColor);
 			else if (pawn.health?.Dead == false && pawn.mindState?.mentalStateHandler?.CurStateDef != null)
 				GetDefaultColonistColors(selected, Settings.defaultColonistMentalOutline, Settings.defaultColonistMentalFill, Settings.defaultColonistMentalSelectedOutline, Settings.defaultColonistMentalSelectedFill, out innerColor, out outerColor);

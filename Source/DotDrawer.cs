@@ -283,7 +283,7 @@ namespace CameraPlus
 			if (pawn.RaceProps?.Animal == true && playerFaction)
 				return 1;
 
-			if (IsPlayerControlled(pawn))
+			if (Tools.IsPlayerControlledForMarker(pawn))
 				return 1;
 
 			if (pawn.HostileTo(Faction.OfPlayer))
@@ -372,7 +372,7 @@ namespace CameraPlus
 			}
 
 			var isAnimal = pawn.RaceProps?.Animal == true && pawn.Name != null;
-			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && IsColonistPlayerControlled(pawn) == false;
+			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && Tools.IsColonistPlayerControlledForMarker(pawn) == false;
 			var drawSize = renderer?.BodyGraphic?.drawSize ?? (miscPlayer ? Vector2.one : SafeDrawSize(pawn));
 			if (IsUsableSize(drawSize) == false)
 				drawSize = Vector2.one;
@@ -397,16 +397,6 @@ namespace CameraPlus
 				return Vector2.one;
 			}
 		}
-
-		static bool IsColonistPlayerControlled(Pawn pawn)
-			=> pawn?.health != null
-			&& pawn.mindState != null
-			&& pawn.IsColonistPlayerControlled;
-
-		static bool IsPlayerControlled(Pawn pawn)
-			=> pawn?.health != null
-			&& pawn.mindState != null
-			&& pawn.IsPlayerControlled;
 
 		static bool IsUsableSize(Vector2 size)
 			=> float.IsNaN(size.x) == false

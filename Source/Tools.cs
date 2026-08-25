@@ -36,6 +36,96 @@ namespace CameraPlus
 			return null;
 		}
 
+		internal static bool IsDraftedForMarker(Pawn pawn)
+		{
+			if (pawn == null)
+				return false;
+
+			var flyer = MarkerFlyerFor(pawn);
+			if (flyer != null)
+				return flyer.pawnWasDrafted;
+
+			try
+			{
+				return pawn.Drafted;
+			}
+			catch (Exception exception)
+			{
+				WarnMarkerStateFallback(pawn, "drafted", exception, 183966911);
+				return false;
+			}
+		}
+
+		internal static bool IsColonistPlayerControlledForMarker(Pawn pawn)
+		{
+			if (pawn?.health == null || pawn.mindState == null)
+				return false;
+
+			var flyer = MarkerFlyerFor(pawn);
+			try
+			{
+				if (flyer == null)
+					return pawn.IsColonistPlayerControlled;
+
+				// PawnFlyer temporarily despawns its pawn. Preserve the rest of
+				// RimWorld's IsColonistPlayerControlled test while ignoring only
+				// the Spawned requirement that the flyer itself now satisfies.
+				return IsColonistPlayerControlledWithoutSpawn(pawn);
+			}
+			catch (Exception exception)
+			{
+				WarnMarkerStateFallback(pawn, "colonist control", exception, 342314807);
+				return flyer?.pawnWasDrafted == true;
+			}
+		}
+
+		internal static bool IsPlayerControlledForMarker(Pawn pawn)
+		{
+			if (pawn?.health == null || pawn.mindState == null)
+				return false;
+
+			var flyer = MarkerFlyerFor(pawn);
+			try
+			{
+				if (flyer == null)
+					return pawn.IsPlayerControlled;
+
+				// These are RimWorld's three player-control branches with only
+				// their Spawned checks removed. The remaining pawn state survives
+				// inside a PawnFlyer and is also restored from mid-flight saves.
+				return IsColonistPlayerControlledWithoutSpawn(pawn)
+					|| pawn.IsColonyMech && pawn.OverseerSubject?.State == OverseerSubjectState.Overseen
+					|| pawn.IsColonySubhuman && pawn.mutant?.Def?.canBeDrafted == true;
+			}
+			catch (Exception exception)
+			{
+				WarnMarkerStateFallback(pawn, "player control", exception, 126365957);
+				return flyer?.pawnWasDrafted == true;
+			}
+		}
+
+		static PawnFlyer MarkerFlyerFor(Pawn pawn)
+		{
+			var markerTarget = MarkerTargetFor(pawn);
+			if (markerTarget is PawnFlyer flyer && object.ReferenceEquals(flyer.FlyingPawn, pawn))
+				return flyer;
+			return null;
+		}
+
+		static bool IsColonistPlayerControlledWithoutSpawn(Pawn pawn)
+		{
+			if (pawn.IsColonist == false || pawn.MentalStateDef != null)
+				return false;
+			return pawn.HostFaction == null || pawn.IsSlave;
+		}
+
+		static void WarnMarkerStateFallback(Pawn pawn, string state, Exception exception, int salt)
+		{
+			var typeName = pawn?.GetType().FullName ?? "unknown pawn type";
+			Log.WarningOnce($"CameraPlus could not read {state} state for {typeName}; using a safe marker fallback: {exception}",
+				Gen.HashCombineInt(typeName.GetHashCode(), salt));
+		}
+
 		public static bool IsHiddenFromPlayer(Pawn pawn)
 		{
 			if (pawn == null)

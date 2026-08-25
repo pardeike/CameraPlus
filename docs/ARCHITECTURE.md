@@ -74,7 +74,7 @@ Important camera patches:
 
 Marker rendering is split across three layers:
 
-- `MarkerDecision` computes the per-pawn marker decision once per Unity frame and resolves the visible map target: normally the pawn itself, or its spawned `PawnFlyer` while in flight.
+- `MarkerDecision` computes the per-pawn marker decision once per Unity frame and resolves the visible map target: normally the pawn itself, or its spawned `PawnFlyer` while in flight. Flyer-held pawns use the drafted flag persisted by RimWorld's flyer and player-control checks that ignore only the temporary despawn, so colors, sizing, edge ordering, and Drafted/Controllable rules keep their preflight meaning after takeoff and save/load.
 - `DotTools` decides whether vanilla pawn drawing, ordinary selection brackets, pawn labels, and silhouettes should continue. Selection calls carrying a mod-supplied material pass through because CameraPlus has no equivalent marker state for them.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
 - `EdgeUIInsets` compares visible marker rectangles with independently animated vanilla-interface groups. Top-left messages move with the resource list, the mouseover readout keeps its own bottom-left channel, and alerts, status text, controls, and gizmos share one bottom-right channel so each visual block moves as a unit. Markers outside a group's opposite-axis span do not move it.
