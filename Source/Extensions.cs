@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -93,10 +92,58 @@ namespace CameraPlus
 			return flag;
 		}
 
-		public static DotConfig GetDotConfig(this Pawn pawn) =>
-			AnimalMarkerPolicy.For(pawn).rulesAllowed
-				? CameraSettings.settings.dotConfigs.FirstOrDefault(dotConfig => dotConfig.conditions.All(condition => condition.Matches(pawn)))
-				: null;
+		public static DotConfig GetDotConfig(this Pawn pawn)
+		{
+			if (pawn == null || AnimalMarkerPolicy.For(pawn).rulesAllowed == false)
+				return null;
+
+			var dotConfigs = CameraSettings.settings?.dotConfigs;
+			if (dotConfigs == null)
+				return null;
+
+			for (var configIndex = 0; configIndex < dotConfigs.Count; configIndex++)
+			{
+				var dotConfig = dotConfigs[configIndex];
+				if (dotConfig == null)
+					continue;
+
+				var conditions = dotConfig.conditions;
+				var matches = true;
+				if (conditions != null)
+				{
+					for (var conditionIndex = 0; conditionIndex < conditions.Count; conditionIndex++)
+					{
+						var condition = conditions[conditionIndex];
+						if (condition == null || MatchesSafely(condition, pawn) == false)
+						{
+							matches = false;
+							break;
+						}
+					}
+				}
+
+				if (matches)
+					return dotConfig;
+			}
+
+			return null;
+		}
+
+		static bool MatchesSafely(ConditionTag condition, Pawn pawn)
+		{
+			try
+			{
+				return condition.Matches(pawn);
+			}
+			catch (Exception exception)
+			{
+				var conditionType = condition.GetType().FullName ?? condition.GetType().Name;
+				var pawnType = pawn?.GetType().FullName ?? "unknown pawn type";
+				var key = Gen.HashCombineInt(Gen.HashCombineInt(conditionType.GetHashCode(), pawnType.GetHashCode()), 236326657);
+				Log.WarningOnce($"CameraPlus rule condition {conditionType} failed for {pawnType}; that rule will not match this pawn: {exception}", key);
+				return false;
+			}
+		}
 
 		public static string ToHex(this Color color)
 		{
@@ -109,6 +156,9 @@ namespace CameraPlus
 
 		public static Color? ToColor(this string hex)
 		{
+			if (string.IsNullOrEmpty(hex))
+				return null;
+
 			if (hex.StartsWith("#"))
 				hex = hex.Substring(1);
 

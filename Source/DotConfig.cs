@@ -42,7 +42,10 @@ namespace CameraPlus
 
 		public DotConfig Clone() => new()
 		{
-			conditions = conditions.Select(condition => condition.Clone()).ToArray().ToList(),
+			conditions = conditions?
+				.Where(condition => condition != null)
+				.Select(condition => condition.Clone())
+				.ToArray().ToList() ?? [],
 			mode = mode,
 			customDotStyle = customDotStyle,
 			showBelowPixels = showBelowPixels,
@@ -80,7 +83,30 @@ namespace CameraPlus
 			Scribe_Values.Look(ref outlineFactor, "outlineFactor", 1);
 			Scribe_Values.Look(ref mouseReveals, "mouseReveals", true);
 			if (Scribe.mode == LoadSaveMode.PostLoadInit)
-				outlineFactor = ClampOutlineFactor(outlineFactor);
+				NormalizeValues();
+		}
+
+		internal void NormalizeValues()
+		{
+			conditions ??= [];
+			conditions.RemoveAll(condition => condition == null);
+			mode = NormalizeMode(mode);
+			outlineFactor = ClampOutlineFactor(outlineFactor);
+		}
+
+		internal static DotStyle NormalizeMode(DotStyle value)
+		{
+			switch (value)
+			{
+				case DotStyle.Off:
+				case DotStyle.VanillaDefault:
+				case DotStyle.ClassicDots:
+				case DotStyle.BetterSilhouettes:
+				case DotStyle.Custom:
+					return value;
+				default:
+					return DotStyle.VanillaDefault;
+			}
 		}
 
 		internal static float ClampOutlineFactor(float value)
@@ -90,7 +116,7 @@ namespace CameraPlus
 
 		public static DotConfig ToDotConfig(string xml)
 		{
-			if (xml.StartsWith("<?xml") == false)
+			if (xml?.StartsWith("<?xml") != true)
 				return null;
 			return Tools.ScribeFromString<DotConfig>(xml);
 		}

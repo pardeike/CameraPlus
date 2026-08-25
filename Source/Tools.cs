@@ -19,15 +19,43 @@ namespace CameraPlus
 		const float zoomedInKeyboardDollyRateAt100Percent = 25f;
 		const float zoomedOutKeyboardDollyRateAt100Percent = 247.5f;
 
+		public static Thing MarkerTargetFor(Pawn pawn)
+		{
+			if (pawn == null || pawn.Destroyed)
+				return null;
+
+			if (pawn.Spawned && pawn.Map != null)
+				return pawn;
+
+			if (pawn.ParentHolder is PawnFlyer flyer
+				&& flyer.Spawned
+				&& flyer.Map != null
+				&& flyer.FlyingPawn == pawn)
+				return flyer;
+
+			return null;
+		}
+
 		public static bool IsHiddenFromPlayer(Pawn pawn)
 		{
-			if (pawn?.Map == null)
+			if (pawn == null)
 				return true;
 
-			if (pawn.Map.fogGrid.IsFogged(pawn.Position))
+			var markerTarget = MarkerTargetFor(pawn);
+			var map = markerTarget?.Map;
+			if (map == null || map.Disposed || map.fogGrid == null)
+				return true;
+
+			var position = markerTarget.Position;
+			if (position.IsValid == false || position.InBounds(map) == false || map.fogGrid.IsFogged(position))
 				return true;
 
 			if (DebugSettings.showHiddenPawns || pawn.Faction == Faction.OfPlayer)
+				return false;
+
+			// Vanilla assumes a fully initialized health tracker. Mod-created pawns can
+			// briefly violate that assumption; showing them is safer than crashing the draw pass.
+			if (pawn.health?.hediffSet?.hediffs == null)
 				return false;
 
 			return InvisibilityUtility.IsHiddenFromPlayer(pawn);
@@ -38,32 +66,55 @@ namespace CameraPlus
 		public static Color GetMainColor(Pawn pawn)
 		{
 			using var measure = PerfMetrics.Measure("Tools.GetMainColor");
+			if (pawn == null)
+				return Color.white;
+
 			if (Caches.cachedPawnMainColors.TryGetValue(pawn, out var color))
 				return color;
 
-			var renderer = pawn.Drawer.renderer;
-			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
-			if (renderer.renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out var bodyNode) == false)
-				return Color.clear;
-
-			var graphic = renderer.BodyGraphic;
-			var material = graphic.MatEast ?? graphic.MatSingle;
-			var texture = material?.mainTexture as Texture2D;
-			var tint = EffectiveMaterialTint(material, graphic.color);
-
-			var key = pawn.GetType().FullName + ":" + graphic.path + ":" + (texture?.GetInstanceID() ?? 0) + ":" + ColorHash(tint);
-			if (Caches.cachedMainColors.TryGetValue(key, out color) == false)
+			try
 			{
-				PerfMetrics.Count("main_color.cache_misses");
-				if (texture == null)
-					color = Color.clear;
-				else
-					color = DominantTextureColor(texture);
+				var renderer = pawn.Drawer?.renderer;
+				var renderTree = renderer?.renderTree;
+				if (renderTree == null)
+					return CachePawnMainColor(pawn, Color.white);
 
-				color = ApplyTint(color, tint);
+				renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
+				if (renderTree.nodesByTag == null
+					|| renderTree.nodesByTag.TryGetValue(PawnRenderNodeTagDefOf.Body, out _) == false)
+					return CachePawnMainColor(pawn, Color.white);
 
-				Caches.cachedMainColors[key] = color;
+				var graphic = renderer.BodyGraphic;
+				if (graphic == null)
+					return CachePawnMainColor(pawn, Color.white);
+
+				var material = graphic.MatEast ?? graphic.MatSingle;
+				var texture = material?.mainTexture as Texture2D;
+				var tint = EffectiveMaterialTint(material, graphic.color);
+
+				var key = pawn.GetType().FullName + ":" + graphic.path + ":" + (texture?.GetInstanceID() ?? 0) + ":" + ColorHash(tint);
+				if (Caches.cachedMainColors.TryGetValue(key, out color) == false)
+				{
+					PerfMetrics.Count("main_color.cache_misses");
+					color = texture == null ? Color.white : DominantTextureColor(texture);
+
+					color = ApplyTint(color, tint);
+
+					Caches.cachedMainColors[key] = color;
+				}
+				return CachePawnMainColor(pawn, color);
 			}
+			catch (Exception exception)
+			{
+				var typeName = pawn.GetType().FullName ?? pawn.GetType().Name;
+				Log.WarningOnce($"CameraPlus could not read the body color for {typeName}; using white: {exception}",
+					Gen.HashCombineInt(typeName.GetHashCode(), 181697643));
+				return CachePawnMainColor(pawn, Color.white);
+			}
+		}
+
+		static Color CachePawnMainColor(Pawn pawn, Color color)
+		{
 			Caches.cachedPawnMainColors[pawn] = color;
 			return color;
 		}
@@ -205,7 +256,7 @@ namespace CameraPlus
 
 		public static void DefaultMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture)
 		{
-			if (pawn.IsEntity)
+			if (pawn?.RaceProps != null && pawn.IsEntity)
 			{
 				innerTexture = Assets.innerEntityTexture;
 				outerTexture = Assets.outerEntityTexture;
@@ -235,11 +286,9 @@ namespace CameraPlus
 				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			}
 
-			// CameraPlus cannot draw a replacement marker for pawns held by PawnFlyer or another container.
-			if (pawn.Spawned == false)
-				return true;
-
 			var decision = MarkerDecisionCache.Get(pawn);
+			if (decision.markerTarget == null)
+				return true;
 			if (decision.hidden)
 				return false;
 			if (decision.revealLabel)
@@ -258,11 +307,15 @@ namespace CameraPlus
 
 		static bool ArrayEquals<T>(T[] a, T[] b)
 		{
+			if (object.ReferenceEquals(a, b))
+				return true;
+			if (a == null || b == null)
+				return false;
 			if (a.Length != b.Length)
 				return false;
 
 			for (int i = 0; i < a.Length; i++)
-				if (a[i].Equals(b[i]) == false)
+				if (EqualityComparer<T>.Default.Equals(a[i], b[i]) == false)
 					return false;
 
 			return true;
@@ -390,6 +443,9 @@ namespace CameraPlus
 				var dotConfigs = new List<DotConfig>();
 				Scribe_Collections.Look(ref dotConfigs, nameof(dotConfigs), LookMode.Deep);
 				Scribe.loader.FinalizeLoading();
+				dotConfigs ??= [];
+				dotConfigs.RemoveAll(dotConfig => dotConfig == null);
+				dotConfigs.ForEach(dotConfig => dotConfig.NormalizeValues());
 				return dotConfigs;
 			}
 			catch
@@ -472,8 +528,11 @@ namespace CameraPlus
 
 		public static void CreateSnapback()
 		{
-			Defs.SnapBack.PlayOneShotOnCamera(null);
 			var cameraDriver = Current.cameraDriverInt;
+			if (cameraDriver == null)
+				return;
+
+			Defs.SnapBack.PlayOneShotOnCamera(null);
 			snapbackRootPos = cameraDriver.rootPos;
 			snapbackRootSize = cameraDriver.rootSize;
 		}
@@ -489,32 +548,41 @@ namespace CameraPlus
 		public static void RestoreSnapback()
 		{
 			var tm = Find.TickManager;
+			var cameraDriver = Current.cameraDriverInt;
+			if (tm == null || cameraDriver == null)
+			{
+				ResetSnapback();
+				return;
+			}
+
 			var savedSpeed = tm.curTimeSpeed;
 
 			IEnumerator ApplyRootPosAndSize()
 			{
 				yield return new WaitForSeconds(0.35f);
-				Current.cameraDriverInt.SetRootPosAndSize(snapbackRootPos, snapbackRootSize);
+				cameraDriver.SetRootPosAndSize(snapbackRootPos, snapbackRootSize);
 				ResetSnapback();
 				tm.curTimeSpeed = savedSpeed;
 			}
 
 			tm.curTimeSpeed = TimeSpeed.Paused;
 			Defs.ApplySnap.PlayOneShotOnCamera(null);
-			_ = Current.cameraDriverInt.StartCoroutine(ApplyRootPosAndSize());
+			_ = cameraDriver.StartCoroutine(ApplyRootPosAndSize());
 		}
 
 		public static void HandleHotkeys()
 		{
-			if (Event.current.type == EventType.Repaint || Current.ProgramState != ProgramState.Playing)
+			var currentEvent = Event.current;
+			var settings = Settings;
+			if (currentEvent == null || settings == null || currentEvent.type == EventType.Repaint || Current.ProgramState != ProgramState.Playing)
 				return;
 
 			KeyCode m1, m2;
 
-			if (Input.GetKey(Settings.cameraSettingsKey))
+			if (Input.GetKey(settings.cameraSettingsKey))
 			{
-				m1 = Settings.cameraSettingsMod[0];
-				m2 = Settings.cameraSettingsMod[1];
+				m1 = ModifierAt(settings.cameraSettingsMod, 0);
+				m2 = ModifierAt(settings.cameraSettingsMod, 1);
 				if (m1 == KeyCode.None && m2 == KeyCode.None)
 					return;
 
@@ -528,7 +596,7 @@ namespace CameraPlus
 							var dialog = new Dialog_ModSettings(me);
 							stack.Add(dialog);
 						}
-						Event.current.Use();
+						currentEvent.Use();
 						return;
 					}
 			}
@@ -543,38 +611,47 @@ namespace CameraPlus
 			if (numKey == 0)
 				return;
 
-			var map = Current.gameInt.CurrentMap;
+			var map = Current.gameInt?.CurrentMap;
 			if (map == null)
 				return;
 
 			var savedViews = map.GetComponent<SavedViews>();
+			if (savedViews?.views == null || savedViews.views.Length < 9)
+				return;
 
-			m1 = Settings.cameraSettingsLoad[0];
-			m2 = Settings.cameraSettingsLoad[1];
+			m1 = ModifierAt(settings.cameraSettingsLoad, 0);
+			m2 = ModifierAt(settings.cameraSettingsLoad, 1);
 			if (m1 != KeyCode.None || m2 != KeyCode.None)
 				if (m1 == KeyCode.None || Input.GetKey(m1))
 					if (m2 == KeyCode.None || Input.GetKey(m2))
 					{
 						var view = savedViews.views[numKey - 1];
 						if (view != null)
-							Current.cameraDriverInt.SetRootPosAndSize(view.rootPos, view.rootSize);
-						Event.current.Use();
+							Current.cameraDriverInt?.SetRootPosAndSize(view.rootPos, view.rootSize);
+						currentEvent.Use();
 					}
 
-			m1 = Settings.cameraSettingsSave[0];
-			m2 = Settings.cameraSettingsSave[1];
+			m1 = ModifierAt(settings.cameraSettingsSave, 0);
+			m2 = ModifierAt(settings.cameraSettingsSave, 1);
 			if (m1 != KeyCode.None || m2 != KeyCode.None)
 				if (m1 == KeyCode.None || Input.GetKey(m1))
 					if (m2 == KeyCode.None || Input.GetKey(m2))
 					{
 						var cameraDriver = Current.cameraDriverInt;
+						if (cameraDriver == null)
+							return;
 						savedViews.views[numKey - 1] = new RememberedCameraPos(map)
 						{
 							rootPos = cameraDriver.rootPos,
 							rootSize = cameraDriver.rootSize
 						};
-						Event.current.Use();
+						currentEvent.Use();
 					}
 		}
+
+		static KeyCode ModifierAt(KeyCode[] modifiers, int index)
+			=> modifiers != null && index >= 0 && index < modifiers.Length
+				? modifiers[index]
+				: KeyCode.None;
 	}
 }

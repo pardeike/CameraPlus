@@ -42,7 +42,7 @@ See [BUILD_AND_DEPENDENCIES.md](BUILD_AND_DEPENDENCIES.md) for the exact command
 
 `DotConfig` in `Source/DotConfig.cs` represents one marker rule. A rule contains:
 
-- `conditions`: all must match the pawn. An empty condition list matches every pawn, so a tagless rule is a global catch-all; the first matching rule wins.
+- `conditions`: all must match the pawn. An empty condition list matches every pawn, so a tagless rule is a global catch-all; the first matching rule wins. Null entries and conditions that fail on an unusual modded pawn do not match that rule instead of breaking the draw pass.
 - `mode`: off, vanilla, classic dots, silhouettes, or custom marker image.
 - colors for normal and selected states.
 - map marker, edge marker, mouse reveal, size threshold, relative size, and outline settings.
@@ -74,17 +74,17 @@ Important camera patches:
 
 Marker rendering is split across three layers:
 
-- `MarkerDecision` computes the per-pawn marker decision once per Unity frame.
-- `DotTools` decides whether vanilla pawn drawing, selection brackets, pawn labels, and silhouettes should continue.
+- `MarkerDecision` computes the per-pawn marker decision once per Unity frame and resolves the visible map target: normally the pawn itself, or its spawned `PawnFlyer` while in flight.
+- `DotTools` decides whether vanilla pawn drawing, ordinary selection brackets, pawn labels, and silhouettes should continue. Selection calls carrying a mod-supplied material pass through because CameraPlus has no equivalent marker state for them.
 - `DotDrawer` draws CameraPlus edge indicators and map markers in a `DynamicDrawManager.DrawDynamicThings` postfix.
 - `EdgeUIInsets` compares visible marker rectangles with independently animated vanilla-interface groups. Top-left messages move with the resource list, the mouseover readout keeps its own bottom-left channel, and alerts, status text, controls, and gizmos share one bottom-right channel so each visual block moves as a unit. Markers outside a group's opposite-axis span do not move it.
 - `MarkerCache` builds and recycles per-pawn `Material` instances for dots, silhouettes, and custom marker textures. It prepares one guarded, non-mipmapped GPU copy per source texture, generates padded radial outline masks per source texture and outline width, and measures the prepared textures once so clearance follows visible pixels rather than transparent quad padding.
 
 The normal draw flow is:
 
-1. RimWorld reaches dynamic drawing for the current map.
-2. `DotDrawer.DrawDots(map)` enumerates `map.mapPawns.AllPawnsSpawned`.
-3. Each pawn is filtered for fog/invisibility.
+1. RimWorld reaches dynamic drawing for a map. CameraPlus draws only when that manager belongs to the current map, avoiding duplicate current-map markers when another mod renders a secondary map.
+2. `DotDrawer.DrawDots(map)` enumerates the map's registered dynamic drawables and accepts ordinary `Pawn` instances plus `PawnFlyer` instances that currently hold a pawn. Using RimWorld's draw registry preserves off-screen edge markers while respecting mods that deregister hidden pawns instead of changing the vanilla fog grid.
+3. Each represented pawn is filtered for fog/invisibility at its visible map target. A flyer-held pawn uses the flyer's interpolated draw position for marker placement, clipping, and mouse reveal.
 4. `MarkerDecisionCache` fetches the first matching `DotConfig` through `Caches.dotConfigCache` and computes marker, edge, vanilla-suppression, zoom-threshold, and mouse-reveal decisions.
 5. If no edge marker or in-map marker can be drawn, `DotDrawer` skips color and material work for that pawn.
 6. `DotTools.GetMarkerColors()` resolves rule colors, external mod colors, or default pawn colors.
@@ -99,7 +99,7 @@ Vanilla rendering suppression is intentional:
 - General map floating text can be suppressed independently outside RimWorld's
   closest zoom level, with the global mouse-reveal setting providing a nearby
   exception.
-- `CameraPlusMain.skipCustomRendering` is a public escape hatch other mods can set temporarily to bypass CameraPlus drawing decisions.
+- `CameraPlusMain.skipCustomRendering` is a cooperative public escape hatch other mods can set temporarily to bypass CameraPlus drawing decisions. Callers must restore the global flag from a `finally` block; CameraPlus cannot infer ownership or safely reset another mod's render scope.
 - Perf builds can additionally patch `PawnRenderer.DynamicDrawPhaseAt` to skip vanilla renderer phases for marker-replaced pawns. That experiment is intentionally behind the `CAMERAPLUS_PERF` compile gate.
 
 ## Caches
@@ -110,11 +110,11 @@ Vanilla rendering suppression is intentional:
 
 `Caches.dotConfigCache` caches the first matching rule per pawn for 60 reads, keyed by `thingIDNumber`.
 
-`Caches.cachedMainColors` shares sampled colors between identical body graphics. `Caches.cachedPawnMainColors` provides the steady-state per-pawn fast path; RimWorld's graphics-dirty notification, despawn/destruction, and map removal invalidate it.
+`Caches.cachedMainColors` shares sampled colors between identical body graphics. `Caches.cachedPawnMainColors` provides the steady-state per-pawn fast path; RimWorld's graphics-dirty notification, despawn/destruction, and map removal invalidate it. `MarkerCache` keeps flyer-held pawns alive while their spawned flyer remains on a loaded map.
 
 `Caches.cachedCameraDelegates` stores reflection-discovered external integration delegates by pawn runtime type.
 
-`MarkerDecisionCache` stores the computed marker decision by `thingIDNumber` for the current Unity frame. It exists so the dynamic draw postfix and the vanilla-rendering suppression prefixes can share the same rule lookup and zoom/mouse decision work.
+`MarkerDecisionCache` stores the computed marker decision by pawn reference for the current Unity frame. It exists so the dynamic draw postfix and the vanilla-rendering suppression prefixes can share the same rule lookup and zoom/mouse decision work without temporary or malformed pawn identifiers colliding.
 
 `MarkerCache.cache` stores `Material` objects by `Pawn`. Entries are reused while their marker mode, custom marker name, outline factor, and silhouette-facing direction still match. RimWorld's graphics-dirty notification invalidates ordinary pawn entries, so steady-state hits do not rebuild silhouette inputs; integrations that provide dynamic marker textures retain per-frame texture validation. Outline values are normalized before they become cache keys or GPU dimensions, and generated textures have fixed dimension and pixel-count limits in addition to the GPU's own limit. Its shared texture cache stores a guarded, non-mipmapped GPU copy per source texture to prevent sub-pixel edge bleed, while its outline cache stores GPU-generated `RenderTexture` masks by source texture and outline width. Normal marker draws sample those two prepared textures once each. A one-time alpha-bounds readback per source texture and outline width is cached alongside them; no readback occurs during steady-state marker drawing. Changing rule outline values releases the old masks and their material references while retaining reusable source copies. Full cache clears additionally release source copies, silhouette textures, and the generator material. Custom marker PNG reloads use the full clear so stale custom marker resources are not reused.
 
@@ -160,10 +160,10 @@ Color swatches are stored in `CameraPlusColors.txt` under `GenFilePaths.ConfigFo
 CameraPlus has explicit compatibility paths:
 
 - Harmony dependency is declared in `About/About.xml`.
-- Optional Vehicle Framework support patches `Vehicles.VehicleRenderer:RenderPawnAt` by reflection when present.
+- Optional Vehicle Framework support patches the draw phase of `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt` by reflection when present. It suppresses only the vehicle body draw; Vehicle Framework's surrounding hitbox and component-overlay work still runs.
 - Optional Save Our Ship 2 support patches background mesh recalculation and material state when present.
 - A Dubs Performance Analyzer name-drawing patch is disabled by patching `Analyzer.Fixes.H_DrawNamesFix:Prefix`.
-- External pawn types can expose `CameraPlusSupport.Methods.GetCameraPlusColors(Pawn)` and `GetCameraPlusMarkers(Pawn)` in their own assembly. `CameraDelegates` discovers these by reflection.
+- External pawn types can expose static `CameraPlusSupport.Methods.GetCameraPlusColors(Pawn)` and `GetCameraPlusMarkers(Pawn)` methods in their own assembly, returning exactly two colors or textures. A null result requests CameraPlus defaults. Invalid results warn once and fall back; a throwing provider is disabled for that pawn type so it cannot break later draw frames. Flyer-held pawns are passed to providers as the same temporarily unspawned `Pawn`, so integrations that need the visible map should use held/parent state rather than assume `Pawn.Map` is non-null.
 - [HARMONY_COMPATIBILITY_REVIEW.md](HARMONY_COMPATIBILITY_REVIEW.md) records the 2026-05-17 decompiler/GitHub compatibility pass over these patch targets.
 
 ## Main Architectural Risks
@@ -171,6 +171,6 @@ CameraPlus has explicit compatibility paths:
 - Harmony transpilers depend on RimWorld method IL shape and publicised internals. API updates can compile while still changing runtime semantics.
 - Rendering decisions are distributed across `Main.cs`, `DotTools.cs`, and `DotDrawer.cs`, so a marker change can also change labels, pawn bodies, overlays, and other mods' patches.
 - Most caches are static and have no central lifecycle reset beyond targeted clear/expiry logic.
-- `DotDrawer.DrawDots()` scans every spawned pawn during dynamic drawing.
+- `DotDrawer.DrawDots()` scans every registered dynamic drawable and filters it to pawn and pawn-flyer marker candidates during dynamic drawing.
 - `MarkerCache` uses `Pawn` object keys and per-pawn Unity materials, so cleanup behavior matters for long sessions and large maps.
 - Settings UI and runtime settings share mutable lists directly; editor interactions take effect immediately.

@@ -18,43 +18,36 @@ namespace CameraPlus
 		{
 			[HarmonyPriority(10000)]
 			public static bool Prefix(Pawn ___pawn)
-			{
-				if (skipCustomRendering)
-					return true;
-
-				if (___pawn.Dead)
-					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
-
-				return ShouldShowMarker(___pawn) == false;
-			}
+				=> ShouldRenderPawn(___pawn);
 		}
 
 		[HarmonyPatch]
-		static class VehicleRenderer_RenderPawnAt_Patch
+		static class VehicleRenderer_DynamicDrawPhaseAt_Patch
 		{
-			public static bool Prepare() => TargetMethod() != null;
-			public static MethodBase TargetMethod() => AccessTools.Method("Vehicles.VehicleRenderer:RenderPawnAt");
+			public static bool Prepare()
+			{
+				var method = TargetMethod();
+				var vehicleField = method == null ? null : AccessTools.Field(method.DeclaringType, "vehicle");
+				return vehicleField != null && typeof(Pawn).IsAssignableFrom(vehicleField.FieldType);
+			}
+
+			public static MethodBase TargetMethod()
+				=> AccessTools.Method("Vehicles.Rendering.VehicleRenderer:DynamicDrawPhaseAt");
 
 			[HarmonyPriority(10000)]
-			public static bool Prefix(Pawn ___vehicle)
-			{
-				if (skipCustomRendering)
-					return true;
-
-				if (___vehicle.Dead)
-					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
-
-				return ShouldShowMarker(___vehicle) == false;
-			}
+			public static bool Prefix(Pawn ___vehicle, DrawPhase phase)
+				=> phase != DrawPhase.Draw || ShouldRenderPawn(___vehicle);
 		}
 
 		[HarmonyPatch(typeof(SelectionDrawer), nameof(SelectionDrawer.DrawSelectionBracketFor))]
 		static class SelectionDrawer_DrawSelectionBracketFor_Patch
 		{
 			[HarmonyPriority(10000)]
-			public static bool Prefix(object obj)
+			public static bool Prefix(object obj, Material overrideMat)
 			{
-				if (skipCustomRendering || obj is not Pawn pawn)
+				// A non-null material belongs to another selection system (for example,
+				// Multiplayer's remote-player brackets) and has no marker equivalent.
+				if (skipCustomRendering || overrideMat != null || obj is not Pawn pawn)
 					return true;
 				return ShouldShowMarker(pawn) == false;
 			}
@@ -66,10 +59,10 @@ namespace CameraPlus
 			[HarmonyPriority(10000)]
 			public static bool Prefix(Pawn ___pawn)
 			{
-				if (skipCustomRendering)
+				if (skipCustomRendering || ___pawn == null)
 					return true;
 
-				if (___pawn.Dead)
+				if (___pawn.health?.Dead == true)
 					return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
 
 				var decision = MarkerDecisionCache.Get(___pawn);
@@ -128,6 +121,17 @@ namespace CameraPlus
 			return MarkerDecisionCache.Get(pawn, dotConfig).suppressVanilla;
 		}
 
+		static bool ShouldRenderPawn(Pawn pawn)
+		{
+			if (skipCustomRendering || pawn == null)
+				return true;
+
+			if (pawn.health?.Dead == true)
+				return FastUI.CurUICellSize > Settings.hideDeadPawnsBelow;
+
+			return ShouldShowMarker(pawn) == false;
+		}
+
 		// returning true will prefer markers over labels
 		public static bool GetMarkerColors(Pawn pawn, out Color innerColor, out Color outerColor)
 			=> GetMarkerColors(pawn, Caches.dotConfigCache.Get(pawn), out innerColor, out outerColor);
@@ -138,14 +142,14 @@ namespace CameraPlus
 			PerfMetrics.Count("get_marker_colors.calls");
 
 			var animalPolicy = AnimalMarkerPolicy.For(pawn);
-			if (animalPolicy.included == false)
+			if (pawn == null || animalPolicy.included == false)
 			{
 				innerColor = default;
 				outerColor = default;
 				return false;
 			}
 
-			var selected = Find.Selector.IsSelected(pawn) ? 1 : 0;
+			var selected = Find.Selector?.IsSelected(pawn) == true ? 1 : 0;
 
 			if (dotConfig != null)
 			{
@@ -155,15 +159,16 @@ namespace CameraPlus
 			}
 
 			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
-			if (cameraDelegate.GetCameraColors != null)
+			if (cameraDelegate.TryGetCameraColors(pawn, out var colors))
 			{
-				var colors = cameraDelegate.GetCameraColors(pawn);
 				if (colors?.Length == 2)
 				{
 					innerColor = colors[0];
 					outerColor = colors[1];
 					return true;
 				}
+				if (colors != null)
+					cameraDelegate.WarnInvalidResult("GetCameraPlusColors", "exactly two colors or null");
 			}
 
 			if (animalPolicy.isAnimal || pawn.Faction != Faction.OfPlayer)
@@ -173,14 +178,12 @@ namespace CameraPlus
 				return true;
 			}
 
-			if (pawn.Downed)
+			if (pawn.health?.Downed == true)
 				GetDefaultColonistColors(selected, Settings.defaultColonistDownedOutline, Settings.defaultColonistDownedFill, Settings.defaultColonistDownedSelectedOutline, Settings.defaultColonistDownedSelectedFill, out innerColor, out outerColor);
 			else if (pawn.Drafted)
 				GetDefaultColonistColors(selected, Settings.defaultColonistDraftedOutline, Settings.defaultColonistDraftedFill, Settings.defaultColonistDraftedSelectedOutline, Settings.defaultColonistDraftedSelectedFill, out innerColor, out outerColor);
-			else if (pawn.MentalStateDef != null || pawn.IsPlayerControlled == false && pawn.IsColonistPlayerControlled)
+			else if (pawn.health?.Dead == false && pawn.mindState?.mentalStateHandler?.CurStateDef != null)
 				GetDefaultColonistColors(selected, Settings.defaultColonistMentalOutline, Settings.defaultColonistMentalFill, Settings.defaultColonistMentalSelectedOutline, Settings.defaultColonistMentalSelectedFill, out innerColor, out outerColor);
-			else if (pawn.IsColonistPlayerControlled == false)
-				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 			else
 				GetDefaultColonistColors(selected, Settings.defaultColonistNormalOutline, Settings.defaultColonistNormalFill, Settings.defaultColonistNormalSelectedOutline, Settings.defaultColonistNormalSelectedFill, out innerColor, out outerColor);
 
@@ -213,24 +216,33 @@ namespace CameraPlus
 		public static bool GetMarkerTextures(Pawn pawn, out Texture2D innerTexture, out Texture2D outerTexture, out bool dynamicMarkerTextures)
 		{
 			using var measure = PerfMetrics.Measure("DotTools.GetMarkerTextures");
-			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
-			dynamicMarkerTextures = cameraDelegate.GetCameraMarkers != null;
-			if (cameraDelegate.GetCameraMarkers != null)
+			if (pawn == null)
 			{
-				var textures = cameraDelegate.GetCameraMarkers(pawn);
-				if (textures == null || textures.Length != 2)
-				{
-					innerTexture = default;
-					outerTexture = default;
-					return false;
-				}
-				innerTexture = textures[0];
-				outerTexture = textures[1];
-				return true;
+				innerTexture = null;
+				outerTexture = null;
+				dynamicMarkerTextures = false;
+				return false;
 			}
 
+			var cameraDelegate = Caches.GetCachedCameraDelegate(pawn);
+			dynamicMarkerTextures = cameraDelegate.HasCameraMarkers;
+			if (cameraDelegate.TryGetCameraMarkers(pawn, out var textures))
+			{
+				if (textures?.Length == 2 && textures[0] != null && textures[1] != null)
+				{
+					innerTexture = textures[0];
+					outerTexture = textures[1];
+					return true;
+				}
+
+				// The published integration contract uses null to request Camera+'s defaults.
+				if (textures != null)
+					cameraDelegate.WarnInvalidResult("GetCameraPlusMarkers", "two non-null textures or null");
+			}
+
+			dynamicMarkerTextures = cameraDelegate.HasCameraMarkers;
 			Tools.DefaultMarkerTextures(pawn, out innerTexture, out outerTexture);
-			return true;
+			return innerTexture != null && outerTexture != null;
 		}
 	}
 }

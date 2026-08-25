@@ -1,6 +1,8 @@
 - Edge scrolling can now be disabled without also disabling keyboard camera movement.
 - Pawn labels now follow matching marker rules, including their marker threshold and mouse-reveal behavior.
-- Pawn nameplates from other mods no longer disappear or flicker while the pawn is in flight.
+- Pawns using jump packs keep their Camera+ markers while in flight.
+- Camera+ markers now respect fog-of-war mods that hide pawns through RimWorld's fog grid or dynamic-draw registration.
+- Markers now coexist more cleanly with custom selection brackets, current Vehicle Framework rendering, and mod-provided marker styles.
 - Floating damage and event text can now be kept visible independently of pawn marker style.
 - Dead-pawn hiding remains editable when using Vanilla pawn markers.
 - Animal edge colors remain configurable when matching rules enable edge indicators.

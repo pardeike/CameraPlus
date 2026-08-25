@@ -70,6 +70,89 @@ namespace CameraPlus.BridgeTools
 			};
 
 		[Tool(
+			"cameraplus/inspect_pawn_marker",
+			Description = "Inspect CameraPlus's live marker decision and visible map target for a named pawn, including pawns currently held by a flyer.",
+			ResultDescription = "Returns the pawn's spawn/holder state, resolved marker target and position, current marker decision, draw-registration state, and whether DotDrawer can enumerate the target.")]
+		public static object InspectPawnMarker(
+			[ToolParameter(Description = "Case-insensitive short pawn name, such as Larry.")] string pawnName)
+		{
+			if (Current.ProgramState != ProgramState.Playing || Find.CurrentMap == null || CameraPlusMain.Settings == null)
+				return new { success = false, error = "A playable map and loaded CameraPlus settings are required." };
+
+			if (string.IsNullOrWhiteSpace(pawnName))
+				return new { success = false, error = "A pawn name is required." };
+
+			var map = Find.CurrentMap;
+			var pawn = FindPawnByName(map, pawnName.Trim());
+			if (pawn == null)
+				return new { success = false, error = $"No pawn named '{pawnName}' was found on or held by the current map." };
+
+			var decision = MarkerDecisionCache.Get(pawn);
+			var markerTarget = decision.markerTarget;
+			var targetListed = markerTarget?.Map == map
+				&& map.listerThings?.Contains(markerTarget) == true;
+			var registeredDrawable = DotDrawer.IsRegisteredDrawable(map, markerTarget);
+			var enumeratedByDotDrawer = DotDrawer.IsMarkerCandidate(map, pawn, markerTarget);
+			var rendersAsMarker = enumeratedByDotDrawer
+				&& decision.hidden == false
+				&& decision.canDrawInsideMarker
+				&& decision.hasMarkerColors
+				&& decision.suppressVanilla;
+
+			return new
+			{
+				success = true,
+				modVersion = typeof(CameraPlusMain).Assembly.GetName().Version?.ToString() ?? string.Empty,
+				mapId = map.uniqueID,
+				pawn = pawn.LabelShortCap,
+				pawnId = pawn.thingIDNumber,
+				pawnSpawned = pawn.Spawned,
+				parentHolder = pawn.ParentHolder?.GetType().FullName,
+				markerTarget = markerTarget?.GetType().FullName,
+				markerTargetDef = markerTarget?.def?.defName,
+				markerTargetSpawned = markerTarget?.Spawned ?? false,
+				markerDrawPosition = decision.drawPos.ToString(),
+				currentCellSize = FastUI.CurUICellSize,
+				decision.mode,
+				decision.hidden,
+				decision.defaultShow,
+				decision.drawInside,
+				decision.canDrawInsideMarker,
+				decision.hasMarkerColors,
+				decision.suppressVanilla,
+				decision.revealLabel,
+				targetListed,
+				registeredDrawable,
+				enumeratedByDotDrawer,
+				rendersAsMarker,
+				vanillaBodySuppressed = DotTools.ShouldShowMarker(pawn),
+				labelVisible = Tools.ShouldShowLabel(pawn)
+			};
+		}
+
+		static Pawn FindPawnByName(Map map, string pawnName)
+		{
+			foreach (var pawn in map.mapPawns.AllPawnsSpawned)
+				if (PawnNameMatches(pawn, pawnName))
+					return pawn;
+
+			var things = map.listerThings?.AllThings;
+			if (things != null)
+				for (var thingIndex = 0; thingIndex < things.Count; thingIndex++)
+					if (things[thingIndex] is PawnFlyer flyer && PawnNameMatches(flyer.FlyingPawn, pawnName))
+						return flyer.FlyingPawn;
+
+			foreach (var pawn in map.mapPawns.AllPawnsUnspawned)
+				if (PawnNameMatches(pawn, pawnName))
+					return pawn;
+
+			return null;
+		}
+
+		static bool PawnNameMatches(Pawn pawn, string pawnName)
+			=> pawn != null && string.Equals(pawn.LabelShortCap.ToString(), pawnName, StringComparison.OrdinalIgnoreCase);
+
+		[Tool(
 			"cameraplus/validate_todo_runtime",
 			Description = "Run CameraPlus's live semantic checks for the current TODO behavior slices against a playable map.",
 			ResultDescription = "Returns a pass/fail result and evidence for movement, labels, floating text, dead pawns, animal edges, shortcuts, Shift zoom behavior, and obsolete settings XML.")]
@@ -239,6 +322,8 @@ namespace CameraPlus.BridgeTools
 				settings.dotStyle = DotStyle.BetterSilhouettes;
 				SetRules(worldSettings, new[] { ruleVanilla });
 				var ruleVanillaShows = Tools.ShouldShowLabel(pawn);
+				var explicitOverrideSuppresses = MarkerDecisionCache.Get(pawn, ruleMarker).suppressVanilla;
+				var explicitOverrideDoesNotLeak = explicitOverrideSuppresses && Tools.ShouldShowLabel(pawn);
 
 				var revealRule = new DotConfig { mode = DotStyle.BetterSilhouettes, showBelowPixels = 64, useInside = true, mouseReveals = true };
 				SetFastUi(8f, pawn.DrawPos);
@@ -255,13 +340,29 @@ namespace CameraPlus.BridgeTools
 				var aboveThresholdShows = Tools.ShouldShowLabel(pawn);
 
 				settings.hidePawnLabelBelow = 0;
+				var nullConditionRule = new DotConfig
+				{
+					conditions = new List<ConditionTag> { null },
+					mode = DotStyle.BetterSilhouettes,
+					showBelowPixels = 64,
+					useInside = true,
+					mouseReveals = false
+				};
+				SetRules(worldSettings, new[] { nullConditionRule, ruleVanilla });
+				var nullConditionRuleFailsOpen = Tools.ShouldShowLabel(pawn);
+
 				var missingCustom = new DotConfig { mode = DotStyle.Custom, customDotStyle = "__CameraPlusMissingValidationAsset__", showBelowPixels = 64, useInside = true, mouseReveals = false };
 				SetRules(worldSettings, new[] { missingCustom });
 				var missingCustomShows = Tools.ShouldShowLabel(pawn);
 
+				var invalidMode = new DotConfig { mode = (DotStyle)int.MaxValue, showBelowPixels = 64, useInside = true, mouseReveals = false };
+				var invalidModeDecision = MarkerDecision.For(pawn, invalidMode);
+				var invalidModeFallsBack = invalidModeDecision.mode == DotStyle.VanillaDefault
+					&& invalidModeDecision.suppressVanilla == false;
+
 				animal = SpawnAnimalFixture(map, pawn.Position);
 				var animalPolicyLeavesVanillaLabel = false;
-				var unspawnedPawnLabelPassesThrough = false;
+				var unrepresentedPawnLabelPasses = false;
 				if (animal != null)
 				{
 					settings.customNameStyle = LabelStyle.HideAnimals;
@@ -271,21 +372,24 @@ namespace CameraPlus.BridgeTools
 					var decision = MarkerDecision.For(animal, ruleMarker);
 					animalPolicyLeavesVanillaLabel = decision.defaultShow == false && decision.suppressVanilla == false && Tools.ShouldShowLabel(animal);
 
-					animal.DeSpawn(DestroyMode.WillReplace);
+					animal.DeSpawn();
 					Caches.ClearMarkerState();
-					unspawnedPawnLabelPassesThrough = animal.Spawned == false && Tools.ShouldShowLabel(animal);
+					unrepresentedPawnLabelPasses = Tools.MarkerTargetFor(animal) == null && Tools.ShouldShowLabel(animal);
 				}
 
 				var success = globalVanillaShows
 					&& globalMarkerSuppresses
 					&& ruleMarkerSuppresses
 					&& ruleVanillaShows
+					&& explicitOverrideDoesNotLeak
 					&& ruleMouseRevealShows
 					&& independentThresholdHides
 					&& aboveThresholdShows
+					&& nullConditionRuleFailsOpen
 					&& missingCustomShows
+					&& invalidModeFallsBack
 					&& animalPolicyLeavesVanillaLabel
-					&& unspawnedPawnLabelPassesThrough;
+					&& unrepresentedPawnLabelPasses;
 
 				return new ValidationCase(success, new
 				{
@@ -295,12 +399,15 @@ namespace CameraPlus.BridgeTools
 					globalMarkerSuppresses,
 					ruleMarkerSuppresses,
 					ruleVanillaShows,
+					explicitOverrideDoesNotLeak,
 					ruleMouseRevealShows,
 					independentThresholdHides,
 					aboveThresholdShows,
+					nullConditionRuleFailsOpen,
 					missingCustomShows,
+					invalidModeFallsBack,
 					animalPolicyLeavesVanillaLabel,
-					unspawnedPawnLabelPassesThrough
+					unrepresentedPawnLabelPasses
 				});
 			}
 			finally

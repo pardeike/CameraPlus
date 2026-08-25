@@ -47,7 +47,9 @@ END {
 	print ""
 
 	print "Samples (latest/max)"
-	PrintSample("dotdrawer.all_pawns_spawned")
+	PrintSample("dotdrawer.registered_drawables")
+	PrintSample("dotdrawer.marker_candidates")
+	PrintSample("dotdrawer.flying_pawns")
 	PrintSample("dotdrawer.visible_pawns")
 	PrintSample("dotdrawer.marker_draws")
 	PrintSample("dotdrawer.edge_draws")

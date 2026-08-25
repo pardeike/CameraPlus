@@ -19,7 +19,8 @@ namespace CameraPlus
 		public static CameraPlusSettings Settings;
 		public static float orthographicSize = -1f;
 
-		// for other mods: set temporarily to true to skip anything Camera+ drawing related
+		// For other mods: set temporarily to true to skip Camera+ drawing. Callers own
+		// this global flag and must restore it from a finally block.
 		public static bool skipCustomRendering = false;
 
 		public CameraPlusMain(ModContentPack content) : base(content)
@@ -49,13 +50,14 @@ namespace CameraPlus
 			if (driver == null)
 			{
 				var info = Harmony.GetPatchInfo(AccessTools.Method(typeof(CameraDriver), nameof(CameraDriver.Update)));
-				var owners = "Maybe one of the mods that patch CameraDriver.Update(): ";
-				info.Owners.Do(owner => owners += owner + " ");
+				var owners = info?.Owners == null
+					? "No patch-owner information was available."
+					: "Mods patching CameraDriver.Update: " + string.Join(" ", info.Owners);
 				Log.ErrorOnce("Unexpected null camera driver. Looks like a mod conflict. " + owners, 506973465);
 				return;
 			}
 
-			if (Event.current.shift || Settings.zoomToMouse == false)
+			if (Event.current?.shift == true || Settings?.zoomToMouse != true)
 			{
 				driver.rootSize = rootSize;
 				return;
@@ -73,7 +75,7 @@ namespace CameraPlus
 
 		public static void Prefix(CameraDriver __instance)
 		{
-			if (Settings.disableCameraShake)
+			if (Settings?.disableCameraShake == true && __instance?.shaker != null)
 				__instance.shaker.curShakeMag = 0;
 		}
 
@@ -90,12 +92,14 @@ namespace CameraPlus
 	[HarmonyPatch(typeof(DynamicDrawManager), nameof(DynamicDrawManager.DrawDynamicThings))]
 	static class DynamicDrawManager_DrawDynamicThings_Patch
 	{
-		static void Postfix()
+		static void Postfix(Map ___map)
 		{
 			using var measure = PerfMetrics.Measure("DynamicDrawManager.DrawDynamicThings.Postfix");
-			var map = Find.CurrentMap;
-			if (map != null && skipCustomRendering == false)
-				DotDrawer.DrawDots(map);
+			if (___map != null
+				&& ___map.Disposed == false
+				&& object.ReferenceEquals(___map, Find.CurrentMap)
+				&& skipCustomRendering == false)
+				DotDrawer.DrawDots(___map);
 		}
 	}
 
@@ -110,10 +114,11 @@ namespace CameraPlus
 
 			var settings = Settings;
 
-			if (settings.suppressFloatingText == false)
+			if (settings?.suppressFloatingText != true)
 				return true;
 
-			if (Current.cameraDriverInt.CurrentZoom == CameraZoomRange.Closest)
+			var cameraDriver = Current.cameraDriverInt;
+			if (cameraDriver == null || cameraDriver.CurrentZoom == CameraZoomRange.Closest)
 				return true;
 
 			if (settings.mouseOverShowsLabels)
@@ -259,9 +264,9 @@ namespace CameraPlus
 			orthographicSize = newOrthographicSize;
 
 			var vanillaHeight = VanillaCameraHeight(driver.rootSize);
-			driver.rootPos.y = Mathf.Max(Mathf.Lerp(vanillaHeight, vanillaCloseCameraHeight, Settings.soundNearness), 0.1f);
+			driver.rootPos.y = Mathf.Max(Mathf.Lerp(vanillaHeight, vanillaCloseCameraHeight, Settings?.soundNearness ?? 0f), 0.1f);
 
-			var currentPos = driver.rootPos + driver.shaker.ShakeOffset;
+			var currentPos = driver.rootPos + (driver.shaker?.ShakeOffset ?? Vector3.zero);
 			camera.transform.position = currentPos;
 			if (driver.reverbDummy != null)
 			{
@@ -273,9 +278,12 @@ namespace CameraPlus
 			camera.nearClipPlane = vanillaNearClipPlane;
 			camera.farClipPlane = Mathf.Max(currentPos.y * 2.5f, 500f);
 
-			driver.config.dollyRateKeys = Tools.GetDollyRateKeys(newOrthographicSize);
-			driver.config.dollyRateScreenEdge = Tools.GetDollyRateScreenEdge(newOrthographicSize);
-			driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(newOrthographicSize);
+			if (driver.config != null)
+			{
+				driver.config.dollyRateKeys = Tools.GetDollyRateKeys(newOrthographicSize);
+				driver.config.dollyRateScreenEdge = Tools.GetDollyRateScreenEdge(newOrthographicSize);
+				driver.config.camSpeedDecayFactor = Tools.GetDollySpeedDecay(newOrthographicSize);
+			}
 		}
 
 		static float VanillaCameraHeight(float rootSize)
@@ -357,9 +365,15 @@ namespace CameraPlus
 	[HarmonyPatch]
 	static class SaveOurShip2BackgroundPatch
 	{
-		public static bool Prepare() => TargetMethod() != null;
+		public static bool Prepare() => TargetMethod() != null && mCenter != null;
 		public static MethodBase TargetMethod() { return AccessTools.Method("SaveOurShip2.MeshRecalculateHelper:RecalculateMesh"); }
-		public static readonly MethodInfo mCenter = AccessTools.PropertyGetter(AccessTools.TypeByName("SaveOurShip2.SectionThreadManager"), "Center");
+		public static readonly MethodInfo mCenter = CenterGetter();
+
+		static MethodInfo CenterGetter()
+		{
+			var type = AccessTools.TypeByName("SaveOurShip2.SectionThreadManager");
+			return type == null ? null : AccessTools.PropertyGetter(type, "Center");
+		}
 
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
@@ -478,10 +492,14 @@ namespace CameraPlus
 
 		public static void Postfix()
 		{
-			if (Tools.HasSnapback && Current.gameInt.tickManager.Paused == false)
+			var tickManager = Current.gameInt?.tickManager;
+			if (tickManager == null)
+				return;
+
+			if (Tools.HasSnapback && tickManager.Paused == false)
 				Tools.RestoreSnapback();
 
-			if (KeyBindingDefOf.TogglePause.IsDown && Current.gameInt.tickManager.Paused)
+			if (KeyBindingDefOf.TogglePause?.IsDown == true && tickManager.Paused)
 			{
 				var now = DateTime.Now;
 				if (lastChange == DateTime.MinValue)
@@ -505,7 +523,7 @@ namespace CameraPlus
 	{
 		public static void Postfix(TickManager __instance)
 		{
-			if (Tools.HasSnapback && __instance.Paused == false)
+			if (Tools.HasSnapback && __instance?.Paused == false)
 				Tools.RestoreSnapback();
 		}
 	}

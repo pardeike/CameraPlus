@@ -1,6 +1,8 @@
 # Harmony Compatibility Review
 
-Date: 2026-05-17
+Original pass: 2026-05-17
+
+Marker/flyer follow-up: 2026-08-25
 
 Purpose: identify CameraPlus Harmony integration points, check the RimWorld target shape, and search acquired GitHub RimWorld mod source for patches on the same methods. The specific concern was mods that indirectly or accidentally shortcut CameraPlus patches.
 
@@ -24,7 +26,7 @@ Limitations:
 2. Dubs Performance Analyzer's `DynamicDrawManager.DrawDynamicThings` profiling patch skips the vanilla dynamic draw body when active, but CameraPlus' postfix should still run. This is a compatibility concern for draw semantics, not a current missing-marker bypass.
 3. Dubs Performance Analyzer's `H_DrawNamesFix` is a real label-path replacement, and CameraPlus already mitigates it by patching `Analyzer.Fixes.H_DrawNamesFix:Prefix` to return `true` and skip the DPA replacement. That mitigation depends on DPA keeping that internal type and method name.
 4. Zombieland is the clearest entity-specific renderer conflict. It patches `PawnRenderer.RenderPawnAt` and `GenMapUI.DrawPawnLabel` for zombies, including a skip-original path for emerging zombies and label suppression for zombies. CameraPlus can intentionally replace pawn rendering with markers first, so this is a policy conflict for zombies rather than a generic crash risk.
-5. The most fragile CameraPlus patches are still the transpilers and string-reflection targets: `CameraDriver.Update`, `CameraDriver.ApplyPositionToGameObject`, `CameraDriver.CurrentViewRect`, `SaveOurShip2.MeshRecalculateHelper:RecalculateMesh`, and optional `Vehicles.VehicleRenderer:RenderPawnAt`.
+5. The most fragile CameraPlus patches are still the transpilers and string-reflection targets: `CameraDriver.Update`, `CameraDriver.ApplyPositionToGameObject`, `CameraDriver.CurrentViewRect`, `SaveOurShip2.MeshRecalculateHelper:RecalculateMesh`, and optional `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt`.
 6. The canonical patch inventory was missing `MarkerCacheLifecycle.cs`. That has now been added to `docs/HARMONY_PATCHES.md`.
 
 ## Target Review
@@ -48,8 +50,8 @@ Limitations:
 | `OverlayDrawer.RenderForbiddenOverlay` | Prefix | No exact external patch found. | Low. Corpse-only overlay suppression. |
 | `GenMapUI.DrawThingLabel(Vector2, string, Color)` | Prefix plus transpiler | No exact external patch found. | Moderate. Label hiding and font replacement are user-visible; transpiler shape is small but still IL-dependent. |
 | `PawnRenderer.RenderPawnAt(Vector3, Rot4?, bool)` | Prefix | Zombieland patches this with `Priority.First`, custom zombie rendering, and a skip-original path for emerging zombies. DPA forks also profile this target. | Moderate to high. CameraPlus priority `10000` should run early, but marker suppression can intentionally preempt entity-specific custom renderers. This is a compatibility policy risk. |
-| `Vehicles.VehicleRenderer:RenderPawnAt` | Reflection prefix | No acquired external Vehicle Framework source hit. | Moderate. Optional API string target; robust against absence, fragile against signature/name drift. |
-| `SelectionDrawer.DrawSelectionBracketFor` | Prefix | JecsTools BigBox has a skip-original prefix for custom brackets on big-box things. Multiplayer calls `DrawSelectionBracketFor` for remote selections. | Low to moderate. CameraPlus only suppresses pawn brackets; JecsTools scope is non-pawn `ThingWithComps`. |
+| `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt` | Reflection prefix | The 2026-08-25 installed-assembly check found that current Vehicle Framework moved the renderer and no longer exposes the older `Vehicles.VehicleRenderer.RenderPawnAt` target. | Moderate. The patch is optional and verifies both the method and its private pawn field before applying; future internal drift still disables this compatibility path. |
+| `SelectionDrawer.DrawSelectionBracketFor` | Prefix | JecsTools BigBox has a skip-original prefix for custom brackets on big-box things. Multiplayer calls `DrawSelectionBracketFor` with a custom material for remote selections. | Low. CameraPlus is pawn-only and now passes through caller-supplied materials, preserving remote/custom bracket semantics. |
 | `PawnUIOverlay.DrawPawnGUIOverlay` | Prefix | Dubs Performance Analyzer `H_DrawNamesFix` replaces label drawing and returns `false` when enabled. | Moderate. CameraPlus has an explicit mitigation for the known DPA type. Drift in DPA internals would reopen this conflict. |
 | `SilhouetteUtility.ShouldDrawSilhouette` | Prefix | No exact external patch found. | Low. CameraPlus returns false only when its marker decision suppresses vanilla rendering. |
 | `GenMapUI.DrawPawnLabel(...)` | Prefix | Zombieland suppresses zombie labels unless they were map pawns before. | Moderate. Entity-specific label policy can conflict with CameraPlus marker/label policy. |
@@ -89,9 +91,31 @@ These were the material external patches found in the acquired corpus:
    - log `Harmony.GetPatchInfo(...)` owners for the affected method once.
    - distinguish prefix-skip, transpiler, and call-site bypass cases in the message.
 4. For optional string targets, prefer fail-soft behavior:
-   - `Vehicles.VehicleRenderer:RenderPawnAt` should keep `Prepare() => TargetMethod() != null`.
+   - `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt` should keep its `Prepare()` checks for both the target and private vehicle field.
    - `SaveOurShip2.MeshRecalculateHelper:RecalculateMesh` should log once if the target exists but the expected IL anchor does not match.
 5. Re-test Dubs Performance Analyzer with its draw labels fix and dynamic draw profiling enabled before changing the current DPA mitigation. It is the only evidence-backed replacement patch that directly overlaps CameraPlus marker/label policy.
 6. Treat Zombieland as the first real renderer-policy compatibility test case: emerging zombies and zombie labels are deliberately non-vanilla. If a user reports this combination, decide whether CameraPlus marker rules should override Zombieland custom rendering or yield for zombies.
 7. Keep the perf-gated renderer-phase shortcut out of release builds. It is much more likely than the normal build to conflict with apparel, weapon, overlay, and custom pawn renderer mods.
 
+## 2026-08-25 Marker And Flyer Follow-up
+
+This follow-up widened the evidence pass to the current 48-repository GitHubCodeSearch corpus, installed Workshop source, and the installed RimWorld, Vanilla Expanded Framework, and Vehicle Framework assemblies. It focused on common draw/label/selection methods and the new flyer-held marker path. It was a source and assembly review; the third-party combinations below were not live-played during this pass.
+
+Safe, low-cost changes made from that evidence:
+
+- Registered derived `PawnFlyer` instances remain accepted by assignability, covering installed Vanilla Expanded, Vehicle Map Framework, Milira, and other subclasses without naming individual mods.
+- The stale Vehicle Framework renderer target was replaced with the current draw-phase target. Only the vehicle body draw is suppressible; Vehicle Framework's outer pawn draw continues its hitbox and component work.
+- Calls to `SelectionDrawer.DrawSelectionBracketFor` with a non-null override material now pass through, preserving Multiplayer remote brackets and other caller-owned selection visuals.
+- Pawn-label calls fail open when CameraPlus cannot resolve a spawned pawn or spawned flyer as the replacement target. This preserves labels for custom holders/renderers without restoring the old blanket rule that broke flying markers.
+- External color/texture providers are bound only when their exact static signature matches. Null results use defaults, malformed arrays warn once and use defaults, and throwing providers are disabled per pawn type.
+- Marker decisions normalize invalid style values, missing custom textures no longer count as drawable markers, and null rule/config/renderer state falls back without suppressing a visible pawn.
+- The `DrawDynamicThings` postfix uses the patched manager's map and draws only for the current map, avoiding duplicate or misplaced markers when a mod renders another map or minimap.
+
+Deliberately accepted compatibility boundaries:
+
+- CameraPlus still intentionally wins its marker policy over entity-specific body and label rendering such as Zombieland when the pawn matches a marker rule. There is no general way to merge arbitrary custom body rendering into a marker.
+- `PawnUIOverlay.DrawPawnGUIOverlay` remains whole-method suppression while a marker replaces the pawn. Harmony postfixes still run, but custom content drawn only inside the skipped original/prefix path may be absent.
+- Dead-pawn suppression can still hide custom corpse rendering, including storage renderers that deliberately call pawn rendering. That is existing player-visible policy, not a safe compatibility tweak.
+- CameraPlus draws markers only for the current main map. Secondary-map and minimap renderers need to opt out with `skipCustomRendering` or supply their own representation.
+- `skipCustomRendering` is cooperative global state. External renderers must restore it in `finally`; CameraPlus cannot reset it defensively without breaking a legitimate caller-owned render scope.
+- The perf-only renderer-phase shortcut remains excluded from normal builds because its wider apparel, weapon, overlay, and custom-renderer collision surface is not justified by this feature.

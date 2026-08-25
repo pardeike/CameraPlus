@@ -26,14 +26,21 @@ namespace CameraPlus
 		const long maxOutlineTexturePixels = 4L * 1024L * 1024L;
 
 		public static Materials MaterialFor(Pawn pawn)
-			=> MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
+		{
+			if (pawn == null)
+				return null;
+			return MaterialFor(pawn, Caches.dotConfigCache.Get(pawn));
+		}
 
 		public static Materials MaterialFor(Pawn pawn, DotConfig dotConfig, bool needInside = true, bool needEdge = false, bool needEdgeBounds = false)
 		{
 			using var measure = PerfMetrics.Measure("MarkerCache.MaterialFor");
-			var mode = dotConfig?.mode ?? Settings.dotStyle;
+			if (pawn == null || pawn.Destroyed || Tools.MarkerTargetFor(pawn) == null)
+				return null;
+
+			var mode = DotConfig.NormalizeMode(dotConfig?.mode ?? Settings?.dotStyle ?? DotStyle.VanillaDefault);
 			var customDotStyle = dotConfig?.customDotStyle;
-			var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings.outlineFactor);
+			var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings?.outlineFactor ?? 0.1f);
 			var westFacing = mode == DotStyle.BetterSilhouettes && pawn.Rotation == Rot4.West;
 			if (cache.TryGetValue(pawn, out var materials))
 			{
@@ -68,7 +75,7 @@ namespace CameraPlus
 			};
 			EnsureMaterials(materials, inputs, needInside, needEdge, needEdgeBounds);
 
-			cache.Add(pawn, materials);
+			cache[pawn] = materials;
 			return materials;
 		}
 
@@ -119,6 +126,8 @@ namespace CameraPlus
 		{
 			foreach (var texture in textures)
 			{
+				if (texture == null)
+					continue;
 				texture.Release();
 				UnityEngine.Object.Destroy(texture);
 			}
@@ -155,7 +164,7 @@ namespace CameraPlus
 
 			var pawns = cache.Keys.ToList();
 			foreach (var pawn in pawns)
-				if (pawn?.Map == map || map.mapPawns.AllPawnsSpawned.Contains(pawn))
+				if (pawn?.MapHeld == map)
 					Remove(pawn);
 		}
 
@@ -171,15 +180,13 @@ namespace CameraPlus
 				return;
 			}
 
-			var livePawns = new HashSet<Pawn>();
-			foreach (var map in maps)
-				foreach (var pawn in map.mapPawns.AllPawnsSpawned)
-					livePawns.Add(pawn);
-
 			var cachedPawns = cache.Keys.ToList();
 			foreach (var pawn in cachedPawns)
-				if (pawn == null || pawn.Destroyed || pawn.Map == null || livePawns.Contains(pawn) == false)
+			{
+				var markerTarget = Tools.MarkerTargetFor(pawn);
+				if (markerTarget?.Map == null || maps.Contains(markerTarget.Map) == false)
 					Remove(pawn);
+			}
 		}
 
 		static void EnsureMaterials(Materials materials, MaterialInputs inputs, bool needInside, bool needEdge, bool needEdgeBounds)
@@ -194,7 +201,7 @@ namespace CameraPlus
 					case DotStyle.ClassicDots when materials.dot == null && inputs.dotTexture != null:
 						materials.dot = CreateMarkerMaterial(inputs.pawn, "dot", inputs.dotTexture, outlineFactor, canMutateTexture: true);
 						break;
-					case DotStyle.BetterSilhouettes when materials.silhouette == null:
+					case DotStyle.BetterSilhouettes when materials.silhouette == null && inputs.silhouetteTexture != null:
 						materials.silhouette = CreateMarkerMaterial(inputs.pawn, "silhouette", inputs.silhouetteTexture, outlineFactor);
 						break;
 					case DotStyle.Custom when materials.custom == null && inputs.customTexture != null:
@@ -333,6 +340,9 @@ namespace CameraPlus
 
 		static Material CreateMarkerMaterial(Pawn pawn, string suffix, Texture texture, float outlineFactor, bool canMutateTexture = false)
 		{
+			if (pawn == null || texture == null || Assets.BorderedShader == null)
+				return null;
+
 			outlineFactor = DotConfig.ClampOutlineFactor(outlineFactor);
 			var material = MaterialAllocator.Create(Assets.BorderedShader);
 			material.name = $"{pawn.ThingID}-{suffix}";
@@ -575,8 +585,8 @@ namespace CameraPlus
 
 			public static MaterialInputs For(Pawn pawn, DotConfig dotConfig)
 			{
-				var mode = dotConfig?.mode ?? Settings.dotStyle;
-				var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings.outlineFactor);
+				var mode = DotConfig.NormalizeMode(dotConfig?.mode ?? Settings?.dotStyle ?? DotStyle.VanillaDefault);
+				var outlineFactor = DotConfig.ClampOutlineFactor(dotConfig?.outlineFactor ?? Settings?.outlineFactor ?? 0.1f);
 
 				Texture dotTexture = null;
 				if (DotTools.GetMarkerTextures(pawn, out var markerTexture, out _, out var dynamicMarkerTextures))
@@ -587,7 +597,10 @@ namespace CameraPlus
 					silhouetteTexture = GetTexture(pawn);
 
 				Texture customTexture = null;
-				if (mode == DotStyle.Custom && Assets.customMarkers.TryGetValue(dotConfig?.customDotStyle, out var texture))
+				if (mode == DotStyle.Custom
+					&& string.IsNullOrEmpty(dotConfig?.customDotStyle) == false
+					&& Assets.customMarkers.TryGetValue(dotConfig.customDotStyle, out var texture)
+					&& texture != null)
 					customTexture = texture;
 
 				var signature = new MaterialSignature(
@@ -607,43 +620,60 @@ namespace CameraPlus
 
 		static Graphic GetSilhouetteGraphic(Pawn pawn)
 		{
-			var renderer = pawn.Drawer.renderer;
-			renderer.renderTree.EnsureInitialized(PawnRenderFlags.DrawNow);
-			return pawn.RaceProps.Humanlike
-				? pawn.ageTracker.CurLifeStage.silhouetteGraphicData.Graphic
-				: (pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData == null
-					? renderer.BodyGraphic
-					: pawn.ageTracker.CurKindLifeStage.silhouetteGraphicData.Graphic
-					);
+			var renderer = pawn?.Drawer?.renderer;
+			if (renderer == null)
+				return null;
+
+			renderer.renderTree?.EnsureInitialized(PawnRenderFlags.DrawNow);
+			GraphicData silhouetteGraphicData;
+			if (pawn.RaceProps?.Humanlike == true)
+				silhouetteGraphicData = pawn.ageTracker?.CurLifeStage?.silhouetteGraphicData;
+			else
+				silhouetteGraphicData = pawn.ageTracker?.CurKindLifeStage?.silhouetteGraphicData;
+
+			return silhouetteGraphicData?.Graphic ?? renderer.BodyGraphic;
 		}
 
 		// copied from RenderPawnAt(Vector3 drawLoc, Rot4? rotOverride, bool neverAimWeapon)
 		// TODO maybe make a reverse patch?
 		static void UpdateSilhouetteCache(Pawn pawn, Graphic graphic)
 		{
-			var renderer = pawn.Drawer.renderer;
-			var bodyPos = renderer.GetBodyPos(pawn.DrawPos, PawnPosture.Standing, out _);
+			var renderer = pawn?.Drawer?.renderer;
+			if (renderer == null || graphic == null)
+				return;
+
+			var drawPos = Tools.MarkerTargetFor(pawn)?.DrawPos ?? pawn.DrawPos;
+			var bodyPos = renderer.GetBodyPos(drawPos, PawnPosture.Standing, out _);
 			renderer.SetSilhouetteData(graphic, bodyPos);
 		}
 
 		static Texture GetTexture(Pawn pawn)
 		{
-			var graphic = GetSilhouetteGraphic(pawn);
-			if (graphic == null)
-			{
-				Tools.DefaultMarkerTextures(pawn, out var fallbackInner, out _);
+			Tools.DefaultMarkerTextures(pawn, out var fallbackInner, out _);
+			if (pawn == null)
 				return fallbackInner;
-			}
 
-			UpdateSilhouetteCache(pawn, graphic);
-			if (pawn.Drawer.renderer.SilhouetteGraphic != null)
+			try
 			{
-				var (_, material) = SilhouetteUtility.GetCachedSilhouetteData(pawn);
-				return PreparedSilhouetteTexture(material, graphic.color);
+				var graphic = GetSilhouetteGraphic(pawn);
+				if (graphic == null)
+					return fallbackInner;
+
+				UpdateSilhouetteCache(pawn, graphic);
+				if (pawn.Drawer?.renderer?.SilhouetteGraphic != null)
+				{
+					var (_, material) = SilhouetteUtility.GetCachedSilhouetteData(pawn);
+					return PreparedSilhouetteTexture(material, graphic.color) ?? fallbackInner;
+				}
+			}
+			catch (Exception exception)
+			{
+				var typeName = pawn.GetType().FullName ?? pawn.GetType().Name;
+				Log.WarningOnce($"CameraPlus could not prepare a silhouette for {typeName}; using its normal marker texture: {exception}",
+					Gen.HashCombineInt(typeName.GetHashCode(), 210902549));
 			}
 
-			Tools.DefaultMarkerTextures(pawn, out var inner, out _);
-			return inner;
+			return fallbackInner;
 		}
 
 		static Texture PreparedSilhouetteTexture(Material sourceMaterial, Color graphicTint)

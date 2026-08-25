@@ -1,6 +1,6 @@
 using RimWorld;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Verse;
 using static CameraPlus.CameraPlusMain;
@@ -30,8 +30,15 @@ namespace CameraPlus
 		public static void DrawDots(Map map)
 		{
 			using var measure = PerfMetrics.Measure("DotDrawer.DrawDots");
+			if (map == null || map.Disposed || map.dynamicDrawManager == null)
+				return;
+
+			var drawThings = map.dynamicDrawManager.DrawThings;
+			if (drawThings == null)
+				return;
+
 			PerfMetrics.Count("dotdrawer.draw_calls");
-			PerfMetrics.Sample("dotdrawer.all_pawns_spawned", map.mapPawns.AllPawnsSpawned.Count);
+			PerfMetrics.Sample("dotdrawer.registered_drawables", drawThings.Count);
 
 			var borderMarkerSize = new Vector2(16f * Prefs.UIScale, 16f * Prefs.UIScale);
 			var viewRect = RealViewRect(borderMarkerSize.x * Settings.clippedBorderDistanceFactor);
@@ -45,91 +52,146 @@ namespace CameraPlus
 			var visiblePawns = 0;
 			var markerDraws = 0;
 			var edgeDraws = 0;
-			foreach (var pawn in map.mapPawns.AllPawnsSpawned)
+			var markerCandidates = 0;
+			var flyingPawns = 0;
+			for (var thingIndex = 0; thingIndex < drawThings.Count; thingIndex++)
 			{
-				if (Tools.IsHiddenFromPlayer(pawn))
+				var markerTarget = drawThings[thingIndex];
+				var pawn = MarkerPawnFor(markerTarget);
+				if (pawn == null || markerTarget == null || markerTarget.Spawned == false || markerTarget.Map != map)
 					continue;
-
-				visiblePawns++;
 
 				var decision = MarkerDecisionCache.Get(pawn);
-				var dotConfig = decision.dotConfig;
-				var drawEdge = false;
-				var edgeVector = default(Vector2);
-				if (decision.edgeEnabled)
-				{
-					var (vec, clipped) = ConfinedPoint(new Vector2(pawn.DrawPos.x, pawn.DrawPos.z), viewRect);
-					if (clipped)
-					{
-						drawEdge = true;
-						edgeVector = vec;
-					}
-				}
-
-				if (drawEdge == false && decision.canDrawInsideMarker == false)
+				if (object.ReferenceEquals(decision.markerTarget, markerTarget) == false)
 					continue;
 
-				if (decision.hasMarkerColors == false)
-				{
-					PerfMetrics.Count("dotdrawer.skipped_colorless");
-					continue;
-				}
-
-				var useMarkers = DotTools.GetMarkerColors(pawn, dotConfig, out var innerColor, out var outerColor);
-				if (useMarkers == false)
-					continue;
-
-				var materials = MarkerCache.MaterialFor(pawn, dotConfig, decision.canDrawInsideMarker, drawEdge, drawEdge && observeEdgeUI);
-				if (materials == null)
-					continue;
-
-				if (drawEdge)
-				{
-					var materialClipped = materials.edgeDot;
-					if (materialClipped != null)
-					{
-						var edgeFillColor = DotTools.GetEdgeFillColor(pawn, innerColor);
-						var command = new EdgeDrawCommand(pawn, dotConfig, materials, edgeVector, edgeFillColor, outerColor);
-						edgeDrawBuckets[command.layer].Add(command);
-						edgeDraws++;
-					}
-				}
-
-				if (decision.canDrawInsideMarker == false)
-					continue;
-
-				materials.ApplyColors(innerColor, outerColor);
-
-				Material materialMarker;
-				switch (decision.mode)
-				{
-					case DotStyle.ClassicDots:
-						materialMarker = materials.dot;
-						markerDraws++;
-						DrawMarker(pawn, dotConfig, materialMarker);
-						break;
-					case DotStyle.BetterSilhouettes:
-						materialMarker = materials.silhouette;
-						markerDraws++;
-						DrawMarker(pawn, dotConfig, materialMarker);
-						break;
-					case DotStyle.Custom:
-						materialMarker = materials.custom;
-						if (materialMarker != null)
-						{
-							markerDraws++;
-							DrawMarker(pawn, dotConfig, materialMarker);
-						}
-						break;
-				}
+				markerCandidates++;
+				if (markerTarget is PawnFlyer)
+					flyingPawns++;
+				DrawPawnMarker(pawn, decision, viewRect, observeEdgeUI, ref visiblePawns, ref markerDraws, ref edgeDraws);
 			}
 
 			DrawEdges(clippedMarkerMapScale, viewRect, borderMarkerSize, observeEdgeUI);
 
+			PerfMetrics.Sample("dotdrawer.marker_candidates", markerCandidates);
+			PerfMetrics.Sample("dotdrawer.flying_pawns", flyingPawns);
 			PerfMetrics.Sample("dotdrawer.visible_pawns", visiblePawns);
 			PerfMetrics.Sample("dotdrawer.marker_draws", markerDraws);
 			PerfMetrics.Sample("dotdrawer.edge_draws", edgeDraws);
 			PerfMetrics.FlushIfNeeded();
+		}
+
+		internal static Pawn MarkerPawnFor(Thing markerTarget)
+		{
+			if (markerTarget is Pawn pawn)
+				return pawn;
+			if (markerTarget is PawnFlyer flyer)
+				return flyer.FlyingPawn;
+			return null;
+		}
+
+		internal static bool IsRegisteredDrawable(Map map, Thing thing)
+		{
+			if (map == null || map.Disposed || thing == null || map.dynamicDrawManager?.DrawThings == null)
+				return false;
+
+			var drawThings = map.dynamicDrawManager.DrawThings;
+			for (var i = 0; i < drawThings.Count; i++)
+				if (object.ReferenceEquals(drawThings[i], thing))
+					return true;
+			return false;
+		}
+
+		internal static bool IsMarkerCandidate(Map map, Pawn pawn, Thing markerTarget)
+		{
+			if (pawn == null || markerTarget == null || markerTarget.Spawned == false || markerTarget.Map != map)
+				return false;
+			return object.ReferenceEquals(MarkerPawnFor(markerTarget), pawn)
+				&& IsRegisteredDrawable(map, markerTarget);
+		}
+
+		static void DrawPawnMarker(Pawn pawn, MarkerDecision decision, Rect viewRect, bool observeEdgeUI, ref int visiblePawns, ref int markerDraws, ref int edgeDraws)
+		{
+			if (pawn == null || decision.hidden || decision.markerTarget == null)
+				return;
+
+			visiblePawns++;
+
+			var dotConfig = decision.dotConfig;
+			var drawEdge = false;
+			var edgeVector = default(Vector2);
+			if (decision.edgeEnabled)
+			{
+				var (vec, clipped) = ConfinedPoint(new Vector2(decision.drawPos.x, decision.drawPos.z), viewRect);
+				if (clipped)
+				{
+					drawEdge = true;
+					edgeVector = vec;
+				}
+			}
+
+			if (drawEdge == false && decision.canDrawInsideMarker == false)
+				return;
+
+			if (decision.hasMarkerColors == false)
+			{
+				PerfMetrics.Count("dotdrawer.skipped_colorless");
+				return;
+			}
+
+			var useMarkers = DotTools.GetMarkerColors(pawn, dotConfig, out var innerColor, out var outerColor);
+			if (useMarkers == false)
+				return;
+
+			var materials = MarkerCache.MaterialFor(pawn, dotConfig, decision.canDrawInsideMarker, drawEdge, drawEdge && observeEdgeUI);
+			if (materials == null)
+				return;
+
+			if (drawEdge)
+			{
+				var materialClipped = materials.edgeDot;
+				if (materialClipped != null)
+				{
+					var edgeFillColor = DotTools.GetEdgeFillColor(pawn, innerColor);
+					var command = new EdgeDrawCommand(pawn, dotConfig, materials, edgeVector, edgeFillColor, outerColor);
+					edgeDrawBuckets[command.layer].Add(command);
+					edgeDraws++;
+				}
+			}
+
+			if (decision.canDrawInsideMarker == false)
+				return;
+
+			materials.ApplyColors(innerColor, outerColor);
+
+			Material materialMarker;
+			switch (decision.mode)
+			{
+				case DotStyle.ClassicDots:
+					materialMarker = materials.dot;
+					if (materialMarker != null)
+					{
+						markerDraws++;
+						DrawMarker(pawn, decision.drawPos, dotConfig, materialMarker);
+					}
+					break;
+				case DotStyle.BetterSilhouettes:
+					materialMarker = materials.silhouette;
+					if (materialMarker != null)
+					{
+						markerDraws++;
+						DrawMarker(pawn, decision.drawPos, dotConfig, materialMarker);
+					}
+					break;
+				case DotStyle.Custom:
+					materialMarker = materials.custom;
+					if (materialMarker != null)
+					{
+						markerDraws++;
+						DrawMarker(pawn, decision.drawPos, dotConfig, materialMarker);
+					}
+					break;
+			}
 		}
 
 		static void DrawEdges(Vector3 clippedMarkerMapScale, Rect viewRect, Vector2 borderMarkerSize, bool observeEdgeUI)
@@ -218,16 +280,16 @@ namespace CameraPlus
 			if (pawn.IsColonist)
 				return 0;
 
-			if (pawn.RaceProps.Animal && playerFaction)
+			if (pawn.RaceProps?.Animal == true && playerFaction)
 				return 1;
 
-			if (pawn.IsColonyMechPlayerControlled || pawn.IsPlayerControlled)
+			if (IsPlayerControlled(pawn))
 				return 1;
 
 			if (pawn.HostileTo(Faction.OfPlayer))
 				return 2;
 
-			if (pawn.RaceProps.Animal)
+			if (pawn.RaceProps?.Animal == true)
 				return 4;
 
 			return 3;
@@ -279,25 +341,86 @@ namespace CameraPlus
 		private static void DrawClipped(Vector3 scale, DotConfig dotConfig, float altitute, Vector2 vec, Material materialClipped)
 		{
 			using var measure = PerfMetrics.Measure("DotDrawer.DrawClipped");
+			if (materialClipped == null)
+				return;
+
 			var pos = vec.ToVector3();
 			pos.y = altitute;
 			var matrixClipped = Matrix4x4.TRS(pos, Quaternion.identity, scale * clippedScale * Settings.clippedRelativeSize * (dotConfig?.relativeSize ?? 1f));
 			Graphics.DrawMesh(meshClipped, matrixClipped, materialClipped, 0);
 		}
 
-		private static void DrawMarker(Pawn pawn, DotConfig dotConfig, Material materialMarker)
+		private static void DrawMarker(Pawn pawn, Vector3 drawPos, DotConfig dotConfig, Material materialMarker)
 		{
 			using var measure = PerfMetrics.Measure("DotDrawer.DrawMarker");
-			var q = pawn.Downed ? downedRotation : Quaternion.identity;
-			var posMarker = pawn.Drawer.renderer.GetBodyPos(pawn.DrawPos, pawn.GetPosture(), out _);
-			var isAnimal = pawn.RaceProps.Animal && pawn.Name != null;
-			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && pawn.IsColonistPlayerControlled == false;
-			var drawSize = pawn.Drawer.renderer?.BodyGraphic?.drawSize ?? pawn.DrawSize;
+			if (pawn == null || materialMarker == null)
+				return;
+
+			var q = pawn.health?.Downed == true ? downedRotation : Quaternion.identity;
+			var renderer = pawn.Drawer?.renderer;
+			var posMarker = drawPos;
+			if (renderer != null)
+			{
+				try
+				{
+					posMarker = renderer.GetBodyPos(drawPos, pawn.GetPosture(), out _);
+				}
+				catch (Exception exception)
+				{
+					WarnRendererFallback(pawn, "position", exception, 219675569);
+				}
+			}
+
+			var isAnimal = pawn.RaceProps?.Animal == true && pawn.Name != null;
+			var miscPlayer = isAnimal == false && pawn.Faction == Faction.OfPlayer && IsColonistPlayerControlled(pawn) == false;
+			var drawSize = renderer?.BodyGraphic?.drawSize ?? (miscPlayer ? Vector2.one : SafeDrawSize(pawn));
+			if (IsUsableSize(drawSize) == false)
+				drawSize = Vector2.one;
 			var finalDrawSize = miscPlayer ? 1.5f * drawSize : drawSize;
 			var relativeSize = Settings.dotRelativeSize * (dotConfig?.relativeSize ?? 1f);
+			if (float.IsNaN(relativeSize) || float.IsInfinity(relativeSize))
+				return;
 			var matrixMarker = Matrix4x4.TRS(posMarker, q, Vector3.one * Mathf.Pow((finalDrawSize.x + finalDrawSize.y) / 2, 1 / markerSizeScaler) * markerScale * relativeSize);
 			var mesh = pawn.Rotation == Rot4.West ? meshWest : meshEast;
 			Graphics.DrawMesh(mesh, matrixMarker, materialMarker, 0);
+		}
+
+		static Vector2 SafeDrawSize(Pawn pawn)
+		{
+			try
+			{
+				return pawn.DrawSize;
+			}
+			catch (Exception exception)
+			{
+				WarnRendererFallback(pawn, "draw size", exception, 223257659);
+				return Vector2.one;
+			}
+		}
+
+		static bool IsColonistPlayerControlled(Pawn pawn)
+			=> pawn?.health != null
+			&& pawn.mindState != null
+			&& pawn.IsColonistPlayerControlled;
+
+		static bool IsPlayerControlled(Pawn pawn)
+			=> pawn?.health != null
+			&& pawn.mindState != null
+			&& pawn.IsPlayerControlled;
+
+		static bool IsUsableSize(Vector2 size)
+			=> float.IsNaN(size.x) == false
+			&& float.IsInfinity(size.x) == false
+			&& float.IsNaN(size.y) == false
+			&& float.IsInfinity(size.y) == false
+			&& size.x > 0f
+			&& size.y > 0f;
+
+		static void WarnRendererFallback(Pawn pawn, string operation, Exception exception, int salt)
+		{
+			var typeName = pawn?.GetType().FullName ?? "unknown pawn type";
+			Log.WarningOnce($"CameraPlus could not read the marker {operation} for {typeName}; using a safe fallback: {exception}",
+				Gen.HashCombineInt(typeName.GetHashCode(), salt));
 		}
 	}
 }

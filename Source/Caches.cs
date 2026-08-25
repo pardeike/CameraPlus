@@ -8,6 +8,7 @@ namespace CameraPlus
 {
 	class Caches
 	{
+		static readonly CameraDelegates emptyCameraDelegates = new(null);
 		public static readonly Dictionary<string, Color> cachedMainColors = [];
 		public static readonly Dictionary<Pawn, Color> cachedPawnMainColors = [];
 		public static readonly Dictionary<Type, CameraDelegates> cachedCameraDelegates = [];
@@ -66,6 +67,9 @@ namespace CameraPlus
 		public static CameraDelegates GetCachedCameraDelegate(Pawn pawn)
 		{
 			using var measure = PerfMetrics.Measure("Caches.GetCachedCameraDelegate");
+			if (pawn == null)
+				return emptyCameraDelegates;
+
 			var type = pawn.GetType();
 			if (cachedCameraDelegates.TryGetValue(type, out var result) == false)
 			{

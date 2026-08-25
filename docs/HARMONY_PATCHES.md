@@ -33,16 +33,16 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 
 | Target | File | Patch | Purpose | Risk |
 | --- | --- | --- | --- | --- |
-| `DynamicDrawManager.DrawDynamicThings` | `Main.cs` | Postfix | Draws CameraPlus dots, silhouettes, custom markers, and edge indicators for current map. | Hot path; scans spawned pawns. |
+| `DynamicDrawManager.DrawDynamicThings` | `Main.cs` | Postfix | Draws CameraPlus dots, silhouettes, custom markers, and edge indicators for normally spawned pawns and pawns held by spawned flyers when the patched manager belongs to the current map. | Hot path; scans spawned pawns plus the def-specific lists for spawned flyer types. |
 | `MoteMaker.ThrowText(Vector3, Map, string, Color, float)` | `Main.cs` | Prefix | Suppresses floating text when its independent setting is enabled and the camera is zoomed out, except close mouse-reveal cases. | User-visible feedback can disappear if the setting or zoom check is wrong. |
 | `OverlayDrawer.RenderForbiddenOverlay` | `Main.cs` | Prefix | Hides corpse forbidden overlays when dead pawns are hidden by zoom threshold. | Overlay suppression can hide information. |
 | `GenMapUI.DrawThingLabel(Vector2, string, Color)` | `Main.cs` | Prefix and transpiler | Hides thing labels by zoom/mouse rules and uses larger fonts when heavily zoomed in. | Label visibility and font selection. |
 | `PawnRenderer.RenderPawnAt(Vector3, Rot4?, bool)` | `DotTools.cs` | Prefix | Suppresses vanilla pawn body draw when a marker should replace it. | Very hot; incorrect decision hides pawns. |
-| `Vehicles.VehicleRenderer:RenderPawnAt` | `DotTools.cs` | Reflection target, Prefix | Same body suppression for Vehicle Framework pawns when present. | Optional mod API shape. |
-| `SelectionDrawer.DrawSelectionBracketFor` | `DotTools.cs` | Prefix | Suppresses vanilla selection brackets when marker should replace pawn rendering. | Selection readability. |
+| `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt` | `DotTools.cs` | Reflection target, Prefix | Suppresses the Vehicle Framework body during `DrawPhase.Draw` when a marker replaces it, while leaving the framework's surrounding pawn draw method active. | Optional mod API and private-field shape; `Prepare` verifies both before patching. |
+| `SelectionDrawer.DrawSelectionBracketFor` | `DotTools.cs` | Prefix | Suppresses ordinary selection brackets when a marker replaces pawn rendering, but preserves calls with a caller-supplied material. | Selection readability and third-party selection semantics. |
 | `PawnUIOverlay.DrawPawnGUIOverlay` | `DotTools.cs` | Prefix | Suppresses pawn GUI overlay for marker-rendered pawns. | Name/status overlays can disappear. |
 | `SilhouetteUtility.ShouldDrawSilhouette` | `DotTools.cs` | Prefix | Prevents vanilla silhouettes when CameraPlus markers are active or explicitly off. | Interaction with RimWorld silhouette cache. |
-| `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides spawned pawn labels by marker/zoom/mouse rules, while passing through external label calls for unspawned pawns such as those held by flyers. | Hot label path; `truncateToWidth == 9999f` guard matters. |
+| `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides pawn labels by marker/zoom/mouse rules for normally spawned pawns and pawns represented by a spawned flyer; calls for pawns CameraPlus cannot represent pass through. | Hot label path; `truncateToWidth == 9999f` guard matters. |
 
 ## Edge Marker Interface Clearance
 

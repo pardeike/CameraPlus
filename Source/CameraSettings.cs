@@ -12,7 +12,7 @@ namespace CameraPlus
 	{
 		public static void Postfix(World __instance)
 		{
-			CameraSettings.settings = __instance.GetComponent<CameraSettings>();
+			CameraSettings.settings = __instance?.GetComponent<CameraSettings>();
 			Caches.ClearMarkerState();
 		}
 	}
@@ -51,7 +51,9 @@ namespace CameraPlus
 			var filePath = Tools.DefaultRulesFilePath;
 			if (File.Exists(filePath) == false)
 				Tools.SaveDotConfigs(filePath, defaultDefaultConfig);
-			defaultConfig = Tools.LoadDotConfigs(filePath);
+			defaultConfig = Tools.LoadDotConfigs(filePath) ?? [];
+			defaultConfig.RemoveAll(dotConfig => dotConfig == null);
+			defaultConfig.ForEach(dotConfig => dotConfig.NormalizeValues());
 			if (RuleMigrations.MigrateKnownDefaults(defaultConfig))
 				Tools.SaveDotConfigs(filePath, defaultConfig);
 		}
@@ -61,6 +63,8 @@ namespace CameraPlus
 			base.ExposeData();
 			Scribe_Collections.Look(ref dotConfigs, "dotConfigs", LookMode.Deep);
 			dotConfigs ??= [.. defaultConfig];
+			dotConfigs.RemoveAll(dotConfig => dotConfig == null);
+			dotConfigs.ForEach(dotConfig => dotConfig.NormalizeValues());
 			RuleMigrations.MigrateKnownDefaults(dotConfigs);
 		}
 	}

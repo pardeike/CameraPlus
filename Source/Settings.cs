@@ -126,7 +126,9 @@ namespace CameraPlus
 		static List<DotConfig> CurrentDotConfigs()
 		{
 			var isInGame = Current.Game != null;
-			return isInGame ? CameraSettings.settings.dotConfigs : CameraSettings.defaultConfig;
+			return isInGame
+				? CameraSettings.settings?.dotConfigs ?? CameraSettings.defaultConfig
+				: CameraSettings.defaultConfig;
 		}
 
 		public override void ExposeData()
@@ -145,6 +147,8 @@ namespace CameraPlus
 			Scribe_Values.Look(ref disableCameraShake, "disableCameraShake", defaults.disableCameraShake);
 			Scribe_Values.Look(ref soundNearness, "soundNearness", defaults.soundNearness);
 			Scribe_Values.Look(ref dotStyle, "dotStyle", defaults.dotStyle);
+			if (Scribe.mode == LoadSaveMode.PostLoadInit)
+				dotStyle = DotConfig.NormalizeMode(dotStyle);
 			Scribe_Values.Look(ref dotSize, "dotSize", defaults.dotSize);
 			Scribe_Values.Look(ref hidePawnLabelBelow, "hidePawnLabelBelow", defaults.hidePawnLabelBelow);
 			Scribe_Values.Look(ref hideThingLabelBelow, "hideThingLabelBelow", defaults.hideThingLabelBelow);
@@ -193,7 +197,7 @@ namespace CameraPlus
 		}
 
 		static int RuleCount(Func<DotConfig, bool> predicate)
-			=> CurrentDotConfigs().Count(dc => predicate(dc));
+			=> CurrentDotConfigs().Count(dc => dc != null && predicate(dc));
 
 		static string OverrideNote(int n)
 		{

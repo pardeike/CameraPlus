@@ -7,14 +7,14 @@ This document lists the runtime areas most likely to matter in the upcoming perf
 `DynamicDrawManager.DrawDynamicThings` postfix:
 
 - Calls `DotDrawer.DrawDots(map)` during dynamic drawing.
-- Enumerates `map.mapPawns.AllPawnsSpawned`.
+- Enumerates `map.dynamicDrawManager.DrawThings` and filters it to registered pawn and pawn-flyer marker candidates.
 - Performs hidden/fog filtering, rule lookup, color lookup, material lookup, edge marker math, and mesh draw calls.
 - This is the first place to profile on large colonies, animal-heavy maps, raids, and vehicle-heavy maps.
 
 Pawn and label suppression prefixes:
 
 - `PawnRenderer.RenderPawnAt`
-- `Vehicles.VehicleRenderer:RenderPawnAt`
+- `Vehicles.Rendering.VehicleRenderer.DynamicDrawPhaseAt`
 - `SelectionDrawer.DrawSelectionBracketFor`
 - `PawnUIOverlay.DrawPawnGUIOverlay`
 - `SilhouetteUtility.ShouldDrawSilhouette`
@@ -43,7 +43,7 @@ Settings and editor UI:
 
 `FastUI` is frame-scoped and avoids repeating RimWorld UI coordinate calls in the same frame.
 
-`MarkerDecisionCache` is frame-scoped and stores one marker decision per pawn `thingIDNumber`. It shares the expensive decision work between the dynamic draw postfix and vanilla-rendering suppression prefixes.
+`MarkerDecisionCache` is frame-scoped and stores one marker decision per pawn reference. It shares the expensive decision work between the dynamic draw postfix and vanilla-rendering suppression prefixes without allowing temporary pawn identifiers to collide.
 
 `Caches.dotConfigCache` is quota-based. Each cached entry is refreshed after 60 retrievals, not by tick or frame. Entries are mutable so repeated hits do not replace dictionary values just to increment the retrieval count. This can reduce repeated rule scans but can also keep stale rule decisions briefly after state changes.
 
@@ -71,7 +71,7 @@ Likely candidates to verify with profiling:
 
 Verified during the 2026-05-15 prep pass:
 
-- Removed LINQ allocation from `DotDrawer.DrawDots()` by iterating `map.mapPawns.AllPawnsSpawned` directly.
+- Removed LINQ allocation from `DotDrawer.DrawDots()` by iterating RimWorld's registered dynamic drawables directly.
 - Reused the already-fetched `DotConfig` through marker color/material paths.
 - Changed quota-cache hits to mutate cache entries instead of replacing dictionary values every request.
 - Cached per-material marker colors so `_FillColor` and `_OutlineColor` are only set when the colors change.

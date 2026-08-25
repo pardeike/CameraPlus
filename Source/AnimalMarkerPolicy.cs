@@ -38,8 +38,12 @@ namespace CameraPlus
 
 			var isNamed = pawn.Name != null;
 			var isPlayerFaction = pawn.Faction?.IsPlayer ?? false;
-			var included = Settings.customNameStyle != LabelStyle.HideAnimals
-				&& (Settings.includeNotTamedAnimals || isNamed || isPlayerFaction);
+			var settings = Settings;
+			if (settings == null)
+				return new AnimalMarkerPolicy(true, isNamed, isPlayerFaction, true, true, false, false);
+
+			var included = settings.customNameStyle != LabelStyle.HideAnimals
+				&& (settings.includeNotTamedAnimals || isNamed || isPlayerFaction);
 
 			return new AnimalMarkerPolicy(
 				true,
@@ -47,8 +51,8 @@ namespace CameraPlus
 				isPlayerFaction,
 				included,
 				included,
-				included && Settings.customNameStyle == LabelStyle.AnimalsDifferent,
-				included && Settings.pawnColoredEdgeIndicators);
+				included && settings.customNameStyle == LabelStyle.AnimalsDifferent,
+				included && settings.pawnColoredEdgeIndicators);
 		}
 	}
 }
