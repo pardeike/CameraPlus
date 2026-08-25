@@ -42,7 +42,7 @@ This inventory is grouped by subsystem. It covers all current Harmony patches in
 | `SelectionDrawer.DrawSelectionBracketFor` | `DotTools.cs` | Prefix | Suppresses vanilla selection brackets when marker should replace pawn rendering. | Selection readability. |
 | `PawnUIOverlay.DrawPawnGUIOverlay` | `DotTools.cs` | Prefix | Suppresses pawn GUI overlay for marker-rendered pawns. | Name/status overlays can disappear. |
 | `SilhouetteUtility.ShouldDrawSilhouette` | `DotTools.cs` | Prefix | Prevents vanilla silhouettes when CameraPlus markers are active or explicitly off. | Interaction with RimWorld silhouette cache. |
-| `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides pawn labels by marker/zoom/mouse rules. | Hot label path; `truncateToWidth == 9999f` guard matters. |
+| `GenMapUI.DrawPawnLabel(Pawn, Vector2, float, float, Dictionary<string,string>, GameFont, bool, bool)` | `DotTools.cs` | Prefix | Hides spawned pawn labels by marker/zoom/mouse rules, while passing through external label calls for unspawned pawns such as those held by flyers. | Hot label path; `truncateToWidth == 9999f` guard matters. |
 
 ## Edge Marker Interface Clearance
 

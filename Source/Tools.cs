@@ -235,6 +235,10 @@ namespace CameraPlus
 				return FastUI.CurUICellSize > Settings.hideThingLabelBelow;
 			}
 
+			// CameraPlus cannot draw a replacement marker for pawns held by PawnFlyer or another container.
+			if (pawn.Spawned == false)
+				return true;
+
 			var decision = MarkerDecisionCache.Get(pawn);
 			if (decision.hidden)
 				return false;

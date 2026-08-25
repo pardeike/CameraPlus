@@ -261,6 +261,7 @@ namespace CameraPlus.BridgeTools
 
 				animal = SpawnAnimalFixture(map, pawn.Position);
 				var animalPolicyLeavesVanillaLabel = false;
+				var unspawnedPawnLabelPassesThrough = false;
 				if (animal != null)
 				{
 					settings.customNameStyle = LabelStyle.HideAnimals;
@@ -269,6 +270,10 @@ namespace CameraPlus.BridgeTools
 					SetRules(worldSettings, new[] { ruleMarker });
 					var decision = MarkerDecision.For(animal, ruleMarker);
 					animalPolicyLeavesVanillaLabel = decision.defaultShow == false && decision.suppressVanilla == false && Tools.ShouldShowLabel(animal);
+
+					animal.DeSpawn(DestroyMode.WillReplace);
+					Caches.ClearMarkerState();
+					unspawnedPawnLabelPassesThrough = animal.Spawned == false && Tools.ShouldShowLabel(animal);
 				}
 
 				var success = globalVanillaShows
@@ -279,7 +284,8 @@ namespace CameraPlus.BridgeTools
 					&& independentThresholdHides
 					&& aboveThresholdShows
 					&& missingCustomShows
-					&& animalPolicyLeavesVanillaLabel;
+					&& animalPolicyLeavesVanillaLabel
+					&& unspawnedPawnLabelPassesThrough;
 
 				return new ValidationCase(success, new
 				{
@@ -293,7 +299,8 @@ namespace CameraPlus.BridgeTools
 					independentThresholdHides,
 					aboveThresholdShows,
 					missingCustomShows,
-					animalPolicyLeavesVanillaLabel
+					animalPolicyLeavesVanillaLabel,
+					unspawnedPawnLabelPassesThrough
 				});
 			}
 			finally
