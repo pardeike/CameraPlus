@@ -85,3 +85,15 @@ For detailed configuration, use the in-game settings menu and its help panel.
 
 Powered by [Harmony](https://github.com/pardeike/Harmony)
 The runtime patch library for Unity
+
+## Performance
+
+Camera+ has been tuned for busy late-game maps. In a deliberately extreme
+962-pawn test measured with
+[Dubs Performance Analyzer](https://steamcommunity.com/sharedfiles/filedetails/?id=2038874626),
+the optimized marker renderer was **56% faster** than before. Across six
+balanced stress-test runs, 2× through 4× simulation speed stayed within normal
+run-to-run variation of vanilla pawn rendering; at 1×, drawing the full
+marker-heavy scene cost about four ticks per second.
+
+[Read the full Camera+ performance test report](docs/PERFORMANCE.md).
