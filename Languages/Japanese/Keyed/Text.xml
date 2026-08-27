@@ -34,6 +34,7 @@
   <ZoomToMouse>マウスにズーム</ZoomToMouse>
   <DisableCameraShake>カメラの揺れを無効にする</DisableCameraShake>
   <MouseRevealsLabels>マウスがラベルを表示する{0}</MouseRevealsLabels>
+  <SuppressFloatingText>ズームアウト時にフローティングテキストを非表示</SuppressFloatingText>
   <EdgeIndicators>エッジインジケーター{0}</EdgeIndicators>
   <IndentVanillaUIForEdgeMarkers>エッジマーカーとRimWorldのUIを重ねない</IndentVanillaUIForEdgeMarkers>
   <PawnColoredEdgeIndicators>動物のエッジ色</PawnColoredEdgeIndicators>
@@ -72,6 +73,8 @@
   <SettingsNote_OverriddenByRules>{0}つのルールで上書きされます.</SettingsNote_OverriddenByRules>
   <SettingsNote_RequiresCameraMarkers>Camera+のマーカースタイルが必要です.</SettingsNote_RequiresCameraMarkers>
   <SettingsNote_RequiresEdgeIndicators>エッジインジケーターが必要です.</SettingsNote_RequiresEdgeIndicators>
+  <SettingsNote_ShortcutDisabled>無効：少なくとも1つのModを選択してください.</SettingsNote_ShortcutDisabled>
+  <SettingsNote_LoadSaveShortcutConflict>読み込みと保存には同じModが使用されます.</SettingsNote_LoadSaveShortcutConflict>
   <SettingsHelp_RuleOverrideByRule>現在,一致するルールがこの設定に独自の値を使っています.そのルールに一致するポーンはルールに従い,一致しないポーンはこの設定を使います.</SettingsHelp_RuleOverrideByRule>
   <SettingsHelp_RuleOverrideByRules>現在,{0}個の一致するルールがこの設定に独自の値を使っています.それらのルールに一致するポーンはルールに従い,一致しないポーンはこの設定を使います.</SettingsHelp_RuleOverrideByRules>
   <SettingsHelp_RuleMarkerStyleByRule>現在,一致するルールが別のマーカースタイルを選んでいます.そのルールは一致するポーンをバニラ描画,ドット,シルエット,カスタムマーカー,またはマーカーなしに切り替えられます.この設定は他のポーンの既定値です.</SettingsHelp_RuleMarkerStyleByRule>
@@ -91,12 +94,12 @@
   <SettingsHelp_Movement>近いズームと遠いズームでは,パン移動や画面端スクロールの感触が変わります.そのためCamera+では別々に調整できます.&#10;&#10;これらの値は現在のズーム範囲全体に適用されます.先にズーム範囲を変えた場合,端点の感触が悪い時だけ戻って調整してください.</SettingsHelp_Movement>
   <SettingsHelp_Audio>RimWorldはカメラ位置を基準にワールド音を配置します.極端にズームアウトすると,見た目は便利でも音が遠すぎることがあります.&#10;&#10;これは音声リスナーだけを調整します.カメラに映る内容は変わりません.</SettingsHelp_Audio>
   <SettingsHelp_Camera>プレイ中に適用される小さなカメラ動作の切り替えです.ラベルやマーカールールとは独立しているため,ポーンマーカーのスタイルは変わりません.</SettingsHelp_Camera>
-  <SettingsHelp_Labels>Camera+はポーンが画面上で小さくなった時にラベルを隠し,必要に応じてマウス近くで表示できます.&#10;&#10;これらの項目はCamera+マーカースタイルに依存します.ポーンがマーカーになると通常ラベルが不要になるため,マーカーしきい値でもラベルが隠れることがあります.</SettingsHelp_Labels>
-  <SettingsHelp_Markers>低ズーム時に,ポーン本体の代わりにCamera+が何を描くかを選びます.&#10;&#10;これらは一致ルールのないポーンの既定値です.下のラベルとマーカーしきい値の項目が有効かどうかも決めます.</SettingsHelp_Markers>
+  <SettingsHelp_Labels>Camera+はポーンが画面上で小さくなった時にラベルを隠し,必要に応じてマウス近くで表示できます.&#10;&#10;これらの項目は有効なマーカースタイルのルールに依存します.スタックにはポーン固有のルールがないため,スタックのラベル表示設定にはグローバルな「Camera+」マーカースタイルが必要となります.</SettingsHelp_Labels>
+  <SettingsHelp_Markers>低ズーム時に,ポーン本体の代わりにCamera+が何を描くかを選びます.&#10;&#10;これらは一致ルールのないポーンの既定値です.ルールが適用されるポーンについては,そのルールに従ってマーカーの置き換えやポーンのラベル表示が行われます.</SettingsHelp_Markers>
   <SettingsHelp_Animals>コロニーの動物,野生動物,名前付きペットは必要な表示が違うことが多いため,動物の既定値は分けています.&#10;&#10;この方針は動物マーカールールより先に適用されます.ここで除外された動物には,動物ルールでスタイルを設定できません.</SettingsHelp_Animals>
-  <SettingsHelp_Edges>端インジケーターは画面外のポーンを画面端に表示します.マップ内のシルエットやドットとは別なので,マップ内マーカーの動作が違っても端マーカーだけ表示できます.&#10;&#10;下の動物色オプションは,端インジケーターが有効な時だけ意味があります.</SettingsHelp_Edges>
+  <SettingsHelp_Edges>端インジケーターは画面外のポーンを画面端に表示します.マップ内のシルエットやドットとは別なので,マップ内マーカーの動作が違っても端マーカーだけ表示できます.&#10;&#10;マッチング・ルールを使用すると,グローバル・スイッチとは独立してエッジを有効または無効にすることができます.</SettingsHelp_Edges>
   <SettingsHelp_Appearance>マーカースタイルを選んだ後で,マーカーサイズ,端の位置,アウトライン幅を微調整します.&#10;&#10;サイズとアウトラインは一致ルールでも調整できます.ルールサイズは倍率で,ルールのアウトライン幅は全体値を置き換えます.</SettingsHelp_Appearance>
-  <SettingsHelp_Shortcuts>別ウィンドウを開かず,ここでCamera+のキー組み合わせを設定します.&#10;&#10;修飾キー枠は空でもかまいません.ビュー枠は常に数字キー1から9を使います.</SettingsHelp_Shortcuts>
+  <SettingsHelp_Shortcuts>別ウィンドウを開かず,ここでCamera+のキー組み合わせを設定します.&#10;&#10;どちらの修飾キー用の枠は空でも問題ありませんが,両方を空にするとそのショートカットは無効になります.</SettingsHelp_Shortcuts>
   <SettingsHelp_Advanced>ルールは列が多く,メイン設定一覧より横幅が必要なため,専用エディターに残しています.</SettingsHelp_Advanced>
   <SettingsHelp_ZoomRange>Camera+が許可する最近接と最遠の視覚ズームを決めます.&#10;&#10;範囲を広げると自由度は上がりますが,遠いズームでは1フレームに見えるポーン,物,マーカーが増えます.移動速度と画面端スクロールの端点もこの範囲を使います.</SettingsHelp_ZoomRange>
   <SettingsHelp_ZoomCurve>ホイールが最近接から最遠までどう移動するかを制御します.&#10;&#10;予測しやすい動きには平坦な曲線を,範囲の片端で細かく操作したい場合は強い曲線を使います.</SettingsHelp_ZoomCurve>
@@ -118,27 +121,28 @@
   <SettingsHelp_Exponentiality>オフではより平坦で線形のズーム感になります.高い値ではホイール反応が変わり,範囲の片端で細かく,もう片端で速く動きます.</SettingsHelp_Exponentiality>
   <SettingsHelp_ZoomedInDollyPercent>最近接ズーム端点付近でのカメラ移動速度です.&#10;&#10;近くを調べる時に敏感すぎるなら下げます.近距離移動が重いなら上げます.端点自体はズーム範囲で設定します.</SettingsHelp_ZoomedInDollyPercent>
   <SettingsHelp_ZoomedOutDollyPercent>最遠ズーム端点付近でのカメラ移動速度です.&#10;&#10;ズームアウト時にマップ横断が遅いなら上げます.小さな入力で飛びすぎるなら下げます.端点自体はズーム範囲で設定します.</SettingsHelp_ZoomedOutDollyPercent>
-  <SettingsHelp_ZoomedInEdgeScroll>最近接ズーム端点付近での画面端スクロールです.&#10;&#10;ポーンや建物を調べる時に画面端を使うなら控えめにします.端点自体はズーム範囲で設定します.</SettingsHelp_ZoomedInEdgeScroll>
-  <SettingsHelp_ZoomedOutEdgeScroll>最遠ズーム端点付近での画面端スクロールです.&#10;&#10;主に長距離のマップ移動用なので,近いズーム値より高くしても問題ないことが多いです.端点自体はズーム範囲で設定します.</SettingsHelp_ZoomedOutEdgeScroll>
-  <SettingsHelp_ZoomToMouse>ズーム中,カーソル下のマップ位置を安定させます.&#10;&#10;特定のポーン,建物,出来事を何度も再中央化せず調べやすくなります.</SettingsHelp_ZoomToMouse>
+  <SettingsHelp_ZoomedInEdgeScroll>最も近いズーム端点付近での画面端スクロールにおける通常の移動速度の倍率.&#10;&#10;これを0xに設定すると,キーボード移動を変更せずに近距離ズーム時の画面端スクロールを無効にします.</SettingsHelp_ZoomedInEdgeScroll>
+  <SettingsHelp_ZoomedOutEdgeScroll>最も遠いズーム端点付近での画面端スクロールにおける通常の移動速度の倍率.&#10;&#10;これを0xに設定すると,キーボード移動を変更せずに遠距離ズーム時の画面端スクロールを無効にします.</SettingsHelp_ZoomedOutEdgeScroll>
+  <SettingsHelp_ZoomToMouse>ズーム中にカーソル下のマップ位置を固定します.ズーム中にShiftキーを押し続けるとこの動作を回避し,カメラの中心を基準にズームします.&#10;&#10;これにより,カメラを何度も中央に戻さなくても,特定のポーン,建物,またはイベントを簡単に確認できます.</SettingsHelp_ZoomToMouse>
   <SettingsHelp_DisableCameraShake>バニラのカメラ揺れイベントを抑制します.&#10;&#10;これはカメラ移動だけに影響します.ワールド内に描かれる視覚効果は消しません.</SettingsHelp_DisableCameraShake>
   <SettingsHelp_SoundNearness>音声リスナーをRimWorldの近距離カメラ音位置へ戻すように混ぜます.&#10;&#10;ズームアウト中に近くの出来事が遠く聞こえすぎる時に上げます.</SettingsHelp_SoundNearness>
-  <SettingsHelp_MouseRevealsLabels>ズームでラベルが隠れている時,マウス近くのラベルを一時的に戻せます.&#10;&#10;ポーンマーカーでは,カーソル下のポーンがマーカーに置き換わらないようにもなり,素早い確認が自然になります.</SettingsHelp_MouseRevealsLabels>
-  <SettingsHelp_HidePawnLabelBelow>マップセルが画面上でこのピクセル数より小さくなると,ポーンラベルを隠します.&#10;&#10;高い値ほどズームアウト時に早く隠します.「このサイズ以下でマーカー表示」がポーン本体をマーカーに置き換え始めた時にも,ポーンラベルは消えることがあります.</SettingsHelp_HidePawnLabelBelow>
+  <SettingsHelp_MouseRevealsLabels>ズームでラベルが隠れている時,マウス付近のラベルを一時的に再表示できます.&#10;&#10;ポーンについては,一致するルールのマウス再表示値がこのデフォルト設定より優先され,そのポーンがマーカーに置き換えられるのも防ぎます.</SettingsHelp_MouseRevealsLabels>
+  <SettingsHelp_SuppressFloatingText>RimWorldの最も近いズームレベル以外では,マップ上の一般的なフローティングテキストを非表示にします.これには静的なラベルだけでなく,ダメージやイベントテキストなどの一時的なフィードバックも含まれます.&#10;&#10;「マウスでラベルを再表示」オプションを有効にすると,抑制中でも近くのフローティングテキストが再表示されます.すべてのフローティングフィードバックを表示したままにするには,これをオフにしてください.</SettingsHelp_SuppressFloatingText>
+  <SettingsHelp_HidePawnLabelBelow>マップセルが画面上でこのピクセル数より小さくなると,ポーンのラベルが非表示になります.&#10;&#10;このしきい値はマーカーのスタイルとは独立しています.また,有効なグローバルルールまたは一致するルールのマーカーがポーン本体に置き換わっている間も,ポーンのラベルは非表示になります.</SettingsHelp_HidePawnLabelBelow>
   <SettingsHelp_HideThingLabelBelow>マップセルが画面上でこのピクセル数より小さくなると,スタックラベルを隠します.&#10;&#10;遠いズームでアイテムラベルが画面を占める場合は高い値にします.Camera+マーカー描画が有効な間は,ポーンのマーカースタイルとは独立しています.</SettingsHelp_HideThingLabelBelow>
   <SettingsHelp_HideDeadPawnsBelow>このセルサイズ以下で死体の描画を隠します.&#10;&#10;戦闘後の視覚的な散らかりを減らしつつ,生きているポーンのマーカーを読みやすく保てます.マーカースタイルではなく遠距離ズームのノイズを減らす設定なので,ラベル表示に含まれています.</SettingsHelp_HideDeadPawnsBelow>
   <SettingsHelp_DotStyle>低ズーム時にCamera+がポーン本体を置き換える既定方法を選びます.&#10;&#10;この設定は,依存するラベルとマーカーしきい値項目が有効かどうかも制御します.ルールで処理されないポーンの既定スタイルを選んでください.</SettingsHelp_DotStyle>
   <SettingsHelp_ShowMarkerBelow>Camera+がポーン本体をマーカーに置き換え始める画面セルサイズです.&#10;&#10;高い値ほど早くマーカーに切り替わり,低い値ほど完全なポーン本体を長く表示します.置換が始まると,マウス表示で戻らない限り通常ポーンラベルは隠れます.</SettingsHelp_ShowMarkerBelow>
   <SettingsHelp_AnimalMarkerStyle>動物の既定マーカー系列を選びます.&#10;&#10;未調教動物オプションと組み合わせて,野生動物を見せるか,控えめにするか,既定マーカーから消すかを決めます.動物を隠すと,動物ルールも適用されません.</SettingsHelp_AnimalMarkerStyle>
   <SettingsHelp_IncludeNotTamedAnimals>名前のない野生動物を既定の動物マーカー処理に含めます.&#10;&#10;野生動物がマーカーを散らかす,または遠いズームで負荷になるマップではオフにします.動物方針が動物を隠す場合,実質的な効果はありません.</SettingsHelp_IncludeNotTamedAnimals>
-  <SettingsHelp_AnimalEdgeColors>有効にすると,動物の端インジケーターが白一色ではなくポーン色に従えます.&#10;&#10;端インジケーターが必要です.主に塗り色が透明な動物ルールを変えます.明示的な塗り色があるルールはその塗りを保ちます.</SettingsHelp_AnimalEdgeColors>
+  <SettingsHelp_AnimalEdgeColors>有効にすると,動物のエッジインジケーターは無地のままではなく,ポーンの色に合わせることができます.&#10;&#10;これは,グローバルに有効化されたエッジ,または一致するルールによって有効化されたエッジに適用されます.明示的な塗りつぶし色が指定されたルールでは,その塗りつぶし色が維持されます.</SettingsHelp_AnimalEdgeColors>
   <SettingsHelp_DotSilhouetteSize>マップ内のドットとシルエットを拡大縮小します.&#10;&#10;マーカーは読めるが地形や建物に対して強すぎる,または小さすぎる時に使います.一致ルールは自分のポーンにこのサイズをさらに掛けられます.</SettingsHelp_DotSilhouetteSize>
   <SettingsHelp_EdgeDotSize>画面外の端インジケーターを拡大縮小します.&#10;&#10;端からの距離は変えず,マーカー自体のサイズだけを変えます.一致ルールはマップ内マーカーと同じルールサイズ値でこのサイズを掛けられます.</SettingsHelp_EdgeDotSize>
   <SettingsHelp_EdgeDistanceFactor>端インジケーターを画面端に近づける,または遠ざけます.&#10;&#10;マーカーがUIや画面端に近すぎる場合は上げ,マップ表示内へ入りすぎる場合は下げます.</SettingsHelp_EdgeDistanceFactor>
   <SettingsHelp_OutlineSize>Camera+マーカー周囲のアウトライン幅を変えます.&#10;&#10;強いアウトラインは混雑した地形でのコントラストを上げますが,密集した集団は重く見えます.一致ルールはこの全体値の代わりに独自のアウトライン幅を使えます.</SettingsHelp_OutlineSize>
-  <SettingsHelp_SettingsShortcut>一番右のボタンが設定の主キーです.左側のボタンは任意の修飾キーです.&#10;&#10;主キーを左クリックするとキーを取得します.右クリックで割り当てをリセットまたは消去します.</SettingsHelp_SettingsShortcut>
-  <SettingsHelp_LoadShortcut>選択した修飾キーを押している間,保存済みカメラビュー1から9を読み込みます.&#10;&#10;数字キーは固定なので,プレイ中に素早く使えます.</SettingsHelp_LoadShortcut>
-  <SettingsHelp_SaveShortcut>選択した修飾キーを押している間,現在のカメラビューをスロット1から9へ保存します.&#10;&#10;誤保存を避けるため,読み込みとは別の修飾キー組み合わせを使ってください.</SettingsHelp_SaveShortcut>
+  <SettingsHelp_SettingsShortcut>一番右のボタンがメイン設定キーです.その左側のボタンは修飾キーです.両方をクリアすると,修飾キーなしの割り当てが作成されるのではなく,ショートカットが無効になります.&#10;&#10;メインキーを左クリックするとキーを取得します.右クリックすると割り当てをリセットまたはクリアします.</SettingsHelp_SettingsShortcut>
+  <SettingsHelp_LoadShortcut>選択した修飾キーを押している間,保存されたカメラビュー1から9を読み込みます.両方の修飾キーをクリアすると,読み込みが無効になります.&#10;&#10;読み込みと保存には異なる修飾キーを使用してください.同じ修飾キーにすると,読み込みが先に実行され,既存のスロットが現在のビューを置き換えてから保存されます.</SettingsHelp_LoadShortcut>
+  <SettingsHelp_SaveShortcut>選択した修飾キーを押している間,現在のカメラビューをスロット1から9に保存します.両方の修飾キーをクリアすると,保存が無効になります.&#10;&#10;ビューの保存を意図的に行えるよう,読み込みとは異なる修飾キーを使用してください.</SettingsHelp_SaveShortcut>
   <KeyLeftShift>左Shift</KeyLeftShift>
   <KeyLeftAlt>左Alt</KeyLeftAlt>
   <KeyLeftControl>左Ctrl</KeyLeftControl>
